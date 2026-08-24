@@ -4,6 +4,10 @@ import { MasterService } from '../../service/master.service';
 import { CalendarViewComponent } from '../../components/calendar-view/calendar-view.component';
 import { TimelineViewComponent } from '../../components/timeline-view/timeline-view.component';
 import { GanttViewComponent } from '../../components/gantt-view/gantt-view.component';
+import {
+  ListSkeletonComponent,
+  StatPillSkeletonComponent,
+} from '@/app/components/ui/list-skeleton.component';
 
 export interface IScheduleData {
   milestones: IMilestone[];
@@ -59,6 +63,8 @@ export interface IProjectTimeline {
     CalendarViewComponent,
     TimelineViewComponent,
     GanttViewComponent,
+    ListSkeletonComponent,
+    StatPillSkeletonComponent,
   ],
   templateUrl: './calendar-timeline.component.html',
   styleUrls: ['./calendar-timeline.component.css'],
@@ -164,7 +170,14 @@ export class CalendarTimelineComponent implements OnInit {
   }
 
   loadScheduleData(): void {
-    this.loadingSignal.set(true);
+    const snapshot = this.masterService.peekSchedule() as IScheduleData | null;
+    if (snapshot) {
+      this.scheduleDataSignal.set(snapshot);
+      this.loadingSignal.set(false);
+    } else {
+      this.loadingSignal.set(true);
+    }
+
     this.masterService.getScheduleData().subscribe({
       next: (data: IScheduleData) => {
         this.scheduleDataSignal.set(data);

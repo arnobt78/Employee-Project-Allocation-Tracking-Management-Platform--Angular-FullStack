@@ -16,7 +16,6 @@
 - **Security:** Private reports → [SECURITY.md](./SECURITY.md) · [contact@arnobmahmud.com](mailto:contact@arnobmahmud.com)
 - **Author:** [Arnob Mahmud](https://www.arnobmahmud.com/) | **LinkedIn:** [https://www.linkedin.com/in/arnob-mahmud-05839655/](https://www.linkedin.com/in/arnob-mahmud-05839655/) | **GitHub:** [https://github.com/arnobt78](https://github.com/arnobt78)
 
-![Screenshot 2025-11-14 at 13 48 27](https://github.com/user-attachments/assets/dfdaa904-17fd-41b4-94aa-4c026a2de616)
 ![Screenshot 2025-11-14 at 13 48 50](https://github.com/user-attachments/assets/53dd3108-4449-4b3d-b359-7a64abd04323)
 ![Screenshot 2025-11-14 at 13 49 18](https://github.com/user-attachments/assets/c9f226bf-3606-4554-a69a-dffdf6e39a27)
 ![Screenshot 2025-11-14 at 13 49 37](https://github.com/user-attachments/assets/148ca789-8ff1-4b28-9524-487a879778b3)

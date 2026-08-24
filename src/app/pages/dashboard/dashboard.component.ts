@@ -52,13 +52,43 @@ export class DashboardComponent implements OnInit {
   }
 
   private loadPageData(): void {
-    this.isLoading.set(true);
+    const dashboardSnap = this.masterService.peekDashboard();
+    const departmentsSnap = this.masterService.peekDepartments();
+    const projectsSnap = this.masterService.peekProjects();
+    const employeesSnap = this.masterService.peekEmployees();
+    const projectEmployeesSnap = this.masterService.peekProjectEmployees();
 
-    let dashboardLoaded = false;
-    let departmentsLoaded = false;
-    let projectsLoaded = false;
-    let employeesLoaded = false;
-    let projectEmployeesLoaded = false;
+    const seededFromCache = dashboardSnap != null;
+
+    if (dashboardSnap) {
+      this.dashboardData = dashboardSnap as DashboardSnapshot;
+    }
+    if (departmentsSnap) {
+      this.applyDepartments(departmentsSnap);
+    }
+    if (projectsSnap) {
+      this.projects = projectsSnap;
+    }
+    if (employeesSnap) {
+      this.employees = employeesSnap;
+    }
+    if (projectEmployeesSnap) {
+      this.projectEmployees = projectEmployeesSnap;
+    }
+    if (projectsSnap && employeesSnap && projectEmployeesSnap) {
+      this.calculateProjectStatistics();
+    }
+
+    this.isLoading.set(!seededFromCache);
+    if (seededFromCache) {
+      this.hasLoaded.set(true);
+    }
+
+    let dashboardLoaded = dashboardSnap != null;
+    let departmentsLoaded = departmentsSnap != null;
+    let projectsLoaded = projectsSnap != null;
+    let employeesLoaded = employeesSnap != null;
+    let projectEmployeesLoaded = projectEmployeesSnap != null;
 
     const markComplete = () => {
       if (
@@ -80,13 +110,15 @@ export class DashboardComponent implements OnInit {
         markComplete();
       },
       error: () => {
-        this.dashboardData = {
-          totalEmployee: 0,
-          totalProject: 0,
-          activeProjectEmployees: 0,
-          recentProjects: [],
-          recentEmployee: [],
-        };
+        if (!this.dashboardData) {
+          this.dashboardData = {
+            totalEmployee: 0,
+            totalProject: 0,
+            activeProjectEmployees: 0,
+            recentProjects: [],
+            recentEmployee: [],
+          };
+        }
         dashboardLoaded = true;
         markComplete();
       },
@@ -94,16 +126,14 @@ export class DashboardComponent implements OnInit {
 
     this.masterService.getAllDept().subscribe({
       next: (response) => {
-        if (response?.result && Array.isArray(response.data)) {
-          this.parentDepartments = response.data;
-        } else if (Array.isArray(response)) {
-          this.parentDepartments = response as unknown as IParentDept[];
-        }
+        this.applyDepartments(response);
         departmentsLoaded = true;
         markComplete();
       },
       error: () => {
-        this.parentDepartments = [];
+        if (!departmentsSnap) {
+          this.parentDepartments = [];
+        }
         departmentsLoaded = true;
         markComplete();
       },
@@ -121,7 +151,9 @@ export class DashboardComponent implements OnInit {
         markComplete();
       },
       error: () => {
-        this.projects = [];
+        if (!projectsSnap) {
+          this.projects = [];
+        }
         projectsLoaded = true;
         markComplete();
       },
@@ -139,7 +171,9 @@ export class DashboardComponent implements OnInit {
         markComplete();
       },
       error: () => {
-        this.employees = [];
+        if (!employeesSnap) {
+          this.employees = [];
+        }
         employeesLoaded = true;
         markComplete();
       },
@@ -157,11 +191,22 @@ export class DashboardComponent implements OnInit {
         markComplete();
       },
       error: () => {
-        this.projectEmployees = [];
+        if (!projectEmployeesSnap) {
+          this.projectEmployees = [];
+        }
         projectEmployeesLoaded = true;
         markComplete();
       },
     });
+  }
+
+  private applyDepartments(response: unknown): void {
+    const res = response as { result?: boolean; data?: IParentDept[] };
+    if (res?.result && Array.isArray(res.data)) {
+      this.parentDepartments = res.data;
+    } else if (Array.isArray(response)) {
+      this.parentDepartments = response as IParentDept[];
+    }
   }
 
   private tryCalculateStatistics(

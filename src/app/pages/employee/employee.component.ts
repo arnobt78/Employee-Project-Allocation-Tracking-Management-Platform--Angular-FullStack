@@ -83,7 +83,22 @@ export class EmployeeComponent implements OnInit {
   }
 
   getEmployees() {
-    this.isLoading.set(true);
+    const snapshot = this.masterService.peekEmployees();
+    const hasLocalData = this.employees().length > 0;
+    if (snapshot) {
+      this.employeesSignal.set(snapshot);
+      if (!this.expandedEmployeeId && snapshot.length) {
+        this.expandedEmployeeId = snapshot[0].employeeId ?? null;
+      }
+      this.isLoading.set(false);
+      this.hasLoaded.set(true);
+    } else if (hasLocalData) {
+      this.isLoading.set(false);
+      this.hasLoaded.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
+
     this.masterService.getAllEmp().subscribe({
       next: (res: Employee[]) => {
         this.employeesSignal.set(res ?? []);
@@ -94,7 +109,9 @@ export class EmployeeComponent implements OnInit {
         this.hasLoaded.set(true);
       },
       error: () => {
-        this.employeesSignal.set([]);
+        if (!snapshot && !hasLocalData) {
+          this.employeesSignal.set([]);
+        }
         this.isLoading.set(false);
         this.hasLoaded.set(true);
       },

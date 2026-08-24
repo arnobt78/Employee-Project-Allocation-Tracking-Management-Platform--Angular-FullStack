@@ -8,7 +8,7 @@ import {
   RouterOutlet,
 } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, startWith } from 'rxjs/operators';
+import { filter, map, startWith, tap } from 'rxjs/operators';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import { ToastContainerComponent } from '@/app/components/ui/toast-container.component';
 
@@ -31,9 +31,15 @@ export class AppComponent {
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
 
+  /** False until first NavigationEnd — avoids painting private chrome while Session resolves. */
+  private navigationSettled = false;
+
   readonly layout = toSignal(
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      tap(() => {
+        this.navigationSettled = true;
+      }),
       startWith(null),
       map(() => this.resolveLayout(this.activatedRoute))
     ),
@@ -41,6 +47,11 @@ export class AppComponent {
   );
 
   private resolveLayout(route: ActivatedRoute): string {
+    const url = this.router.url.split('?')[0];
+    if (!this.navigationSettled || url === '/' || url.startsWith('/login')) {
+      return 'auth';
+    }
+
     let current: ActivatedRoute = route;
     while (current.firstChild) {
       current = current.firstChild;

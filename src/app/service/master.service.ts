@@ -27,18 +27,27 @@ export class MasterService {
 
   private employeesCache$: Observable<Employee[]> | null = null;
   private employeesCacheAt = 0;
+  private employeesSnapshot: Employee[] | null = null;
 
   private projectsCache$: Observable<IProject[]> | null = null;
   private projectsCacheAt = 0;
+  private projectsSnapshot: IProject[] | null = null;
 
   private projectEmployeesCache$: Observable<IProjectEmployee[]> | null = null;
   private projectEmployeesCacheAt = 0;
+  private projectEmployeesSnapshot: IProjectEmployee[] | null = null;
 
   private dashboardCache$: Observable<any> | null = null;
   private dashboardCacheAt = 0;
+  private dashboardSnapshot: any | null = null;
 
   private departmentsCache$: Observable<IApiResponse> | null = null;
   private departmentsCacheAt = 0;
+  private departmentsSnapshot: IApiResponse | null = null;
+
+  private scheduleCache$: Observable<any> | null = null;
+  private scheduleCacheAt = 0;
+  private scheduleSnapshot: any | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -66,43 +75,94 @@ export class MasterService {
     );
   }
 
+  peekEmployees(): Employee[] | null {
+    return this.employeesSnapshot;
+  }
+
+  peekProjects(): IProject[] | null {
+    return this.projectsSnapshot;
+  }
+
+  peekProjectEmployees(): IProjectEmployee[] | null {
+    return this.projectEmployeesSnapshot;
+  }
+
+  peekDashboard(): any | null {
+    return this.dashboardSnapshot;
+  }
+
+  peekDepartments(): IApiResponse | null {
+    return this.departmentsSnapshot;
+  }
+
+  peekSchedule(): any | null {
+    return this.scheduleSnapshot;
+  }
+
   clearAllCaches(): void {
     this.employeesCache$ = null;
     this.projectsCache$ = null;
     this.projectEmployeesCache$ = null;
     this.dashboardCache$ = null;
     this.departmentsCache$ = null;
+    this.scheduleCache$ = null;
     this.employeesCacheAt = 0;
     this.projectsCacheAt = 0;
     this.projectEmployeesCacheAt = 0;
     this.dashboardCacheAt = 0;
     this.departmentsCacheAt = 0;
+    this.scheduleCacheAt = 0;
+    this.employeesSnapshot = null;
+    this.projectsSnapshot = null;
+    this.projectEmployeesSnapshot = null;
+    this.dashboardSnapshot = null;
+    this.departmentsSnapshot = null;
+    this.scheduleSnapshot = null;
   }
 
   invalidateEmployees(): void {
     this.employeesCache$ = null;
     this.employeesCacheAt = 0;
+    this.employeesSnapshot = null;
     this.dashboardCache$ = null;
     this.dashboardCacheAt = 0;
+    this.dashboardSnapshot = null;
   }
 
   invalidateProjects(): void {
     this.projectsCache$ = null;
     this.projectsCacheAt = 0;
+    this.projectsSnapshot = null;
     this.dashboardCache$ = null;
     this.dashboardCacheAt = 0;
+    this.dashboardSnapshot = null;
+    this.scheduleCache$ = null;
+    this.scheduleCacheAt = 0;
+    this.scheduleSnapshot = null;
   }
 
   invalidateProjectEmployees(): void {
     this.projectEmployeesCache$ = null;
     this.projectEmployeesCacheAt = 0;
+    this.projectEmployeesSnapshot = null;
     this.dashboardCache$ = null;
     this.dashboardCacheAt = 0;
+    this.dashboardSnapshot = null;
+    this.scheduleCache$ = null;
+    this.scheduleCacheAt = 0;
+    this.scheduleSnapshot = null;
   }
 
   invalidateDashboard(): void {
     this.dashboardCache$ = null;
     this.dashboardCacheAt = 0;
+    this.dashboardSnapshot = null;
+  }
+
+  invalidateSchedule(): void {
+    this.scheduleCache$ = null;
+    this.scheduleCacheAt = 0;
+    this.scheduleSnapshot = null;
   }
 
   getAllDept(): Observable<IApiResponse> {
@@ -114,6 +174,9 @@ export class MasterService {
       () => this.departmentsCacheAt,
       (value) => {
         this.departmentsCacheAt = value;
+      },
+      (value) => {
+        this.departmentsSnapshot = value;
       },
       () =>
         this.http
@@ -143,6 +206,9 @@ export class MasterService {
       () => this.employeesCacheAt,
       (value) => {
         this.employeesCacheAt = value;
+      },
+      (value) => {
+        this.employeesSnapshot = value;
       },
       () =>
         this.http
@@ -187,6 +253,9 @@ export class MasterService {
       () => this.projectsCacheAt,
       (value) => {
         this.projectsCacheAt = value;
+      },
+      (value) => {
+        this.projectsSnapshot = value;
       },
       () =>
         this.http
@@ -328,6 +397,9 @@ export class MasterService {
       (value) => {
         this.projectEmployeesCacheAt = value;
       },
+      (value) => {
+        this.projectEmployeesSnapshot = value;
+      },
       () =>
         this.http
           .get<IProjectEmployee[]>(this.getProxyUrl('GetAllProjectEmployees'))
@@ -366,6 +438,9 @@ export class MasterService {
       (value) => {
         this.dashboardCacheAt = value;
       },
+      (value) => {
+        this.dashboardSnapshot = value;
+      },
       () =>
         this.http
           .get<any>(this.getProxyUrl('GetDashboard'))
@@ -374,7 +449,23 @@ export class MasterService {
   }
 
   getScheduleData(): Observable<any> {
-    return this.http.get<any>(this.getProxyUrl('GetSchedule'));
+    return this.getCached(
+      () => this.scheduleCache$,
+      (value) => {
+        this.scheduleCache$ = value;
+      },
+      () => this.scheduleCacheAt,
+      (value) => {
+        this.scheduleCacheAt = value;
+      },
+      (value) => {
+        this.scheduleSnapshot = value;
+      },
+      () =>
+        this.http
+          .get<any>(this.getProxyUrl('GetSchedule'))
+          .pipe(shareReplay({ bufferSize: 1, refCount: false }))
+    );
   }
 
   getApiDocumentation(): Observable<any> {
@@ -390,6 +481,7 @@ export class MasterService {
     setCache: (value: Observable<T>) => void,
     getCacheAt: () => number,
     setCacheAt: (value: number) => void,
+    setSnapshot: (value: T) => void,
     factory: () => Observable<T>
   ): Observable<T> {
     const now = Date.now();
@@ -399,7 +491,10 @@ export class MasterService {
     }
 
     const nextCache = factory().pipe(
-      tap(() => setCacheAt(Date.now()))
+      tap((value) => {
+        setCacheAt(Date.now());
+        setSnapshot(value);
+      })
     );
     setCache(nextCache);
     return nextCache;

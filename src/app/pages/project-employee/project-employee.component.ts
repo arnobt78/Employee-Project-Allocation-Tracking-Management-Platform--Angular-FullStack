@@ -103,10 +103,35 @@ export class ProjectEmployeeComponent implements OnInit {
   isDeleting = false;
 
   ngOnInit(): void {
-    this.isLoading.set(true);
-    let projectsLoaded = false;
-    let employeesLoaded = false;
-    let assignmentsLoaded = false;
+    const projectsSnap = this.masterService.peekProjects();
+    const employeesSnap = this.masterService.peekEmployees();
+    const assignmentsSnap = this.masterService.peekProjectEmployees();
+    const hasLocalAssignments = this.assignments().length > 0;
+
+    // Warm for list/metrics only when assignment data exists (sibling peeks alone must not skip skeleton).
+    const assignmentsWarm = assignmentsSnap != null || hasLocalAssignments;
+
+    if (projectsSnap) {
+      this.projectsSignal.set(projectsSnap);
+    }
+    if (employeesSnap) {
+      this.employeesSignal.set(employeesSnap);
+    }
+    if (assignmentsSnap) {
+      this.assignmentsSignal.set(assignmentsSnap);
+      if (!this.expandedAssignmentId && assignmentsSnap.length) {
+        this.expandedAssignmentId = assignmentsSnap[0].empProjectId ?? null;
+      }
+    }
+
+    this.isLoading.set(!assignmentsWarm);
+    if (assignmentsWarm) {
+      this.hasLoaded.set(true);
+    }
+
+    let projectsLoaded = projectsSnap != null;
+    let employeesLoaded = employeesSnap != null;
+    let assignmentsLoaded = assignmentsSnap != null;
 
     const markComplete = () => {
       if (projectsLoaded && employeesLoaded && assignmentsLoaded) {
@@ -122,7 +147,9 @@ export class ProjectEmployeeComponent implements OnInit {
         markComplete();
       },
       error: () => {
-        this.projectsSignal.set([]);
+        if (!projectsSnap) {
+          this.projectsSignal.set([]);
+        }
         projectsLoaded = true;
         markComplete();
       },
@@ -134,7 +161,9 @@ export class ProjectEmployeeComponent implements OnInit {
         markComplete();
       },
       error: () => {
-        this.employeesSignal.set([]);
+        if (!employeesSnap) {
+          this.employeesSignal.set([]);
+        }
         employeesLoaded = true;
         markComplete();
       },
@@ -155,7 +184,9 @@ export class ProjectEmployeeComponent implements OnInit {
         onComplete?.();
       },
       error: () => {
-        this.assignmentsSignal.set([]);
+        if (this.assignments().length === 0) {
+          this.assignmentsSignal.set([]);
+        }
         onComplete?.();
       },
     });

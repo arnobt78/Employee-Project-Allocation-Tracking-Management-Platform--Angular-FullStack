@@ -12,7 +12,9 @@ export class AuthService {
   private readonly router = inject(Router);
 
   private readonly sessionSignal = signal<AuthUser | null>(null);
+  private readonly sessionResolvedSignal = signal(false);
   readonly session = this.sessionSignal.asReadonly();
+  readonly sessionResolved = this.sessionResolvedSignal.asReadonly();
   readonly isAuthenticated = computed(() => this.sessionSignal() !== null);
 
   private sessionCheck$: Observable<AuthUser | null> | null = null;
@@ -20,15 +22,24 @@ export class AuthService {
   ensureSession(): Observable<AuthUser | null> {
     const current = this.sessionSignal();
     if (current) {
+      this.sessionResolvedSignal.set(true);
       return of(current);
+    }
+
+    if (this.sessionResolvedSignal() && !this.sessionCheck$) {
+      return of(null);
     }
 
     if (!this.sessionCheck$) {
       this.sessionCheck$ = this.masterService.getSession().pipe(
         map((response) => (response.result ? response.data ?? null : null)),
-        tap((user) => this.sessionSignal.set(user)),
+        tap((user) => {
+          this.sessionSignal.set(user);
+          this.sessionResolvedSignal.set(true);
+        }),
         catchError(() => {
           this.sessionSignal.set(null);
+          this.sessionResolvedSignal.set(true);
           return of(null);
         }),
         finalize(() => {
@@ -46,6 +57,7 @@ export class AuthService {
       tap((response) => {
         if (response.result && response.data) {
           this.sessionSignal.set(response.data);
+          this.sessionResolvedSignal.set(true);
         }
       })
     );
@@ -55,10 +67,12 @@ export class AuthService {
     return this.masterService.logout().pipe(
       tap(() => {
         this.sessionSignal.set(null);
+        this.sessionResolvedSignal.set(true);
         this.masterService.clearAllCaches();
       }),
       catchError(() => {
         this.sessionSignal.set(null);
+        this.sessionResolvedSignal.set(true);
         this.masterService.clearAllCaches();
         return of({ result: true, message: 'Logged out', data: null });
       })
@@ -67,6 +81,7 @@ export class AuthService {
 
   handleUnauthorized(): void {
     this.sessionSignal.set(null);
+    this.sessionResolvedSignal.set(true);
     this.masterService.clearAllCaches();
     if (!this.router.url.startsWith('/login')) {
       void this.router.navigateByUrl('/login');

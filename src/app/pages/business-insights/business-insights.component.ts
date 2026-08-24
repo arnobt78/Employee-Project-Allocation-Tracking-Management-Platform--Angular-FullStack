@@ -10,6 +10,10 @@ import { MasterService } from '../../service/master.service';
 import { IProject, IProjectEmployee } from '../../model/interface/master';
 import { Employee } from '../../model/class/Employee';
 import { UbButtonDirective } from '@/app/components/ui/button';
+import {
+  ListSkeletonComponent,
+  StatPillSkeletonComponent,
+} from '@/app/components/ui/list-skeleton.component';
 
 export interface IBusinessInsights {
   projectStatusDistribution: {
@@ -73,7 +77,14 @@ export interface IBusinessInsights {
 @Component({
   selector: 'app-business-insights',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, UbButtonDirective],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    UbButtonDirective,
+    ListSkeletonComponent,
+    StatPillSkeletonComponent,
+  ],
   templateUrl: './business-insights.component.html',
   styleUrls: ['./business-insights.component.css'],
 })
@@ -124,11 +135,34 @@ export class BusinessInsightsComponent implements OnInit {
   }
 
   loadData(): void {
-    this.loadingSignal.set(true);
+    const projectsSnap = this.masterService.peekProjects();
+    const employeesSnap = this.masterService.peekEmployees();
+    const projectEmployeesSnap = this.masterService.peekProjectEmployees();
 
-    let projectsLoaded = false;
-    let employeesLoaded = false;
-    let projectEmployeesLoaded = false;
+    const hasWarm =
+      projectsSnap != null &&
+      employeesSnap != null &&
+      projectEmployeesSnap != null;
+
+    if (projectsSnap) {
+      this.projectsSignal.set(projectsSnap);
+    }
+    if (employeesSnap) {
+      this.employeesSignal.set(employeesSnap);
+    }
+    if (projectEmployeesSnap) {
+      this.projectEmployeesSignal.set(projectEmployeesSnap);
+    }
+
+    if (hasWarm) {
+      this.calculateInsights();
+    } else {
+      this.loadingSignal.set(true);
+    }
+
+    let projectsLoaded = projectsSnap != null;
+    let employeesLoaded = employeesSnap != null;
+    let projectEmployeesLoaded = projectEmployeesSnap != null;
 
     const checkAndCalculate = () => {
       if (projectsLoaded && employeesLoaded && projectEmployeesLoaded) {
@@ -136,7 +170,6 @@ export class BusinessInsightsComponent implements OnInit {
       }
     };
 
-    // Load projects, employees, and project-employees in parallel
     this.masterService.getAllProjects().subscribe({
       next: (projects) => {
         this.projectsSignal.set(projects);
@@ -145,7 +178,9 @@ export class BusinessInsightsComponent implements OnInit {
       },
       error: (error) => {
         console.error('[Business Insights] Failed to load projects', error);
-        this.loadingSignal.set(false);
+        if (!hasWarm) {
+          this.loadingSignal.set(false);
+        }
       },
     });
 
@@ -157,7 +192,9 @@ export class BusinessInsightsComponent implements OnInit {
       },
       error: (error) => {
         console.error('[Business Insights] Failed to load employees', error);
-        this.loadingSignal.set(false);
+        if (!hasWarm) {
+          this.loadingSignal.set(false);
+        }
       },
     });
 
@@ -172,8 +209,7 @@ export class BusinessInsightsComponent implements OnInit {
           '[Business Insights] Failed to load project employees',
           error
         );
-        // Don't fail completely, just use empty array
-        this.projectEmployeesSignal.set([]);
+        this.projectEmployeesSignal.set(projectEmployeesSnap ?? []);
         projectEmployeesLoaded = true;
         checkAndCalculate();
       },

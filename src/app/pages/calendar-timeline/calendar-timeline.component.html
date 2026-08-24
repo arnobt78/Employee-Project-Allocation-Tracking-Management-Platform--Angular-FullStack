@@ -33,12 +33,17 @@
     </div>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="loading()" class="flex items-center justify-center py-12">
-    <div class="text-center">
-      <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-      <p class="mt-4 text-sm text-white/60">Loading schedule data...</p>
-    </div>
+  <!-- Loading State (inline skeletons — first paint only when cache is cold) -->
+  <div *ngIf="loading()" class="space-y-6">
+    <section class="rounded-2xl border border-white/10 bg-white/5 px-6 py-4">
+      <div class="flex flex-wrap gap-2">
+        <app-stat-pill-skeleton
+          *ngFor="let pill of [1, 2, 3]"
+          [width]="110"
+        ></app-stat-pill-skeleton>
+      </div>
+    </section>
+    <app-list-skeleton [rows]="4"></app-list-skeleton>
   </div>
 
   <!-- Content -->

@@ -81,7 +81,22 @@ export class ProjectComponent implements OnInit {
   }
 
   getProjects() {
-    this.isLoading.set(true);
+    const snapshot = this.masterSrv.peekProjects();
+    const hasLocalData = this.projects().length > 0;
+    if (snapshot) {
+      this.projectsSignal.set(snapshot);
+      if (!this.expandedProjectId && snapshot.length) {
+        this.expandedProjectId = snapshot[0].projectId ?? null;
+      }
+      this.isLoading.set(false);
+      this.hasLoaded.set(true);
+    } else if (hasLocalData) {
+      this.isLoading.set(false);
+      this.hasLoaded.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
+
     this.masterSrv.getAllProjects().subscribe({
       next: (Res: IProject[]) => {
         this.projectsSignal.set(Res ?? []);
@@ -92,7 +107,9 @@ export class ProjectComponent implements OnInit {
         this.hasLoaded.set(true);
       },
       error: () => {
-        this.projectsSignal.set([]);
+        if (!snapshot && !hasLocalData) {
+          this.projectsSignal.set([]);
+        }
         this.isLoading.set(false);
         this.hasLoaded.set(true);
       },
