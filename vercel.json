@@ -7,7 +7,7 @@
   },
   "headers": [
     {
-      "source": "/api/employee-management/(.*)",
+      "source": "/api/employee-management/:path*",
       "headers": [
         {
           "key": "Cache-Control",
@@ -29,7 +29,7 @@
       ]
     },
     {
-      "source": "/(.*\\.[a-f0-9]{8,}\\.(js|css|woff2))",
+      "source": "/:path*.js",
       "headers": [
         {
           "key": "Cache-Control",
@@ -38,7 +38,25 @@
       ]
     },
     {
-      "source": "/(.*\\.svg)",
+      "source": "/:path*.css",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/:path*.woff2",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/:path*.svg",
       "headers": [
         {
           "key": "Cache-Control",
@@ -47,7 +65,7 @@
       ]
     },
     {
-      "source": "/(.*)",
+      "source": "/:path*",
       "headers": [
         {
           "key": "X-Content-Type-Options",

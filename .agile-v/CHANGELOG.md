@@ -1,5 +1,9 @@
 # Changelog — Agile V project memory
 
+## 2026-08-25 — Fix Vercel invalid route source
+
+- Replaced invalid hashed-asset `headers.source` regex in `vercel.json` with path-to-regexp-safe `/:path*.js|css|woff2` patterns (unblocks deploy)
+
 ## 2026-08-25 — Session endpoint public-flag fix
 
 - Removed `Session` from `PUBLIC_ACTIONS`; gated by `requireAuth` (401 without cookie)

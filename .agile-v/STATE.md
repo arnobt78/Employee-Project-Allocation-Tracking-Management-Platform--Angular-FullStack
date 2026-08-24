@@ -10,9 +10,9 @@
 
 ## Resume Point
 
-**Last completed:** Removed `Session` from `PUBLIC_ACTIONS` (auth-gated via middleware). Prior: session auth, AI fallback, Sentry tunnel, SEO/README.
+**Last completed:** Fixed `vercel.json` invalid route source (hash-asset regex) that caused Vercel Deployment failed. Prior: Session PUBLIC_ACTIONS fix.
 
-**Next exact action:** Push to GitHub so Vercel redeploys; confirm production commit is latest `feat`/`fix` (not stale `60bda45`); investigate any red GitHub/Vercel check on tip of `main`.
+**Next exact action:** Push commits so Vercel redeploys successfully; confirm production tip is latest.
 
 **Resume prompt:**
 
