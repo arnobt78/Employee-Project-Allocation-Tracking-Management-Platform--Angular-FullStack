@@ -3,8 +3,7 @@ import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  Validators } from '@angular/forms';
 import { IProject } from '../../model/interface/master';
 import { MasterService } from '../../service/master.service';
 import { DatePipe, CommonModule } from '@angular/common';
@@ -13,19 +12,20 @@ import { ToastService } from '@/app/components/ui/toast.service';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import {
   ListSkeletonComponent,
-  StatPillSkeletonComponent,
-} from '@/app/components/ui/list-skeleton.component';
+  StatPillSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 
 @Component({
   selector: 'app-project',
   standalone: true,
   imports: [
+    AppIconComponent,
     CommonModule,
     ReactiveFormsModule,
     UbButtonDirective,
     RouterLink,
     ListSkeletonComponent,
-    StatPillSkeletonComponent,
+    StatPillSkeletonComponent
   ],
   providers: [DatePipe],
   templateUrl: './project.component.html',
@@ -66,8 +66,7 @@ export class ProjectComponent implements OnInit {
     leadByEmpId: [null],
     contactPerson: [''],
     contactNo: [''],
-    emailId: ['', Validators.email],
-  });
+    emailId: ['', Validators.email] });
 
   expandedProjectId: number | null = null;
   editingProjectId: number | null = null;
@@ -112,8 +111,7 @@ export class ProjectComponent implements OnInit {
         }
         this.isLoading.set(false);
         this.hasLoaded.set(true);
-      },
-    });
+      } });
   }
 
   onEdit(id: number) {
@@ -126,8 +124,7 @@ export class ProjectComponent implements OnInit {
     this.expandedProjectId = id;
     this.projectForm.patchValue({
       ...project,
-      startDate: project.startDate ? project.startDate.substring(0, 10) : '',
-    });
+      startDate: project.startDate ? project.startDate.substring(0, 10) : '' });
   }
 
   onDelete(id: number) {
@@ -152,8 +149,7 @@ export class ProjectComponent implements OnInit {
         );
         this.toast.success({
           title: 'Project deleted',
-          description: `${projectName} has been removed.`,
-        });
+          description: `${projectName} has been removed.` });
         if (this.expandedProjectId === projectId) {
           this.expandedProjectId = null;
         }
@@ -162,8 +158,7 @@ export class ProjectComponent implements OnInit {
         this.isDeleting = false;
         this.toast.error({
           title: 'Delete failed',
-          description: 'Something went wrong while removing the project.',
-        });
+          description: 'Something went wrong while removing the project.' });
       }
     );
   }
@@ -190,8 +185,7 @@ export class ProjectComponent implements OnInit {
       leadByEmpId: null,
       contactPerson: '',
       contactNo: '',
-      emailId: '',
-    });
+      emailId: '' });
   }
 
   closeCreatePanel() {
@@ -210,8 +204,7 @@ export class ProjectComponent implements OnInit {
       leadByEmpId: null,
       contactPerson: '',
       contactNo: '',
-      emailId: '',
-    });
+      emailId: '' });
   }
 
   updateSearch(term: string) {
@@ -222,8 +215,7 @@ export class ProjectComponent implements OnInit {
     if (this.projectForm.invalid) {
       this.toast.error({
         title: 'Incomplete details',
-        description: 'Please fill all required fields before saving.',
-      });
+        description: 'Please fill all required fields before saving.' });
       return;
     }
     if (this.isSaving) {
@@ -231,8 +223,7 @@ export class ProjectComponent implements OnInit {
     }
     const project: IProject = {
       ...this.projectForm.value,
-      startDate: this.projectForm.value.startDate,
-    };
+      startDate: this.projectForm.value.startDate };
     this.isSaving = true;
     if (project.projectId) {
       this.masterSrv.updateProject(project).subscribe(
@@ -241,16 +232,14 @@ export class ProjectComponent implements OnInit {
           this.getProjects();
           this.toast.success({
             title: 'Project updated',
-            description: 'Changes have been saved successfully.',
-          });
+            description: 'Changes have been saved successfully.' });
           this.cancelEdit();
         },
         () => {
           this.isSaving = false;
           this.toast.error({
             title: 'Update failed',
-            description: 'Unable to update the project right now.',
-          });
+            description: 'Unable to update the project right now.' });
         }
       );
     } else {
@@ -260,8 +249,7 @@ export class ProjectComponent implements OnInit {
           this.getProjects();
           this.toast.success({
             title: 'Project created',
-            description: 'A new project is now tracked in the system.',
-          });
+            description: 'A new project is now tracked in the system.' });
           this.showCreatePanel = false;
           this.cancelEdit();
         },
@@ -269,8 +257,7 @@ export class ProjectComponent implements OnInit {
           this.isSaving = false;
           this.toast.error({
             title: 'Creation failed',
-            description: 'Unable to create project right now.',
-          });
+            description: 'Unable to create project right now.' });
         }
       );
     }

@@ -1,6 +1,6 @@
 <div class="space-y-8 text-white/85">
   <section
-    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-6 py-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between"
+    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl lg:flex-row lg:items-center lg:justify-between"
   >
     <div class="w-full lg:max-w-xl">
       <label for="assignment-search" class="sr-only">Search assignments</label>
@@ -48,22 +48,28 @@
       <button
         ubButton
         size="sm"
-        class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+        class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
         (click)="toggleCreatePanel()"
       >
-        {{ showCreatePanel ? 'Close form' : 'Add assignment' }}
+        @if (showCreatePanel) {
+          <lucide-icon name="x" [size]="16"></lucide-icon>
+          <span>Close Form</span>
+        } @else {
+          <lucide-icon name="plus" [size]="16"></lucide-icon>
+          <span>Add Assignment</span>
+        }
       </button>
     </div>
   </section>
 
   <section
     *ngIf="showCreatePanel"
-    class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
   >
     <header class="mb-6">
-      <h2 class="text-lg font-semibold text-white">Add project assignment</h2>
+      <h2 class="text-lg font-medium text-white">Add Project Assignment</h2>
       <p class="text-xs uppercase tracking-[0.3em] text-white/55">
-        Connect team members to initiatives
+        Connect employees to projects
       </p>
     </header>
     <form
@@ -84,7 +90,10 @@
           class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
         >
           <option value="">Select project</option>
-          <option *ngFor="let project of projects()" [ngValue]="project.projectId">
+          <option
+            *ngFor="let project of projects()"
+            [ngValue]="project.projectId"
+          >
             {{ project.projectName }}
           </option>
         </select>
@@ -93,15 +102,18 @@
         <label
           for="create-employee"
           class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Team member</label
+          >Team Member</label
         >
         <select
           id="create-employee"
           formControlName="empId"
           class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
         >
-          <option value="">Select teammate</option>
-          <option *ngFor="let employee of employees()" [ngValue]="employee.employeeId">
+          <option value="">Select Teammate</option>
+          <option
+            *ngFor="let employee of employees()"
+            [ngValue]="employee.employeeId"
+          >
             {{ employee.employeeName }}
           </option>
         </select>
@@ -110,7 +122,7 @@
         <label
           for="create-date"
           class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Assigned date</label
+          >Assigned Date</label
         >
         <input
           id="create-date"
@@ -123,14 +135,17 @@
         <label
           for="create-role"
           class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Role</label
+          >Project Role</label
         >
         <input
           id="create-role"
           type="text"
           formControlName="role"
-          placeholder="Product Owner"
+          placeholder="Project Role"
           class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+          [attr.aria-label]="
+            'Enter the project role for ' + projectEmployeeForm.value.empId
+          "
         />
       </div>
       <div>
@@ -166,9 +181,13 @@
         <button
           type="button"
           class="relative inline-flex h-9 w-16 items-center rounded-full border border-white/15 bg-white/10 px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          (click)="projectEmployeeForm.patchValue({ isActive: !projectEmployeeForm.value.isActive })"
+          (click)="
+            projectEmployeeForm.patchValue({
+              isActive: !projectEmployeeForm.value.isActive,
+            })
+          "
           [ngClass]="{
-            'bg-emerald-500/30': projectEmployeeForm.value.isActive
+            'bg-emerald-500/30': projectEmployeeForm.value.isActive,
           }"
         >
           <span
@@ -177,7 +196,11 @@
           ></span>
         </button>
         <span class="text-xs text-white/70">
-          {{ projectEmployeeForm.value.isActive ? 'Active assignment' : 'Inactive' }}
+          {{
+            projectEmployeeForm.value.isActive
+              ? "Active assignment"
+              : "Inactive"
+          }}
         </span>
       </div>
       <div class="md:col-span-2">
@@ -202,8 +225,12 @@
           [disabled]="isSaving"
           class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span *ngIf="!isSaving">Save assignment</span>
-          <span *ngIf="isSaving">Saving assignment...</span>
+          @if (!isSaving) {
+            <lucide-icon name="save" [size]="16"></lucide-icon>
+            <span>Save Assignment</span>
+          } @else {
+            <span>Saving Assignment...</span>
+          }
         </button>
       </div>
     </form>
@@ -214,15 +241,15 @@
 
     <div
       *ngFor="let item of filteredAssignments()"
-      class="overflow-hidden rounded-[26px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-xl transition duration-200 hover:border-white/20"
+      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-xl transition duration-200 hover:border-white/20"
     >
       <button
         type="button"
-        class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
+        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
         (click)="toggleExpand(item.empProjectId)"
       >
         <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
-          <span class="text-base font-semibold text-white">
+          <span class="text-base font-medium text-white">
             {{ item.projectName }}
           </span>
           <span
@@ -233,11 +260,8 @@
           </span>
         </div>
         <div class="flex items-center gap-4">
-          <span
-            [class]="statusBadge(item.isActive)"
-            class="transition"
-          >
-            {{ isActive(item.isActive) ? 'Active' : 'Inactive' }}
+          <span [class]="statusBadge(item.isActive)" class="transition">
+            {{ isActive(item.isActive) ? "Active" : "Inactive" }}
           </span>
           <span class="text-xs text-white/60">
             {{ formattedDate(item.assignedDate) }}
@@ -246,14 +270,16 @@
             class="text-xs uppercase tracking-[0.35em] text-white/40 transition"
             [class.text-white]="expandedAssignmentId === item.empProjectId"
           >
-            {{ expandedAssignmentId === item.empProjectId ? 'Hide' : 'Details' }}
+            {{
+              expandedAssignmentId === item.empProjectId ? "Hide" : "Details"
+            }}
           </span>
         </div>
       </button>
 
       <div
         *ngIf="expandedAssignmentId === item.empProjectId"
-        class="border-t border-white/10 px-6 py-6 text-sm text-white/75"
+        class="border-t border-white/10 px-2 sm:px-4 py-6 text-sm text-white/75"
       >
         <ng-container
           *ngIf="editingAssignmentId === item.empProjectId; else assignmentView"
@@ -362,9 +388,13 @@
               <button
                 type="button"
                 class="relative inline-flex h-9 w-16 items-center rounded-full border border-white/15 bg-white/10 px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                (click)="projectEmployeeForm.patchValue({ isActive: !projectEmployeeForm.value.isActive })"
+                (click)="
+                  projectEmployeeForm.patchValue({
+                    isActive: !projectEmployeeForm.value.isActive,
+                  })
+                "
                 [ngClass]="{
-                  'bg-emerald-500/30': projectEmployeeForm.value.isActive
+                  'bg-emerald-500/30': projectEmployeeForm.value.isActive,
                 }"
               >
                 <span
@@ -373,7 +403,11 @@
                 ></span>
               </button>
               <span class="text-xs text-white/70">
-                {{ projectEmployeeForm.value.isActive ? 'Active assignment' : 'Inactive' }}
+                {{
+                  projectEmployeeForm.value.isActive
+                    ? "Active assignment"
+                    : "Inactive"
+                }}
               </span>
             </div>
             <div class="md:col-span-2">
@@ -406,51 +440,66 @@
                 [disabled]="isSaving"
                 class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span *ngIf="!isSaving">Save changes</span>
-                <span *ngIf="isSaving">Updating...</span>
+                @if (!isSaving) {
+                  <lucide-icon name="save" [size]="16"></lucide-icon>
+                  <span>Save Changes</span>
+                } @else {
+                  <span>Updating...</span>
+                }
               </button>
             </div>
           </form>
         </ng-container>
         <ng-template #assignmentView>
           <div class="grid gap-4 sm:grid-cols-2">
-            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Assigned role
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ item.role }}
               </p>
             </div>
-            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Assigned on
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ formattedDate(item.assignedDate) }}
               </p>
             </div>
-            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Employee ID
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
-                {{ item.empId }} · {{ employeeNameFor(item.empId) || '—' }}
+              <p class="mt-1 text-base font-medium text-white">
+                {{ item.empId }} · {{ employeeNameFor(item.empId) || "—" }}
               </p>
             </div>
-            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Project ID
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
-                {{ item.projectId }} · {{ projectNameFor(item.projectId) || '—' }}
+              <p class="mt-1 text-base font-medium text-white">
+                {{ item.projectId }} ·
+                {{ projectNameFor(item.projectId) || "—" }}
               </p>
             </div>
-            <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Allocation
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ item.allocationPct ?? 0 }}%
               </p>
             </div>
@@ -461,24 +510,28 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Notes
               </p>
-              <p class="mt-2 text-sm leading-relaxed text-white/80 whitespace-pre-wrap">
+              <p
+                class="mt-2 text-sm leading-relaxed text-white/80 whitespace-pre-wrap"
+              >
                 {{ item.notes }}
               </p>
             </div>
             <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
               <button
                 type="button"
-                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
                 (click)="onEdit(item)"
+                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
               >
-                Edit
+                <lucide-icon name="pencil" [size]="14"></lucide-icon>
+                <span>Edit</span>
               </button>
               <button
                 type="button"
-                class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
+                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
                 (click)="onDelete(item.empProjectId)"
               >
-                Delete
+                <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+                <span>Delete</span>
               </button>
             </div>
           </div>
@@ -488,7 +541,7 @@
 
     <div
       *ngIf="hasLoaded() && !filteredAssignments().length"
-      class="rounded-[26px] border border-dashed border-white/15 bg-white/5/60 px-6 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
+      class="rounded-[28px] border border-dashed border-white/15 bg-white/5/60 px-2 sm:px-4 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
     >
       No assignments match your filters.
     </div>
@@ -498,12 +551,22 @@
 <div
   *ngIf="pendingDelete as assignment"
   class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 px-4 py-4"
-  style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; display: flex; align-items: center; justify-content: center;"
+  style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  "
 >
   <div
-    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-6 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
+    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-2 sm:p-4 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
   >
-    <h2 class="text-lg font-semibold text-white">
+    <h2 class="text-lg font-medium text-white">
       Remove {{ assignment.employeeName }} from {{ assignment.projectName }}?
     </h2>
     <p class="mt-2 text-white/70">
@@ -525,8 +588,12 @@
         class="rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
         (click)="confirmDelete(true)"
       >
-        <span *ngIf="!isDeleting">Remove assignment</span>
-        <span *ngIf="isDeleting">Deleting...</span>
+        @if (!isDeleting) {
+          <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+          <span>Remove Assignment</span>
+        } @else {
+          <span>Deleting...</span>
+        }
       </button>
     </div>
   </div>

@@ -5,31 +5,35 @@ import {
   NavigationEnd,
   Router,
   RouterLink,
-  RouterOutlet,
-} from '@angular/router';
+  RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith, tap } from 'rxjs/operators';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import { ToastContainerComponent } from '@/app/components/ui/toast-container.component';
+import { ProfileDropdownComponent } from '@/app/components/ui/profile-dropdown.component';
+import { AuthService } from '@/app/service/auth.service';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
+    AppIconComponent,
     CommonModule,
     RouterOutlet,
     RouterLink,
     UbButtonDirective,
     ToastContainerComponent,
+    ProfileDropdownComponent
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
-})
+  styleUrl: './app.component.css' })
 export class AppComponent {
   title = 'Employee Management';
   readonly currentYear = new Date().getFullYear();
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
+  readonly authService = inject(AuthService);
 
   /** False until first NavigationEnd — avoids painting private chrome while Session resolves. */
   private navigationSettled = false;

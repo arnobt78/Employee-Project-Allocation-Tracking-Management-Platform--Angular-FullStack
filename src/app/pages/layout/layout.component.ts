@@ -1,11 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import {
-  Router,
   RouterLink,
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
-import { AuthService } from '@/app/service/auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -14,18 +12,4 @@ import { AuthService } from '@/app/service/auth.service';
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.css'],
 })
-export class LayoutComponent {
-  router = inject(Router);
-  private readonly authService = inject(AuthService);
-
-  logOff(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        void this.router.navigateByUrl('login');
-      },
-      error: () => {
-        void this.router.navigateByUrl('login');
-      },
-    });
-  }
-}
+export class LayoutComponent {}

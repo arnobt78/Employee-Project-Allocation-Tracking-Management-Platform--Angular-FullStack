@@ -3,14 +3,12 @@ import {
   OnInit,
   computed,
   inject,
-  signal,
-} from '@angular/core';
+  signal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
+  ReactiveFormsModule } from '@angular/forms';
 import { MasterService } from '../../service/master.service';
 import { IProjectEmployee, IProject } from '../../model/interface/master';
 import { CommonModule } from '@angular/common';
@@ -21,23 +19,23 @@ import { DatePipe } from '@angular/common';
 
 import {
   ListSkeletonComponent,
-  StatPillSkeletonComponent,
-} from '@/app/components/ui/list-skeleton.component';
+  StatPillSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 
 @Component({
   selector: 'app-project-employee',
   standalone: true,
   imports: [
+    AppIconComponent,
     CommonModule,
     ReactiveFormsModule,
     UbButtonDirective,
     ListSkeletonComponent,
-    StatPillSkeletonComponent,
+    StatPillSkeletonComponent
   ],
   providers: [DatePipe],
   templateUrl: './project-employee.component.html',
-  styleUrls: ['./project-employee.component.css'],
-})
+  styleUrls: ['./project-employee.component.css'] })
 export class ProjectEmployeeComponent implements OnInit {
   private readonly masterService = inject(MasterService);
   private readonly toast = inject(ToastService);
@@ -77,8 +75,7 @@ export class ProjectEmployeeComponent implements OnInit {
     return {
       total: data.length,
       active,
-      inactive: data.length - active,
-    };
+      inactive: data.length - active };
   });
 
   projectEmployeeForm: FormGroup = this.fb.group({
@@ -89,11 +86,9 @@ export class ProjectEmployeeComponent implements OnInit {
     role: ['', Validators.required],
     allocationPct: [
       0,
-      [Validators.required, Validators.min(0), Validators.max(200)],
-    ],
+      [Validators.required, Validators.min(0), Validators.max(200)]],
     isActive: [true],
-    notes: [''],
-  });
+    notes: [''] });
 
   expandedAssignmentId: number | null = null;
   editingAssignmentId: number | null = null;
@@ -152,8 +147,7 @@ export class ProjectEmployeeComponent implements OnInit {
         }
         projectsLoaded = true;
         markComplete();
-      },
-    });
+      } });
     this.masterService.getAllEmp().subscribe({
       next: (employees) => {
         this.employeesSignal.set(employees ?? []);
@@ -166,8 +160,7 @@ export class ProjectEmployeeComponent implements OnInit {
         }
         employeesLoaded = true;
         markComplete();
-      },
-    });
+      } });
     this.getProjectEmployees(() => {
       assignmentsLoaded = true;
       markComplete();
@@ -188,8 +181,7 @@ export class ProjectEmployeeComponent implements OnInit {
           this.assignmentsSignal.set([]);
         }
         onComplete?.();
-      },
-    });
+      } });
   }
 
   onEdit(projectEmployee: IProjectEmployee) {
@@ -210,8 +202,7 @@ export class ProjectEmployeeComponent implements OnInit {
           ? projectEmployee.allocationPct
           : 0,
       isActive: this.isActive(projectEmployee.isActive),
-      notes: projectEmployee.notes || '',
-    });
+      notes: projectEmployee.notes || '' });
   }
 
   onDelete(id: number) {
@@ -229,8 +220,7 @@ export class ProjectEmployeeComponent implements OnInit {
       const projectEmployee = {
         ...this.projectEmployeeForm.value,
         allocationPct: Number(this.projectEmployeeForm.value.allocationPct) || 0,
-        isActive: this.projectEmployeeForm.value.isActive ? 'Y' : 'N',
-      };
+        isActive: this.projectEmployeeForm.value.isActive ? 'Y' : 'N' };
       this.isSaving = true;
       if (projectEmployee.empProjectId) {
         // Update existing project employee
@@ -241,8 +231,7 @@ export class ProjectEmployeeComponent implements OnInit {
             this.projectEmployeeForm.reset();
             this.toast.success({
               title: 'Assignment updated',
-              description: 'Changes saved successfully.',
-            });
+              description: 'Changes saved successfully.' });
             this.editingAssignmentId = null;
             this.expandedAssignmentId = null;
           },
@@ -250,8 +239,7 @@ export class ProjectEmployeeComponent implements OnInit {
             this.isSaving = false;
             this.toast.error({
               title: 'Update failed',
-              description: 'Unable to update project assignment.',
-            });
+              description: 'Unable to update project assignment.' });
           }
         );
       } else {
@@ -263,8 +251,7 @@ export class ProjectEmployeeComponent implements OnInit {
             this.projectEmployeeForm.reset();
             this.toast.success({
               title: 'Assignment created',
-              description: 'A new team assignment has been added.',
-            });
+              description: 'A new team assignment has been added.' });
             this.showCreatePanel = false;
             this.resetForm();
           },
@@ -272,8 +259,7 @@ export class ProjectEmployeeComponent implements OnInit {
             this.isSaving = false;
             this.toast.error({
               title: 'Creation failed',
-              description: 'Unable to create project assignment.',
-            });
+              description: 'Unable to create project assignment.' });
           }
         );
       }
@@ -281,8 +267,7 @@ export class ProjectEmployeeComponent implements OnInit {
       if (!this.isSaving) {
         this.toast.error({
           title: 'Missing details',
-          description: 'Please complete all required fields.',
-        });
+          description: 'Please complete all required fields.' });
       }
     }
   }
@@ -303,8 +288,7 @@ export class ProjectEmployeeComponent implements OnInit {
         );
         this.toast.success({
           title: 'Assignment removed',
-          description: `${projectName} assignment deleted.`,
-        });
+          description: `${projectName} assignment deleted.` });
         if (this.expandedAssignmentId === empProjectId) {
           this.expandedAssignmentId = null;
         }
@@ -316,8 +300,7 @@ export class ProjectEmployeeComponent implements OnInit {
         this.isDeleting = false;
         this.toast.error({
           title: 'Delete failed',
-          description: 'Unable to remove project assignment.',
-        });
+          description: 'Unable to remove project assignment.' });
       }
     );
   }
@@ -400,7 +383,6 @@ export class ProjectEmployeeComponent implements OnInit {
       role: '',
       allocationPct: 0,
       isActive: true,
-      notes: '',
-    });
+      notes: '' });
   }
 }

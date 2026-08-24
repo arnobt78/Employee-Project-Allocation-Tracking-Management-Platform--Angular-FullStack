@@ -7,44 +7,44 @@ import { UbButtonDirective } from '@/app/components/ui/button';
 import { OptimizedImageComponent } from '@/app/components/ui/optimized-image.component';
 import {
   SelectMenuComponent,
-  SelectMenuOption,
-} from '@/app/components/ui/select-menu.component';
+  SelectMenuOption } from '@/app/components/ui/select-menu.component';
 import { environment } from '@/environments/environment';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { AuthService } from '@/app/service/auth.service';
 import { MasterService } from '@/app/service/master.service';
-import { finalize } from 'rxjs';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
+import { DemoAccount } from '@/app/model/interface/master';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
+    AppIconComponent,
     CommonModule,
     FormsModule,
     FloatingBackgroundComponent,
     UbButtonDirective,
     OptimizedImageComponent,
-    SelectMenuComponent,
+    SelectMenuComponent
   ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css',
-})
+  styleUrl: './login.component.css' })
 export class LoginComponent {
   loginObj = {
     username: '',
-    password: '',
-  };
+    password: '' };
 
   selectedTestAccount = '';
   isSubmitting = false;
 
   readonly demoCredentials = environment.demoLogin;
+  private demoAccounts: DemoAccount[] = [];
   readonly accountOptions = signal<SelectMenuOption[]>([
     {
       value: 'admin',
       label: 'Admin Account',
-    },
-  ]);
+      subtitle: 'admin',
+      imageSeed: 'admin' }]);
 
   private readonly authService = inject(AuthService);
   private readonly masterService = inject(MasterService);
@@ -55,19 +55,15 @@ export class LoginComponent {
     {
       title: 'Smart Dashboards',
       description:
-        'Monitor people, projects & assignments in a single view with real-time insight.',
-    },
+        'Monitor people, projects & assignments in a single view with real-time insight.' },
     {
       title: 'Lightning Onboarding',
       description:
-        'Invite new teammates, provision access & share documentation in a few clicks.',
-    },
+        'Invite new teammates, provision access & share documentation in a few clicks.' },
     {
       title: 'Predictive Analytics',
       description:
-        'Anticipate resourcing needs with automated forecasting and talent signals.',
-    },
-  ];
+        'Anticipate resourcing needs with automated forecasting and talent signals.' }];
 
   constructor() {
     this.loadDemoAccounts();
@@ -77,23 +73,30 @@ export class LoginComponent {
     this.masterService.getDemoAccounts().subscribe({
       next: (response) => {
         if (response.result && Array.isArray(response.data) && response.data.length) {
+          this.demoAccounts = response.data;
           this.accountOptions.set(
             response.data.map((account) => ({
               value: account.id,
               label: account.label,
-            }))
+              subtitle: account.username,
+              imageSeed: account.username }))
           );
         }
       },
       error: () => {
+        this.demoAccounts = [
+          {
+            id: 'admin',
+            label: 'Admin Account',
+            username: this.demoCredentials.username,
+            role: 'admin' }];
         this.accountOptions.set([
           {
             value: 'admin',
             label: 'Admin Account',
-          },
-        ]);
-      },
-    });
+            subtitle: this.demoCredentials.username,
+            imageSeed: this.demoCredentials.username }]);
+      } });
   }
 
   onTestAccountSelect(value: string): void {
@@ -105,7 +108,12 @@ export class LoginComponent {
     }
 
     this.selectedTestAccount = value;
-    this.loginObj.username = this.demoCredentials.username;
+    const account =
+      this.demoAccounts.find((item) => item.id === value) ||
+      this.demoAccounts.find((item) => item.username === value);
+
+    this.loginObj.username =
+      account?.username || this.demoCredentials.username;
     this.loginObj.password = this.demoCredentials.password;
   }
 
@@ -118,39 +126,38 @@ export class LoginComponent {
     const password = this.loginObj.password;
     if (!username || !password) {
       this.toast.error({
-        title: 'Missing credentials',
-        description: 'Enter both username and password.',
-      });
+        title: 'Missing Credentials',
+        description: 'Enter both username and password.' });
       return;
     }
 
     this.isSubmitting = true;
-    this.authService
-      .login(username, password)
-      .pipe(finalize(() => (this.isSubmitting = false)))
-      .subscribe({
-        next: (response) => {
-          if (response.result) {
-            void this.router.navigateByUrl('dashboard');
-            this.toast.success({
-              title: 'Welcome back!',
-              description: 'You have been signed in successfully.',
-            });
-            return;
-          }
-          this.toast.error({
-            title: 'Invalid credentials',
-            description: response.message || 'Please double check your username and password.',
+    this.authService.login(username, password).subscribe({
+      next: (response) => {
+        if (response.result) {
+          this.toast.success({
+            title: 'Welcome Back!',
+            description: 'You have been signed in successfully.' });
+          void this.router.navigateByUrl('dashboard').finally(() => {
+            // Keep spinner until navigation finishes; then reset if still on login.
+            this.isSubmitting = false;
           });
-        },
-        error: (error) => {
-          this.toast.error({
-            title: 'Sign in failed',
-            description:
-              error?.error?.message ||
-              'Unable to sign in. Please verify your credentials and try again.',
-          });
-        },
-      });
+          return;
+        }
+        this.isSubmitting = false;
+        this.toast.error({
+          title: 'Invalid Credentials',
+          description:
+            response.message ||
+            'Please double check your username and password.' });
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        this.toast.error({
+          title: 'Sign In Failed',
+          description:
+            error?.error?.message ||
+            'Unable to sign in. Please verify your credentials and try again.' });
+      } });
   }
 }

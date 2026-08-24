@@ -1,13 +1,11 @@
 <div class="space-y-6">
   <div class="flex items-center justify-between">
-    <h3 class="text-lg font-semibold text-white">Project Timeline</h3>
-    <p class="text-sm text-white/60">
-      {{ sortedProjects().length }} projects
-    </p>
+    <h3 class="text-lg font-medium text-white">Project Timeline</h3>
+    <p class="text-sm text-white/60">{{ sortedProjects().length }} projects</p>
   </div>
 
   <!-- Main Timeline Bar (Horizontal) -->
-  <div class="relative mb-8" style="height: 80px;">
+  <div class="relative mb-8" style="height: 80px">
     <!-- Background Timeline Line -->
     <div
       class="absolute left-0 top-10 h-1.5 w-full rounded-full bg-white/10"
@@ -21,12 +19,12 @@
         project.status === 'approved' || project.status === 'completed'
           ? 'bg-green-500/60 hover:bg-green-500/80'
           : project.status === 'in_progress' || project.status === 'in_review'
-          ? 'bg-blue-500/60 hover:bg-blue-500/80'
-          : project.status === 'on_hold'
-          ? 'bg-yellow-500/60 hover:bg-yellow-500/80'
-          : project.status === 'cancelled' || project.status === 'rejected'
-          ? 'bg-red-500/60 hover:bg-red-500/80'
-          : 'bg-gray-500/60 hover:bg-gray-500/80'
+            ? 'bg-blue-500/60 hover:bg-blue-500/80'
+            : project.status === 'on_hold'
+              ? 'bg-yellow-500/60 hover:bg-yellow-500/80'
+              : project.status === 'cancelled' || project.status === 'rejected'
+                ? 'bg-red-500/60 hover:bg-red-500/80'
+                : 'bg-gray-500/60 hover:bg-gray-500/80'
       "
       [style.left.%]="getProjectPosition(project)"
       [style.width.%]="getProjectWidth(project)"
@@ -38,11 +36,11 @@
         <div
           class="whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-xl border border-white/20"
         >
-          <div class="font-semibold">{{ project.projectName }}</div>
+          <div class="font-medium">{{ project.projectName }}</div>
           <div class="text-white/60">
-            {{ project.startDate | date : 'MMM d, y' }}
+            {{ project.startDate | date: "MMM d, y" }}
             <span *ngIf="project.endDate">
-              - {{ project.endDate | date : 'MMM d, y' }}
+              - {{ project.endDate | date: "MMM d, y" }}
             </span>
           </div>
           <div class="text-white/60">
@@ -62,7 +60,7 @@
       *ngFor="let project of sortedProjects()"
       class="group absolute top-10 left-0 transition-all hover:scale-125 hover:shadow-lg cursor-pointer z-10"
       [style.left.%]="getProjectPosition(project)"
-      style="transform: translateX(-50%) translateY(-50%);"
+      style="transform: translateX(-50%) translateY(-50%)"
     >
       <!-- Outer Ring -->
       <div
@@ -71,12 +69,13 @@
           project.status === 'approved' || project.status === 'completed'
             ? 'border-green-500'
             : project.status === 'in_progress' || project.status === 'in_review'
-            ? 'border-blue-500'
-            : project.status === 'on_hold'
-            ? 'border-yellow-500'
-            : project.status === 'cancelled' || project.status === 'rejected'
-            ? 'border-red-500'
-            : 'border-gray-500'
+              ? 'border-blue-500'
+              : project.status === 'on_hold'
+                ? 'border-yellow-500'
+                : project.status === 'cancelled' ||
+                    project.status === 'rejected'
+                  ? 'border-red-500'
+                  : 'border-gray-500'
         "
       >
         <!-- Inner Circle -->
@@ -85,13 +84,15 @@
           [class]="
             project.status === 'approved' || project.status === 'completed'
               ? 'bg-green-500/30'
-              : project.status === 'in_progress' || project.status === 'in_review'
-              ? 'bg-blue-500/30'
-              : project.status === 'on_hold'
-              ? 'bg-yellow-500/30'
-              : project.status === 'cancelled' || project.status === 'rejected'
-              ? 'bg-red-500/30'
-              : 'bg-gray-500/30'
+              : project.status === 'in_progress' ||
+                  project.status === 'in_review'
+                ? 'bg-blue-500/30'
+                : project.status === 'on_hold'
+                  ? 'bg-yellow-500/30'
+                  : project.status === 'cancelled' ||
+                      project.status === 'rejected'
+                    ? 'bg-red-500/30'
+                    : 'bg-gray-500/30'
           "
         ></div>
       </div>
@@ -102,9 +103,9 @@
         <div
           class="whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-xl border border-white/20"
         >
-          <div class="font-semibold">{{ project.projectName }}</div>
+          <div class="font-medium">{{ project.projectName }}</div>
           <div class="text-white/60">
-            Start: {{ project.startDate | date : 'MMM d, y' }}
+            Start: {{ project.startDate | date: "MMM d, y" }}
           </div>
           <div class="text-white/60">Status: {{ project.status }}</div>
         </div>
@@ -117,10 +118,10 @@
 
     <!-- Date Labels (optional - showing min and max dates) -->
     <div class="absolute left-0 top-0 text-xs text-white/40">
-      {{ dateRange().min | date : 'MMM d, y' }}
+      {{ dateRange().min | date: "MMM d, y" }}
     </div>
     <div class="absolute right-0 top-0 text-xs text-white/40">
-      {{ dateRange().max | date : 'MMM d, y' }}
+      {{ dateRange().max | date: "MMM d, y" }}
     </div>
   </div>
 
@@ -134,12 +135,14 @@
       <div
         class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl transition-all hover:border-primary/50 hover:bg-white/10"
       >
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div
+          class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+        >
           <div class="flex-1">
             <div class="flex items-center gap-2">
               <h4
                 [routerLink]="['/update-project', project.projectId]"
-                class="cursor-pointer text-lg font-semibold text-white transition-colors hover:text-primary"
+                class="cursor-pointer text-lg font-medium text-white transition-colors hover:text-primary"
               >
                 {{ project.projectName }}
               </h4>
@@ -153,24 +156,29 @@
             <p class="mt-1 text-sm text-white/60">
               {{ project.clientName }}
             </p>
-            
+
             <!-- Mini Timeline Bar for this project -->
-            <div class="mt-3 relative h-2 w-full rounded-full bg-white/5 overflow-visible">
+            <div
+              class="mt-3 relative h-2 w-full rounded-full bg-white/5 overflow-visible"
+            >
               <!-- Background line showing full date range -->
               <div class="absolute inset-0 bg-white/10 rounded-full"></div>
               <!-- This project's position and duration -->
               <div
                 class="group/bar absolute h-full rounded-full transition-all cursor-pointer hover:opacity-80"
                 [class]="
-                  project.status === 'approved' || project.status === 'completed'
+                  project.status === 'approved' ||
+                  project.status === 'completed'
                     ? 'bg-green-500/60'
-                    : project.status === 'in_progress' || project.status === 'in_review'
-                    ? 'bg-blue-500/60'
-                    : project.status === 'on_hold'
-                    ? 'bg-yellow-500/60'
-                    : project.status === 'cancelled' || project.status === 'rejected'
-                    ? 'bg-red-500/60'
-                    : 'bg-gray-500/60'
+                    : project.status === 'in_progress' ||
+                        project.status === 'in_review'
+                      ? 'bg-blue-500/60'
+                      : project.status === 'on_hold'
+                        ? 'bg-yellow-500/60'
+                        : project.status === 'cancelled' ||
+                            project.status === 'rejected'
+                          ? 'bg-red-500/60'
+                          : 'bg-gray-500/60'
                 "
                 [style.left.%]="getProjectPosition(project)"
                 [style.width.%]="getProjectWidth(project)"
@@ -182,18 +190,20 @@
                   <div
                     class="whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-xl border border-white/20"
                   >
-                    <div class="font-semibold">{{ project.projectName }}</div>
+                    <div class="font-medium">{{ project.projectName }}</div>
                     <div class="text-white/60">
-                      {{ project.startDate | date : 'MMM d, y' }}
+                      {{ project.startDate | date: "MMM d, y" }}
                       <span *ngIf="project.endDate">
-                        - {{ project.endDate | date : 'MMM d, y' }}
+                        - {{ project.endDate | date: "MMM d, y" }}
                       </span>
                     </div>
                     <div class="text-white/60">
                       Duration: {{ getDurationDisplay(project) }}
                     </div>
                     <div class="text-white/60">
-                      Position: {{ (getProjectPosition(project) | number:'1.0-1') }}% on timeline
+                      Position:
+                      {{ getProjectPosition(project) | number: "1.0-1" }}% on
+                      timeline
                     </div>
                   </div>
                   <!-- Tooltip Arrow -->
@@ -206,15 +216,18 @@
               <div
                 class="group/marker absolute top-1/2 -translate-y-1/2 h-3 w-3 -translate-x-1/2 rounded-full border-2 bg-background transition-all cursor-pointer hover:scale-125 z-20"
                 [class]="
-                  project.status === 'approved' || project.status === 'completed'
+                  project.status === 'approved' ||
+                  project.status === 'completed'
                     ? 'border-green-500'
-                    : project.status === 'in_progress' || project.status === 'in_review'
-                    ? 'border-blue-500'
-                    : project.status === 'on_hold'
-                    ? 'border-yellow-500'
-                    : project.status === 'cancelled' || project.status === 'rejected'
-                    ? 'border-red-500'
-                    : 'border-gray-500'
+                    : project.status === 'in_progress' ||
+                        project.status === 'in_review'
+                      ? 'border-blue-500'
+                      : project.status === 'on_hold'
+                        ? 'border-yellow-500'
+                        : project.status === 'cancelled' ||
+                            project.status === 'rejected'
+                          ? 'border-red-500'
+                          : 'border-gray-500'
                 "
                 [style.left.%]="getProjectPosition(project)"
               >
@@ -225,13 +238,16 @@
                   <div
                     class="whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-xl border border-white/20"
                   >
-                    <div class="font-semibold">{{ project.projectName }}</div>
+                    <div class="font-medium">{{ project.projectName }}</div>
                     <div class="text-white/60">
-                      Start: {{ project.startDate | date : 'MMM d, y' }}
+                      Start: {{ project.startDate | date: "MMM d, y" }}
                     </div>
-                    <div class="text-white/60">Status: {{ project.status }}</div>
                     <div class="text-white/60">
-                      Timeline Position: {{ (getProjectPosition(project) | number:'1.0-1') }}%
+                      Status: {{ project.status }}
+                    </div>
+                    <div class="text-white/60">
+                      Timeline Position:
+                      {{ getProjectPosition(project) | number: "1.0-1" }}%
                     </div>
                   </div>
                   <!-- Tooltip Arrow -->
@@ -241,17 +257,13 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="mt-2 flex flex-wrap gap-4 text-xs text-white/60">
-              <span>
-                Start: {{ project.startDate | date : 'MMM d, y' }}
-              </span>
+              <span> Start: {{ project.startDate | date: "MMM d, y" }} </span>
               <span *ngIf="project.endDate">
-                End: {{ project.endDate | date : 'MMM d, y' }}
+                End: {{ project.endDate | date: "MMM d, y" }}
               </span>
-              <span>
-                Duration: {{ getDurationDisplay(project) }}
-              </span>
+              <span> Duration: {{ getDurationDisplay(project) }} </span>
             </div>
           </div>
           <div class="text-right text-sm">
@@ -263,4 +275,3 @@
     </div>
   </div>
 </div>
-

@@ -21,7 +21,7 @@ import { ToastService } from './toast.service';
       >
         <div class="flex items-start justify-between gap-3">
           <div>
-            <p class="font-semibold leading-none">{{ toast.title }}</p>
+            <p class="font-medium leading-none">{{ toast.title }}</p>
             <p *ngIf="toast.description" class="mt-1 text-xs text-white/70">
               {{ toast.description }}
             </p>
@@ -45,13 +45,13 @@ import { ToastService } from './toast.service';
         style({ opacity: 0, transform: 'translateY(12px) scale(0.98)' }),
         animate(
           '180ms ease',
-          style({ opacity: 1, transform: 'translateY(0) scale(1)' })
+          style({ opacity: 1, transform: 'translateY(0) scale(1)' }),
         ),
       ]),
       transition(':leave', [
         animate(
           '150ms ease',
-          style({ opacity: 0, transform: 'translateY(12px) scale(0.98)' })
+          style({ opacity: 0, transform: 'translateY(12px) scale(0.98)' }),
         ),
       ]),
     ]),

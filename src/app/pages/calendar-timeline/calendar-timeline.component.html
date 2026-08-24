@@ -1,11 +1,13 @@
 <div class="space-y-6">
   <!-- Header -->
   <div
-    class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
   >
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div
+      class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+    >
       <div>
-        <h1 class="text-2xl font-bold text-white">Calendar & Timeline</h1>
+        <h1 class="text-2xl font-medium text-white">Calendar & Timeline</h1>
         <p class="mt-1 text-sm text-white/60">
           View project milestones, timelines, and due date reminders
         </p>
@@ -35,7 +37,9 @@
 
   <!-- Loading State (inline skeletons — first paint only when cache is cold) -->
   <div *ngIf="loading()" class="space-y-6">
-    <section class="rounded-2xl border border-white/10 bg-white/5 px-6 py-4">
+    <section
+      class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-4"
+    >
       <div class="flex flex-wrap gap-2">
         <app-stat-pill-skeleton
           *ngFor="let pill of [1, 2, 3]"
@@ -51,9 +55,9 @@
     <!-- Upcoming Reminders -->
     <div
       *ngIf="upcomingReminders().length > 0"
-      class="rounded-[26px] border border-yellow-500/20 bg-yellow-500/5 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+      class="rounded-[28px] border border-yellow-500/20 bg-yellow-500/5 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
     >
-      <h2 class="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
+      <h2 class="mb-4 flex items-center gap-2 text-lg font-medium text-white">
         <svg
           class="h-5 w-5 text-yellow-400"
           fill="none"
@@ -81,7 +85,7 @@
                 {{ reminder.projectName }}
               </p>
               <p class="mt-2 text-sm text-white/80">
-                Due: {{ reminder.dueDate | date : 'MMM d, y' }}
+                Due: {{ reminder.dueDate | date: "MMM d, y" }}
               </p>
             </div>
             <span
@@ -89,16 +93,16 @@
                 isOverdue(reminder.dueDate)
                   ? 'rounded-full bg-red-500/20 px-2 py-1 text-xs font-medium text-red-400'
                   : isDueSoon(reminder.dueDate)
-                  ? 'rounded-full bg-yellow-500/20 px-2 py-1 text-xs font-medium text-yellow-400'
-                  : 'rounded-full bg-green-500/20 px-2 py-1 text-xs font-medium text-green-400'
+                    ? 'rounded-full bg-yellow-500/20 px-2 py-1 text-xs font-medium text-yellow-400'
+                    : 'rounded-full bg-green-500/20 px-2 py-1 text-xs font-medium text-green-400'
               "
             >
               {{
                 isOverdue(reminder.dueDate)
-                  ? 'Overdue'
+                  ? "Overdue"
                   : isDueSoon(reminder.dueDate)
-                  ? 'Due Soon'
-                  : getDaysUntilDue(reminder.dueDate) + ' days'
+                    ? "Due Soon"
+                    : getDaysUntilDue(reminder.dueDate) + " days"
               }}
             </span>
           </div>
@@ -108,14 +112,14 @@
 
     <!-- Tabs -->
     <div
-      class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
     >
       <div class="mb-6 flex gap-2 border-b border-white/10">
         <button
           (click)="setActiveTab('calendar')"
           [class]="
             activeTab() === 'calendar'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-semibold text-primary'
+              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
               : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
           "
         >
@@ -125,7 +129,7 @@
           (click)="setActiveTab('timeline')"
           [class]="
             activeTab() === 'timeline'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-semibold text-primary'
+              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
               : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
           "
         >
@@ -135,7 +139,7 @@
           (click)="setActiveTab('gantt')"
           [class]="
             activeTab() === 'gantt'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-semibold text-primary'
+              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
               : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
           "
         >
@@ -145,23 +149,17 @@
 
       <!-- Calendar Tab -->
       <div *ngIf="activeTab() === 'calendar'" class="space-y-4">
-        <app-calendar-view
-          [events]="calendarEvents()"
-        ></app-calendar-view>
+        <app-calendar-view [events]="calendarEvents()"></app-calendar-view>
       </div>
 
       <!-- Timeline Tab -->
       <div *ngIf="activeTab() === 'timeline'" class="space-y-4">
-        <app-timeline-view
-          [projects]="timelineProjects()"
-        ></app-timeline-view>
+        <app-timeline-view [projects]="timelineProjects()"></app-timeline-view>
       </div>
 
       <!-- Gantt Tab -->
       <div *ngIf="activeTab() === 'gantt'" class="space-y-4">
-        <app-gantt-view
-          [projects]="ganttData()"
-        ></app-gantt-view>
+        <app-gantt-view [projects]="ganttData()"></app-gantt-view>
       </div>
     </div>
   </div>
@@ -169,9 +167,8 @@
   <!-- Empty State -->
   <div
     *ngIf="!loading() && !scheduleData()"
-    class="rounded-[26px] border border-dashed border-white/20 bg-white/5 px-6 py-12 text-center"
+    class="rounded-[28px] border border-dashed border-white/20 bg-white/5 px-2 sm:px-4 py-12 text-center"
   >
     <p class="text-sm text-white/60">No schedule data available.</p>
   </div>
 </div>
-

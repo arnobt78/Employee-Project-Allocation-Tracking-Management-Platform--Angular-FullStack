@@ -1,6 +1,6 @@
 <div class="space-y-8 text-white/85">
   <section
-    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-6 py-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
+    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
   >
     <div class="w-full sm:max-w-sm">
       <label for="project-search" class="sr-only">Search projects</label>
@@ -33,30 +33,32 @@
       <button
         ubButton
         size="sm"
-        class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+        class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
         (click)="startCreate()"
       >
-        Add project
+        <lucide-icon name="plus" [size]="16"></lucide-icon>
+        <span>Add Project</span>
       </button>
       <a
         ubButton
         size="sm"
         variant="outline"
-        class="border-white/20 bg-white/10 text-white/80 hover:border-white/40 hover:text-white"
+        class="inline-flex items-center justify-center gap-2 border-white/20 bg-white/10 text-white/80 hover:border-white/40 hover:text-white"
         routerLink="/new-project"
       >
-        Open full editor
+        <lucide-icon name="external-link" [size]="16"></lucide-icon>
+        <span>Open Full Editor</span>
       </a>
     </div>
   </section>
 
   <section
     *ngIf="showCreatePanel"
-    class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
   >
     <header class="mb-4 flex items-center justify-between">
       <div>
-        <h2 class="text-lg font-semibold text-white">Create new project</h2>
+        <h2 class="text-lg font-medium text-white">Create new project</h2>
         <p class="text-xs uppercase tracking-[0.3em] text-white/50">
           Track engagements from day one
         </p>
@@ -64,10 +66,11 @@
       <button
         type="button"
         [disabled]="isSaving"
-        class="text-xs text-white/60 transition hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        class="inline-flex items-center justify-center gap-1 text-xs text-white/60 transition hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
         (click)="closeCreatePanel()"
       >
-        Cancel
+        <lucide-icon name="x" [size]="14"></lucide-icon>
+        <span>Cancel</span>
       </button>
     </header>
     <form
@@ -167,8 +170,12 @@
           [disabled]="isSaving"
           class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span *ngIf="!isSaving">Save project</span>
-          <span *ngIf="isSaving">Saving project...</span>
+          @if (!isSaving) {
+            <lucide-icon name="save" [size]="16"></lucide-icon>
+            <span>Save Project</span>
+          } @else {
+            <span>Saving Project...</span>
+          }
         </button>
       </div>
     </form>
@@ -179,15 +186,15 @@
 
     <div
       *ngFor="let project of filteredProjects()"
-      class="overflow-hidden rounded-[26px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-xl transition duration-200 hover:border-white/20"
+      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-xl transition duration-200 hover:border-white/20"
     >
       <button
         type="button"
-        class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
+        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
         (click)="toggleExpand(project.projectId)"
       >
         <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
-          <span class="text-base font-semibold text-white">
+          <span class="text-base font-medium text-white">
             {{ project.projectName }}
           </span>
           <span
@@ -211,7 +218,7 @@
 
       <div
         *ngIf="expandedProjectId === project.projectId"
-        class="border-t border-white/10 px-6 py-6 text-sm text-white/75"
+        class="border-t border-white/10 px-2 sm:px-4 py-6 text-sm text-white/75"
       >
         <ng-container
           *ngIf="editingProjectId === project.projectId; else projectView"
@@ -316,8 +323,12 @@
                 [disabled]="isSaving"
                 class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span *ngIf="!isSaving">Save changes</span>
-                <span *ngIf="isSaving">Updating...</span>
+                @if (!isSaving) {
+                  <lucide-icon name="save" [size]="16"></lucide-icon>
+                  <span>Save Changes</span>
+                } @else {
+                  <span>Updating...</span>
+                }
               </button>
             </div>
           </form>
@@ -330,7 +341,7 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Client name
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ project.clientName }}
               </p>
             </div>
@@ -340,7 +351,7 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Start date
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ formattedDate(project.startDate) }}
               </p>
             </div>
@@ -350,7 +361,7 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Contact person
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ project.contactPerson || "—" }}
               </p>
             </div>
@@ -360,7 +371,7 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Contact number
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ project.contactNo || "—" }}
               </p>
             </div>
@@ -370,7 +381,7 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Contact email
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ project.emailId || "—" }}
               </p>
             </div>
@@ -382,21 +393,24 @@
                 class="border-white/20 bg-white/5 text-white/80 hover:border-white/40 hover:text-white"
                 [routerLink]="['/update-project', project.projectId || 0]"
               >
-                Full editor
+                <lucide-icon name="external-link" [size]="14"></lucide-icon>
+                <span>Full Editor</span>
               </a>
               <button
                 type="button"
-                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
                 (click)="onEdit(project.projectId)"
+                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
               >
-                Edit
+                <lucide-icon name="pencil" [size]="14"></lucide-icon>
+                <span>Edit</span>
               </button>
               <button
                 type="button"
-                class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
+                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
                 (click)="onDelete(project.projectId)"
               >
-                Delete
+                <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+                <span>Delete</span>
               </button>
             </div>
           </div>
@@ -406,7 +420,7 @@
 
     <div
       *ngIf="hasLoaded() && !filteredProjects().length"
-      class="rounded-[26px] border border-dashed border-white/15 bg-white/5/60 px-6 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
+      class="rounded-[28px] border border-dashed border-white/15 bg-white/5/60 px-2 sm:px-4 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
     >
       No projects match your filters.
     </div>
@@ -429,9 +443,9 @@
   "
 >
   <div
-    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-6 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
+    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-2 sm:p-4 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
   >
-    <h2 class="text-lg font-semibold text-white">
+    <h2 class="text-lg font-medium text-white">
       Delete {{ toDelete.projectName }}?
     </h2>
     <p class="mt-2 text-white/70">
@@ -441,10 +455,11 @@
       <button
         type="button"
         [disabled]="isDeleting"
-        class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        class="inline-flex items-center justify-center gap-1 rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
         (click)="confirmDelete(false)"
       >
-        Cancel
+        <lucide-icon name="x" [size]="14"></lucide-icon>
+        <span>Cancel</span>
       </button>
       <button
         type="button"
@@ -452,8 +467,12 @@
         class="rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
         (click)="confirmDelete(true)"
       >
-        <span *ngIf="!isDeleting">Delete project</span>
-        <span *ngIf="isDeleting">Deleting...</span>
+        @if (!isDeleting) {
+          <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+          <span>Delete Project</span>
+        } @else {
+          <span>Deleting...</span>
+        }
       </button>
     </div>
   </div>

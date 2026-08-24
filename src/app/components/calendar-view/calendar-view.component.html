@@ -1,6 +1,6 @@
 <div class="space-y-4">
   <div class="flex items-center justify-between">
-    <h3 class="text-lg font-semibold text-white">
+    <h3 class="text-lg font-medium text-white">
       {{ monthName() }} {{ currentYear() }}
     </h3>
     <div class="flex items-center gap-2">
@@ -53,12 +53,14 @@
   </div>
 
   <!-- Calendar Grid -->
-  <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl">
+  <div
+    class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl"
+  >
     <!-- Day Headers -->
     <div class="mb-2 grid grid-cols-7 gap-2">
       <div
         *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
-        class="py-2 text-center text-xs font-semibold uppercase tracking-wider text-white/60"
+        class="py-2 text-center text-xs font-medium uppercase tracking-wider text-white/60"
       >
         {{ day }}
       </div>
@@ -195,4 +197,3 @@
     </div>
   </div>
 </div>
-

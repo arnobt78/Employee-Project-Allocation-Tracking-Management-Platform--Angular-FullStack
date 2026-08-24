@@ -1,6 +1,6 @@
 <div class="space-y-8 text-white/85">
   <section
-    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-6 py-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
+    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
   >
     <div class="w-full sm:max-w-sm">
       <label for="employee-search" class="sr-only">Search employees</label>
@@ -33,21 +33,22 @@
       <button
         ubButton
         size="sm"
-        class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+        class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
         (click)="startCreate()"
       >
-        Add employee
+        <lucide-icon name="plus" [size]="16"></lucide-icon>
+        <span>Add Employee</span>
       </button>
     </div>
   </section>
 
   <section
     *ngIf="showCreatePanel"
-    class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
   >
     <header class="mb-4 flex items-center justify-between">
       <div>
-        <h2 class="text-lg font-semibold text-white">Create new employee</h2>
+        <h2 class="text-lg font-medium text-white">Create new employee</h2>
         <p class="text-xs uppercase tracking-[0.3em] text-white/50">
           Quick onboarding form
         </p>
@@ -256,8 +257,12 @@
           [disabled]="isSaving"
           class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span *ngIf="!isSaving">Save employee</span>
-          <span *ngIf="isSaving">Saving employee...</span>
+          @if (!isSaving) {
+            <lucide-icon name="save" [size]="16"></lucide-icon>
+            <span>Save Employee</span>
+          } @else {
+            <span>Saving Employee...</span>
+          }
         </button>
       </div>
     </form>
@@ -268,20 +273,20 @@
 
     <div
       *ngFor="let employee of filteredEmployees(); let idx = index"
-      class="overflow-hidden rounded-[26px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-xl transition duration-200 hover:border-white/20"
+      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-xl transition duration-200 hover:border-white/20"
     >
       <button
         type="button"
-        class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
+        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
         (click)="toggleExpand(employee.employeeId)"
       >
         <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
           <span
-            class="inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-xs font-semibold text-white/80 shadow-inner shadow-slate-950/25"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-xs font-medium text-white/80 shadow-inner shadow-slate-950/25"
           >
             {{ employee.employeeId }}
           </span>
-          <span class="font-semibold text-white md:ml-4 md:text-base">
+          <span class="font-medium text-white md:ml-4 md:text-base">
             {{ employee.employeeName }}
           </span>
           <span
@@ -306,7 +311,7 @@
 
       <div
         *ngIf="expandedEmployeeId === employee.employeeId"
-        class="border-t border-white/10 px-6 py-6 text-sm text-white/75"
+        class="border-t border-white/10 px-2 sm:px-4 py-6 text-sm text-white/75"
       >
         <ng-container
           *ngIf="editingEmployeeId === employee.employeeId; else viewMode"
@@ -500,10 +505,14 @@
                 ubButton
                 size="sm"
                 [disabled]="isSaving"
-                class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+                class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span *ngIf="!isSaving">Save changes</span>
-                <span *ngIf="isSaving">Updating...</span>
+                @if (!isSaving) {
+                  <lucide-icon name="save" [size]="16"></lucide-icon>
+                  <span>Save Changes</span>
+                } @else {
+                  <span>Updating...</span>
+                }
               </button>
             </div>
           </form>
@@ -516,7 +525,7 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Employee ID
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ employee.employeeId }}
               </p>
             </div>
@@ -526,7 +535,7 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Department
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ employee.department }}
               </p>
             </div>
@@ -536,8 +545,8 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Department ID
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
-                {{ employee.deptId || '—' }}
+              <p class="mt-1 text-base font-medium text-white">
+                {{ employee.deptId || "—" }}
               </p>
             </div>
             <div
@@ -546,11 +555,11 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Role & Title
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
-                {{ employee.role || '—' }}
+              <p class="mt-1 text-base font-medium text-white">
+                {{ employee.role || "—" }}
               </p>
               <p class="text-xs text-white/55">
-                {{ employee.title || '—' }}
+                {{ employee.title || "—" }}
               </p>
             </div>
             <div
@@ -559,8 +568,8 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Employment type
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
-                {{ employee.employmentType || '—' }}
+              <p class="mt-1 text-base font-medium text-white">
+                {{ employee.employmentType || "—" }}
               </p>
             </div>
             <div
@@ -569,11 +578,11 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Contact
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
-                {{ employee.contactNo || '—' }}
+              <p class="mt-1 text-base font-medium text-white">
+                {{ employee.contactNo || "—" }}
               </p>
               <p class="text-xs text-white/55">
-                {{ employee.emailId || '—' }}
+                {{ employee.emailId || "—" }}
               </p>
             </div>
             <div
@@ -582,11 +591,11 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Location
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
-                {{ employee.location || '—' }}
+              <p class="mt-1 text-base font-medium text-white">
+                {{ employee.location || "—" }}
               </p>
               <p class="text-xs text-white/55">
-                {{ employee.timezone || '—' }}
+                {{ employee.timezone || "—" }}
               </p>
             </div>
             <div
@@ -595,13 +604,13 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Hire Date
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{
                   employee.hireDate
-                    ? (employee.hireDate | date: 'mediumDate')
-                    : (employee.createdAt
-                        ? (employee.createdAt | date: 'mediumDate')
-                        : '—')
+                    ? (employee.hireDate | date: "mediumDate")
+                    : employee.createdAt
+                      ? (employee.createdAt | date: "mediumDate")
+                      : "—"
                 }}
               </p>
             </div>
@@ -611,11 +620,11 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Skills
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{
                   employee.skills && employee.skills.length
-                    ? employee.skills.join(', ')
-                    : '—'
+                    ? employee.skills.join(", ")
+                    : "—"
                 }}
               </p>
             </div>
@@ -625,28 +634,30 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Tags
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{
                   employee.tags && employee.tags.length
-                    ? employee.tags.join(', ')
-                    : '—'
+                    ? employee.tags.join(", ")
+                    : "—"
                 }}
               </p>
             </div>
             <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
               <button
                 type="button"
-                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
                 (click)="onEdit(employee)"
               >
-                Edit
+                <lucide-icon name="pencil" [size]="14"></lucide-icon>
+                <span>Edit</span>
               </button>
               <button
                 type="button"
-                class="rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
+                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
                 (click)="promptDelete(employee)"
               >
-                Delete
+                <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+                <span>Delete</span>
               </button>
             </div>
           </div>
@@ -656,22 +667,32 @@
 
     <div
       *ngIf="hasLoaded() && !filteredEmployees().length"
-      class="rounded-[26px] border border-dashed border-white/15 bg-white/5/60 px-6 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
+      class="rounded-[28px] border border-dashed border-white/15 bg-white/5/60 px-2 sm:px-4 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
     >
       No employees match your filters.
-  </div>
+    </div>
   </section>
-        </div>
+</div>
 
 <div
   *ngIf="pendingDelete as toDelete"
   class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 px-4 py-4"
-  style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; display: flex; align-items: center; justify-content: center;"
+  style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  "
 >
   <div
-    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-6 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
+    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-2 sm:p-4 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
   >
-    <h2 class="text-lg font-semibold text-white">
+    <h2 class="text-lg font-medium text-white">
       Delete {{ toDelete.employeeName }}?
     </h2>
     <p class="mt-2 text-white/70">
@@ -690,11 +711,20 @@
       <button
         type="button"
         [disabled]="isDeleting"
-        class="rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="inline-flex items-center justify-center gap-2 rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
         (click)="confirmDelete(true)"
       >
-        <span *ngIf="!isDeleting">Delete employee</span>
-        <span *ngIf="isDeleting">Deleting...</span>
+        @if (!isDeleting) {
+          <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+          <span>Delete Employee</span>
+        } @else {
+          <lucide-icon
+            name="loader-circle"
+            [size]="16"
+            class="animate-spin"
+          ></lucide-icon>
+          <span>Deleting...</span>
+        }
       </button>
     </div>
   </div>

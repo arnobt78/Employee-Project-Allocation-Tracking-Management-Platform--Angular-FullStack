@@ -1,8 +1,8 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Verified implementation committed (auth, AI fallback, Sentry, SEO/docs)  
-**Gate:** GATE-0001 formally still open in APPROVALS; user directed delivery of Wave 1 items  
+**Phase / Stage:** Verified implementation commit-ready (Auth UI Lucide polish + dashboard control-flow)  
+**Gate:** GATE-0001 formally still open in APPROVALS; user directed delivery  
 **Status:** COMMIT_READY_COMPLETE  
 **Updated:** 2026-08-25
 
@@ -10,27 +10,26 @@
 
 ## Resume Point
 
-**Last completed:** Fixed `vercel.json` invalid route source (hash-asset regex) that caused Vercel Deployment failed. Prior: Session PUBLIC_ACTIONS fix.
+**Last completed:** Auth UI Lucide polish (Robohash select, login spinner, profile dropdown, Title Case + Lucide buttons, app-shell `@if`) + dashboard/login `*ngIf`/`*ngFor` → `@if`/`@for`. verify-deep PASS; commit-ready.
 
-**Next exact action:** Push commits so Vercel redeploys successfully; confirm production tip is latest.
+**Next exact action:** Push when ready so Vercel redeploys; remaining deferred work is full-app control-flow sweep and GATE-0001 formal closure.
 
 **Resume prompt:**
 
 ```text
-Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md. Continue from post-commit C1 checkpoint.
+Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md. Continue from C1 Auth UI polish post-commit checkpoint.
 ```
 
 ---
 
 ## Completed This Session
 
-- Auth: `AppUser`/`Session`, `auth.mjs`, guards, interceptor, seed `db:seed:auth`
-- UI: loading skeletons / `hasLoaded` on dashboard, employees, projects, assignments
-- AI: `ai-providers.mjs` Gemini → Groq → OpenRouter → HF; wired in `generateOverviewDraft`
-- Env: `.env.example`; no secrets under `NG_APP_*`
-- Sentry: `@sentry/angular`, `/api/monitoring` tunnel, quiet CLI upload
-- SEO: `src/index.html`, `public/sitemap.xml`, `browserconfig.xml`, `robots.txt`
-- Docs: educational `README.md`, `SECURITY.md`; CLAUDE/.agile-v synced at commit-ready
+- Auth UI: `robohashUrl`, `UserAvatar`, `UTILITY_NAVIGATION`, rich `SelectMenu` (Clear Selection + Robohash)
+- Login: Sparkles + Logging In spinner until `navigateByUrl`; demo fill via `environment.demoLogin`
+- Shell: profile dropdown (API Docs/Status/Log Out); API links removed from nav; layout Log Out removed
+- Buttons: Title Case + Lucide via standalone `AppIconComponent` (lucide-angular NgModule not importable in Angular 20 standalone)
+- Control flow: `app.component`, dashboard, login feature list on `@if`/`@for`
+- Deferred: full remaining-app `*ngIf`/`*ngFor` sweep (project-form ~90+)
 
 ---
 
@@ -39,9 +38,10 @@ Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md. Continue from post-commit C1 c
 | Check | Result |
 |---|---|
 | `npm run lint` | PASS |
-| `npm run build` | PASS (bundle budget warning) |
-| `npm test` (ChromeHeadless) | 11/11 PASS |
-| verify-deep (Sentry + SEO/README) | PASS WITH WARNINGS |
+| `npm run build` | PASS (bundle budget warning ~1.01 MB > 700 kB) |
+| `npm test` (ChromeHeadless) | 12/12 PASS |
+| verify-deep (Auth UI + dashboard control-flow) | PASS WITH WARNINGS (non-blocking) |
+| implementation-verifier | PASS WITH WARNINGS |
 
 ---
 
@@ -54,6 +54,7 @@ Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md. Continue from post-commit C1 c
 ## Deferred
 
 - Formal GATE-0001 approval record closure
+- Full remaining-app `*ngIf`/`*ngFor` → `@if`/`@for` (project-form, employee, insights, etc.)
 - Broader test coverage (TASK-0010)
 - Employee password field policy (REQ-0106)
 - Redis / PostHog (guide only; not implemented)

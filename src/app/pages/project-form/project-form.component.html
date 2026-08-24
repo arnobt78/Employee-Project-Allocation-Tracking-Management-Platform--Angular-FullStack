@@ -1,6 +1,6 @@
 <div class="space-y-10 text-white/85" [formGroup]="projectForm">
   <header
-    class="rounded-[28px] border border-white/10 bg-white/5/70 px-6 py-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+    class="rounded-[28px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
   >
     <div
       class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
@@ -13,7 +13,7 @@
           ← Back to projects
         </a>
         <div class="flex items-center gap-3">
-          <h1 class="text-2xl font-semibold text-white">
+          <h1 class="text-2xl font-medium text-white">
             {{ projectTitle() }}
           </h1>
           <span
@@ -31,7 +31,7 @@
       <div class="space-y-4 text-sm text-white/70">
         <div class="flex items-center justify-between gap-6">
           <span>Readiness</span>
-          <span class="text-base font-semibold text-white"
+          <span class="text-base font-medium text-white"
             >{{ progress() }}%</span
           >
         </div>
@@ -46,14 +46,14 @@
   </header>
 
   <section
-    class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
     [formGroup]="readinessForm"
   >
     <header
       class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
     >
       <div>
-        <h2 class="text-lg font-semibold text-white">Readiness checklist</h2>
+        <h2 class="text-lg font-medium text-white">Readiness checklist</h2>
         <p class="text-xs uppercase tracking-[0.3em] text-white/55">
           Confirm essentials before project kickoff
         </p>
@@ -61,7 +61,7 @@
       <div
         class="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/65"
       >
-        <span class="text-2xl font-semibold text-white">
+        <span class="text-2xl font-medium text-white">
           {{ readinessProgress() }}%
         </span>
         <span class="flex flex-col text-[11px] uppercase tracking-[0.3em]">
@@ -84,7 +84,7 @@
         >
           <div class="space-y-1">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="text-sm font-semibold text-white">
+              <span class="text-sm font-medium text-white">
                 {{ task.title }}
               </span>
               <span
@@ -173,19 +173,19 @@
   <section class="space-y-4">
     <!-- Overview -->
     <div
-      class="overflow-hidden rounded-[26px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-xl transition hover:border-white/20"
+      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-xl transition hover:border-white/20"
     >
       <button
         type="button"
-        class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
+        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
         (click)="toggleSection('overview')"
       >
         <div class="flex flex-col gap-1">
           <span
-            class="text-sm font-semibold uppercase tracking-[0.35em] text-white/55"
+            class="text-sm font-medium uppercase tracking-[0.35em] text-white/55"
             >Overview</span
           >
-          <span class="text-base font-semibold text-white">
+          <span class="text-base font-medium text-white">
             {{ displayValue("projectName") }}
           </span>
         </div>
@@ -198,7 +198,7 @@
       </button>
       <div
         *ngIf="expandedSection() === 'overview'"
-        class="border-t border-white/10 px-6 py-6 text-sm text-white/75"
+        class="border-t border-white/10 px-2 sm:px-4 py-6 text-sm text-white/75"
       >
         <ng-container
           *ngIf="editingSection() === 'overview'; else overviewView"
@@ -337,16 +337,28 @@
               type="button"
               ubButton
               size="sm"
-              class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+              class="gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
               [disabled]="isSaving()"
               (click)="saveSection('overview')"
             >
-              <span *ngIf="!isSaving()">
-                {{ isEditMode() ? "Save changes" : "Create project" }}
-              </span>
-              <span *ngIf="isSaving()">
-                {{ isEditMode() ? "Saving..." : "Creating..." }}
-              </span>
+              @if (!isSaving()) {
+                <lucide-icon
+                  [name]="isEditMode() ? 'save' : 'plus'"
+                  [size]="16"
+                ></lucide-icon>
+                <span>{{
+                  isEditMode() ? "Save Changes" : "Create Project"
+                }}</span>
+              } @else {
+                <lucide-icon
+                  name="loader-circle"
+                  [size]="16"
+                  class="animate-spin"
+                ></lucide-icon>
+                <span>{{
+                  isEditMode() ? "Saving..." : "Creating Project..."
+                }}</span>
+              }
             </button>
           </div>
         </ng-container>
@@ -358,7 +370,7 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Client
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ displayValue("clientName") }}
               </p>
             </div>
@@ -368,7 +380,7 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Kick-off
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ displayValue("startDate") }}
               </p>
             </div>
@@ -436,7 +448,7 @@
               </span>
               <span *ngIf="overview.aiDraftGeneratedAt">
                 Updated
-                {{ overview.aiDraftGeneratedAt | date : "medium" }}
+                {{ overview.aiDraftGeneratedAt | date: "medium" }}
               </span>
               <span *ngIf="overview.cmsEntryTitle">
                 Contentful:
@@ -485,11 +497,21 @@
                 type="button"
                 ubButton
                 size="sm"
-                class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-[0_20px_45px_rgba(251,191,36,0.35)]"
+                class="gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-[0_20px_45px_rgba(251,191,36,0.35)]"
                 [disabled]="aiProcessing()"
                 (click)="generateOverviewDraft()"
               >
-                {{ aiProcessing() ? "Generating…" : "Generate AI draft" }}
+                @if (aiProcessing()) {
+                  <lucide-icon
+                    name="loader-circle"
+                    [size]="16"
+                    class="animate-spin"
+                  ></lucide-icon>
+                  <span>Generating...</span>
+                } @else {
+                  <lucide-icon name="wand-sparkles" [size]="16"></lucide-icon>
+                  <span>Generate AI Draft</span>
+                }
               </button>
               <button
                 *ngIf="aiDraft()"
@@ -584,10 +606,20 @@
                 type="submit"
                 ubButton
                 size="sm"
-                class="w-full sm:w-auto bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+                class="w-full gap-2 sm:w-auto bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
                 [disabled]="contentfulLoading()"
               >
-                {{ contentfulLoading() ? "Fetching…" : "Fetch brief" }}
+                @if (contentfulLoading()) {
+                  <lucide-icon
+                    name="loader-circle"
+                    [size]="16"
+                    class="animate-spin"
+                  ></lucide-icon>
+                  <span>Fetching...</span>
+                } @else {
+                  <lucide-icon name="download" [size]="16"></lucide-icon>
+                  <span>Fetch Brief</span>
+                }
               </button>
             </div>
           </form>
@@ -602,7 +634,7 @@
               class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between"
             >
               <div>
-                <p class="text-sm font-semibold text-white">
+                <p class="text-sm font-medium text-white">
                   {{ brief.title || "Contentful entry" }}
                 </p>
                 <p class="text-xs text-white/55" *ngIf="brief.entryId">
@@ -674,10 +706,11 @@
                 type="button"
                 ubButton
                 size="sm"
-                class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)]"
+                class="gap-2 bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)]"
                 (click)="applyContentfulOverview(brief)"
               >
-                Apply to overview
+                <lucide-icon name="check" [size]="16"></lucide-icon>
+                <span>Apply To Overview</span>
               </button>
             </div>
           </div>
@@ -688,7 +721,7 @@
             <div
               class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between"
             >
-              <p class="text-sm font-semibold text-white">
+              <p class="text-sm font-medium text-white">
                 AI draft · {{ ai.source | uppercase }}
               </p>
               <span class="text-xs text-white/50" *ngIf="ai.prompt">
@@ -759,10 +792,11 @@
                 type="button"
                 ubButton
                 size="sm"
-                class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+                class="gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
                 (click)="applyAiDraft(ai)"
               >
-                Apply AI draft
+                <lucide-icon name="check" [size]="16"></lucide-icon>
+                <span>Apply AI Draft</span>
               </button>
             </div>
           </div>
@@ -775,19 +809,19 @@
 
     <!-- Team -->
     <div
-      class="overflow-hidden rounded-[26px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-xl transition hover:border-white/20"
+      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-xl transition hover:border-white/20"
     >
       <button
         type="button"
-        class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
+        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
         (click)="toggleSection('team')"
       >
         <div class="flex flex-col gap-1">
           <span
-            class="text-sm font-semibold uppercase tracking-[0.35em] text-white/55"
+            class="text-sm font-medium uppercase tracking-[0.35em] text-white/55"
             >Leadership</span
           >
-          <span class="text-base font-semibold text-white">
+          <span class="text-base font-medium text-white">
             {{ displayValue("leadByEmpId") }}
           </span>
         </div>
@@ -800,7 +834,7 @@
       </button>
       <div
         *ngIf="expandedSection() === 'team'"
-        class="border-t border-white/10 px-6 py-6 text-sm text-white/75"
+        class="border-t border-white/10 px-2 sm:px-4 py-6 text-sm text-white/75"
       >
         <ng-container *ngIf="editingSection() === 'team'; else teamView">
           <div class="grid gap-4 md:grid-cols-2">
@@ -837,12 +871,21 @@
               type="button"
               ubButton
               size="sm"
-              class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+              class="gap-2 bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
               [disabled]="isSaving()"
               (click)="saveSection('team')"
             >
-              <span *ngIf="!isSaving()">Save assignment</span>
-              <span *ngIf="isSaving()">Saving...</span>
+              @if (!isSaving()) {
+                <lucide-icon name="save" [size]="16"></lucide-icon>
+                <span>Save Assignment</span>
+              } @else {
+                <lucide-icon
+                  name="loader-circle"
+                  [size]="16"
+                  class="animate-spin"
+                ></lucide-icon>
+                <span>Saving...</span>
+              }
             </button>
           </div>
         </ng-container>
@@ -851,7 +894,7 @@
             <p class="text-xs uppercase tracking-[0.3em] text-white/45">
               Project lead
             </p>
-            <p class="mt-1 text-base font-semibold text-white">
+            <p class="mt-1 text-base font-medium text-white">
               {{ displayValue("leadByEmpId") }}
             </p>
           </div>
@@ -868,7 +911,7 @@
         <ng-container *ngIf="resourceInsights() as resources">
           <div class="mt-8 space-y-6">
             <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 sm:px-6 sm:py-5"
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 sm:px-2 sm:px-4 sm:py-5"
             >
               <div
                 class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
@@ -899,7 +942,7 @@
                     >
                       Team size
                     </p>
-                    <p class="mt-2 text-2xl font-semibold text-white">
+                    <p class="mt-2 text-2xl font-medium text-white">
                       {{ metrics.teamSize }}
                     </p>
                     <p class="text-xs text-white/55">
@@ -914,7 +957,7 @@
                     >
                       Bench ready
                     </p>
-                    <p class="mt-2 text-2xl font-semibold text-white">
+                    <p class="mt-2 text-2xl font-medium text-white">
                       {{ metrics.benchCount }}
                     </p>
                     <p class="text-xs text-white/55">
@@ -929,7 +972,7 @@
                     >
                       Overbooked
                     </p>
-                    <p class="mt-2 text-2xl font-semibold text-white">
+                    <p class="mt-2 text-2xl font-medium text-white">
                       {{ metrics.overbookedCount }}
                     </p>
                     <p class="text-xs text-white/55">
@@ -944,7 +987,7 @@
                     >
                       Active assignments
                     </p>
-                    <p class="mt-2 text-2xl font-semibold text-white">
+                    <p class="mt-2 text-2xl font-medium text-white">
                       {{ metrics.activeAssignmentCount }}
                     </p>
                     <p class="text-xs text-white/55">
@@ -959,7 +1002,7 @@
                     >
                       Avg allocation
                     </p>
-                    <p class="mt-2 text-2xl font-semibold text-white">
+                    <p class="mt-2 text-2xl font-medium text-white">
                       {{ formatPercent(metrics.averageAllocation) }}
                     </p>
                     <p class="text-xs text-white/55">
@@ -973,14 +1016,14 @@
             <div class="grid gap-4 lg:grid-cols-2">
               <div
                 *ngIf="resources.lead as lead"
-                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 sm:px-6 sm:py-5"
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 sm:px-2 sm:px-4 sm:py-5"
               >
                 <div class="flex items-start justify-between gap-4">
                   <div>
                     <p class="text-xs uppercase tracking-[0.3em] text-white/50">
                       Current lead
                     </p>
-                    <p class="text-lg font-semibold text-white">
+                    <p class="text-lg font-medium text-white">
                       {{ lead.employeeName }}
                     </p>
                     <p class="text-sm text-white/60">
@@ -1067,7 +1110,7 @@
                 </div>
               </div>
               <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 sm:px-6 sm:py-5"
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 sm:px-2 sm:px-4 sm:py-5"
               >
                 <div class="flex flex-col gap-2">
                   <p class="text-xs uppercase tracking-[0.3em] text-white/50">
@@ -1093,7 +1136,7 @@
                   >
                     <div class="flex items-start justify-between gap-3">
                       <div>
-                        <p class="text-sm font-semibold text-white">
+                        <p class="text-sm font-medium text-white">
                           {{ candidate.employeeName }}
                         </p>
                         <p class="text-xs text-white/55">
@@ -1103,7 +1146,7 @@
                           </span>
                         </p>
                       </div>
-                      <span class="text-xs font-semibold text-white/75">
+                      <span class="text-xs font-medium text-white/75">
                         {{ formatScore(candidate.fitScore) }}
                       </span>
                     </div>
@@ -1136,7 +1179,8 @@
                         class="bg-gradient-to-r from-indigo-500 via-sky-500 to-blue-500 text-white shadow-[0_15px_40px_rgba(56,189,248,0.35)]"
                         (click)="applyRecommendedLead(candidate)"
                       >
-                        Assign as lead
+                        <lucide-icon name="user-plus" [size]="16"></lucide-icon>
+                        <span>Assign As Lead</span>
                       </button>
                     </div>
                   </div>
@@ -1152,7 +1196,7 @@
 
             <div class="grid gap-4 lg:grid-cols-2">
               <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 sm:px-6 sm:py-5"
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 sm:px-2 sm:px-4 sm:py-5"
               >
                 <div
                   class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
@@ -1184,7 +1228,7 @@
                   >
                     <div class="flex items-start justify-between gap-3">
                       <div>
-                        <p class="text-sm font-semibold text-white">
+                        <p class="text-sm font-medium text-white">
                           {{ assignment.employee.employeeName }}
                         </p>
                         <p class="text-xs text-white/55">
@@ -1240,7 +1284,7 @@
                 </ng-template>
               </div>
               <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 sm:px-6 sm:py-5"
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 sm:px-2 sm:px-4 sm:py-5"
               >
                 <div class="flex flex-col gap-2">
                   <p class="text-xs uppercase tracking-[0.3em] text-white/50">
@@ -1267,7 +1311,7 @@
                   >
                     <div class="flex items-start justify-between gap-3">
                       <div>
-                        <p class="text-sm font-semibold text-white">
+                        <p class="text-sm font-medium text-white">
                           {{ collaborator.employeeName }}
                         </p>
                         <p class="text-xs text-white/55">
@@ -1277,7 +1321,7 @@
                           </span>
                         </p>
                       </div>
-                      <span class="text-xs font-semibold text-white/75">
+                      <span class="text-xs font-medium text-white/75">
                         {{ formatScore(collaborator.fitScore) }}
                       </span>
                     </div>
@@ -1402,7 +1446,8 @@
                           class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)]"
                           [disabled]="collaboratorAssignmentProcessing()"
                         >
-                          Add assignment
+                          <lucide-icon name="plus" [size]="16"></lucide-icon>
+                          <span>Add Assignment</span>
                         </button>
                       </div>
                     </form>
@@ -1423,19 +1468,19 @@
 
     <!-- Contact -->
     <div
-      class="overflow-hidden rounded-[26px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-xl transition hover:border-white/20"
+      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-xl transition hover:border-white/20"
     >
       <button
         type="button"
-        class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
+        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
         (click)="toggleSection('contact')"
       >
         <div class="flex flex-col gap-1">
           <span
-            class="text-sm font-semibold uppercase tracking-[0.35em] text-white/55"
+            class="text-sm font-medium uppercase tracking-[0.35em] text-white/55"
             >Client contact</span
           >
-          <span class="text-base font-semibold text-white">
+          <span class="text-base font-medium text-white">
             {{ displayValue("contactPerson") }}
           </span>
         </div>
@@ -1448,7 +1493,7 @@
       </button>
       <div
         *ngIf="expandedSection() === 'contact'"
-        class="border-t border-white/10 px-6 py-6 text-sm text-white/75"
+        class="border-t border-white/10 px-2 sm:px-4 py-6 text-sm text-white/75"
       >
         <ng-container *ngIf="editingSection() === 'contact'; else contactView">
           <div class="grid gap-4 md:grid-cols-2">
@@ -1519,12 +1564,21 @@
               type="button"
               ubButton
               size="sm"
-              class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-[0_20px_45px_rgba(251,146,60,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+              class="gap-2 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-[0_20px_45px_rgba(251,146,60,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
               [disabled]="isSaving()"
               (click)="saveSection('contact')"
             >
-              <span *ngIf="!isSaving()">Save contact</span>
-              <span *ngIf="isSaving()">Saving...</span>
+              @if (!isSaving()) {
+                <lucide-icon name="save" [size]="16"></lucide-icon>
+                <span>Save Contact</span>
+              } @else {
+                <lucide-icon
+                  name="loader-circle"
+                  [size]="16"
+                  class="animate-spin"
+                ></lucide-icon>
+                <span>Saving...</span>
+              }
             </button>
           </div>
         </ng-container>
@@ -1536,7 +1590,7 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Primary contact
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ displayValue("contactPerson") }}
               </p>
             </div>
@@ -1546,7 +1600,7 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Phone
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ displayValue("contactNo") }}
               </p>
             </div>
@@ -1556,7 +1610,7 @@
               <p class="text-xs uppercase tracking-[0.3em] text-white/45">
                 Email
               </p>
-              <p class="mt-1 text-base font-semibold text-white">
+              <p class="mt-1 text-base font-medium text-white">
                 {{ displayValue("emailId") }}
               </p>
             </div>
@@ -1576,19 +1630,19 @@
 
     <!-- Approval -->
     <div
-      class="overflow-hidden rounded-[26px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-xl transition hover:border-white/20"
+      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-xl transition hover:border-white/20"
     >
       <button
         type="button"
-        class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
+        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
         (click)="toggleSection('approval')"
       >
         <div class="flex flex-col gap-1">
           <span
-            class="text-sm font-semibold uppercase tracking-[0.35em] text-white/55"
+            class="text-sm font-medium uppercase tracking-[0.35em] text-white/55"
             >Approval</span
           >
-          <span class="text-base font-semibold text-white">
+          <span class="text-base font-medium text-white">
             {{ approvalStatusLabel(approvalStatus()) }}
           </span>
         </div>
@@ -1601,7 +1655,7 @@
       </button>
       <div
         *ngIf="expandedSection() === 'approval'"
-        class="border-t border-white/10 px-6 py-6 text-sm text-white/75 space-y-6"
+        class="border-t border-white/10 px-2 sm:px-4 py-6 text-sm text-white/75 space-y-6"
       >
         <div class="grid gap-4 md:grid-cols-2">
           <div
@@ -1640,7 +1694,8 @@
                 "
                 (click)="requestApprovalAction()"
               >
-                Request approval
+                <lucide-icon name="sparkles" [size]="16"></lucide-icon>
+                <span>Request Approval</span>
               </button>
               <button
                 *ngIf="canApprove()"
@@ -1651,7 +1706,8 @@
                 [disabled]="approvalProcessing()"
                 (click)="approveProjectAction()"
               >
-                Approve
+                <lucide-icon name="check" [size]="16"></lucide-icon>
+                <span>Approve</span>
               </button>
               <button
                 *ngIf="canReject()"
@@ -1662,7 +1718,8 @@
                 [disabled]="approvalProcessing()"
                 (click)="rejectProjectAction()"
               >
-                Reject
+                <lucide-icon name="x" [size]="16"></lucide-icon>
+                <span>Reject</span>
               </button>
               <button
                 *ngIf="canResetApproval()"
@@ -1674,7 +1731,8 @@
                 [disabled]="approvalProcessing()"
                 (click)="resetProjectApprovalAction()"
               >
-                Reset to draft
+                <lucide-icon name="rotate-ccw" [size]="16"></lucide-icon>
+                <span>Reset To Draft</span>
               </button>
             </div>
             <p class="text-[11px] text-white/50">
@@ -1742,14 +1800,14 @@
           <div
             class="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4"
           >
-            <h3 class="text-sm font-semibold text-white">Status history</h3>
+            <h3 class="text-sm font-medium text-white">Status history</h3>
             <ng-container *ngIf="approvalHistory().length; else noHistory">
               <div
                 *ngFor="let entry of approvalHistory()"
                 class="space-y-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
               >
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-semibold text-white">
+                  <span class="text-sm font-medium text-white">
                     {{ approvalStatusLabel(entry.status) }}
                   </span>
                   <span class="text-xs text-white/60">
@@ -1781,14 +1839,14 @@
           <div
             class="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4"
           >
-            <h3 class="text-sm font-semibold text-white">Timeline</h3>
+            <h3 class="text-sm font-medium text-white">Timeline</h3>
             <ng-container *ngIf="approvalTimeline().length; else noTimeline">
               <div
-                *ngFor="let entry of approvalTimeline() | slice : 0 : 6"
+                *ngFor="let entry of approvalTimeline() | slice: 0 : 6"
                 class="space-y-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
               >
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-semibold text-white">
+                  <span class="text-sm font-medium text-white">
                     {{ entry.label }}
                   </span>
                   <span class="text-xs text-white/60">
@@ -1815,7 +1873,7 @@
           class="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4"
         >
           <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-white">Reviewer comments</h3>
+            <h3 class="text-sm font-medium text-white">Reviewer comments</h3>
             <span class="text-[11px] uppercase tracking-[0.3em] text-white/50">
               {{ reviewerComments().length }} total
             </span>
@@ -1920,7 +1978,11 @@
                   reviewerCommentProcessing() || !currentProject()?.projectId
                 "
               >
-                Add comment
+                <lucide-icon
+                  name="message-square-plus"
+                  [size]="16"
+                ></lucide-icon>
+                <span>Add Comment</span>
               </button>
             </div>
           </form>
@@ -1931,7 +1993,7 @@
                 class="space-y-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
               >
                 <div class="flex items-center justify-between gap-2">
-                  <span class="text-sm font-semibold text-white">
+                  <span class="text-sm font-medium text-white">
                     {{ comment.comment }}
                   </span>
                   <span
@@ -1986,7 +2048,7 @@
   </section>
 
   <footer
-    class="flex flex-col gap-4 rounded-[24px] border border-white/10 bg-white/5/70 px-6 py-5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
+    class="flex flex-col gap-4 rounded-[24px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
   >
     <div class="space-y-1 text-xs text-white/60">
       <p>
@@ -1999,28 +2061,40 @@
       </p>
     </div>
     <div class="flex flex-wrap items-center gap-3">
-      <button
-        *ngIf="isEditMode()"
-        type="button"
-        class="rounded-xl border border-rose-400/40 bg-rose-500/15 px-4 py-2 text-xs text-rose-100 transition hover:border-rose-300/60 hover:bg-rose-500/25 hover:text-rose-50"
-        (click)="requestDelete()"
-      >
-        Archive project
-      </button>
+      @if (isEditMode()) {
+        <button
+          type="button"
+          class="inline-flex items-center justify-center gap-2 rounded-xl border border-rose-400/40 bg-rose-500/15 px-4 py-2 text-xs text-rose-100 transition hover:border-rose-300/60 hover:bg-rose-500/25 hover:text-rose-50"
+          (click)="requestDelete()"
+        >
+          <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+          <span>Archive Project</span>
+        </button>
+      }
       <button
         type="button"
         ubButton
         size="sm"
-        class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+        class="gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
         [disabled]="isSaving()"
         (click)="saveAllChanges()"
       >
-        <span *ngIf="!isSaving()">
-          {{ isEditMode() ? "Save all changes" : "Create project" }}
-        </span>
-        <span *ngIf="isSaving()">
-          {{ isEditMode() ? "Saving..." : "Creating project..." }}
-        </span>
+        @if (!isSaving()) {
+          <lucide-icon
+            [name]="isEditMode() ? 'save' : 'plus'"
+            [size]="16"
+          ></lucide-icon>
+          <span>{{
+            isEditMode() ? "Save All Changes" : "Create Project"
+          }}</span>
+        } @else {
+          <lucide-icon
+            name="loader-circle"
+            [size]="16"
+            class="animate-spin"
+          ></lucide-icon>
+          <span>{{ isEditMode() ? "Saving..." : "Creating Project..." }}</span>
+        }
       </button>
     </div>
   </footer>
@@ -2029,12 +2103,22 @@
 <div
   *ngIf="pendingDelete()"
   class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 px-4 py-4"
-  style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; display: flex; align-items: center; justify-content: center;"
+  style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  "
 >
   <div
-    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-6 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
+    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-2 sm:p-4 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
   >
-    <h2 class="text-lg font-semibold text-white">Archive this project?</h2>
+    <h2 class="text-lg font-medium text-white">Archive this project?</h2>
     <p class="mt-2 text-white/70">
       The project will be removed from your dashboards but you can recreate it
       later if needed. Assignments linked to this project will remain untouched.
@@ -2051,11 +2135,20 @@
       <button
         type="button"
         [disabled]="isDeleting()"
-        class="rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="inline-flex items-center justify-center gap-2 rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
         (click)="confirmDelete(true)"
       >
-        <span *ngIf="!isDeleting()">Archive project</span>
-        <span *ngIf="isDeleting()">Deleting...</span>
+        @if (!isDeleting()) {
+          <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+          <span>Archive Project</span>
+        } @else {
+          <lucide-icon
+            name="loader-circle"
+            [size]="16"
+            class="animate-spin"
+          ></lucide-icon>
+          <span>Deleting...</span>
+        }
       </button>
     </div>
   </div>

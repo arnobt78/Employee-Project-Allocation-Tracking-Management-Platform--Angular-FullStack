@@ -1,5 +1,4 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { MasterService } from '../../service/master.service';
 import { IParentDept, IProject, IProjectEmployee } from '../../model/interface/master';
 import { Employee } from '../../model/class/Employee';
@@ -19,7 +18,7 @@ interface DashboardSnapshot {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ListSkeletonComponent, StatPillSkeletonComponent],
+  imports: [ListSkeletonComponent, StatPillSkeletonComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })

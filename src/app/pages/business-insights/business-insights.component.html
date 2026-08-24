@@ -4,7 +4,7 @@
     class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
   >
     <div>
-      <h1 class="text-2xl font-bold text-white">Business Insights</h1>
+      <h1 class="text-2xl font-medium text-white">Business Insights</h1>
       <p class="text-sm text-white/60 mt-1">
         Analytics and reporting for projects, resources, and performance
       </p>
@@ -14,28 +14,30 @@
         ubButton
         size="sm"
         variant="secondary"
-        class="border border-white/20 bg-white/5 hover:bg-white/10"
+        class="inline-flex items-center justify-center gap-2 border border-white/20 bg-white/5 hover:bg-white/10"
         (click)="exportToCSV()"
         [disabled]="loading() || !insights()"
       >
-        Export CSV
+        <lucide-icon name="download" [size]="16"></lucide-icon>
+        <span>Export CSV</span>
       </button>
       <button
         ubButton
         size="sm"
         variant="secondary"
-        class="border border-white/20 bg-white/5 hover:bg-white/10"
+        class="inline-flex items-center justify-center gap-2 border border-white/20 bg-white/5 hover:bg-white/10"
         (click)="exportToPDF()"
         [disabled]="loading() || !insights()"
       >
-        Export PDF
+        <lucide-icon name="file-down" [size]="16"></lucide-icon>
+        <span>Export PDF</span>
       </button>
     </div>
   </div>
 
   <!-- Filters -->
   <div
-    class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
   >
     <form
       [formGroup]="filterForm"
@@ -108,7 +110,9 @@
 
   <!-- Loading State (inline skeletons — first paint only when cache is cold) -->
   <div *ngIf="loading()" class="space-y-6">
-    <section class="rounded-2xl border border-white/10 bg-white/5 px-6 py-4">
+    <section
+      class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
+    >
       <div class="flex flex-wrap gap-2">
         <app-stat-pill-skeleton
           *ngFor="let pill of [1, 2, 3, 4]"
@@ -127,7 +131,7 @@
         (click)="setActiveTab('overview')"
         [ngClass]="{
           'border-b-2 border-primary text-white': activeTab() === 'overview',
-          'text-white/60': activeTab() !== 'overview'
+          'text-white/60': activeTab() !== 'overview',
         }"
         class="px-4 py-2 text-sm font-medium transition-colors hover:text-white"
       >
@@ -138,7 +142,7 @@
         (click)="setActiveTab('projects')"
         [ngClass]="{
           'border-b-2 border-primary text-white': activeTab() === 'projects',
-          'text-white/60': activeTab() !== 'projects'
+          'text-white/60': activeTab() !== 'projects',
         }"
         class="px-4 py-2 text-sm font-medium transition-colors hover:text-white"
       >
@@ -149,7 +153,7 @@
         (click)="setActiveTab('resources')"
         [ngClass]="{
           'border-b-2 border-primary text-white': activeTab() === 'resources',
-          'text-white/60': activeTab() !== 'resources'
+          'text-white/60': activeTab() !== 'resources',
         }"
         class="px-4 py-2 text-sm font-medium transition-colors hover:text-white"
       >
@@ -160,7 +164,7 @@
         (click)="setActiveTab('financials')"
         [ngClass]="{
           'border-b-2 border-primary text-white': activeTab() === 'financials',
-          'text-white/60': activeTab() !== 'financials'
+          'text-white/60': activeTab() !== 'financials',
         }"
         class="px-4 py-2 text-sm font-medium transition-colors hover:text-white"
       >
@@ -173,52 +177,55 @@
       <!-- Key Metrics Cards -->
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div
-          class="rounded-2xl border border-white/10 bg-white/5 px-6 py-5 backdrop-blur-xl"
+          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
           <p class="text-xs uppercase tracking-[0.3em] text-white/45">
             Total Projects
           </p>
-          <p class="mt-2 text-3xl font-bold text-white">
+          <p class="mt-2 text-3xl font-medium text-white">
             {{ insights()?.totalProjectCount ?? projectsSignal().length }}
           </p>
         </div>
         <div
-          class="rounded-2xl border border-white/10 bg-white/5 px-6 py-5 backdrop-blur-xl"
+          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
           <p class="text-xs uppercase tracking-[0.3em] text-white/45">
             Total Employees
           </p>
-          <p class="mt-2 text-3xl font-bold text-white">
+          <p class="mt-2 text-3xl font-medium text-white">
             {{
               (insights()?.filteredEmployeeCount ??
-                insights()?.resourceUtilization?.totalEmployees) || 0
+                insights()?.resourceUtilization?.totalEmployees) ||
+                0
             }}
           </p>
         </div>
         <div
-          class="rounded-2xl border border-white/10 bg-white/5 px-6 py-5 backdrop-blur-xl"
+          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
           <p class="text-xs uppercase tracking-[0.3em] text-white/45">
             Avg Readiness
           </p>
-          <p class="mt-2 text-3xl font-bold text-white">
+          <p class="mt-2 text-3xl font-medium text-white">
             {{ insights()?.readinessScores?.average || 0 }}%
           </p>
         </div>
         <div
-          class="rounded-2xl border border-white/10 bg-white/5 px-6 py-5 backdrop-blur-xl"
+          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
           <p class="text-xs uppercase tracking-[0.3em] text-white/45">
             Resource Utilization
           </p>
-          <p class="mt-2 text-3xl font-bold text-white">
+          <p class="mt-2 text-3xl font-medium text-white">
             {{ insights()?.teamCapacity?.utilizationPercentage || 0 }}%
           </p>
         </div>
       </div>
-      
+
       <!-- Project Breakdown Badges - Full Width Row Below Cards -->
-      <div class="rounded-2xl border border-white/10 bg-white/5 px-6 py-4 backdrop-blur-xl">
+      <div
+        class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+      >
         <div class="flex flex-wrap gap-2 items-center">
           <span
             class="inline-flex items-center rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs font-medium text-cyan-400 border border-cyan-500/30"
@@ -271,9 +278,9 @@
 
       <!-- Project Status Distribution Chart -->
       <div
-        class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
       >
-        <h2 class="mb-4 text-lg font-semibold text-white">
+        <h2 class="mb-4 text-lg font-medium text-white">
           Project Status Distribution
         </h2>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -283,37 +290,37 @@
                 {
                   label: 'Draft',
                   value: insights()?.projectStatusDistribution?.draft || 0,
-                  color: 'bg-slate-500'
+                  color: 'bg-slate-500',
                 },
                 {
                   label: 'In Progress',
                   value:
                     insights()?.projectStatusDistribution?.in_progress || 0,
-                  color: 'bg-blue-500'
+                  color: 'bg-blue-500',
                 },
                 {
                   label: 'Completed',
                   value: insights()?.projectStatusDistribution?.completed || 0,
-                  color: 'bg-green-500'
+                  color: 'bg-green-500',
                 },
                 {
                   label: 'On Hold',
                   value: insights()?.projectStatusDistribution?.on_hold || 0,
-                  color: 'bg-yellow-500'
+                  color: 'bg-yellow-500',
                 },
                 {
                   label: 'Cancelled',
                   value: insights()?.projectStatusDistribution?.cancelled || 0,
-                  color: 'bg-red-500'
-                }
+                  color: 'bg-red-500',
+                },
               ]
             "
-            class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-xs text-white/60">{{ item.label }}</p>
-                <p class="mt-1 text-2xl font-bold text-white">
+                <p class="mt-1 text-2xl font-medium text-white">
                   {{ item.value }}
                 </p>
               </div>
@@ -327,9 +334,9 @@
 
       <!-- Readiness Score Distribution -->
       <div
-        class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
       >
-        <h2 class="mb-4 text-lg font-semibold text-white">
+        <h2 class="mb-4 text-lg font-medium text-white">
           Readiness Score Distribution
         </h2>
         <div class="space-y-3">
@@ -352,7 +359,7 @@
                 ></div>
               </div>
             </div>
-            <div class="w-12 text-right text-sm font-semibold text-white">
+            <div class="w-12 text-right text-sm font-medium text-white">
               {{ dist.count }}
             </div>
           </div>
@@ -363,9 +370,9 @@
     <!-- Projects Tab -->
     <div *ngIf="activeTab() === 'projects'" class="space-y-6">
       <div
-        class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
       >
-        <h2 class="mb-4 text-lg font-semibold text-white">
+        <h2 class="mb-4 text-lg font-medium text-white">
           Department Breakdown
         </h2>
         <div class="overflow-x-auto">
@@ -423,18 +430,18 @@
       </div>
 
       <div
-        class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
       >
-        <h2 class="mb-4 text-lg font-semibold text-white">
+        <h2 class="mb-4 text-lg font-medium text-white">
           Project Type Breakdown
         </h2>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div
             *ngFor="let type of insights()?.projectTypeBreakdown || []"
-            class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-sm font-medium text-white">{{ type.type }}</p>
-            <p class="mt-2 text-2xl font-bold text-white">{{ type.count }}</p>
+            <p class="mt-2 text-2xl font-medium text-white">{{ type.count }}</p>
             <p class="mt-1 text-xs text-white/60">
               Avg Readiness: {{ type.averageReadiness }}%
             </p>
@@ -442,7 +449,7 @@
         </div>
         <div
           *ngIf="!insights()?.projectTypeBreakdown?.length"
-          class="rounded-2xl border border-dashed border-white/20 bg-white/5 px-6 py-12 text-center"
+          class="rounded-2xl border border-dashed border-white/20 bg-white/5 px-2 sm:px-4 py-12 text-center"
         >
           <p class="text-sm text-white/60">
             No project type data available for the selected filters.
@@ -454,41 +461,41 @@
     <!-- Resources Tab -->
     <div *ngIf="activeTab() === 'resources'" class="space-y-6">
       <div
-        class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
       >
-        <h2 class="mb-4 text-lg font-semibold text-white">
+        <h2 class="mb-4 text-lg font-medium text-white">
           Resource Utilization
         </h2>
         <div class="grid gap-4 sm:grid-cols-2">
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Total Employees</p>
-            <p class="mt-2 text-3xl font-bold text-white">
+            <p class="mt-2 text-3xl font-medium text-white">
               {{ insights()?.resourceUtilization?.totalEmployees || 0 }}
             </p>
           </div>
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Active Assignments</p>
-            <p class="mt-2 text-3xl font-bold text-white">
+            <p class="mt-2 text-3xl font-medium text-white">
               {{ insights()?.resourceUtilization?.activeAssignments || 0 }}
             </p>
           </div>
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Average Allocation</p>
-            <p class="mt-2 text-3xl font-bold text-white">
+            <p class="mt-2 text-3xl font-medium text-white">
               {{ insights()?.resourceUtilization?.averageAllocation || 0 }}%
             </p>
           </div>
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Available Resources</p>
-            <p class="mt-2 text-3xl font-bold text-white">
+            <p class="mt-2 text-3xl font-medium text-white">
               {{ insights()?.resourceUtilization?.availableCount || 0 }}
             </p>
           </div>
@@ -496,14 +503,14 @@
       </div>
 
       <div
-        class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
       >
-        <h2 class="mb-4 text-lg font-semibold text-white">Team Capacity</h2>
+        <h2 class="mb-4 text-lg font-medium text-white">Team Capacity</h2>
         <div class="space-y-4">
           <div>
             <div class="mb-2 flex items-center justify-between text-sm">
               <span class="text-white/60">Utilization</span>
-              <span class="font-semibold text-white">
+              <span class="font-medium text-white">
                 {{ insights()?.teamCapacity?.utilizationPercentage || 0 }}%
               </span>
             </div>
@@ -519,19 +526,19 @@
           <div class="grid gap-4 sm:grid-cols-3">
             <div>
               <p class="text-xs text-white/60">Total Capacity</p>
-              <p class="mt-1 text-xl font-bold text-white">
+              <p class="mt-1 text-xl font-medium text-white">
                 {{ insights()?.teamCapacity?.totalCapacity || 0 }}%
               </p>
             </div>
             <div>
               <p class="text-xs text-white/60">Utilized</p>
-              <p class="mt-1 text-xl font-bold text-white">
+              <p class="mt-1 text-xl font-medium text-white">
                 {{ insights()?.teamCapacity?.utilizedCapacity || 0 }}%
               </p>
             </div>
             <div>
               <p class="text-xs text-white/60">Available</p>
-              <p class="mt-1 text-xl font-bold text-white">
+              <p class="mt-1 text-xl font-medium text-white">
                 {{ insights()?.teamCapacity?.availableCapacity || 0 }}%
               </p>
             </div>
@@ -543,49 +550,49 @@
     <!-- Financials Tab -->
     <div *ngIf="activeTab() === 'financials'" class="space-y-6">
       <div
-        class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
       >
-        <h2 class="mb-4 text-lg font-semibold text-white">Budget Metrics</h2>
+        <h2 class="mb-4 text-lg font-medium text-white">Budget Metrics</h2>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Total Budget</p>
-            <p class="mt-2 text-2xl font-bold text-white">
+            <p class="mt-2 text-2xl font-medium text-white">
               ${{
-                insights()?.budgetMetrics?.totalBudget || 0 | number : "1.0-0"
+                insights()?.budgetMetrics?.totalBudget || 0 | number: "1.0-0"
               }}
             </p>
           </div>
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Allocated</p>
-            <p class="mt-2 text-2xl font-bold text-white">
+            <p class="mt-2 text-2xl font-medium text-white">
               ${{
                 insights()?.budgetMetrics?.allocatedBudget || 0
-                  | number : "1.0-0"
+                  | number: "1.0-0"
               }}
             </p>
           </div>
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Spent</p>
-            <p class="mt-2 text-2xl font-bold text-white">
+            <p class="mt-2 text-2xl font-medium text-white">
               ${{
-                insights()?.budgetMetrics?.spentBudget || 0 | number : "1.0-0"
+                insights()?.budgetMetrics?.spentBudget || 0 | number: "1.0-0"
               }}
             </p>
           </div>
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Remaining</p>
-            <p class="mt-2 text-2xl font-bold text-white">
+            <p class="mt-2 text-2xl font-medium text-white">
               ${{
                 insights()?.budgetMetrics?.remainingBudget || 0
-                  | number : "1.0-0"
+                  | number: "1.0-0"
               }}
             </p>
           </div>
@@ -594,7 +601,7 @@
 
       <!-- Budget Management Status Info -->
       <div
-        class="rounded-[26px] border border-blue-500/20 bg-blue-500/5 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-blue-500/20 bg-blue-500/5 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
       >
         <div class="flex items-start gap-4">
           <div class="flex-shrink-0">
@@ -613,7 +620,7 @@
             </svg>
           </div>
           <div class="flex-1">
-            <h3 class="mb-2 text-sm font-semibold text-blue-300">
+            <h3 class="mb-2 text-sm font-medium text-blue-300">
               Budget Management Status
             </h3>
             <div class="space-y-2 text-sm text-white/70">

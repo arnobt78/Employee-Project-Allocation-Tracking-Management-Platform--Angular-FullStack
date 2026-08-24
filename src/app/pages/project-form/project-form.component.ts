@@ -4,16 +4,14 @@ import {
   OnInit,
   computed,
   inject,
-  signal,
-} from '@angular/core';
+  signal } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MasterService } from '../../service/master.service';
@@ -35,13 +33,13 @@ import {
   IExternalIntegrationReference,
   ReadinessStatus,
   ResourceLoadStatus,
-  SectionId,
-} from '../../model/interface/master';
+  SectionId } from '../../model/interface/master';
 import { Employee } from '../../model/class/Employee';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Observable, startWith } from 'rxjs';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 
 const readinessTaskDefinitions = [
   {
@@ -50,41 +48,35 @@ const readinessTaskDefinitions = [
     description: 'Requirements baseline captured and shared with stakeholders.',
     category: 'Scope',
     weight: 25,
-    defaultDueInDays: 7,
-  },
+    defaultDueInDays: 7 },
   {
     id: 'budgetApproved',
     title: 'Budget approved',
     description: 'Finance sign-off received for the projected spend.',
     category: 'Budget',
     weight: 20,
-    defaultDueInDays: 14,
-  },
+    defaultDueInDays: 14 },
   {
     id: 'legalReviewed',
     title: 'Contracts reviewed',
     description: 'Master services agreement and NDAs cleared with legal.',
     category: 'Legal',
     weight: 20,
-    defaultDueInDays: 21,
-  },
+    defaultDueInDays: 21 },
   {
     id: 'assetsPrepared',
     title: 'Assets prepared',
     description: 'Brand assets, data rooms, and collateral ready to share.',
     category: 'Assets',
     weight: 15,
-    defaultDueInDays: 10,
-  },
+    defaultDueInDays: 10 },
   {
     id: 'kickoffScheduled',
     title: 'Kickoff scheduled',
     description: 'Kickoff meeting on calendar with internal and client teams.',
     category: 'Timeline',
     weight: 20,
-    defaultDueInDays: 28,
-  },
-] as const;
+    defaultDueInDays: 28 }] as const;
 
 type ReadinessTaskDefinition = (typeof readinessTaskDefinitions)[number];
 type ReadinessTaskId = ReadinessTaskDefinition['id'];
@@ -109,50 +101,49 @@ const READINESS_STATUS_LABELS: Record<ReadinessStatus, string> = {
   not_started: 'Not started',
   in_progress: 'In progress',
   blocked: 'Blocked',
-  done: 'Complete',
-};
+  done: 'Complete' };
 
 const READINESS_STATUS_VALUES: Record<ReadinessStatus, number> = {
   not_started: 0,
   in_progress: 0.5,
   blocked: 0,
-  done: 1,
-};
+  done: 1 };
 
 const APPROVAL_STATUS_LABELS: Record<ApprovalStatus, string> = {
   draft: 'Draft',
   in_review: 'In review',
   approved: 'Approved',
-  rejected: 'Rejected',
-};
+  rejected: 'Rejected' };
 
 const APPROVAL_STATUS_CLASSES: Record<ApprovalStatus, string> = {
   draft: 'border border-white/20 bg-white/10 text-white/80',
   in_review: 'border border-sky-400/40 bg-sky-500/10 text-sky-200',
   approved: 'border border-emerald-400/40 bg-emerald-500/10 text-emerald-200',
-  rejected: 'border border-rose-400/40 bg-rose-500/10 text-rose-200',
-};
+  rejected: 'border border-rose-400/40 bg-rose-500/10 text-rose-200' };
 
 const REVIEWER_COMMENT_SECTIONS: Array<{ value: SectionId; label: string }> = [
   { value: 'overview', label: 'Overview' },
   { value: 'team', label: 'Leadership' },
   { value: 'contact', label: 'Client contact' },
-  { value: 'approval', label: 'Approval workflow' },
-];
+  { value: 'approval', label: 'Approval workflow' }];
 
 const REVIEWER_SEVERITIES = [
   { value: 'info', label: 'Info' },
   { value: 'warning', label: 'Warning' },
-  { value: 'critical', label: 'Critical' },
-];
+  { value: 'critical', label: 'Critical' }];
 
 @Component({
   selector: 'app-project-form',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, UbButtonDirective],
+  imports: [
+    AppIconComponent,
+    CommonModule,
+    RouterLink,
+    ReactiveFormsModule,
+    UbButtonDirective
+  ],
   templateUrl: './project-form.component.html',
-  styleUrl: './project-form.component.css',
-})
+  styleUrl: './project-form.component.css' })
 export class ProjectFormComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly masterService = inject(MasterService);
@@ -203,23 +194,20 @@ export class ProjectFormComponent implements OnInit {
   readonly approvalForm = this.fb.group({
     actorId: this.fb.control<number | null>(null),
     actorName: this.fb.control<string>('', { nonNullable: true }),
-    comment: this.fb.control<string>('', { nonNullable: true }),
-  });
+    comment: this.fb.control<string>('', { nonNullable: true }) });
 
   readonly reviewerCommentForm = this.fb.group({
     section: ['overview', Validators.required],
     reviewerId: [null],
     reviewerName: [''],
     comment: ['', [Validators.required, Validators.minLength(3)]],
-    severity: ['info'],
-  });
+    severity: ['info'] });
 
   readonly overviewDetailsForm = this.fb.group({
     summary: [''],
     objectives: [''],
     successCriteria: [''],
-    stakeholderNotes: [''],
-  });
+    stakeholderNotes: [''] });
 
   private readonly overviewMetadataSignal =
     signal<Partial<IProjectOverview> | null>(null);
@@ -228,8 +216,7 @@ export class ProjectFormComponent implements OnInit {
     entryId: [''],
     contentType: [''],
     slug: [''],
-    preview: [false],
-  });
+    preview: [false] });
   readonly contentfulPanelOpen = signal<boolean>(false);
   readonly contentfulLoading = signal<boolean>(false);
   readonly contentfulError = signal<string | null>(null);
@@ -292,12 +279,9 @@ export class ProjectFormComponent implements OnInit {
     allocationPct: this.fb.control<number | null>(25, [
       Validators.required,
       Validators.min(1),
-      Validators.max(200),
-    ]),
+      Validators.max(200)]),
     assignedDate: this.fb.control<string>(this.todayString(), {
-      nonNullable: true,
-    }),
-  });
+      nonNullable: true }) });
 
   readonly projectForm: FormGroup = this.fb.group({
     projectId: [0],
@@ -307,8 +291,7 @@ export class ProjectFormComponent implements OnInit {
     leadByEmpId: [null],
     contactPerson: [''],
     contactNo: ['', [Validators.pattern(/^[\d\s+\-()]{7,20}$/)]],
-    emailId: ['', Validators.email],
-  });
+    emailId: ['', Validators.email] });
   private readonly projectNameValue = toSignal(
     this.projectForm.controls['projectName'].valueChanges.pipe(
       startWith(this.projectForm.controls['projectName'].value ?? '')
@@ -372,8 +355,7 @@ export class ProjectFormComponent implements OnInit {
       .subscribe(() => {
         if (!this.overviewDetailsForm.pristine) {
           this.overviewMetadataSignal.set({
-            aiDraftSource: 'manual',
-          });
+            aiDraftSource: 'manual' });
         }
       });
     this.activatedRoute.params.subscribe((params) => {
@@ -390,8 +372,7 @@ export class ProjectFormComponent implements OnInit {
         this.modeSignal.set('create');
         this.editingSection.set('overview');
         this.projectForm.patchValue({
-          startDate: this.todayString(),
-        });
+          startDate: this.todayString() });
         this.resetReadinessForm();
         this.resetApprovalForms();
         this.resourceInsightsSignal.set(null);
@@ -440,14 +421,12 @@ export class ProjectFormComponent implements OnInit {
         leadByEmpId: current.leadByEmpId ?? null,
         contactPerson: current.contactPerson ?? '',
         contactNo: current.contactNo ?? '',
-        emailId: current.emailId ?? '',
-      });
+        emailId: current.emailId ?? '' });
       this.applyOverviewToForms(current.overview ?? null);
     } else {
       this.projectForm.reset({
         projectId: 0,
-        startDate: this.todayString(),
-      });
+        startDate: this.todayString() });
       this.applyOverviewToForms(null);
     }
     this.contentfulPanelOpen.set(false);
@@ -466,8 +445,7 @@ export class ProjectFormComponent implements OnInit {
         title: 'Project saved',
         description: this.isEditMode()
           ? 'Updates applied to the project.'
-          : 'A new project has been created.',
-      });
+          : 'A new project has been created.' });
       this.editingSection.set(null);
       if (!this.isEditMode()) {
         this.modeSignal.set('edit');
@@ -481,8 +459,7 @@ export class ProjectFormComponent implements OnInit {
         title: this.isEditMode() ? 'Project updated' : 'Project created',
         description: this.isEditMode()
           ? 'All changes have been saved.'
-          : 'A new project has been created.',
-      });
+          : 'A new project has been created.' });
       this.editingSection.set(null);
       if (!this.isEditMode()) {
         this.modeSignal.set('edit');
@@ -495,8 +472,7 @@ export class ProjectFormComponent implements OnInit {
       this.projectForm.markAllAsTouched();
       this.toast.error({
         title: 'Incomplete details',
-        description: 'Please resolve validation warnings before continuing.',
-      });
+        description: 'Please resolve validation warnings before continuing.' });
       return;
     }
     const readinessChecklist = this.buildReadinessPayload();
@@ -506,8 +482,7 @@ export class ProjectFormComponent implements OnInit {
       readinessChecklist,
       readinessScore: readinessChecklist.percent,
       overview: this.buildOverviewPayload(),
-      cmsContentRefs: this.cmsReferencesSignal(),
-    };
+      cmsContentRefs: this.cmsReferencesSignal() };
     this.isSaving.set(true);
 
     const request$ =
@@ -521,8 +496,7 @@ export class ProjectFormComponent implements OnInit {
         this.hydrateProject(res);
         if (res.projectId && res.projectId > 0) {
           this.router.navigate(['/update-project', res.projectId], {
-            replaceUrl: true,
-          });
+            replaceUrl: true });
         }
         if (onSuccess) {
           onSuccess();
@@ -532,10 +506,8 @@ export class ProjectFormComponent implements OnInit {
         this.isSaving.set(false);
         this.toast.error({
           title: 'Save failed',
-          description: 'Unable to persist changes right now. Try again later.',
-        });
-      },
-    });
+          description: 'Unable to persist changes right now. Try again later.' });
+      } });
   }
 
   requestDelete() {
@@ -562,8 +534,7 @@ export class ProjectFormComponent implements OnInit {
         this.pendingDelete.set(false);
         this.toast.success({
           title: 'Project removed',
-          description: 'The project has been archived successfully.',
-        });
+          description: 'The project has been archived successfully.' });
         this.resetReadinessForm();
         this.resourceInsightsSignal.set(null);
         this.router.navigate(['/projects']);
@@ -572,10 +543,8 @@ export class ProjectFormComponent implements OnInit {
         this.isDeleting.set(false);
         this.toast.error({
           title: 'Delete failed',
-          description: 'Unable to archive the project currently.',
-        });
-      },
-    });
+          description: 'Unable to archive the project currently.' });
+      } });
   }
 
   leadName(leadByEmpId: number | null | undefined) {
@@ -677,8 +646,7 @@ export class ProjectFormComponent implements OnInit {
       this.projectForm.controls['leadByEmpId'].setValue(candidate.employeeId);
       this.toast.success({
         title: 'Lead selected',
-        description: `${candidate.employeeName} has been assigned as the project lead. Save to confirm.`,
-      });
+        description: `${candidate.employeeName} has been assigned as the project lead. Save to confirm.` });
     });
   }
 
@@ -719,8 +687,7 @@ export class ProjectFormComponent implements OnInit {
           ? profile.title
           : 'Contributor',
         allocationPct: suggestedAllocation,
-        assignedDate: this.todayString(),
-      },
+        assignedDate: this.todayString() },
       { emitEvent: false }
     );
     this.collaboratorAssignmentForm.markAsPristine();
@@ -732,8 +699,7 @@ export class ProjectFormComponent implements OnInit {
       {
         role: '',
         allocationPct: 25,
-        assignedDate: this.todayString(),
-      },
+        assignedDate: this.todayString() },
       { emitEvent: false }
     );
   }
@@ -749,8 +715,7 @@ export class ProjectFormComponent implements OnInit {
       this.collaboratorAssignmentForm.markAllAsTouched();
       this.toast.error({
         title: 'Missing details',
-        description: 'Provide role, allocation, and a start date.',
-      });
+        description: 'Provide role, allocation, and a start date.' });
       return;
     }
 
@@ -764,8 +729,7 @@ export class ProjectFormComponent implements OnInit {
           ? Number(value.allocationPct)
           : 0,
       assignedDate: value.assignedDate,
-      isActive: 'Y',
-    };
+      isActive: 'Y' };
 
     this.collaboratorAssignmentProcessing.set(true);
     this.masterService.saveProjectEmp(payload as any).subscribe({
@@ -773,8 +737,7 @@ export class ProjectFormComponent implements OnInit {
         this.collaboratorAssignmentProcessing.set(false);
         this.toast.success({
           title: 'Contributor added',
-          description: `${profile.employeeName} has been assigned to the project.`,
-        });
+          description: `${profile.employeeName} has been assigned to the project.` });
         this.cancelCollaboratorAssignment();
         this.refreshProjectSnapshot(project.projectId);
         this.loadResourceInsights(project.projectId);
@@ -784,15 +747,12 @@ export class ProjectFormComponent implements OnInit {
         this.toast.error({
           title: 'Assignment failed',
           description:
-            'Unable to create the assignment right now. Please try again.',
-        });
+            'Unable to create the assignment right now. Please try again.' });
         console.error('[Resource] collaborator assignment failed', {
           projectId: project.projectId,
           empId: profile.employeeId,
-          error,
-        });
-      },
-    });
+          error });
+      } });
   }
 
   toggleContentfulPanel() {
@@ -809,8 +769,7 @@ export class ProjectFormComponent implements OnInit {
       this.contentfulForm.markAllAsTouched();
       this.toast.error({
         title: 'Missing identifier',
-        description: 'Provide an entry ID or content type to fetch from Contentful.',
-      });
+        description: 'Provide an entry ID or content type to fetch from Contentful.' });
       return;
     }
     const value = this.contentfulForm.getRawValue();
@@ -820,8 +779,7 @@ export class ProjectFormComponent implements OnInit {
     ) {
       this.toast.error({
         title: 'Identifier required',
-        description: 'Provide an entry ID or content type before fetching.',
-      });
+        description: 'Provide an entry ID or content type before fetching.' });
       return;
     }
     this.contentfulLoading.set(true);
@@ -830,8 +788,7 @@ export class ProjectFormComponent implements OnInit {
         entryId: value.entryId?.trim() || undefined,
         contentType: value.contentType?.trim() || undefined,
         slug: value.slug?.trim() || undefined,
-        preview: value.preview ?? false,
-      })
+        preview: value.preview ?? false })
       .subscribe({
         next: (brief) => {
           this.contentfulLoading.set(false);
@@ -840,8 +797,7 @@ export class ProjectFormComponent implements OnInit {
           this.contentfulPanelOpen.set(true);
           this.toast.success({
             title: 'Brief loaded',
-            description: 'Review the Contentful entry below.',
-          });
+            description: 'Review the Contentful entry below.' });
         },
         error: (error) => {
           this.contentfulLoading.set(false);
@@ -852,11 +808,9 @@ export class ProjectFormComponent implements OnInit {
           this.contentfulError.set(message);
           this.toast.error({
             title: 'Contentful error',
-            description: message,
-          });
+            description: message });
           console.error('[Contentful] fetch failed', error);
-        },
-      });
+        } });
   }
 
   applyContentfulOverview(brief: IContentfulBrief | null | undefined) {
@@ -866,15 +820,13 @@ export class ProjectFormComponent implements OnInit {
     const overview = brief.overview ?? {
       summary: '',
       objectives: [],
-      successCriteria: [],
-    };
+      successCriteria: [] };
     this.overviewDetailsForm.patchValue(
       {
         summary: overview.summary ?? '',
         objectives: this.joinMultiline(overview.objectives),
         successCriteria: this.joinMultiline(overview.successCriteria),
-        stakeholderNotes: overview.stakeholderNotes ?? '',
-      },
+        stakeholderNotes: overview.stakeholderNotes ?? '' },
       { emitEvent: false }
     );
     this.overviewDetailsForm.markAsPristine();
@@ -883,13 +835,11 @@ export class ProjectFormComponent implements OnInit {
       aiDraftGeneratedAt:
         overview.aiDraftGeneratedAt ?? new Date().toISOString(),
       cmsEntryId: overview.cmsEntryId ?? brief.entryId ?? undefined,
-      cmsEntryTitle: overview.cmsEntryTitle ?? brief.title ?? undefined,
-    });
+      cmsEntryTitle: overview.cmsEntryTitle ?? brief.title ?? undefined });
     this.upsertContentfulReference(brief);
     this.toast.success({
       title: 'Overview updated',
-      description: 'Contentful brief applied to the overview.',
-    });
+      description: 'Contentful brief applied to the overview.' });
   }
 
   toggleAiPanel() {
@@ -910,8 +860,7 @@ export class ProjectFormComponent implements OnInit {
     const metadata: Record<string, unknown> = {
       contentType: formValue.contentType?.trim() || undefined,
       slug: formValue.slug?.trim() || undefined,
-      appliedAt: new Date().toISOString(),
-    };
+      appliedAt: new Date().toISOString() };
     Object.keys(metadata).forEach((key) => {
       if (
         metadata[key] === undefined ||
@@ -927,8 +876,7 @@ export class ProjectFormComponent implements OnInit {
       referenceId: entryId,
       label: brief.title ?? undefined,
       syncStatus: 'idle',
-      metadata: Object.keys(metadata).length ? metadata : undefined,
-    };
+      metadata: Object.keys(metadata).length ? metadata : undefined };
     const existingIndex = current.findIndex(
       (ref) => ref.provider === 'contentful' && ref.referenceId === entryId
     );
@@ -942,10 +890,8 @@ export class ProjectFormComponent implements OnInit {
           label: nextReference.label ?? ref.label,
           metadata: {
             ...(ref.metadata ?? {}),
-            ...(nextReference.metadata ?? {}),
-          },
-          syncStatus: nextReference.syncStatus,
-        };
+            ...(nextReference.metadata ?? {}) },
+          syncStatus: nextReference.syncStatus };
       });
       this.cmsReferencesSignal.set(updated);
     } else {
@@ -964,8 +910,7 @@ export class ProjectFormComponent implements OnInit {
         this.aiPanelOpen.set(true);
         this.toast.success({
           title: 'AI draft ready',
-          description: `Overview generated with ${draft.source.toUpperCase()}.`,
-        });
+          description: `Overview generated with ${draft.source.toUpperCase()}.` });
       },
       error: (error) => {
         this.aiProcessing.set(false);
@@ -976,11 +921,9 @@ export class ProjectFormComponent implements OnInit {
         this.aiError.set(message);
         this.toast.error({
           title: 'Generation failed',
-          description: message,
-        });
+          description: message });
         console.error('[AI] overview generation failed', error);
-      },
-    });
+      } });
   }
 
   applyAiDraft(draft: IAiOverviewDraft | null | undefined) {
@@ -990,26 +933,22 @@ export class ProjectFormComponent implements OnInit {
     const overview = draft.overview ?? {
       summary: '',
       objectives: [],
-      successCriteria: [],
-    };
+      successCriteria: [] };
     this.overviewDetailsForm.patchValue(
       {
         summary: overview.summary ?? '',
         objectives: this.joinMultiline(overview.objectives),
         successCriteria: this.joinMultiline(overview.successCriteria),
-        stakeholderNotes: overview.stakeholderNotes ?? '',
-      },
+        stakeholderNotes: overview.stakeholderNotes ?? '' },
       { emitEvent: false }
     );
     this.overviewDetailsForm.markAsPristine();
     this.overviewMetadataSignal.set({
       aiDraftSource: draft.source,
-      aiDraftGeneratedAt: new Date().toISOString(),
-    });
+      aiDraftGeneratedAt: new Date().toISOString() });
     this.toast.success({
       title: 'Overview updated',
-      description: `AI draft from ${draft.source.toUpperCase()} applied.`,
-    });
+      description: `AI draft from ${draft.source.toUpperCase()} applied.` });
   }
 
   assignmentStatusLabel(assignment: IProjectResourceAssignment) {
@@ -1048,8 +987,7 @@ export class ProjectFormComponent implements OnInit {
     try {
       return new Intl.DateTimeFormat(undefined, {
         dateStyle: 'medium',
-        timeStyle: 'short',
-      }).format(new Date(value));
+        timeStyle: 'short' }).format(new Date(value));
     } catch {
       return value;
     }
@@ -1100,8 +1038,7 @@ export class ProjectFormComponent implements OnInit {
       this.reviewerCommentForm.markAllAsTouched();
       this.toast.error({
         title: 'Missing details',
-        description: 'Please provide a comment before submitting.',
-      });
+        description: 'Please provide a comment before submitting.' });
       return;
     }
 
@@ -1124,8 +1061,7 @@ export class ProjectFormComponent implements OnInit {
               reviewerId: null,
               reviewerName: '',
               comment: '',
-              severity: payload.severity ?? 'info',
-            },
+              severity: payload.severity ?? 'info' },
             { emitEvent: false }
           );
           Object.values(this.reviewerCommentForm.controls).forEach((control) =>
@@ -1134,22 +1070,18 @@ export class ProjectFormComponent implements OnInit {
           this.reviewerCommentForm.markAsPristine();
           this.toast.success({
             title: 'Comment added',
-            description: 'Reviewer feedback has been logged.',
-          });
+            description: 'Reviewer feedback has been logged.' });
           this.refreshProjectSnapshot(updatedProject.projectId);
         },
         error: () => {
           this.reviewerCommentProcessing.set(false);
           this.toast.error({
             title: 'Action failed',
-            description: 'Unable to add reviewer comment right now.',
-          });
+            description: 'Unable to add reviewer comment right now.' });
           console.error('[Approval] add reviewer comment failed', {
             projectId: project.projectId,
-            payload,
-          });
-        },
-      });
+            payload });
+        } });
   }
 
   toggleReviewerCommentResolved(comment: IReviewerCommentEntry) {
@@ -1161,8 +1093,7 @@ export class ProjectFormComponent implements OnInit {
     this.reviewerCommentProcessing.set(true);
     const payload = {
       resolved: !comment.resolved,
-      ...this.buildApprovalPayload(),
-    };
+      ...this.buildApprovalPayload() };
     this.masterService
       .resolveReviewerComment(project.projectId, comment.id, payload)
       .subscribe({
@@ -1174,18 +1105,15 @@ export class ProjectFormComponent implements OnInit {
             : 'Comment resolved';
           this.toast.success({
             title: message,
-            description: 'Reviewer comment state has been updated.',
-          });
+            description: 'Reviewer comment state has been updated.' });
           this.refreshProjectSnapshot(updatedProject.projectId);
         },
         error: () => {
           this.reviewerCommentProcessing.set(false);
           this.toast.error({
             title: 'Action failed',
-            description: 'Unable to update reviewer comment right now.',
-          });
-        },
-      });
+            description: 'Unable to update reviewer comment right now.' });
+        } });
   }
 
   private performApprovalAction(
@@ -1195,8 +1123,7 @@ export class ProjectFormComponent implements OnInit {
     if (!project?.projectId) {
       this.toast.error({
         title: 'Project not saved',
-        description: 'Save the project before managing approvals.',
-      });
+        description: 'Save the project before managing approvals.' });
       return;
     }
 
@@ -1204,8 +1131,7 @@ export class ProjectFormComponent implements OnInit {
     if (action === 'reject' && !payload.comment) {
       this.toast.error({
         title: 'Provide a reason',
-        description: 'Please include a short note explaining the rejection.',
-      });
+        description: 'Please include a short note explaining the rejection.' });
       return;
     }
 
@@ -1256,23 +1182,19 @@ export class ProjectFormComponent implements OnInit {
           title: successTitle,
           description: `Status is now ${this.approvalStatusLabel(
             snapshot.approvalStatus
-          )}.`,
-        });
+          )}.` });
         this.refreshProjectSnapshot(snapshot.projectId);
       },
       error: () => {
         this.approvalProcessing.set(false);
         this.toast.error({
           title: 'Approval update failed',
-          description: 'Unable to update approval status right now.',
-        });
+          description: 'Unable to update approval status right now.' });
         console.error('[Approval] approval action failed', {
           action,
           projectId: project.projectId,
-          payload,
-        });
-      },
-    });
+          payload });
+      } });
   }
 
   private buildApprovalPayload() {
@@ -1290,8 +1212,7 @@ export class ProjectFormComponent implements OnInit {
       actorId: selectedActorId ?? fallbackActorId ?? undefined,
       actorName: cleanActorName,
       comment:
-        typeof value.comment === 'string' ? value.comment.trim() : undefined,
-    };
+        typeof value.comment === 'string' ? value.comment.trim() : undefined };
   }
 
   private normalizeApprovalStatus(status?: string | null): ApprovalStatus {
@@ -1317,11 +1238,9 @@ export class ProjectFormComponent implements OnInit {
       error: () => {
         this.toast.error({
           title: 'Load failed',
-          description: 'Unable to load project details. Please retry.',
-        });
+          description: 'Unable to load project details. Please retry.' });
         this.router.navigate(['/projects']);
-      },
-    });
+      } });
   }
 
   private loadEmployees() {
@@ -1329,8 +1248,7 @@ export class ProjectFormComponent implements OnInit {
       next: (employees) => {
         this.employeesSignal.set(employees ?? []);
         this.applyDefaultApprovalActor();
-      },
-    });
+      } });
   }
 
   private loadResourceInsights(projectId: number) {
@@ -1352,12 +1270,10 @@ export class ProjectFormComponent implements OnInit {
           if (requestToken === this.resourceInsightsRequestToken) {
             console.error('[Resource] failed to load insights', {
               projectId,
-              error,
-            });
+              error });
             this.resourceInsightsSignal.set(null);
           }
-        },
-      });
+        } });
   }
 
   private buildReadinessControls(): Record<
@@ -1369,15 +1285,12 @@ export class ProjectFormComponent implements OnInit {
         ...controls,
         [task.id]: this.fb.group({
           status: this.fb.control<ReadinessStatus>('not_started', {
-            nonNullable: true,
-          }),
+            nonNullable: true }),
           ownerId: this.fb.control<number | null>(null),
           dueDate: this.fb.control<string | null>(
             this.defaultDueDate(task.defaultDueInDays)
           ),
-          notes: this.fb.control<string>(''),
-        }),
-      }),
+          notes: this.fb.control<string>('') }) }),
       {} as Record<ReadinessTaskId, ReadinessTaskFormGroup>
     );
   }
@@ -1403,8 +1316,7 @@ export class ProjectFormComponent implements OnInit {
         id: task.id,
         status,
         ownerId: value?.ownerId ?? null,
-        dueDate: value?.dueDate ?? null,
-      };
+        dueDate: value?.dueDate ?? null };
     });
     const percent = totalWeight
       ? Math.round((completedWeight / totalWeight) * 100)
@@ -1415,8 +1327,7 @@ export class ProjectFormComponent implements OnInit {
       completedWeight,
       percent,
       completedItems,
-      remainingItems,
-    };
+      remainingItems };
   }
 
   private readinessGroup(taskId: ReadinessTaskId): ReadinessTaskFormGroup {
@@ -1460,8 +1371,7 @@ export class ProjectFormComponent implements OnInit {
         status: 'not_started',
         ownerId: null,
         dueDate: this.defaultDueDate(task.defaultDueInDays),
-        notes: '',
-      };
+        notes: '' };
       return acc;
     }, {} as ReadinessFormValue);
   }
@@ -1531,8 +1441,7 @@ export class ProjectFormComponent implements OnInit {
         dueDate,
         notes,
         statusUpdatedAt,
-        lastUpdatedBy: previous?.lastUpdatedBy,
-      };
+        lastUpdatedBy: previous?.lastUpdatedBy };
     });
 
     const percent = totalWeight
@@ -1546,8 +1455,7 @@ export class ProjectFormComponent implements OnInit {
       percent,
       updatedAt: nowIso,
       updatedBy: baseline?.updatedBy,
-      summary: baseline?.summary,
-    };
+      summary: baseline?.summary };
   }
 
   private formValueFromChecklist(
@@ -1570,8 +1478,7 @@ export class ProjectFormComponent implements OnInit {
             ? item.ownerId
             : item.ownerId ?? null,
         dueDate: item.dueDate ?? fallback[id].dueDate ?? null,
-        notes: item.notes ?? '',
-      };
+        notes: item.notes ?? '' };
     });
     return this.readinessTasks.reduce((acc, task) => {
       acc[task.id] = value[task.id] ?? fallback[task.id];
@@ -1600,8 +1507,7 @@ export class ProjectFormComponent implements OnInit {
         summary,
         objectives,
         successCriteria,
-        stakeholderNotes,
-      },
+        stakeholderNotes },
       { emitEvent: false }
     );
     this.overviewDetailsForm.markAsPristine();
@@ -1610,8 +1516,7 @@ export class ProjectFormComponent implements OnInit {
         aiDraftSource: overview.aiDraftSource,
         aiDraftGeneratedAt: overview.aiDraftGeneratedAt,
         cmsEntryId: overview.cmsEntryId,
-        cmsEntryTitle: overview.cmsEntryTitle,
-      });
+        cmsEntryTitle: overview.cmsEntryTitle });
     } else {
       this.overviewMetadataSignal.set(null);
     }
@@ -1644,8 +1549,7 @@ export class ProjectFormComponent implements OnInit {
     const payload: IProjectOverview = {
       summary,
       objectives,
-      successCriteria,
-    };
+      successCriteria };
 
     if (stakeholderNotes) {
       payload.stakeholderNotes = stakeholderNotes;
@@ -1697,17 +1601,13 @@ export class ProjectFormComponent implements OnInit {
           summary: (overviewValue.summary ?? '').trim(),
           objectives: this.splitMultiline(overviewValue.objectives),
           successCriteria: this.splitMultiline(overviewValue.successCriteria),
-          stakeholderNotes: (overviewValue.stakeholderNotes ?? '').trim(),
-        },
-      },
+          stakeholderNotes: (overviewValue.stakeholderNotes ?? '').trim() } },
       readiness,
       assignments: assignments.map((assignment) => ({
         employeeName: assignment.employee?.employeeName,
         role: assignment.role ?? assignment.employee?.role,
         allocationPct: assignment.allocationPct ?? null,
-        allocationStatus: assignment.allocationStatus,
-      })),
-    };
+        allocationStatus: assignment.allocationStatus })) };
   }
 
   private cloneProject(project: IProject): IProject {
@@ -1739,8 +1639,7 @@ export class ProjectFormComponent implements OnInit {
         leadByEmpId: snapshot.leadByEmpId ?? null,
         contactPerson: snapshot.contactPerson ?? '',
         contactNo: snapshot.contactNo ?? '',
-        emailId: snapshot.emailId ?? '',
-      },
+        emailId: snapshot.emailId ?? '' },
       { emitEvent: false }
     );
     this.applyReadinessFromProject(snapshot.readinessChecklist);
@@ -1764,14 +1663,11 @@ export class ProjectFormComponent implements OnInit {
         this.toast.error({
           title: 'Refresh failed',
           description:
-            'Unable to refresh the project data at the moment. Try again shortly.',
-        });
+            'Unable to refresh the project data at the moment. Try again shortly.' });
         console.error('[Approval] refreshProjectSnapshot failed', {
           projectId,
-          error,
-        });
-      },
-    });
+          error });
+      } });
   }
 
   private resetReadinessForm() {
@@ -1785,15 +1681,13 @@ export class ProjectFormComponent implements OnInit {
     this.approvalForm.reset({
       actorId: null,
       actorName: '',
-      comment: '',
-    });
+      comment: '' });
     this.reviewerCommentForm.reset({
       section: 'overview',
       reviewerId: null,
       reviewerName: '',
       comment: '',
-      severity: 'info',
-    });
+      severity: 'info' });
     this.applyDefaultApprovalActor();
   }
 

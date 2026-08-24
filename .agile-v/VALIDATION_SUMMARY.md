@@ -1,5 +1,36 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-08-25 — Auth UI Lucide polish + dashboard control-flow (commit-ready)
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | 0 errors |
+| `npm run build` | **PASS** | Bundle budget warning (~1.01 MB > 700 kB); quiet Sentry map upload |
+| `npm test -- --watch=false --browsers=ChromeHeadless` | **PASS** | 12/12 specs |
+| verify-deep | **PASS WITH WARNINGS** | Auth UI + dashboard/login `@if`/`@for`; remaining-app control-flow deferred |
+| implementation-verifier | **PASS WITH WARNINGS** | Non-blocking (unused CommonModule on some peers; deferred full `*ngIf` sweep) |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Robohash helpers + UserAvatar + utility nav constants | Done |
+| SelectMenu rich options / Clear Selection / full-width panel | Done |
+| Login Sparkles + Logging In until navigate; demoLogin fill | Done |
+| Profile dropdown; API links off nav; Log Out off layout | Done |
+| Title Case + Lucide primary actions (`AppIconComponent`) | Done |
+| App shell + dashboard + login control-flow (`@if`/`@for`) | Done |
+
+### eval_gate_status
+
+N/A (user-directed delivery; formal GATE-0001 record optional follow-up)
+
+---
+
 ## Session 2026-08-25 — Auth, AI fallback, Sentry, SEO/README (commit-ready)
 
 **Node:** v24.x

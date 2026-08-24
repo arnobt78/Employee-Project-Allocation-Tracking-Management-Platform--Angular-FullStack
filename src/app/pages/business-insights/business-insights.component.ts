@@ -4,16 +4,15 @@ import {
   FormsModule,
   ReactiveFormsModule,
   FormBuilder,
-  FormGroup,
-} from '@angular/forms';
+  FormGroup } from '@angular/forms';
 import { MasterService } from '../../service/master.service';
 import { IProject, IProjectEmployee } from '../../model/interface/master';
 import { Employee } from '../../model/class/Employee';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import {
   ListSkeletonComponent,
-  StatPillSkeletonComponent,
-} from '@/app/components/ui/list-skeleton.component';
+  StatPillSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 
 export interface IBusinessInsights {
   projectStatusDistribution: {
@@ -78,16 +77,16 @@ export interface IBusinessInsights {
   selector: 'app-business-insights',
   standalone: true,
   imports: [
+    AppIconComponent,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     UbButtonDirective,
     ListSkeletonComponent,
-    StatPillSkeletonComponent,
+    StatPillSkeletonComponent
   ],
   templateUrl: './business-insights.component.html',
-  styleUrls: ['./business-insights.component.css'],
-})
+  styleUrls: ['./business-insights.component.css'] })
 export class BusinessInsightsComponent implements OnInit {
   private readonly masterService = inject(MasterService);
   private readonly fb = inject(FormBuilder);
@@ -126,8 +125,7 @@ export class BusinessInsightsComponent implements OnInit {
       startDate: [''],
       endDate: [''],
       department: ['all'],
-      projectType: ['all'],
-    });
+      projectType: ['all'] });
   }
 
   ngOnInit(): void {
@@ -181,8 +179,7 @@ export class BusinessInsightsComponent implements OnInit {
         if (!hasWarm) {
           this.loadingSignal.set(false);
         }
-      },
-    });
+      } });
 
     this.masterService.getAllEmp().subscribe({
       next: (employees) => {
@@ -195,8 +192,7 @@ export class BusinessInsightsComponent implements OnInit {
         if (!hasWarm) {
           this.loadingSignal.set(false);
         }
-      },
-    });
+      } });
 
     this.masterService.getProjectEmp().subscribe({
       next: (projectEmployees) => {
@@ -212,8 +208,7 @@ export class BusinessInsightsComponent implements OnInit {
         this.projectEmployeesSignal.set(projectEmployeesSnap ?? []);
         projectEmployeesLoaded = true;
         checkAndCalculate();
-      },
-    });
+      } });
   }
 
   calculateInsights(): void {
@@ -552,8 +547,7 @@ export class BusinessInsightsComponent implements OnInit {
       archivedProjectCount,
       planningProjectCount,
       assignedProjectCount,
-      nonAssignedProjectCount,
-    };
+      nonAssignedProjectCount };
 
     this.insightsSignal.set(insights);
     this.loadingSignal.set(false);
@@ -565,8 +559,7 @@ export class BusinessInsightsComponent implements OnInit {
       in_progress: 0,
       completed: 0,
       on_hold: 0,
-      cancelled: 0,
-    };
+      cancelled: 0 };
 
     projects.forEach((p) => {
       // Use status field, fallback to approvalStatus if status is not set
@@ -660,8 +653,7 @@ export class BusinessInsightsComponent implements OnInit {
       activeAssignments: activeAssignments.length,
       averageAllocation: Math.round(averageAllocation),
       overbookedCount,
-      availableCount,
-    };
+      availableCount };
   }
 
   /**
@@ -689,15 +681,13 @@ export class BusinessInsightsComponent implements OnInit {
       { id: 'budgetApproved', weight: 20 },
       { id: 'legalReviewed', weight: 20 },
       { id: 'assetsPrepared', weight: 15 },
-      { id: 'kickoffScheduled', weight: 20 },
-    ];
+      { id: 'kickoffScheduled', weight: 20 }];
 
     const READINESS_STATUS_VALUES: Record<string, number> = {
       not_started: 0,
       in_progress: 0.5,
       blocked: 0,
-      done: 1,
-    };
+      done: 1 };
 
     const READINESS_TOTAL_WEIGHT = READINESS_DEFINITIONS.reduce(
       (total, item) => total + item.weight,
@@ -753,8 +743,7 @@ export class BusinessInsightsComponent implements OnInit {
       { range: '0-25%', count: 0 },
       { range: '26-50%', count: 0 },
       { range: '51-75%', count: 0 },
-      { range: '76-100%', count: 0 },
-    ];
+      { range: '76-100%', count: 0 }];
 
     allScores.forEach((score) => {
       if (score <= 25) distribution[0].count++;
@@ -797,8 +786,7 @@ export class BusinessInsightsComponent implements OnInit {
       totalCapacity,
       utilizedCapacity: Math.round(utilizedCapacity),
       availableCapacity: Math.round(availableCapacity),
-      utilizationPercentage,
-    };
+      utilizationPercentage };
   }
 
   private calculateHealthTrends(_projects: IProject[]) {
@@ -808,8 +796,7 @@ export class BusinessInsightsComponent implements OnInit {
       month,
       healthy: Math.floor(Math.random() * 5) + 1,
       atRisk: Math.floor(Math.random() * 3),
-      critical: Math.floor(Math.random() * 2),
-    }));
+      critical: Math.floor(Math.random() * 2) }));
   }
 
   private calculateBudgetMetrics(projects: IProject[]) {
@@ -840,8 +827,7 @@ export class BusinessInsightsComponent implements OnInit {
       totalBudget,
       allocatedBudget,
       spentBudget,
-      remainingBudget: Math.max(0, totalBudget - spentBudget),
-    };
+      remainingBudget: Math.max(0, totalBudget - spentBudget) };
   }
 
   private calculateDepartmentBreakdown(
@@ -895,8 +881,7 @@ export class BusinessInsightsComponent implements OnInit {
           ? Math.round(
               data.readiness.reduce((a, b) => a + b, 0) / data.readiness.length
             )
-          : 0,
-    }));
+          : 0 }));
   }
 
   private calculateProjectTypeBreakdown(projects: IProject[]) {
@@ -924,8 +909,7 @@ export class BusinessInsightsComponent implements OnInit {
           ? Math.round(
               data.readiness.reduce((a, b) => a + b, 0) / data.readiness.length
             )
-          : 0,
-    }));
+          : 0 }));
   }
 
   setActiveTab(

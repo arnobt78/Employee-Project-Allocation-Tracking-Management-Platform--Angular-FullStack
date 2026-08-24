@@ -3,8 +3,7 @@ import {
   FormBuilder,
   FormGroup,
   Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
+  ReactiveFormsModule } from '@angular/forms';
 import { MasterService } from '../../service/master.service';
 import { Employee } from '../../model/class/Employee';
 import { CommonModule } from '@angular/common';
@@ -12,22 +11,22 @@ import { UbButtonDirective } from '@/app/components/ui/button';
 import { ToastService } from '@/app/components/ui/toast.service';
 import {
   ListSkeletonComponent,
-  StatPillSkeletonComponent,
-} from '@/app/components/ui/list-skeleton.component';
+  StatPillSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 
 @Component({
   selector: 'app-employee',
   standalone: true,
   imports: [
+    AppIconComponent,
     CommonModule,
     ReactiveFormsModule,
     UbButtonDirective,
     ListSkeletonComponent,
-    StatPillSkeletonComponent,
+    StatPillSkeletonComponent
   ],
   templateUrl: './employee.component.html',
-  styleUrls: ['./employee.component.css'],
-})
+  styleUrls: ['./employee.component.css'] })
 export class EmployeeComponent implements OnInit {
   employeeForm: FormGroup;
   private readonly employeesSignal = signal<Employee[]>([]);
@@ -74,8 +73,7 @@ export class EmployeeComponent implements OnInit {
       timezone: [''],
       hireDate: [''],
       skills: [''],
-      tags: [''],
-    });
+      tags: [''] });
   }
 
   ngOnInit(): void {
@@ -114,8 +112,7 @@ export class EmployeeComponent implements OnInit {
         }
         this.isLoading.set(false);
         this.hasLoaded.set(true);
-      },
-    });
+      } });
   }
 
   toggleExpand(employeeId: number | null | undefined) {
@@ -146,8 +143,7 @@ export class EmployeeComponent implements OnInit {
       timezone: '',
       hireDate: '',
       skills: '',
-      tags: '',
-    });
+      tags: '' });
   }
 
   closeCreatePanel() {
@@ -185,8 +181,7 @@ export class EmployeeComponent implements OnInit {
       timezone: employee.timezone ?? '',
       hireDate: formatDateForInput(employee.hireDate),
       skills: Array.isArray(employee.skills) ? employee.skills.join(', ') : '',
-      tags: Array.isArray(employee.tags) ? employee.tags.join(', ') : '',
-    });
+      tags: Array.isArray(employee.tags) ? employee.tags.join(', ') : '' });
   }
 
   cancelEdit() {
@@ -206,8 +201,7 @@ export class EmployeeComponent implements OnInit {
       timezone: '',
       hireDate: '',
       skills: '',
-      tags: '',
-    });
+      tags: '' });
   }
 
   promptDelete(employee: Employee) {
@@ -230,8 +224,7 @@ export class EmployeeComponent implements OnInit {
         );
         this.toast.success({
           title: 'Employee removed',
-          description: `${employeeName} has been deleted.`,
-        });
+          description: `${employeeName} has been deleted.` });
         if (this.expandedEmployeeId === employeeId) {
           this.expandedEmployeeId = null;
         }
@@ -240,8 +233,7 @@ export class EmployeeComponent implements OnInit {
         this.isDeleting = false;
         this.toast.error({
           title: 'Deletion failed',
-          description: 'Unable to delete the employee right now.',
-        });
+          description: 'Unable to delete the employee right now.' });
       }
     );
   }
@@ -259,16 +251,14 @@ export class EmployeeComponent implements OnInit {
             this.employeeForm.reset();
             this.toast.success({
               title: 'Employee updated',
-              description: 'Employee details were saved successfully.',
-            });
+              description: 'Employee details were saved successfully.' });
             this.editingEmployeeId = null;
           },
           () => {
             this.isSaving = false;
             this.toast.error({
               title: 'Update failed',
-              description: 'Something went wrong while saving changes.',
-            });
+              description: 'Something went wrong while saving changes.' });
           }
         );
       } else {
@@ -280,16 +270,14 @@ export class EmployeeComponent implements OnInit {
             this.employeeForm.reset();
             this.toast.success({
               title: 'Employee created',
-              description: 'A new employee record is now available.',
-            });
+              description: 'A new employee record is now available.' });
             this.showCreatePanel = false;
           },
           () => {
             this.isSaving = false;
             this.toast.error({
               title: 'Creation failed',
-              description: 'Unable to save the new employee.',
-            });
+              description: 'Unable to save the new employee.' });
           }
         );
       }
@@ -342,7 +330,6 @@ export class EmployeeComponent implements OnInit {
       timezone: raw.timezone ?? '',
       hireDate: normalizeDate(raw.hireDate),
       skills: parseCsv(raw.skills),
-      tags: parseCsv(raw.tags),
-    } as Employee;
+      tags: parseCsv(raw.tags) } as Employee;
   }
 }

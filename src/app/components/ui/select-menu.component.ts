@@ -9,45 +9,73 @@ import {
   ViewChild,
   forwardRef,
   inject,
-  signal,
-} from '@angular/core';
+  signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
+import { UserAvatarComponent } from './user-avatar.component';
 
 export interface SelectMenuOption {
   value: string;
   label: string;
+  subtitle?: string;
+  imageSeed?: string;
+  imageUrl?: string | null;
 }
 
 @Component({
   selector: 'app-select-menu-panel',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    AppIconComponent,CommonModule, UserAvatarComponent],
   template: `
     <ul
       role="listbox"
-      class="max-h-60 overflow-auto rounded-2xl border border-white/15 bg-slate-950/95 p-2 shadow-[0_25px_70px_rgba(9,14,33,0.65)] backdrop-blur-xl"
+      class="w-full max-h-72 overflow-auto rounded-2xl border border-white/15 bg-slate-950/95 p-2 shadow-[0_25px_70px_rgba(9,14,33,0.65)] backdrop-blur-xl"
     >
-      <li
-        *ngFor="let option of options; let index = index"
-        role="option"
-        [attr.aria-selected]="option.value === selectedValue"
-        class="cursor-pointer rounded-xl px-4 py-2.5 text-sm transition"
-        [class.bg-white/10]="option.value === selectedValue"
-        [class.text-white]="option.value === selectedValue"
-        [class.text-white/80]="option.value !== selectedValue"
-        [class.hover:bg-white/10]="option.value !== selectedValue"
-        (click)="pick(option.value)"
-        (mouseenter)="activeIndex = index"
-      >
-        {{ option.label }}
-      </li>
+      @if (showClear) {
+        <li
+          role="option"
+          class="mb-1 flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 px-3 py-2.5 text-sm text-rose-200 transition hover:bg-white/10"
+          (click)="pick('clear')"
+        >
+          <lucide-icon name="eraser" [size]="16" class="shrink-0"></lucide-icon>
+          <span class="font-medium">Clear Selection</span>
+        </li>
+      }
+      @for (option of options; track option.value; let index = $index) {
+        <li
+          role="option"
+          [attr.aria-selected]="option.value === selectedValue"
+          class="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition"
+          [class.bg-white/10]="option.value === selectedValue"
+          [class.text-white]="option.value === selectedValue"
+          [class.text-white/80]="option.value !== selectedValue"
+          [class.hover:bg-white/10]="option.value !== selectedValue"
+          (click)="pick(option.value)"
+          (mouseenter)="activeIndex = index"
+        >
+          <app-user-avatar
+            [seed]="option.imageSeed || option.value"
+            [imageUrl]="option.imageUrl ?? null"
+            [label]="option.label"
+            [size]="36"
+            [alt]="''"
+          ></app-user-avatar>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-medium">{{ option.label }}</p>
+            @if (option.subtitle) {
+              <p class="truncate text-xs opacity-70">{{ option.subtitle }}</p>
+            }
+          </div>
+        </li>
+      }
     </ul>
-  `,
-})
+  ` })
 class SelectMenuPanelComponent {
   options: SelectMenuOption[] = [];
   selectedValue = '';
+  showClear = false;
   activeIndex = 0;
   pick = (_value: string) => {};
 }
@@ -55,28 +83,52 @@ class SelectMenuPanelComponent {
 @Component({
   selector: 'app-select-menu',
   standalone: true,
-  imports: [CommonModule, OverlayModule],
+  imports: [
+    CommonModule,
+    OverlayModule,
+    UserAvatarComponent
+  ],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SelectMenuComponent),
-      multi: true,
-    },
-  ],
+      multi: true }],
   template: `
     <button
       #trigger
       type="button"
-      class="flex w-full items-center justify-between rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-left text-sm text-white/85 outline-none backdrop-blur-sm transition focus:border-amber-400/60 focus:bg-white/10 focus:text-white disabled:cursor-not-allowed disabled:opacity-60"
+      class="flex w-full items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-left text-sm text-white/85 outline-none backdrop-blur-sm transition focus:border-amber-400/60 focus:bg-white/10 focus:text-white disabled:cursor-not-allowed disabled:opacity-60"
       [attr.aria-expanded]="isOpen()"
       aria-haspopup="listbox"
       [disabled]="disabled"
       (click)="toggle()"
       (keydown)="onTriggerKeydown($event)"
     >
-      <span [class.text-white/40]="!selectedLabel()">{{ selectedLabel() || placeholder }}</span>
+      <span class="flex min-w-0 flex-1 items-center gap-3">
+        @if (selectedOption(); as selected) {
+          <app-user-avatar
+            [seed]="selected.imageSeed || selected.value"
+            [imageUrl]="selected.imageUrl ?? null"
+            [label]="selected.label"
+            [size]="32"
+            [alt]="''"
+          ></app-user-avatar>
+          <span class="min-w-0">
+            <span class="block truncate font-medium text-white">{{
+              selected.label
+            }}</span>
+            @if (selected.subtitle) {
+              <span class="block truncate text-xs text-white/55">{{
+                selected.subtitle
+              }}</span>
+            }
+          </span>
+        } @else {
+          <span class="text-white/40">{{ placeholder }}</span>
+        }
+      </span>
       <svg
-        class="h-4 w-4 text-white/60 transition"
+        class="h-4 w-4 shrink-0 text-white/60 transition"
         [class.rotate-180]="isOpen()"
         viewBox="0 0 24 24"
         fill="none"
@@ -87,21 +139,21 @@ class SelectMenuPanelComponent {
         <path d="M6 9l6 6 6-6" />
       </svg>
     </button>
-  `,
-})
+  ` })
 export class SelectMenuComponent implements ControlValueAccessor {
   private readonly overlay = inject(Overlay);
 
-  @ViewChild('trigger', { static: true }) trigger!: ElementRef<HTMLButtonElement>;
+  @ViewChild('trigger', { static: true })
+  trigger!: ElementRef<HTMLButtonElement>;
 
   @Input() options: SelectMenuOption[] = [];
-  @Input() placeholder = 'Select an option';
+  @Input() placeholder = 'Select An Option';
   @Input() disabled = false;
 
   @Output() selectionChange = new EventEmitter<string>();
 
   readonly isOpen = signal(false);
-  readonly selectedLabel = signal('');
+  readonly selectedOption = signal<SelectMenuOption | null>(null);
 
   private value = '';
   private overlayRef: OverlayRef | null = null;
@@ -110,7 +162,7 @@ export class SelectMenuComponent implements ControlValueAccessor {
 
   writeValue(value: string | null): void {
     this.value = value ?? '';
-    this.syncLabel();
+    this.syncSelection();
   }
 
   registerOnChange(fn: (value: string) => void): void {
@@ -150,16 +202,13 @@ export class SelectMenuComponent implements ControlValueAccessor {
           originY: 'bottom',
           overlayX: 'start',
           overlayY: 'top',
-          offsetY: 8,
-        },
+          offsetY: 8 },
         {
           originX: 'start',
           originY: 'top',
           overlayX: 'start',
           overlayY: 'bottom',
-          offsetY: -8,
-        },
-      ])
+          offsetY: -8 }])
       .withPush(true);
 
     this.overlayRef = this.overlay.create({
@@ -167,13 +216,13 @@ export class SelectMenuComponent implements ControlValueAccessor {
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
       hasBackdrop: true,
       backdropClass: 'cdk-overlay-transparent-backdrop',
-      width: this.trigger.nativeElement.offsetWidth,
-    });
+      width: this.trigger.nativeElement.offsetWidth });
 
     const portal = new ComponentPortal(SelectMenuPanelComponent);
     const componentRef = this.overlayRef.attach(portal);
     componentRef.instance.options = this.options;
     componentRef.instance.selectedValue = this.value;
+    componentRef.instance.showClear = !!this.value && this.value !== 'clear';
     componentRef.instance.pick = (nextValue: string) => {
       this.selectValue(nextValue);
       this.close();
@@ -209,14 +258,14 @@ export class SelectMenuComponent implements ControlValueAccessor {
   }
 
   private selectValue(nextValue: string): void {
-    this.value = nextValue;
-    this.syncLabel();
-    this.onChange(nextValue);
-    this.selectionChange.emit(nextValue);
+    this.value = nextValue === 'clear' ? '' : nextValue;
+    this.syncSelection();
+    this.onChange(this.value);
+    this.selectionChange.emit(nextValue === 'clear' ? 'clear' : this.value);
   }
 
-  private syncLabel(): void {
+  private syncSelection(): void {
     const match = this.options.find((option) => option.value === this.value);
-    this.selectedLabel.set(match?.label ?? '');
+    this.selectedOption.set(match ?? null);
   }
 }

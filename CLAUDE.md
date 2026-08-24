@@ -5,9 +5,9 @@
 Project Name: EmpowerHub — Employee & Project Management (employee-management)  
 Description: Angular 20 SPA + Vercel serverless API + Prisma/MongoDB for employees, projects, assignments, dashboards, calendar/Gantt, insights, API docs/status, email notifications, optional Contentful + AI drafting, Sentry tunnel.
 
-Current Status: Session work verified commit-ready (auth, AI fallback, Sentry, SEO/README)  
+Current Status: Auth UI Lucide polish + dashboard `@if`/`@for` verified commit-ready  
 Current Agile V Cycle: C1  
-Current Gate: GATE-0001 (original formal gate still open in memory; session delivered Wave 1 auth + hygiene with user direction)
+Current Gate: GATE-0001 (original formal gate still open in memory; user-directed delivery)
 
 ---
 

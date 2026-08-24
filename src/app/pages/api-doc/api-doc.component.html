@@ -1,8 +1,10 @@
 <div class="space-y-6">
   <!-- Header -->
-  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <div
+    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+  >
     <div>
-      <h1 class="text-3xl font-bold text-white">API Documentation</h1>
+      <h1 class="text-3xl font-medium text-white">API Documentation</h1>
       <p class="mt-2 text-sm text-white/60">
         Complete API reference for Employee Management System
       </p>
@@ -12,14 +14,17 @@
       class="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2"
     >
       <span class="text-xs text-white/60">Version</span>
-      <span class="text-sm font-semibold text-white">{{
+      <span class="text-sm font-medium text-white">{{
         apiDoc()!.info.version
       }}</span>
     </div>
   </div>
 
   <!-- Loading State -->
-  <div *ngIf="loading()" class="rounded-lg border border-white/10 bg-white/5 p-8 text-center">
+  <div
+    *ngIf="loading()"
+    class="rounded-lg border border-white/10 bg-white/5 p-8 text-center"
+  >
     <p class="text-white/60">Loading API documentation...</p>
   </div>
 
@@ -41,9 +46,9 @@
   <div *ngIf="apiDoc() && !loading()" class="space-y-6">
     <!-- API Info Card -->
     <div
-      class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
+      class="rounded-2xl border border-white/10 bg-white/5 p-2 sm:p-4 backdrop-blur-xl"
     >
-      <h2 class="mb-4 text-xl font-semibold text-white">
+      <h2 class="mb-4 text-xl font-medium text-white">
         {{ apiDoc()!.info.title }}
       </h2>
       <p class="mb-4 text-sm text-white/70">
@@ -52,10 +57,9 @@
       <div class="flex flex-wrap items-center gap-4">
         <div class="flex items-center gap-2">
           <span class="text-xs text-white/60">Base URL:</span>
-          <code
-            class="rounded bg-white/10 px-2 py-1 text-xs text-white"
-            >{{ apiDoc()!.info.baseUrl }}</code
-          >
+          <code class="rounded bg-white/10 px-2 py-1 text-xs text-white">{{
+            apiDoc()!.info.baseUrl
+          }}</code>
         </div>
         <div class="flex items-center gap-2">
           <span class="text-xs text-white/60">Version:</span>
@@ -68,14 +72,14 @@
 
     <!-- Tabs for HTTP Methods -->
     <div
-      class="rounded-[26px] border border-white/10 bg-white/5/80 p-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
     >
       <div class="mb-6 flex gap-2 border-b border-white/10">
         <button
           (click)="setActiveTab('GET')"
           [class]="
             activeTab() === 'GET'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-semibold text-primary'
+              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
               : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
           "
         >
@@ -85,7 +89,7 @@
           (click)="setActiveTab('POST')"
           [class]="
             activeTab() === 'POST'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-semibold text-primary'
+              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
               : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
           "
         >
@@ -95,7 +99,7 @@
           (click)="setActiveTab('PUT')"
           [class]="
             activeTab() === 'PUT'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-semibold text-primary'
+              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
               : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
           "
         >
@@ -105,7 +109,7 @@
           (click)="setActiveTab('DELETE')"
           [class]="
             activeTab() === 'DELETE'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-semibold text-primary'
+              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
               : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
           "
         >
@@ -142,14 +146,16 @@
       <div class="space-y-4">
         <div
           *ngFor="let endpoint of filteredEndpoints()"
-          class="rounded-xl border border-white/10 bg-white/5 p-6 transition-all hover:border-white/20 hover:bg-white/10"
+          class="rounded-xl border border-white/10 bg-white/5 p-2 sm:p-4 transition-all hover:border-white/20 hover:bg-white/10"
         >
           <!-- Endpoint Header -->
-          <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div
+            class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+          >
             <div class="flex-1">
               <div class="mb-2 flex items-center gap-3">
                 <span
-                  class="inline-flex rounded border px-2 py-1 text-xs font-semibold"
+                  class="inline-flex rounded border px-2 py-1 text-xs font-medium"
                   [class]="getMethodColor(endpoint.method)"
                 >
                   {{ endpoint.method }}
@@ -161,7 +167,7 @@
                   {{ endpoint.category }}
                 </span>
               </div>
-              <h3 class="mb-2 text-lg font-semibold text-white">
+              <h3 class="mb-2 text-lg font-medium text-white">
                 {{ endpoint.path }}
               </h3>
               <p class="text-sm text-white/70">{{ endpoint.description }}</p>
@@ -181,8 +187,11 @@
           </div>
 
           <!-- Parameters -->
-          <div *ngIf="endpoint.parameters && endpoint.parameters.length > 0" class="mb-4">
-            <h4 class="mb-2 text-sm font-semibold text-white">Parameters</h4>
+          <div
+            *ngIf="endpoint.parameters && endpoint.parameters.length > 0"
+            class="mb-4"
+          >
+            <h4 class="mb-2 text-sm font-medium text-white">Parameters</h4>
             <div class="space-y-2">
               <div
                 *ngFor="let param of endpoint.parameters"
@@ -209,14 +218,16 @@
                     Required
                   </span>
                 </div>
-                <p class="mt-1 text-xs text-white/60">{{ param.description }}</p>
+                <p class="mt-1 text-xs text-white/60">
+                  {{ param.description }}
+                </p>
               </div>
             </div>
           </div>
 
           <!-- Request Body -->
           <div *ngIf="endpoint.requestBody" class="mb-4">
-            <h4 class="mb-2 text-sm font-semibold text-white">Request Body</h4>
+            <h4 class="mb-2 text-sm font-medium text-white">Request Body</h4>
             <div class="rounded-lg border border-white/10 bg-white/5 p-3">
               <div class="mb-2">
                 <span class="text-xs text-white/60">Content-Type:</span>
@@ -235,12 +246,14 @@
 
           <!-- Response -->
           <div class="mb-4">
-            <h4 class="mb-2 text-sm font-semibold text-white">Response</h4>
-            <div class="rounded-lg border border-green-500/30 bg-green-500/10 p-3">
+            <h4 class="mb-2 text-sm font-medium text-white">Response</h4>
+            <div
+              class="rounded-lg border border-green-500/30 bg-green-500/10 p-3"
+            >
               <div class="mb-2">
                 <span class="text-xs text-white/60">Status:</span>
                 <span
-                  class="ml-2 rounded bg-green-500/20 px-2 py-0.5 text-xs font-semibold text-green-400"
+                  class="ml-2 rounded bg-green-500/20 px-2 py-0.5 text-xs font-medium text-green-400"
                 >
                   {{ endpoint.response.status }}
                 </span>
@@ -255,8 +268,12 @@
           </div>
 
           <!-- Error Responses -->
-          <div *ngIf="endpoint.errorResponses && endpoint.errorResponses.length > 0">
-            <h4 class="mb-2 text-sm font-semibold text-white">Error Responses</h4>
+          <div
+            *ngIf="
+              endpoint.errorResponses && endpoint.errorResponses.length > 0
+            "
+          >
+            <h4 class="mb-2 text-sm font-medium text-white">Error Responses</h4>
             <div class="space-y-2">
               <div
                 *ngFor="let error of endpoint.errorResponses"
@@ -265,7 +282,7 @@
                 <div class="mb-2">
                   <span class="text-xs text-white/60">Status:</span>
                   <span
-                    class="ml-2 rounded bg-red-500/20 px-2 py-0.5 text-xs font-semibold text-red-400"
+                    class="ml-2 rounded bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-400"
                   >
                     {{ error.status }}
                   </span>
@@ -294,4 +311,3 @@
     </div>
   </div>
 </div>
-

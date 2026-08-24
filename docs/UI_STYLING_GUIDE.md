@@ -42,14 +42,14 @@ The design system is built on the following principles:
 
 The system uses 6 main color variants for semantic differentiation:
 
-| Variant | Use Case | RGB Values |
-|---------|----------|------------|
-| **Sky** | Primary actions, info, default cards | `rgb(2,132,199)` |
-| **Emerald** | Success, active states, positive metrics | `rgb(16,185,129)` |
-| **Amber** | Warnings, active projects, highlights | `rgb(245,158,11)` |
-| **Rose** | Destructive actions, errors, delete buttons | `rgb(225,29,72)` |
-| **Violet** | Filters, search, secondary actions | `rgb(139,92,246)` |
-| **Blue** | Alternative primary, navigation | `rgb(59,130,246)` |
+| Variant     | Use Case                                    | RGB Values        |
+| ----------- | ------------------------------------------- | ----------------- |
+| **Sky**     | Primary actions, info, default cards        | `rgb(2,132,199)`  |
+| **Emerald** | Success, active states, positive metrics    | `rgb(16,185,129)` |
+| **Amber**   | Warnings, active projects, highlights       | `rgb(245,158,11)` |
+| **Rose**    | Destructive actions, errors, delete buttons | `rgb(225,29,72)`  |
+| **Violet**  | Filters, search, secondary actions          | `rgb(139,92,246)` |
+| **Blue**    | Alternative primary, navigation             | `rgb(59,130,246)` |
 
 ### Opacity Scale
 
@@ -64,7 +64,7 @@ Consistent opacity values used throughout:
 - `/40` - Button borders, hover states
 - `/50` - Medium backgrounds, overlays
 - `/60` - Text, icons
-| `/70` - Text, icons
+  | `/70` - Text, icons
 - `/80` - Hover states
 - `/85` - Headers, sticky elements
 
@@ -80,7 +80,7 @@ Consistent opacity values used throughout:
 <div class="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.15),transparent_55%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.12),transparent_65%)]">
   <!-- Background overlay layer -->
   <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05),transparent_60%)]"></div>
-  
+
   <!-- Content -->
   <div class="relative z-10">
     <!-- Your content here -->
@@ -89,6 +89,7 @@ Consistent opacity values used throughout:
 ```
 
 **Breakdown**:
+
 - **Top gradient**: `rgba(59,130,246,0.15)` (blue) fading to transparent at 55%
 - **Bottom gradient**: `rgba(236,72,153,0.12)` (pink) fading to transparent at 65%
 - **Overlay layer**: Subtle white radial gradient at center with 5% opacity
@@ -120,7 +121,7 @@ Cards use 3-stop gradients with colored borders and shadows.
   <div class="flex items-start justify-between gap-4">
     <div>
       <p class="text-xs uppercase tracking-[0.45em] text-white/60">Title</p>
-      <p class="mt-3 text-3xl font-semibold text-white">Value</p>
+      <p class="mt-3 text-3xl font-medium text-white">Value</p>
     </div>
   </div>
   <p class="mt-4 text-sm text-white/70">Description text</p>
@@ -128,6 +129,7 @@ Cards use 3-stop gradients with colored borders and shadows.
 ```
 
 **Key Classes**:
+
 - `rounded-[28px]` - Large border radius for modern look
 - `border border-sky-400/30` - Colored border with 30% opacity
 - `bg-gradient-to-br from-sky-500/25 via-sky-500/10 to-sky-500/5` - 3-stop gradient (top-left to bottom-right)
@@ -188,6 +190,7 @@ For cards without specific color variants:
 ```
 
 **Key Classes**:
+
 - `border border-white/10` - Subtle white border
 - `bg-gradient-to-br from-white/5 via-white/5 to-white/5` - Neutral gradient
 - `shadow-lg` - Standard shadow (no color)
@@ -201,6 +204,7 @@ For cards without specific color variants:
 ```
 
 **Key Differences**:
+
 - `rounded-[20px]` - Slightly smaller radius
 - Interactive hover states that lighten the gradient
 - Responsive flex layout
@@ -212,12 +216,11 @@ For cards without specific color variants:
 ### Primary Button (Default)
 
 ```html
-<button type="button" class="inline-flex items-center justify-center rounded-xl border border-primary/30 bg-gradient-to-r from-primary/70 via-primary/50 to-primary/30 px-4 py-2 text-sm font-semibold text-white shadow-[0_15px_35px_rgba(59,130,246,0.45)] backdrop-blur-sm transition duration-200 hover:border-primary/40 hover:from-primary/80 hover:via-primary/60 hover:to-primary/40">
-  Button Text
-</button>
+<button type="button" class="inline-flex items-center justify-center rounded-xl border border-primary/30 bg-gradient-to-r from-primary/70 via-primary/50 to-primary/30 px-4 py-2 text-sm font-medium text-white shadow-[0_15px_35px_rgba(59,130,246,0.45)] backdrop-blur-sm transition duration-200 hover:border-primary/40 hover:from-primary/80 hover:via-primary/60 hover:to-primary/40">Button Text</button>
 ```
 
 **Key Classes**:
+
 - `bg-gradient-to-r` - Horizontal gradient (left to right)
 - `from-primary/70 via-primary/50 to-primary/30` - 3-stop gradient
 - `shadow-[0_15px_35px_rgba(59,130,246,0.45)]` - Colored shadow
@@ -226,20 +229,17 @@ For cards without specific color variants:
 ### Destructive Button (Delete/Logout)
 
 ```html
-<button type="button" class="inline-flex items-center justify-center rounded-xl border border-rose-400/30 bg-gradient-to-r from-rose-500/70 via-rose-500/50 to-rose-500/30 px-4 py-2 text-sm font-semibold text-white shadow-[0_15px_35px_rgba(225,29,72,0.45)] backdrop-blur-sm transition duration-200 hover:border-rose-300/40 hover:from-rose-500/80 hover:via-rose-500/60 hover:to-rose-500/40">
-  Delete / Log out
-</button>
+<button type="button" class="inline-flex items-center justify-center rounded-xl border border-rose-400/30 bg-gradient-to-r from-rose-500/70 via-rose-500/50 to-rose-500/30 px-4 py-2 text-sm font-medium text-white shadow-[0_15px_35px_rgba(225,29,72,0.45)] backdrop-blur-sm transition duration-200 hover:border-rose-300/40 hover:from-rose-500/80 hover:via-rose-500/60 hover:to-rose-500/40">Delete / Log out</button>
 ```
 
 ### Outline Button
 
 ```html
-<button type="button" class="border border-white/10 bg-background/50 backdrop-blur-sm shadow-xs hover:bg-accent/50 hover:border-white/20 hover:text-accent-foreground px-4 py-2 rounded-md transition">
-  Outline Button
-</button>
+<button type="button" class="border border-white/10 bg-background/50 backdrop-blur-sm shadow-xs hover:bg-accent/50 hover:border-white/20 hover:text-accent-foreground px-4 py-2 rounded-md transition">Outline Button</button>
 ```
 
 **Key Classes**:
+
 - `border border-white/10` - Subtle border
 - `bg-background/50` - Semi-transparent background
 - `hover:border-white/20` - Brighter border on hover
@@ -247,17 +247,13 @@ For cards without specific color variants:
 ### Ghost Button
 
 ```html
-<button type="button" class="hover:bg-accent/50 hover:text-accent-foreground backdrop-blur-sm px-4 py-2 rounded-md transition">
-  Ghost Button
-</button>
+<button type="button" class="hover:bg-accent/50 hover:text-accent-foreground backdrop-blur-sm px-4 py-2 rounded-md transition">Ghost Button</button>
 ```
 
 ### Secondary Button
 
 ```html
-<button type="button" class="bg-gradient-to-r from-secondary/70 via-secondary/50 to-secondary/30 text-secondary-foreground border border-secondary/30 shadow-xs hover:bg-secondary/80 backdrop-blur-sm px-4 py-2 rounded-md transition">
-  Secondary
-</button>
+<button type="button" class="bg-gradient-to-r from-secondary/70 via-secondary/50 to-secondary/30 text-secondary-foreground border border-secondary/30 shadow-xs hover:bg-secondary/80 backdrop-blur-sm px-4 py-2 rounded-md transition">Secondary</button>
 ```
 
 ### Button Size Variants
@@ -274,17 +270,13 @@ For cards without specific color variants:
 ### Active Badge (Emerald)
 
 ```html
-<span class="text-xs border border-emerald-400/30 bg-gradient-to-r from-emerald-500/25 via-emerald-500/10 to-emerald-500/5 text-white px-2 py-0.5 rounded-md backdrop-blur-sm shadow-[0_10px_30px_rgba(16,185,129,0.2)]">
-  Active
-</span>
+<span class="text-xs border border-emerald-400/30 bg-gradient-to-r from-emerald-500/25 via-emerald-500/10 to-emerald-500/5 text-white px-2 py-0.5 rounded-md backdrop-blur-sm shadow-[0_10px_30px_rgba(16,185,129,0.2)]"> Active </span>
 ```
 
 ### Inactive Badge (Gray)
 
 ```html
-<span class="text-xs border border-gray-400/30 bg-gradient-to-r from-gray-500/25 via-gray-500/10 to-gray-500/5 text-white/70 px-2 py-0.5 rounded-md backdrop-blur-sm shadow-[0_10px_30px_rgba(107,114,128,0.2)]">
-  Inactive
-</span>
+<span class="text-xs border border-gray-400/30 bg-gradient-to-r from-gray-500/25 via-gray-500/10 to-gray-500/5 text-white/70 px-2 py-0.5 rounded-md backdrop-blur-sm shadow-[0_10px_30px_rgba(107,114,128,0.2)]"> Inactive </span>
 ```
 
 ### Filter Badge (Sky)
@@ -321,6 +313,7 @@ For cards without specific color variants:
 ```
 
 **Badge Pattern**:
+
 - Small padding: `px-2 py-0.5` or `px-2 py-1`
 - Horizontal gradient: `bg-gradient-to-r`
 - Smaller shadows: `shadow-[0_10px_30px_rgba(...)]`
@@ -334,12 +327,8 @@ For cards without specific color variants:
 
 ```html
 <div class="relative flex-1 sm:max-w-sm">
-  <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-  <input
-    type="text"
-    placeholder="Search projects..."
-    class="pl-9 pr-9 w-full bg-white/5 backdrop-blur-sm border border-white/20 text-white placeholder:text-white/40 focus-visible:border-sky-400 focus-visible:ring-sky-500/50 shadow-[0_10px_30px_rgba(2,132,199,0.15)] rounded-md px-3 py-2"
-  />
+  <search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+  <input type="text" placeholder="Search projects..." class="pl-9 pr-9 w-full bg-white/5 backdrop-blur-sm border border-white/20 text-white placeholder:text-white/40 focus-visible:border-sky-400 focus-visible:ring-sky-500/50 shadow-[0_10px_30px_rgba(2,132,199,0.15)] rounded-md px-3 py-2" />
   <!-- Clear button (X) when value exists -->
   <button class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors">
     <X class="h-4 w-4" />
@@ -348,6 +337,7 @@ For cards without specific color variants:
 ```
 
 **Key Classes**:
+
 - `bg-white/5` - Very subtle background
 - `border border-white/20` - Visible border
 - `focus-visible:border-sky-400` - Sky blue border on focus
@@ -357,19 +347,13 @@ For cards without specific color variants:
 ### Text Input
 
 ```html
-<input
-  type="text"
-  class="w-full bg-white/5 backdrop-blur-sm border border-white/20 text-white placeholder:text-white/40 focus-visible:border-sky-400 focus-visible:ring-sky-500/50 rounded-md px-3 py-2 transition"
-/>
+<input type="text" class="w-full bg-white/5 backdrop-blur-sm border border-white/20 text-white placeholder:text-white/40 focus-visible:border-sky-400 focus-visible:ring-sky-500/50 rounded-md px-3 py-2 transition" />
 ```
 
 ### Checkbox
 
 ```html
-<input
-  type="checkbox"
-  class="h-4 w-4 rounded border-white/20 bg-white/5 backdrop-blur-sm accent-sky-500 focus:ring-sky-500/50 focus:ring-2"
-/>
+<input type="checkbox" class="h-4 w-4 rounded border-white/20 bg-white/5 backdrop-blur-sm accent-sky-500 focus:ring-sky-500/50 focus:ring-2" />
 ```
 
 ### Select/Dropdown Input
@@ -399,9 +383,7 @@ For cards without specific color variants:
 ```html
 <thead class="bg-white/5 border-b border-white/10">
   <tr>
-    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-white/70">
-      Header
-    </th>
+    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">Header</th>
   </tr>
 </thead>
 ```
@@ -411,9 +393,7 @@ For cards without specific color variants:
 ```html
 <tbody>
   <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-    <td class="px-4 py-3 text-sm text-white/80">
-      Cell content
-    </td>
+    <td class="px-4 py-3 text-sm text-white/80">Cell content</td>
   </tr>
 </tbody>
 ```
@@ -437,17 +417,14 @@ For cards without specific color variants:
 
 ```html
 <div class="w-56 bg-popover/50 backdrop-blur-sm border border-white/10 text-white rounded-md shadow-lg p-1">
-  <div class="px-2 py-1.5 text-sm font-semibold text-white/80">
-    Menu Label
-  </div>
+  <div class="px-2 py-1.5 text-sm font-medium text-white/80">Menu Label</div>
   <div class="border-t border-white/10 my-1"></div>
-  <div class="px-2 py-1.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded cursor-pointer">
-    Menu Item
-  </div>
+  <div class="px-2 py-1.5 text-sm text-white/80 hover:text-white hover:bg-white/10 rounded cursor-pointer">Menu Item</div>
 </div>
 ```
 
 **Key Classes**:
+
 - `bg-popover/50` - Semi-transparent background
 - `border border-white/10` - Subtle border
 - Hover states: `hover:bg-white/10 hover:text-white`
@@ -473,7 +450,7 @@ For cards without specific color variants:
   <div class="relative flex-1 sm:max-w-sm">
     <!-- Input with icon -->
   </div>
-  
+
   <!-- Filter Buttons -->
   <div class="flex items-center gap-2">
     <!-- Filter buttons -->
@@ -484,17 +461,13 @@ For cards without specific color variants:
 ### Filter Button (Active State)
 
 ```html
-<button class="bg-sky-500/20 text-sky-400 border border-sky-400/30 hover:bg-sky-500/30 px-3 py-1.5 rounded-md text-sm font-medium transition">
-  All
-</button>
+<button class="bg-sky-500/20 text-sky-400 border border-sky-400/30 hover:bg-sky-500/30 px-3 py-1.5 rounded-md text-sm font-medium transition">All</button>
 ```
 
 ### Filter Button (Inactive State)
 
 ```html
-<button class="border border-white/20 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-md text-sm font-medium transition">
-  Active
-</button>
+<button class="border border-white/20 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-md text-sm font-medium transition">Active</button>
 ```
 
 ### Active Filters Display
@@ -502,9 +475,7 @@ For cards without specific color variants:
 ```html
 <div class="flex items-center gap-2 mb-6 flex-wrap">
   <!-- Filter badges (see Badge Styling section) -->
-  <button class="text-sm hover:text-destructive transition-colors">
-    Clear All
-  </button>
+  <button class="text-sm hover:text-destructive transition-colors">Clear All</button>
 </div>
 ```
 
@@ -559,6 +530,7 @@ For cards without specific color variants:
 ### Background Opacity Patterns
 
 #### Card Backgrounds
+
 - `bg-white/5` - Very subtle
 - `bg-white/10` - Light (buttons, hover states)
 - `bg-popover/50` - Medium (dropdowns, menus)
@@ -566,12 +538,14 @@ For cards without specific color variants:
 - `bg-background/85` - High (sticky headers)
 
 #### Border Opacity
+
 - `border-white/10` - Standard borders
 - `border-white/20` - More visible borders (inputs, hover)
 - `border-color-400/30` - Colored borders (cards, badges)
 - `border-color-300/40` - Colored borders (buttons, hover)
 
 #### Text Opacity
+
 - `text-white/40` - Placeholders
 - `text-white/60` - Secondary text, labels
 - `text-white/70` - Descriptions, muted text
@@ -668,51 +642,33 @@ hover:border-sky-300/50
 <article class="group rounded-[28px] border border-sky-400/30 bg-gradient-to-br from-sky-500/25 via-sky-500/10 to-sky-500/5 p-6 shadow-[0_30px_80px_rgba(2,132,199,0.35)] backdrop-blur-sm transition hover:border-sky-300/50">
   <div class="flex items-start justify-between gap-4">
     <div>
-      <p class="text-xs uppercase tracking-[0.45em] text-white/60">
-        Total Employees
-      </p>
-      <p class="mt-3 text-3xl font-semibold text-white">
-        150
-      </p>
+      <p class="text-xs uppercase tracking-[0.45em] text-white/60">Total Employees</p>
+      <p class="mt-3 text-3xl font-medium text-white">150</p>
     </div>
   </div>
-  <p class="mt-4 text-sm text-white/70">
-    Track your entire organisation workforce across locations.
-  </p>
+  <p class="mt-4 text-sm text-white/70">Track your entire organisation workforce across locations.</p>
 </article>
 
 <!-- Emerald Variant (Total Projects) -->
 <article class="group rounded-[28px] border border-emerald-400/30 bg-gradient-to-br from-emerald-500/25 via-emerald-500/10 to-emerald-500/5 p-6 shadow-[0_30px_80px_rgba(16,185,129,0.3)] backdrop-blur-sm transition hover:border-emerald-300/50">
   <div class="flex items-start justify-between gap-4">
     <div>
-      <p class="text-xs uppercase tracking-[0.45em] text-white/60">
-        Total Projects
-      </p>
-      <p class="mt-3 text-3xl font-semibold text-white">
-        42
-      </p>
+      <p class="text-xs uppercase tracking-[0.45em] text-white/60">Total Projects</p>
+      <p class="mt-3 text-3xl font-medium text-white">42</p>
     </div>
   </div>
-  <p class="mt-4 text-sm text-white/70">
-    Monitor project health and velocity with real-time status.
-  </p>
+  <p class="mt-4 text-sm text-white/70">Monitor project health and velocity with real-time status.</p>
 </article>
 
 <!-- Amber Variant (Active Project Employees) -->
 <article class="group rounded-[28px] border border-amber-400/30 bg-gradient-to-br from-amber-500/30 via-amber-500/15 to-amber-500/5 p-6 shadow-[0_30px_80px_rgba(245,158,11,0.25)] backdrop-blur-sm transition hover:border-amber-300/60">
   <div class="flex items-start justify-between gap-4">
     <div>
-      <p class="text-xs uppercase tracking-[0.45em] text-white/60">
-        Active Project Employees
-      </p>
-      <p class="mt-3 text-3xl font-semibold text-white">
-        89
-      </p>
+      <p class="text-xs uppercase tracking-[0.45em] text-white/60">Active Project Employees</p>
+      <p class="mt-3 text-3xl font-medium text-white">89</p>
     </div>
   </div>
-  <p class="mt-4 text-sm text-white/70">
-    Know exactly who is booked and where the next gaps appear.
-  </p>
+  <p class="mt-4 text-sm text-white/70">Know exactly who is booked and where the next gaps appear.</p>
 </article>
 ```
 
@@ -720,14 +676,10 @@ hover:border-sky-300/50
 
 ```html
 <!-- Primary Button -->
-<button type="button" class="inline-flex items-center justify-center rounded-xl border border-primary/30 bg-gradient-to-r from-primary/70 via-primary/50 to-primary/30 px-4 py-2 text-sm font-semibold text-white shadow-[0_15px_35px_rgba(59,130,246,0.45)] backdrop-blur-sm transition duration-200 hover:border-primary/40 hover:from-primary/80 hover:via-primary/60 hover:to-primary/40">
-  Primary Action
-</button>
+<button type="button" class="inline-flex items-center justify-center rounded-xl border border-primary/30 bg-gradient-to-r from-primary/70 via-primary/50 to-primary/30 px-4 py-2 text-sm font-medium text-white shadow-[0_15px_35px_rgba(59,130,246,0.45)] backdrop-blur-sm transition duration-200 hover:border-primary/40 hover:from-primary/80 hover:via-primary/60 hover:to-primary/40">Primary Action</button>
 
 <!-- Destructive Button (Logout) -->
-<button type="button" class="inline-flex items-center justify-center rounded-xl border border-rose-400/30 bg-gradient-to-r from-rose-500/70 via-rose-500/50 to-rose-500/30 px-4 py-2 text-sm font-semibold text-white shadow-[0_15px_35px_rgba(225,29,72,0.45)] backdrop-blur-sm transition duration-200 hover:border-rose-300/40 hover:from-rose-500/80 hover:via-rose-500/60 hover:to-rose-500/40">
-  Log out
-</button>
+<button type="button" class="inline-flex items-center justify-center rounded-xl border border-rose-400/30 bg-gradient-to-r from-rose-500/70 via-rose-500/50 to-rose-500/30 px-4 py-2 text-sm font-medium text-white shadow-[0_15px_35px_rgba(225,29,72,0.45)] backdrop-blur-sm transition duration-200 hover:border-rose-300/40 hover:from-rose-500/80 hover:via-rose-500/60 hover:to-rose-500/40">Log out</button>
 ```
 
 ### Full Page Background Example
@@ -755,32 +707,32 @@ hover:border-sky-300/50
 
 ### Color Variant Quick Reference
 
-| Variant | Border | Gradient Start | Gradient Middle | Gradient End | Shadow RGBA |
-|---------|--------|----------------|-----------------|--------------|-------------|
-| Sky | `border-sky-400/30` | `from-sky-500/25` | `via-sky-500/10` | `to-sky-500/5` | `rgba(2,132,199,0.35)` |
-| Emerald | `border-emerald-400/30` | `from-emerald-500/25` | `via-emerald-500/10` | `to-emerald-500/5` | `rgba(16,185,129,0.3)` |
-| Amber | `border-amber-400/30` | `from-amber-500/30` | `via-amber-500/15` | `to-amber-500/5` | `rgba(245,158,11,0.25)` |
-| Rose | `border-rose-400/30` | `from-rose-500/25` | `via-rose-500/10` | `to-rose-500/5` | `rgba(225,29,72,0.35)` |
-| Violet | `border-violet-400/30` | `from-violet-500/25` | `via-violet-500/10` | `to-violet-500/5` | `rgba(139,92,246,0.35)` |
-| Blue | `border-blue-400/30` | `from-blue-500/25` | `via-blue-500/10` | `to-blue-500/5` | `rgba(59,130,246,0.35)` |
+| Variant | Border                  | Gradient Start        | Gradient Middle      | Gradient End       | Shadow RGBA             |
+| ------- | ----------------------- | --------------------- | -------------------- | ------------------ | ----------------------- |
+| Sky     | `border-sky-400/30`     | `from-sky-500/25`     | `via-sky-500/10`     | `to-sky-500/5`     | `rgba(2,132,199,0.35)`  |
+| Emerald | `border-emerald-400/30` | `from-emerald-500/25` | `via-emerald-500/10` | `to-emerald-500/5` | `rgba(16,185,129,0.3)`  |
+| Amber   | `border-amber-400/30`   | `from-amber-500/30`   | `via-amber-500/15`   | `to-amber-500/5`   | `rgba(245,158,11,0.25)` |
+| Rose    | `border-rose-400/30`    | `from-rose-500/25`    | `via-rose-500/10`    | `to-rose-500/5`    | `rgba(225,29,72,0.35)`  |
+| Violet  | `border-violet-400/30`  | `from-violet-500/25`  | `via-violet-500/10`  | `to-violet-500/5`  | `rgba(139,92,246,0.35)` |
+| Blue    | `border-blue-400/30`    | `from-blue-500/25`    | `via-blue-500/10`    | `to-blue-500/5`    | `rgba(59,130,246,0.35)` |
 
 ### Common Class Combinations
 
 ```html
 <!-- Glassmorphism Card -->
 <div class="rounded-[28px] border border-white/10 bg-gradient-to-br from-white/5 via-white/5 to-white/5 backdrop-blur-sm shadow-lg p-6">
+  <!-- Colored Card -->
+  <article class="rounded-[28px] border border-sky-400/30 bg-gradient-to-br from-sky-500/25 via-sky-500/10 to-sky-500/5 shadow-[0_30px_80px_rgba(2,132,199,0.35)] backdrop-blur-sm">
+    <!-- Primary Button -->
+    <button class="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/70 via-primary/50 to-primary/30 shadow-[0_15px_35px_rgba(59,130,246,0.45)] backdrop-blur-sm">
+      <!-- Input Field -->
+      <input class="bg-white/5 backdrop-blur-sm border border-white/20 focus-visible:border-sky-400 focus-visible:ring-sky-500/50" />
 
-<!-- Colored Card -->
-<article class="rounded-[28px] border border-sky-400/30 bg-gradient-to-br from-sky-500/25 via-sky-500/10 to-sky-500/5 shadow-[0_30px_80px_rgba(2,132,199,0.35)] backdrop-blur-sm">
-
-<!-- Primary Button -->
-<button class="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/70 via-primary/50 to-primary/30 shadow-[0_15px_35px_rgba(59,130,246,0.45)] backdrop-blur-sm">
-
-<!-- Input Field -->
-<input class="bg-white/5 backdrop-blur-sm border border-white/20 focus-visible:border-sky-400 focus-visible:ring-sky-500/50">
-
-<!-- Badge -->
-<span class="border border-emerald-400/30 bg-gradient-to-r from-emerald-500/25 via-emerald-500/10 to-emerald-500/5 backdrop-blur-sm shadow-[0_10px_30px_rgba(16,185,129,0.2)]">
+      <!-- Badge -->
+      <span class="border border-emerald-400/30 bg-gradient-to-r from-emerald-500/25 via-emerald-500/10 to-emerald-500/5 backdrop-blur-sm shadow-[0_10px_30px_rgba(16,185,129,0.2)]"></span>
+    </button>
+  </article>
+</div>
 ```
 
 ---
@@ -800,4 +752,3 @@ hover:border-sky-300/50
 
 **Last Updated**: Based on feedback-widget project styling patterns
 **Framework**: Tailwind CSS with custom opacity values and colored shadows
-

@@ -9,7 +9,7 @@ import { Component, Input } from '@angular/core';
     <div class="animate-pulse space-y-4" [attr.aria-hidden]="true">
       <div
         *ngFor="let row of rowsArray"
-        class="rounded-[26px] border border-white/10 bg-white/5 px-6 py-5"
+        class="rounded-[28px] border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
       >
         <div class="flex items-center justify-between gap-4">
           <div class="h-4 rounded-full bg-white/10" [style.width.%]="70"></div>
