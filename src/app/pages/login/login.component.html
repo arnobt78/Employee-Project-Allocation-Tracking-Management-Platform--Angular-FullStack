@@ -118,17 +118,17 @@
                 class="text-xs font-medium uppercase tracking-[0.35em] text-white/80 break-words"
                 >Test Accounts To Login With</label
               >
-              <select
-                [value]="selectedTestAccount"
-                (change)="onTestAccountSelect($any($event.target).value)"
-                class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none backdrop-blur-sm transition focus:border-amber-400/60 focus:bg-white/10 focus:text-white"
-              >
-                <option value="">Select Test Account</option>
-                <option value="admin">{{ testAccounts.admin.label }}</option>
-                <option *ngIf="selectedTestAccount" value="clear">
-                  Clear Selection
-                </option>
-              </select>
+              <app-select-menu
+                [options]="accountOptions()"
+                placeholder="Select Test Account"
+                [(ngModel)]="selectedTestAccount"
+                name="testAccount"
+                (selectionChange)="onTestAccountSelect($event)"
+              ></app-select-menu>
+              <p class="text-xs text-amber-100/80">
+                Demo credentials: {{ demoCredentials.username }} /
+                {{ demoCredentials.password }}
+              </p>
             </div>
           </article>
           <article
@@ -174,6 +174,7 @@
           <button
             type="button"
             (click)="onLogin()"
+            [disabled]="isSubmitting"
             ubButton
             size="lg"
             class="w-full rounded-2xl border border-white/10 bg-gradient-to-r from-purple-500/70 via-pink-500/50 to-rose-500/30 px-6 py-3 text-base font-semibold text-white shadow-[0_20px_60px_rgba(168,85,247,0.45)] backdrop-blur-sm transition duration-200 hover:border-purple-300/40 hover:from-purple-500/80 hover:via-pink-500/60 hover:to-rose-500/40 hover:shadow-[0_25px_70px_rgba(168,85,247,0.55)]"

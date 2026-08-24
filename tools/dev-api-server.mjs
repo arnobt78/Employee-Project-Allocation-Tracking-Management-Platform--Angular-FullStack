@@ -1,11 +1,19 @@
 import "dotenv/config";
 import { createServer } from "node:http";
 import { handleEmployeeManagementRequest } from "../api/employee-management/handler.mjs";
+import { handleSentryTunnel } from "../api/_lib/sentry/tunnel.mjs";
 
 const PORT = Number(process.env.API_PORT || 4310);
 
 const server = createServer((request, response) => {
-  if (request.url && request.url.startsWith("/api/employee-management")) {
+  const url = request.url || "";
+
+  if (url.startsWith("/api/monitoring")) {
+    handleSentryTunnel(request, response);
+    return;
+  }
+
+  if (url.startsWith("/api/employee-management")) {
     handleEmployeeManagementRequest(request, response);
     return;
   }
@@ -23,4 +31,3 @@ const server = createServer((request, response) => {
 server.listen(PORT, () => {
   console.log(`Mock Employee Management API running at http://localhost:${PORT}`);
 });
-

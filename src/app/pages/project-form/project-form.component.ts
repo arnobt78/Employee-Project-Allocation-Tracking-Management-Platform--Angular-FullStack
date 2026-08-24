@@ -460,7 +460,7 @@ export class ProjectFormComponent implements OnInit {
     this.editingSection.set(null);
   }
 
-  saveSection(section: SectionId) {
+  saveSection(_section: SectionId) {
     this.submitProject(() => {
       this.toast.success({
         title: 'Project saved',
@@ -518,9 +518,6 @@ export class ProjectFormComponent implements OnInit {
     request$.subscribe({
       next: (res) => {
         this.isSaving.set(false);
-        console.log('[Approval] project save completed', {
-          projectId: res.projectId,
-        });
         this.hydrateProject(res);
         if (res.projectId && res.projectId > 0) {
           this.router.navigate(['/update-project', res.projectId], {
@@ -727,10 +724,6 @@ export class ProjectFormComponent implements OnInit {
       { emitEvent: false }
     );
     this.collaboratorAssignmentForm.markAsPristine();
-    console.log('[Resource] starting collaborator assignment', {
-      employeeId: profile.employeeId,
-      suggestedAllocation,
-    });
   }
 
   cancelCollaboratorAssignment() {
@@ -781,11 +774,6 @@ export class ProjectFormComponent implements OnInit {
         this.toast.success({
           title: 'Contributor added',
           description: `${profile.employeeName} has been assigned to the project.`,
-        });
-        console.log('[Resource] collaborator assignment saved', {
-          projectId: project.projectId,
-          empId: profile.employeeId,
-          allocation: payload.allocationPct,
         });
         this.cancelCollaboratorAssignment();
         this.refreshProjectSnapshot(project.projectId);
@@ -850,10 +838,6 @@ export class ProjectFormComponent implements OnInit {
           this.contentfulBrief.set(brief);
           this.contentfulError.set(null);
           this.contentfulPanelOpen.set(true);
-          console.log('[Contentful] brief fetched', {
-            entryId: brief.entryId,
-            title: brief.title,
-          });
           this.toast.success({
             title: 'Brief loaded',
             description: 'Review the Contentful entry below.',
@@ -905,10 +889,6 @@ export class ProjectFormComponent implements OnInit {
     this.toast.success({
       title: 'Overview updated',
       description: 'Contentful brief applied to the overview.',
-    });
-    console.log('[Contentful] overview applied', {
-      entryId: brief.entryId,
-      title: brief.title,
     });
   }
 
@@ -982,9 +962,6 @@ export class ProjectFormComponent implements OnInit {
         this.aiProcessing.set(false);
         this.aiDraft.set(draft);
         this.aiPanelOpen.set(true);
-        console.log('[AI] overview draft generated', {
-          source: draft.source,
-        });
         this.toast.success({
           title: 'AI draft ready',
           description: `Overview generated with ${draft.source.toUpperCase()}.`,
@@ -1140,10 +1117,6 @@ export class ProjectFormComponent implements OnInit {
       .subscribe({
         next: (updatedProject) => {
           this.reviewerCommentProcessing.set(false);
-          console.log('[Approval] reviewer comment added', {
-            projectId: updatedProject.projectId,
-            commentCount: updatedProject.reviewerComments?.length ?? 0,
-          });
           this.hydrateProject(updatedProject);
           this.reviewerCommentForm.reset(
             {
@@ -1273,14 +1246,6 @@ export class ProjectFormComponent implements OnInit {
     request$.subscribe({
       next: (updatedProject) => {
         this.approvalProcessing.set(false);
-        console.log('[Approval] approval action complete', {
-          action,
-          projectId: updatedProject.projectId,
-          status: updatedProject.status,
-          approvalStatus: updatedProject.approvalStatus,
-          historyCount: updatedProject.statusHistory?.length ?? 0,
-          timelineCount: updatedProject.timeline?.length ?? 0,
-        });
         const snapshot = this.cloneProject(updatedProject);
         this.hydrateProject(snapshot);
         this.approvalForm.patchValue({ comment: '' }, { emitEvent: false });
@@ -1751,18 +1716,9 @@ export class ProjectFormComponent implements OnInit {
 
   private hydrateProject(project: IProject | null) {
     if (!project) {
-      console.warn('[Approval] hydrateProject called with null project');
       this.resourceInsightsSignal.set(null);
       return;
     }
-    console.log('[Approval] hydrating project', {
-      projectId: project.projectId,
-      status: project.status,
-      approvalStatus: project.approvalStatus,
-      historyCount: project.statusHistory?.length ?? 0,
-      timelineCount: project.timeline?.length ?? 0,
-      commentCount: project.reviewerComments?.length ?? 0,
-    });
     const snapshot = this.cloneProject(project);
     this.contentfulPanelOpen.set(false);
     this.contentfulBrief.set(null);
@@ -1800,10 +1756,8 @@ export class ProjectFormComponent implements OnInit {
 
   private refreshProjectSnapshot(projectId: number | null | undefined) {
     if (!projectId) {
-      console.warn('[Approval] refreshProjectSnapshot skipped, missing id');
       return;
     }
-    console.log('[Approval] refreshing project snapshot', { projectId });
     this.masterService.getProjectById(projectId).subscribe({
       next: (project) => this.hydrateProject(project),
       error: (error) => {
@@ -1908,7 +1862,6 @@ export class ProjectFormComponent implements OnInit {
   }
 }
 
-const sectionIds: SectionId[] = ['overview', 'team', 'contact', 'approval'];
 type FieldKey =
   | 'projectName'
   | 'clientName'

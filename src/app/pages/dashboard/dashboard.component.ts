@@ -1,32 +1,38 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MasterService } from '../../service/master.service';
 import { IParentDept, IProject, IProjectEmployee } from '../../model/interface/master';
 import { Employee } from '../../model/class/Employee';
+import {
+  ListSkeletonComponent,
+  StatPillSkeletonComponent,
+} from '@/app/components/ui/list-skeleton.component';
+
+interface DashboardSnapshot {
+  totalEmployee: number;
+  totalProject: number;
+  activeProjectEmployees: number;
+  recentProjects: IProject[];
+  recentEmployee: Employee[];
+}
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule], // Import CommonModule here
+  imports: [CommonModule, ListSkeletonComponent, StatPillSkeletonComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
-  dashboardData: any = {
-    totalEmployee: 0,
-    totalProject: 0,
-    activeProjectEmployees: 0,
-    recentProjects: [],
-    recentEmployee: [],
-  };
+  readonly isLoading = signal(true);
+  readonly hasLoaded = signal(false);
+  dashboardData: DashboardSnapshot | null = null;
   parentDepartments: IParentDept[] = [];
 
-  // Statistics data
   projects: IProject[] = [];
   employees: Employee[] = [];
   projectEmployees: IProjectEmployee[] = [];
 
-  // Calculated statistics
   projectStats: {
     nonArchived: number;
     archived: number;
@@ -37,66 +43,87 @@ export class DashboardComponent implements OnInit {
     nonAssigned: number;
     activeAssignments: number;
     inactiveAssignments: number;
-  } = {
-    nonArchived: 0,
-    archived: 0,
-    active: 0,
-    inactive: 0,
-    planning: 0,
-    assigned: 0,
-    nonAssigned: 0,
-    activeAssignments: 0,
-    inactiveAssignments: 0,
-  };
+  } | null = null;
 
   constructor(private masterService: MasterService) {}
 
   ngOnInit(): void {
-    this.getDashboardData();
-    this.getParentDepartments();
-    this.loadStatisticsData();
+    this.loadPageData();
   }
 
-  getDashboardData() {
-    this.masterService.getDashboardData().subscribe((data: any) => {
-      this.dashboardData = data;
-    });
-  }
+  private loadPageData(): void {
+    this.isLoading.set(true);
 
-  getParentDepartments() {
-    this.masterService.getAllDept().subscribe((response) => {
-      if (response?.result && Array.isArray(response.data)) {
-        this.parentDepartments = response.data;
-      } else if (Array.isArray(response)) {
-        // in case API returns array directly
-        this.parentDepartments = response as unknown as IParentDept[];
-      }
-    });
-  }
-
-  loadStatisticsData(): void {
+    let dashboardLoaded = false;
+    let departmentsLoaded = false;
     let projectsLoaded = false;
     let employeesLoaded = false;
     let projectEmployeesLoaded = false;
 
-    const checkAndCalculate = () => {
-      if (projectsLoaded && employeesLoaded && projectEmployeesLoaded) {
-        this.calculateProjectStatistics();
+    const markComplete = () => {
+      if (
+        dashboardLoaded &&
+        departmentsLoaded &&
+        projectsLoaded &&
+        employeesLoaded &&
+        projectEmployeesLoaded
+      ) {
+        this.isLoading.set(false);
+        this.hasLoaded.set(true);
       }
     };
 
-    // Load projects, employees, and project-employees in parallel
+    this.masterService.getDashboardData().subscribe({
+      next: (data) => {
+        this.dashboardData = data as DashboardSnapshot;
+        dashboardLoaded = true;
+        markComplete();
+      },
+      error: () => {
+        this.dashboardData = {
+          totalEmployee: 0,
+          totalProject: 0,
+          activeProjectEmployees: 0,
+          recentProjects: [],
+          recentEmployee: [],
+        };
+        dashboardLoaded = true;
+        markComplete();
+      },
+    });
+
+    this.masterService.getAllDept().subscribe({
+      next: (response) => {
+        if (response?.result && Array.isArray(response.data)) {
+          this.parentDepartments = response.data;
+        } else if (Array.isArray(response)) {
+          this.parentDepartments = response as unknown as IParentDept[];
+        }
+        departmentsLoaded = true;
+        markComplete();
+      },
+      error: () => {
+        this.parentDepartments = [];
+        departmentsLoaded = true;
+        markComplete();
+      },
+    });
+
     this.masterService.getAllProjects().subscribe({
       next: (projects) => {
         this.projects = projects;
         projectsLoaded = true;
-        checkAndCalculate();
+        this.tryCalculateStatistics(
+          projectsLoaded,
+          employeesLoaded,
+          projectEmployeesLoaded
+        );
+        markComplete();
       },
-      error: (error) => {
-        console.error('[Dashboard] Failed to load projects', error);
+      error: () => {
         this.projects = [];
         projectsLoaded = true;
-        checkAndCalculate();
+        markComplete();
       },
     });
 
@@ -104,13 +131,17 @@ export class DashboardComponent implements OnInit {
       next: (employees) => {
         this.employees = employees;
         employeesLoaded = true;
-        checkAndCalculate();
+        this.tryCalculateStatistics(
+          projectsLoaded,
+          employeesLoaded,
+          projectEmployeesLoaded
+        );
+        markComplete();
       },
-      error: (error) => {
-        console.error('[Dashboard] Failed to load employees', error);
+      error: () => {
         this.employees = [];
         employeesLoaded = true;
-        checkAndCalculate();
+        markComplete();
       },
     });
 
@@ -118,23 +149,47 @@ export class DashboardComponent implements OnInit {
       next: (projectEmployees) => {
         this.projectEmployees = projectEmployees;
         projectEmployeesLoaded = true;
-        checkAndCalculate();
+        this.tryCalculateStatistics(
+          projectsLoaded,
+          employeesLoaded,
+          projectEmployeesLoaded
+        );
+        markComplete();
       },
-      error: (error) => {
-        console.error('[Dashboard] Failed to load project employees', error);
+      error: () => {
         this.projectEmployees = [];
         projectEmployeesLoaded = true;
-        checkAndCalculate();
+        markComplete();
       },
     });
   }
 
+  private tryCalculateStatistics(
+    projectsLoaded: boolean,
+    employeesLoaded: boolean,
+    projectEmployeesLoaded: boolean
+  ): void {
+    if (projectsLoaded && employeesLoaded && projectEmployeesLoaded) {
+      this.calculateProjectStatistics();
+    }
+  }
+
   calculateProjectStatistics(): void {
     if (!this.projects.length) {
+      this.projectStats = {
+        nonArchived: 0,
+        archived: 0,
+        active: 0,
+        inactive: 0,
+        planning: 0,
+        assigned: 0,
+        nonAssigned: 0,
+        activeAssignments: 0,
+        inactiveAssignments: 0,
+      };
       return;
     }
 
-    // Separate archived projects
     const archivedProjects = this.projects.filter(
       (p) => p.archivedAt != null && p.archivedAt !== ''
     );
@@ -142,7 +197,6 @@ export class DashboardComponent implements OnInit {
       (p) => !p.archivedAt || p.archivedAt === ''
     );
 
-    // Filter to only active assignments
     const activeProjectEmployees = this.projectEmployees.filter(
       (pe) =>
         pe.isActive === 'Y' ||
@@ -151,12 +205,10 @@ export class DashboardComponent implements OnInit {
         String(pe.isActive).toLowerCase() === 'true'
     );
 
-    // Get project IDs with active assignments
     const projectIdsWithActiveAssignments = new Set(
       activeProjectEmployees.map((pe) => pe.projectId)
     );
 
-    // Categorize non-archived projects
     const activeProjects: IProject[] = [];
     const inactiveProjects: IProject[] = [];
     const planningProjects: IProject[] = [];
@@ -167,35 +219,28 @@ export class DashboardComponent implements OnInit {
       const hasActiveAssignments = projectIdsWithActiveAssignments.has(p.projectId);
       const hasLead = p.leadByEmpId != null;
 
-      // Assigned vs Non-assigned
       if (hasActiveAssignments) {
         assignedProjects.push(p);
       } else {
         nonAssignedProjects.push(p);
       }
 
-      // Active vs Inactive vs Planning
       if (hasActiveAssignments) {
-        // Has active assignments = Active
         activeProjects.push(p);
       } else if (hasLead) {
-        // Has lead but no active assignments = Planning/Startup
         planningProjects.push(p);
-        activeProjects.push(p); // Planning projects are also considered "active"
+        activeProjects.push(p);
       } else {
-        // No lead and no active assignments = Inactive
         inactiveProjects.push(p);
       }
     });
 
-    // Calculate active and inactive assignments
     const activeAssignmentsCount = this.projectEmployees.filter((pe) =>
       this.isActive(pe.isActive)
     ).length;
     const inactiveAssignmentsCount =
       this.projectEmployees.length - activeAssignmentsCount;
 
-    // Update statistics
     this.projectStats = {
       nonArchived: nonArchivedProjects.length,
       archived: archivedProjects.length,
@@ -209,7 +254,6 @@ export class DashboardComponent implements OnInit {
     };
   }
 
-  // Helper method to check if assignment is active (matching project-employee component logic)
   private isActive(value: string | boolean | null | undefined): boolean {
     if (typeof value === 'boolean') return value;
     if (typeof value === 'string') {

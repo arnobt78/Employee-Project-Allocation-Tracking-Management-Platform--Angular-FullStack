@@ -1,6 +1,7 @@
 import { prisma } from "../_lib/prisma-client.mjs";
 import { getStore } from "./store.mjs";
 import { MongoClient } from "mongodb";
+import { completeChatWithFallback } from "./ai-providers.mjs";
 
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}/;
 
@@ -71,19 +72,6 @@ const CONTENTFUL_SPACE_ID = process.env.CMS_SPACE_ID;
 const CONTENTFUL_ENVIRONMENT = process.env.CMS_ENVIRONMENT || "master";
 const CONTENTFUL_DELIVERY_TOKEN = process.env.CMS_DELIVERY_TOKEN;
 const CONTENTFUL_PREVIEW_TOKEN = process.env.CMS_PREVIEW_TOKEN;
-
-const GEMINI_API_KEY =
-  process.env.Google_Gemini_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
-const GROQ_API_KEY =
-  process.env.Groq_Llama_API_KEY || process.env.GROQ_LLAMA_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
-const GEMINI_ENDPOINT =
-  process.env.GEMINI_ENDPOINT ||
-  `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
-const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.1-8b-instant";
-const GROQ_ENDPOINT =
-  process.env.GROQ_ENDPOINT ||
-  "https://api.groq.com/openai/v1/chat/completions";
 
 const APPROVAL_STATUSES = new Set([
   "draft",
@@ -176,8 +164,7 @@ async function getNextSequenceValue(key, startAt) {
       select: { value: true },
     });
   } catch (error) {
-    console.warn(`[getNextSequenceValue] Prisma counter update failed for key ${key}, using MongoDB native driver:`, error.message);
-  }
+      }
 
   // If Prisma update failed or returned null, use MongoDB native driver
   if (!updateResult || !updateResult.value) {
@@ -682,87 +669,6 @@ function buildContentfulBrief(entry) {
     overview,
     raw: entry,
   };
-}
-
-async function callGemini(prompt) {
-  if (!GEMINI_API_KEY) {
-    throw new Error("Gemini API key missing.");
-  }
-  const endpoint = `${GEMINI_ENDPOINT}?key=${GEMINI_API_KEY}`;
-  const body = {
-    contents: [
-      {
-        parts: [
-          {
-            text: prompt,
-          },
-        ],
-      },
-    ],
-    generationConfig: {
-      temperature: 0.4,
-      topK: 32,
-      topP: 0.95,
-    },
-  };
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Gemini request failed (${response.status}): ${text}`);
-  }
-  const data = await response.json();
-  const text =
-    data?.candidates?.[0]?.content?.parts?.[0]?.text ??
-    data?.candidates?.[0]?.output_text ??
-    null;
-  if (!text) {
-    throw new Error("Gemini response did not include text.");
-  }
-  return text;
-}
-
-async function callGroq(prompt) {
-  if (!GROQ_API_KEY) {
-    throw new Error("Groq API key missing.");
-  }
-  const response = await fetch(GROQ_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${GROQ_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: GROQ_MODEL,
-      temperature: 0.4,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a helpful project brief assistant. Always return valid JSON without markdown fences.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    }),
-  });
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Groq request failed (${response.status}): ${text}`);
-  }
-  const data = await response.json();
-  const text = data?.choices?.[0]?.message?.content;
-  if (!text) {
-    throw new Error("Groq response did not include text.");
-  }
-  return text;
 }
 
 function parseOverviewJson(rawText) {
@@ -2684,10 +2590,7 @@ export async function createProjectEmployee(payload) {
 export async function updateProjectEmployee(empProjectId, payload) {
   await ensureBootstrapData();
 
-  console.log(`[updateProjectEmployee] Starting update for empProjectId: ${empProjectId}`);
-  console.log(`[updateProjectEmployee] Payload:`, JSON.stringify(payload, null, 2));
-
-  // Verify the record exists before attempting to update
+      // Verify the record exists before attempting to update
   const existingRecord = await prisma.projectEmployee.findUnique({
     where: { empProjectId: Number(empProjectId) },
   });
@@ -2696,13 +2599,7 @@ export async function updateProjectEmployee(empProjectId, payload) {
     throw new Error(`Project employee assignment with empProjectId ${empProjectId} not found`);
   }
 
-  console.log(`[updateProjectEmployee] Existing record found:`, {
-    empProjectId: existingRecord.empProjectId,
-    projectId: existingRecord.projectId,
-    empId: existingRecord.empId,
-  });
-
-  // Build update data object, only including fields that are provided
+    // Build update data object, only including fields that are provided
   const updateData = {};
 
   // Only update projectId if provided (it's a required field, so don't set to null)
@@ -2765,12 +2662,9 @@ export async function updateProjectEmployee(empProjectId, payload) {
     updateData.unassignedAt = toDate(payload.unassignedAt);
   }
 
-  console.log(`[updateProjectEmployee] Update data:`, JSON.stringify(updateData, null, 2));
-
-  // If no fields to update, return the existing record
+    // If no fields to update, return the existing record
   if (Object.keys(updateData).length === 0) {
-    console.log(`[updateProjectEmployee] No fields to update, returning existing record`);
-    // Fetch lookups and return mapped existing record
+        // Fetch lookups and return mapped existing record
     const [projectLookup, employeeLookup] = await Promise.all([
       prisma.project.findMany({
         select: { projectId: true, projectName: true },
@@ -2797,8 +2691,7 @@ export async function updateProjectEmployee(empProjectId, payload) {
 
   let record;
   try {
-    console.log(`[updateProjectEmployee] Calling Prisma update with where:`, { empProjectId: Number(empProjectId) });
-    
+        
     // Try Prisma update first
     let updateSucceeded = false;
     try {
@@ -2809,21 +2702,17 @@ export async function updateProjectEmployee(empProjectId, payload) {
       if (updateResult) {
         record = updateResult;
         updateSucceeded = true;
-        console.log(`[updateProjectEmployee] Prisma update succeeded and returned record`);
-      } else {
-        console.warn(`[updateProjectEmployee] Prisma update returned null, trying MongoDB native driver`);
-      }
+              } else {
+              }
     } catch (updateError) {
-      console.warn(`[updateProjectEmployee] Prisma update threw error:`, updateError.message);
-      if (updateError.code === 'P2025') {
+            if (updateError.code === 'P2025') {
         throw new Error(`Record with empProjectId ${empProjectId} not found`);
       }
     }
     
     // If Prisma update failed or returned null, use MongoDB native driver
     if (!updateSucceeded) {
-      console.log(`[updateProjectEmployee] Using MongoDB native driver to perform update`);
-      
+            
       const databaseUrl =
         process.env.NG_APP_PRISMA_URL ||
         process.env.NG_APP_MONGODB_URI ||
@@ -2837,8 +2726,7 @@ export async function updateProjectEmployee(empProjectId, payload) {
       const client = new MongoClient(databaseUrl);
       try {
         await client.connect();
-        console.log(`[updateProjectEmployee] Connected to MongoDB via native driver`);
-        
+                
         // Extract database name from connection string
         const dbName = databaseUrl.split("/").pop()?.split("?")[0] || "employee_management_db";
         const db = client.db(dbName);
@@ -2850,18 +2738,13 @@ export async function updateProjectEmployee(empProjectId, payload) {
           { $set: updateData }
         );
         
-        console.log(`[updateProjectEmployee] MongoDB native update result:`, {
-          matchedCount: updateResult.matchedCount,
-          modifiedCount: updateResult.modifiedCount,
-        });
-        
+                
         if (updateResult.matchedCount === 0) {
           throw new Error(`No record found with empProjectId ${empProjectId}`);
         }
         
         if (updateResult.modifiedCount === 0) {
-          console.warn(`[updateProjectEmployee] Update matched but didn't modify (values may be the same)`);
-        }
+                  }
         
         // Fetch the updated record using Prisma
         record = await prisma.projectEmployee.findUnique({
@@ -2872,22 +2755,12 @@ export async function updateProjectEmployee(empProjectId, payload) {
           throw new Error(`Record not found after MongoDB native update for empProjectId ${empProjectId}`);
         }
         
-        console.log(`[updateProjectEmployee] Successfully updated via MongoDB native driver`);
-      } finally {
+              } finally {
         await client.close();
       }
     }
     
-    console.log(`[updateProjectEmployee] Final record details:`, {
-      empProjectId: record.empProjectId,
-      projectId: record.projectId,
-      empId: record.empId,
-      isActive: record.isActive,
-      allocationPct: record.allocationPct,
-      role: record.role,
-      assignedDate: record.assignedDate,
-    });
-  } catch (error) {
+      } catch (error) {
     console.error(`[updateProjectEmployee] Prisma update error for empProjectId ${empProjectId}:`, error);
     console.error(`[updateProjectEmployee] Error code:`, error.code);
     console.error(`[updateProjectEmployee] Error message:`, error.message);
@@ -3478,48 +3351,23 @@ export async function fetchContentfulBrief({
 }
 
 export async function generateOverviewDraft(payload) {
+  // Multi-provider free-tier chain: Gemini → Groq → OpenRouter :free → Hugging Face.
   const prompt = buildOverviewPrompt(payload ?? {});
-  const errors = [];
-  let overview = null;
-  let source = null;
-  let rawResponse = null;
+  const completion = await completeChatWithFallback(prompt);
 
-  if (GEMINI_API_KEY) {
-    try {
-      const text = await callGemini(prompt);
-      rawResponse = text;
-      overview = parseOverviewJson(text);
-      source = "gemini";
-    } catch (error) {
-      errors.push(error);
-      console.warn("[AI] Gemini generation failed", error);
-    }
+  if (!completion.ok) {
+    throw new Error(
+      completion.message ||
+        "No AI providers available. Configure GOOGLE_GEMINI_API_KEY, GROQ_LLAMA_API_KEY, OPENROUTER_API_KEY, or HUGGINGFACE_API_KEY."
+    );
   }
 
-  if (!overview && GROQ_API_KEY) {
-    try {
-      const text = await callGroq(prompt);
-      rawResponse = text;
-      overview = parseOverviewJson(text);
-      source = "groq";
-    } catch (error) {
-      errors.push(error);
-      console.warn("[AI] Groq generation failed", error);
-    }
-  }
-
-  if (!overview) {
-    const message =
-      errors.length > 0
-        ? errors.map((error) => error.message).join("; ")
-        : "No AI providers available.";
-    throw new Error(message);
-  }
-
+  const overview = parseOverviewJson(completion.text);
   return {
-    source,
+    source: completion.provider,
+    model: completion.model,
     overview,
-    raw: rawResponse,
+    raw: completion.text,
     prompt,
   };
 }

@@ -40,6 +40,23 @@ import {
   getEndpointHealth,
   getUptime,
 } from "./monitoring.mjs";
+import { captureApiException } from "../_lib/sentry/server.mjs";
+import {
+  authenticateUser,
+  clearLoginAttempts,
+  clearSessionCookie,
+  createSession,
+  deleteSessionByToken,
+  getSessionFromRequest,
+  isLoginRateLimited,
+  isPublicAction,
+  listDemoAccounts,
+  parseCookies,
+  recordFailedLogin,
+  requireAuth,
+  SESSION_COOKIE_NAME,
+  setSessionCookie,
+} from "./auth.mjs";
 
 function sendJson(response, statusCode, body, statusCodeRef = null) {
   if (!(response instanceof ServerResponse)) {
@@ -99,15 +116,7 @@ async function notifyApprovalChange(project, action) {
     defaults.forEach((email) => to.add(email));
 
     if (!to.size && !cc.size && !bcc.size) {
-      console.log(
-        "[Notification] Skipped approval notification (no recipients)",
-        {
-          projectId: project.projectId,
-          projectName: project.projectName,
-          action,
-        }
-      );
-      return;
+            return;
     }
 
     const subject = buildApprovalSubject(project, action);
@@ -290,14 +299,7 @@ async function notifyReviewerComment(project, commentPayload) {
     defaults.forEach((email) => to.add(email));
 
     if (!to.size && !cc.size && !bcc.size) {
-      console.log(
-        "[Notification] Skipped reviewer comment notification (no recipients)",
-        {
-          projectId: project.projectId,
-          projectName: project.projectName,
-        }
-      );
-      return;
+            return;
     }
 
     const subject = buildReviewerCommentSubject(project, commentPayload);
@@ -390,14 +392,7 @@ function buildReviewerCommentText(project, commentPayload) {
 async function notifyAssignmentCreated(assignment) {
   try {
     if (!assignment || !assignment.employeeEmail) {
-      console.log(
-        "[Notification] Skipped assignment notification (no employee email)",
-        {
-          assignmentId: assignment?.empProjectId,
-          projectId: assignment?.projectId,
-        }
-      );
-      return;
+            return;
     }
 
     const to = [assignment.employeeEmail];
@@ -577,14 +572,7 @@ function buildAssignmentText(assignment, project) {
 async function notifyAssignmentUpdated(assignment) {
   try {
     if (!assignment || !assignment.employeeEmail) {
-      console.log(
-        "[Notification] Skipped assignment update notification (no employee email)",
-        {
-          assignmentId: assignment?.empProjectId,
-          projectId: assignment?.projectId,
-        }
-      );
-      return;
+            return;
     }
 
     const to = [assignment.employeeEmail];
@@ -764,14 +752,7 @@ function buildAssignmentUpdateText(assignment, project) {
 async function notifyAssignmentDeleted(assignment) {
   try {
     if (!assignment || !assignment.employeeEmail) {
-      console.log(
-        "[Notification] Skipped assignment deletion notification (no employee email)",
-        {
-          assignmentId: assignment?.empProjectId,
-          projectId: assignment?.projectId,
-        }
-      );
-      return;
+            return;
     }
 
     const to = [assignment.employeeEmail];
@@ -941,13 +922,7 @@ function buildAssignmentDeletedText(assignment, project) {
 async function notifyProjectCreated(project) {
   try {
     if (!project || !project.projectId) {
-      console.log(
-        "[Notification] Skipped project creation notification (invalid project)",
-        {
-          projectId: project?.projectId,
-        }
-      );
-      return;
+            return;
     }
 
     const projectRecipients = await getProjectStakeholderEmails(
@@ -965,14 +940,7 @@ async function notifyProjectCreated(project) {
     defaults.forEach((email) => to.add(email));
 
     if (!to.size && !cc.size && !bcc.size) {
-      console.log(
-        "[Notification] Skipped project creation notification (no recipients)",
-        {
-          projectId: project.projectId,
-          projectName: project.projectName,
-        }
-      );
-      return;
+            return;
     }
 
     const subject = buildProjectCreatedSubject(project);
@@ -1004,13 +972,7 @@ async function notifyProjectCreated(project) {
 async function notifyProjectUpdated(project) {
   try {
     if (!project || !project.projectId) {
-      console.log(
-        "[Notification] Skipped project update notification (invalid project)",
-        {
-          projectId: project?.projectId,
-        }
-      );
-      return;
+            return;
     }
 
     const projectRecipients = await getProjectStakeholderEmails(
@@ -1028,14 +990,7 @@ async function notifyProjectUpdated(project) {
     defaults.forEach((email) => to.add(email));
 
     if (!to.size && !cc.size && !bcc.size) {
-      console.log(
-        "[Notification] Skipped project update notification (no recipients)",
-        {
-          projectId: project.projectId,
-          projectName: project.projectName,
-        }
-      );
-      return;
+            return;
     }
 
     const subject = buildProjectUpdatedSubject(project);
@@ -1067,13 +1022,7 @@ async function notifyProjectUpdated(project) {
 async function notifyProjectDeleted(project, preFetchedRecipients = null) {
   try {
     if (!project || !project.projectId) {
-      console.log(
-        "[Notification] Skipped project deletion notification (invalid project)",
-        {
-          projectId: project?.projectId,
-        }
-      );
-      return;
+            return;
     }
 
     const to = new Set();
@@ -1109,14 +1058,7 @@ async function notifyProjectDeleted(project, preFetchedRecipients = null) {
     defaults.forEach((email) => to.add(email));
 
     if (!to.size && !cc.size && !bcc.size) {
-      console.log(
-        "[Notification] Skipped project deletion notification (no recipients)",
-        {
-          projectId: project.projectId,
-          projectName: project.projectName,
-        }
-      );
-      return;
+            return;
     }
 
     const subject = buildProjectDeletedSubject(project);
@@ -1392,25 +1334,14 @@ async function getManagerEmail(managerId) {
     });
     return manager?.emailId || null;
   } catch (error) {
-    console.log("[Notification] Could not fetch manager email", {
-      managerId,
-      error,
-    });
-    return null;
+        return null;
   }
 }
 
 async function notifyEmployeeCreated(employee) {
   try {
     if (!employee || !employee.emailId) {
-      console.log(
-        "[Notification] Skipped employee creation notification (no email)",
-        {
-          employeeId: employee?.employeeId,
-          employeeName: employee?.employeeName,
-        }
-      );
-      return;
+            return;
     }
 
     const to = [employee.emailId];
@@ -1437,14 +1368,7 @@ async function notifyEmployeeCreated(employee) {
     });
 
     if (!to.length && !cc.size && !bcc.size) {
-      console.log(
-        "[Notification] Skipped employee creation notification (no recipients)",
-        {
-          employeeId: employee.employeeId,
-          employeeName: employee.employeeName,
-        }
-      );
-      return;
+            return;
     }
 
     const subject = buildEmployeeCreatedSubject(employee);
@@ -1476,14 +1400,7 @@ async function notifyEmployeeCreated(employee) {
 async function notifyEmployeeUpdated(employee) {
   try {
     if (!employee || !employee.emailId) {
-      console.log(
-        "[Notification] Skipped employee update notification (no email)",
-        {
-          employeeId: employee?.employeeId,
-          employeeName: employee?.employeeName,
-        }
-      );
-      return;
+            return;
     }
 
     const to = [employee.emailId];
@@ -1510,14 +1427,7 @@ async function notifyEmployeeUpdated(employee) {
     });
 
     if (!to.length && !cc.size && !bcc.size) {
-      console.log(
-        "[Notification] Skipped employee update notification (no recipients)",
-        {
-          employeeId: employee.employeeId,
-          employeeName: employee.employeeName,
-        }
-      );
-      return;
+            return;
     }
 
     const subject = buildEmployeeUpdatedSubject(employee);
@@ -1549,14 +1459,7 @@ async function notifyEmployeeUpdated(employee) {
 async function notifyEmployeeDeleted(employee) {
   try {
     if (!employee || !employee.emailId) {
-      console.log(
-        "[Notification] Skipped employee deletion notification (no email)",
-        {
-          employeeId: employee?.employeeId,
-          employeeName: employee?.employeeName,
-        }
-      );
-      return;
+            return;
     }
 
     const to = [employee.emailId];
@@ -1583,14 +1486,7 @@ async function notifyEmployeeDeleted(employee) {
     });
 
     if (!to.length && !cc.size && !bcc.size) {
-      console.log(
-        "[Notification] Skipped employee deletion notification (no recipients)",
-        {
-          employeeId: employee.employeeId,
-          employeeName: employee.employeeName,
-        }
-      );
-      return;
+            return;
     }
 
     const subject = buildEmployeeDeletedSubject(employee);
@@ -1882,10 +1778,7 @@ function normalizePathname(url) {
   const parts = pathname.split("/").filter((p) => p.length > 0);
 
   // Debug: log the parts to understand the structure
-  console.log("[normalizePathname] Input pathname:", pathname);
-  console.log("[normalizePathname] Parts:", parts);
-
-  // On Vercel, request.url contains the full path: /api/employee-management/GetProject/5001
+      // On Vercel, request.url contains the full path: /api/employee-management/GetProject/5001
   // On localhost, it's the same: /api/employee-management/GetProject/5001
   // We need to extract: GetProject/5001
 
@@ -1898,12 +1791,7 @@ function normalizePathname(url) {
     // We found "employee-management", skip up to and including it
     const remainingParts = parts.slice(employeeManagementIndex + 1);
     const result = remainingParts.join("/");
-    console.log(
-      "[normalizePathname] Found employee-management at index:",
-      employeeManagementIndex
-    );
-    console.log("[normalizePathname] Result:", result);
-    return result;
+            return result;
   }
 
   // If "employee-management" is not found, check if it starts with "api"
@@ -1916,11 +1804,7 @@ function normalizePathname(url) {
     parts[1] === "employee-management"
   ) {
     const result = parts.slice(2).join("/");
-    console.log(
-      "[normalizePathname] Using api/employee-management pattern, result:",
-      result
-    );
-    return result;
+        return result;
   }
 
   // If it doesn't start with "api" or "employee-management", assume it's already normalized
@@ -1931,20 +1815,17 @@ function normalizePathname(url) {
     parts[0] !== "employee-management"
   ) {
     const result = parts.join("/");
-    console.log("[normalizePathname] Already normalized, result:", result);
-    return result;
+        return result;
   }
 
   // Fallback: if we have at least 2 parts, skip the first two
   if (parts.length > 2) {
     const result = parts.slice(2).join("/");
-    console.log("[normalizePathname] Fallback (slice 2), result:", result);
-    return result;
+        return result;
   }
 
   // Last resort: return empty string
-  console.log("[normalizePathname] Returning empty string");
-  return "";
+    return "";
 }
 
 function findEmployee(store, id) {
@@ -2716,26 +2597,30 @@ export async function handleEmployeeManagementRequest(request, response) {
   const requestPath = normalizePathname(url);
 
   // Debug logging for troubleshooting (works in both dev and production on Vercel)
-  console.log("[Handler] Original request.url:", request.url);
-  console.log("[Handler] Constructed requestUrl:", requestUrl);
-  console.log("[Handler] URL pathname:", url.pathname);
-  console.log("[Handler] Normalized path:", requestPath);
-  console.log("[Handler] Method:", request.method);
-
-  const pathParts = requestPath.split("/").filter((p) => p.length > 0);
+            const pathParts = requestPath.split("/").filter((p) => p.length > 0);
   const action = pathParts[0] || "";
   const rawId = pathParts[1] || "";
   const method = (request.method || "GET").toUpperCase();
-
-  // Additional debug for path parsing
-  console.log("[Handler] Path parts:", pathParts);
-  console.log("[Handler] Action:", action);
-  console.log("[Handler] Raw ID:", rawId);
-
-  // Start timing the request
   const requestStartTime = Date.now();
-  const statusCodeRef = { value: 200 }; // Use object reference for tracking
+  const statusCodeRef = { value: 200 };
   let error = null;
+
+  if (!isPublicAction(method, action)) {
+    const session = await requireAuth(request, response);
+    if (!session) {
+      statusCodeRef.value = 401;
+      if (action !== "GetApiStatus") {
+        logRequest({
+          endpoint: action || "unknown",
+          method,
+          status: 401,
+          responseTime: Date.now() - requestStartTime,
+          error: null,
+        });
+      }
+      return 401;
+    }
+  }
 
   try {
     if (method === "GET" && (!action || action === "")) {
@@ -2752,6 +2637,34 @@ export async function handleEmployeeManagementRequest(request, response) {
 
     switch (method) {
       case "GET": {
+        if (action === "GetDemoAccounts") {
+          const accounts = await listDemoAccounts();
+          return sendJson(
+            response,
+            200,
+            createApiResponse(true, "Demo accounts", accounts),
+            statusCodeRef
+          );
+        }
+
+        if (action === "Session") {
+          const session = await getSessionFromRequest(request);
+          if (!session) {
+            return sendJson(
+              response,
+              401,
+              createApiResponse(false, "Not authenticated"),
+              statusCodeRef
+            );
+          }
+          return sendJson(
+            response,
+            200,
+            createApiResponse(true, "Session active", session.user),
+            statusCodeRef
+          );
+        }
+
         if (action === "GetParentDepartment") {
           const parents = await listParentDepartments();
           return sendJson(
@@ -2897,6 +2810,67 @@ export async function handleEmployeeManagementRequest(request, response) {
 
       case "POST": {
         const body = await readRequestBody(request);
+
+        if (action === "Login") {
+          if (isLoginRateLimited(request)) {
+            return sendJson(
+              response,
+              429,
+              createApiResponse(
+                false,
+                "Too many login attempts. Try again later."
+              ),
+              statusCodeRef
+            );
+          }
+
+          const username = body?.username?.trim?.() || "";
+          const password = body?.password || "";
+          if (!username || !password) {
+            return sendJson(
+              response,
+              400,
+              createApiResponse(false, "Username and password are required"),
+              statusCodeRef
+            );
+          }
+
+          const user = await authenticateUser(username, password);
+          if (!user) {
+            recordFailedLogin(request);
+            return sendJson(
+              response,
+              401,
+              createApiResponse(false, "Invalid username or password"),
+              statusCodeRef
+            );
+          }
+
+          clearLoginAttempts(request);
+          const token = await createSession(user.id);
+          setSessionCookie(response, token);
+          return sendJson(
+            response,
+            200,
+            createApiResponse(true, "Login successful", user),
+            statusCodeRef
+          );
+        }
+
+        if (action === "Logout") {
+          const cookies = parseCookies(request.headers?.cookie);
+          const token = cookies[SESSION_COOKIE_NAME];
+          if (token) {
+            await deleteSessionByToken(token);
+          }
+          clearSessionCookie(response);
+          return sendJson(
+            response,
+            200,
+            createApiResponse(true, "Logged out"),
+            statusCodeRef
+          );
+        }
 
         if (action === "GenerateOverviewDraft") {
           try {
@@ -3297,11 +3271,7 @@ export async function handleEmployeeManagementRequest(request, response) {
             try {
               projectRecipients = await getProjectStakeholderEmails(projectId);
             } catch (error) {
-              console.log(
-                "[Notification] Could not fetch stakeholders before deletion, will use fallback data",
-                { projectId }
-              );
-            }
+                          }
 
             const deletedProject = await deleteProject(projectId);
             // Send email notification for project deletion
@@ -3382,6 +3352,10 @@ export async function handleEmployeeManagementRequest(request, response) {
     error = err;
     statusCodeRef.value = 500;
     console.error("Employee management handler error:", err);
+    captureApiException(err, {
+      action: action || "unknown",
+      method,
+    });
     return sendJson(
       response,
       500,

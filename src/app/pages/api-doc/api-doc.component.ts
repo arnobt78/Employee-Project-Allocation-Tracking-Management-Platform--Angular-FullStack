@@ -101,7 +101,6 @@ export class ApiDocComponent implements OnInit {
 
     this.masterService.getApiDocumentation().subscribe({
       next: (data) => {
-        console.log('API Documentation loaded:', data);
         this.apiDocSignal.set(data);
         this.loadingSignal.set(false);
       },
@@ -167,8 +166,7 @@ export class ApiDocComponent implements OnInit {
 
   copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text).then(() => {
-      // Could add a toast notification here
-      console.log('Copied to clipboard:', text);
+      // Clipboard write succeeded; toast can be added here if needed.
     });
   }
 }

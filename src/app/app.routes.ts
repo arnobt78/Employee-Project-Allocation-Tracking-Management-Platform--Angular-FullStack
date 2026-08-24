@@ -10,6 +10,8 @@ import { BusinessInsightsComponent } from './pages/business-insights/business-in
 import { CalendarTimelineComponent } from './pages/calendar-timeline/calendar-timeline.component';
 import { ApiDocComponent } from './pages/api-doc/api-doc.component';
 import { ApiStatusComponent } from './pages/api-status/api-status.component';
+import { authGuard } from './guards/auth.guard';
+import { guestGuard } from './guards/guest.guard';
 
 export const routes: Routes = [
   {
@@ -20,6 +22,7 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
+    canActivate: [guestGuard],
     data: {
       layout: 'auth',
       pageTitle: 'Sign in',
@@ -28,6 +31,7 @@ export const routes: Routes = [
   {
     path: '',
     component: LayoutComponent,
+    canActivate: [authGuard],
     children: [
       {
         path: 'dashboard',

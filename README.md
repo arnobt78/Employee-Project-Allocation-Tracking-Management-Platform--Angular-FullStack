@@ -1,8 +1,20 @@
-# Modern Employee & Project Management Platform - Angular 18, TypeScript, MongoDB Full-Stack Serverless Application (Including Real-time Dashboard, Calendar, Gantt Chart, Business Insights, API Monitoring)
+# Employee & Project Allocation, Tracking & Management Platform - Angular, TypeScript, MongoDB, Prisma, Serverless API, AI Drafting, Contentful, Resend Full-Stack Project (including Real-time Dashboard, Calendar, Timeline, Gantt Chart, Business Insights)
 
-A comprehensive, full-stack Employee Management System built with **Angular 18**, featuring real-time dashboards, project tracking, calendar views, Gantt charts, business insights, and API monitoring. This is a production-ready CRUD application demonstrating modern web development practices with serverless architecture.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Angular](https://img.shields.io/badge/Angular-20-DD0031?logo=angular&logoColor=white)](https://angular.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Prisma-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-Serverless-000000?logo=vercel&logoColor=white)](https://vercel.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-24.x-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Sentry](https://img.shields.io/badge/Sentry-Error_Tracking-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
+[![launch with diploi badge](https://diploi.com/launch.svg)](https://diploi.com/launch/arnobt78/Employee-Management--Angular-FullStack-Fundamental-Project-1)
 
-- **Live-Demo:** [https://employee-project-management.vercel.app/](https://employee-project-management.vercel.app/)
+**EmpowerHub** is a comprehensive, full-stack **Employee & Project Management** learning project built with **Angular 20**, a **Vercel serverless API**, **Prisma + MongoDB**, optional **AI overview drafting**, **Contentful** briefs, and **email notifications** (Resend / SMTP). It demonstrates real-world CRUD, session auth, dashboards, calendar / Gantt / timeline views, business insights, and API docs & monitoring.
+
+- **Live demo:** [https://employee-project-management.vercel.app/](https://employee-project-management.vercel.app/)
+- **Security:** Private reports → [SECURITY.md](./SECURITY.md) · [contact@arnobmahmud.com](mailto:contact@arnobmahmud.com)
+- **Author:** [Arnob Mahmud](https://www.arnobmahmud.com/) | **LinkedIn:** [https://www.linkedin.com/in/arnob-mahmud-05839655/](https://www.linkedin.com/in/arnob-mahmud-05839655/) | **GitHub:** [https://github.com/arnobt78](https://github.com/arnobt78)
 
 ![Screenshot 2025-11-14 at 13 48 27](https://github.com/user-attachments/assets/dfdaa904-17fd-41b4-94aa-4c026a2de616)
 ![Screenshot 2025-11-14 at 13 48 50](https://github.com/user-attachments/assets/53dd3108-4449-4b3d-b359-7a64abd04323)
@@ -21,7 +33,7 @@ A comprehensive, full-stack Employee Management System built with **Angular 18**
 ![Screenshot 2025-11-14 at 13 53 07](https://github.com/user-attachments/assets/423181c3-69ff-491f-863e-3869edf782f7)
 ![Screenshot 2025-11-14 at 13 53 18](https://github.com/user-attachments/assets/4772436c-ab5a-4bfc-a736-79862f308b10)
 ![Screenshot 2025-11-14 at 13 53 36](https://github.com/user-attachments/assets/2a46adc9-fc24-451d-a9d3-d0d2ee9acebb)
-![Screenshot 2025-11-14 at 13 53 51](https://github.com/user-attachments/assets/de2ebff3-214c-4cb8-b259-3dd3f449f6ec)
+![Screenshot 2025-11-14 at 13 53 51](https://github.com/user-attachments/assets/de2ebff3-214c-4cb8-b259-3dd3f449c6ec)
 ![Screenshot 2025-11-14 at 13 54 16](https://github.com/user-attachments/assets/301b1e12-0079-43fc-b8c0-b50fa4340ef9)
 ![Screenshot 2025-11-14 at 13 54 25](https://github.com/user-attachments/assets/fe05c79e-7a5f-475d-ae71-e26f1f585bdd)
 ![Screenshot 2025-11-14 at 13 54 37](https://github.com/user-attachments/assets/792f3108-19a2-494a-94c7-55e229295a10)
@@ -30,1153 +42,636 @@ A comprehensive, full-stack Employee Management System built with **Angular 18**
 ![Screenshot 2025-11-14 at 13 56 25](https://github.com/user-attachments/assets/38aef232-5ab7-46ff-8e0a-7e4ece451c68)
 ![Screenshot 2025-11-14 at 13 56 53](https://github.com/user-attachments/assets/4756d90b-0a62-4995-9682-35287b810055)
 
----
+## Table of Contents
 
-## 📋 Table of Contents
-
-- [Overview](#-overview)
-- [Features](#-features)
-- [Technology Stack](#-technology-stack)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Environment Variables](#-environment-variables)
-- [API Endpoints](#-api-endpoints)
-- [Components & Reusability](#-components--reusability)
-- [Routes & Navigation](#-routes--navigation)
-- [Serverless Architecture](#️-serverless-architecture)
-- [Database Schema](#-database-schema)
-- [Key Functionalities](#-key-functionalities)
-- [Code Examples](#-code-examples)
-- [Deployment](#-deployment)
-- [Keywords](#-keywords)
-- [Conclusion](#-conclusion)
-
----
-
-## 🎯 Overview
-
-EmpowerHub is a modern, feature-rich Employee Management System designed to help organizations manage their workforce, projects, and resources efficiently. The application provides a complete solution for:
-
-- **Employee Management**: Track employee information, departments, roles, and assignments
-- **Project Management**: Manage projects with timelines, milestones, approvals, and resource planning
-- **Resource Allocation**: Assign employees to projects with role-based access and tracking
-- **Analytics & Insights**: Real-time dashboards, business insights, and performance metrics
-- **Calendar & Timeline**: Visual calendar views, timeline visualization, and Gantt charts
-- **API Monitoring**: Real-time API status tracking, performance monitoring, and documentation
-
-The application is built with a modern tech stack, following best practices for scalability, maintainability, and user experience.
+- [Overview](#overview)
+- [Who This Project Is For](#who-this-project-is-for)
+- [Features](#features)
+- [Technology Stack](#technology-stack)
+- [Architecture Walkthrough](#architecture-walkthrough)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Demo Login](#demo-login)
+- [Routes & Navigation](#routes--navigation)
+- [API Endpoints](#api-endpoints)
+- [Backend & Data Layer](#backend--data-layer)
+- [Frontend Components & Reuse](#frontend-components--reuse)
+- [Key Libraries Explained](#key-libraries-explained)
+- [Code Snippets for Learners](#code-snippets-for-learners)
+- [Scripts Reference](#scripts-reference)
+- [Deployment (Vercel)](#deployment-vercel)
+- [Observability (Sentry)](#observability-sentry)
+- [Further Docs in This Repo](#further-docs-in-this-repo)
+- [Keywords](#keywords)
+- [Conclusion](#conclusion)
+- [License](#license)
+- [Happy Coding](#happy-coding-)
 
 ---
 
-## ✨ Features
+## Overview
 
-### Core Features
+**EmpowerHub** helps learners explore how a modern SPA talks to a serverless backend and a document database:
 
-- **🔐 Authentication System**: Secure login with demo credentials
-- **👥 Employee Management**: Full CRUD operations for employees with department hierarchy
-- **📊 Project Management**: Comprehensive project tracking with approval workflows
-- **🔗 Project Assignments**: Assign employees to projects with role management
-- **📈 Dashboard**: Real-time statistics and insights
-- **📅 Calendar View**: Interactive calendar with milestone and due date tracking
-- **📉 Timeline View**: Visual timeline representation of projects
-- **📊 Gantt Chart**: Project timeline visualization with dynamic calculations
-- **💡 Business Insights**: Analytics and reporting features
-- **📚 API Documentation**: Interactive API documentation with Swagger-style interface
-- **🔍 API Status Monitoring**: Real-time API health monitoring and performance tracking
-- **📧 Email Notifications**: Automated email notifications for key events
-- **🤖 AI Integration**: AI-powered project overview generation (Gemini/Groq)
-- **📦 Contentful Integration**: CMS integration for content management
+| Layer           | What it does                                                                                               |
+| --------------- | ---------------------------------------------------------------------------------------------------------- |
+| **Angular SPA** | Pages for login, dashboard, employees, projects, assignments, insights, calendar/timeline, API docs/status |
+| **API**         | Node handlers under `api/employee-management/` on Vercel (locally via `tools/dev-api-server.mjs`)          |
+| **Database**    | MongoDB via Prisma (`prisma/schema.prisma`) with a native Mongo fallback path where needed                 |
+| **Auth**        | HttpOnly session cookie (`eh_session`), bcrypt-hashed demo user, route guards                              |
+| **Extras**      | AI overview draft (multi-provider fallback), Contentful brief fetch, email notifications, Sentry tunnel    |
 
-### Advanced Features
-
-- **Real-time Data**: All data is fetched dynamically from MongoDB via Prisma
-- **Serverless Architecture**: Deployable on Vercel with serverless functions
-- **Responsive Design**: Mobile-first design with Tailwind CSS
-- **Modern UI Components**: Shadcn UI components for consistent design
-- **Type Safety**: Full TypeScript implementation
-- **Performance Optimized**: Lazy loading, code splitting, and optimized builds
-- **SEO Optimized**: Comprehensive meta tags and Open Graph support
+You can run the UI against the **live demo** immediately, or clone and run **locally** with MongoDB. Most optional services (AI, CMS, email, Sentry) can stay empty—the core CRUD and UI still work when `DATABASE_URL` and a seeded auth user are available.
 
 ---
 
-## 🛠 Technology Stack
+## Who This Project Is For
 
-### Frontend
-
-- **Angular 18**: Latest version with standalone components, signals, and modern features
-- **TypeScript 5.4**: Type-safe development
-- **Tailwind CSS 3.4**: Utility-first CSS framework
-- **Shadcn UI**: High-quality, accessible component library
-- **RxJS 7.8**: Reactive programming for async operations
-- **Lucide Angular**: Modern icon library
-- **Font Awesome**: Icon library for additional icons
-
-### Backend
-
-- **Node.js**: Serverless runtime environment
-- **Prisma 6.19**: Next-generation ORM for database access
-- **MongoDB**: NoSQL database for flexible data storage
-- **Nodemailer**: Email sending capabilities
-
-### Development Tools
-
-- **Angular CLI**: Development and build tooling
-- **Concurrently**: Run multiple commands simultaneously
-- **Vercel**: Serverless deployment platform
-- **ESLint/Prettier**: Code quality and formatting
-
-### Integrations
-
-- **Google Gemini API**: AI-powered content generation
-- **Groq API**: Alternative AI provider
-- **Contentful**: Headless CMS integration
-- **Resend**: Email service provider
+- Beginners learning **Angular standalone components**, **signals**, and **RxJS Observables**
+- Developers exploring **serverless APIs** on Vercel without a long-running Node server in production
+- Anyone wanting a **portfolio CRUD** app with dashboards, charts-like schedule views, and API status pages
+- Learners studying **session cookies**, **route guards**, and **API auth middleware**
 
 ---
 
-## 📁 Project Structure
+## Features
 
-```bash
+### Core product features
+
+- **Authentication** — Demo admin login with bcrypt + HttpOnly cookie; `authGuard` / `guestGuard`
+- **Employees** — Full CRUD with department hierarchy (parent / child)
+- **Projects** — Create/update/delete, approval workflow, reviewer comments, rich project form
+- **Project assignments** — Link employees to projects with roles and allocation fields
+- **Dashboard** — Aggregated KPIs with loading skeletons (avoids empty-state flash)
+- **Business insights** — Analytics over projects and assignments
+- **Calendar, timeline & Gantt** — Schedule visualization components
+- **API documentation & status** — In-app docs plus live request monitoring metrics
+- **Notifications** — Optional Resend and/or SMTP emails on key CRUD / approval events
+- **AI overview drafting** — Optional Gemini → Groq → OpenRouter `:free` → Hugging Face fallback
+- **Contentful briefs** — Optional CMS fetch into project overview
+- **Error tracking** — Optional Sentry with same-origin tunnel `/api/monitoring` (ad-blocker friendly)
+
+### Learning-oriented features
+
+- Single API client: `MasterService` (prefer extending this over adding new HTTP clients)
+- Feature flags via public env (`NG_APP_FEATURE_*`)
+- `.env.example` documents every variable and where to obtain keys
+- Lint (`npm run lint`), unit tests (`npm test`), production build (`npm run build`)
+
+---
+
+## Technology Stack
+
+| Area         | Choice                              | Why it matters (beginner note)                 |
+| ------------ | ----------------------------------- | ---------------------------------------------- |
+| UI           | Angular 20 (standalone)             | Components without NgModules; modern default   |
+| Language     | TypeScript ~5.8                     | Types catch mistakes before runtime            |
+| Styling      | Tailwind CSS 3.4 + shadcn-style UI  | Utility classes + reusable button/cva patterns |
+| Icons        | Lucide Angular, Font Awesome        | Icon sets for nav and actions                  |
+| State / HTTP | RxJS + `HttpClient`                 | Streams for async API calls                    |
+| API          | Vercel Serverless Functions         | Pay-per-request backend, no always-on server   |
+| ORM / DB     | Prisma 6 + MongoDB                  | Schema in code; Mongo for flexible documents   |
+| Auth         | bcryptjs + HttpOnly cookies         | Password hashing; cookie not readable by JS    |
+| Email        | Resend API and/or Nodemailer SMTP   | Transactional mail                             |
+| AI           | Gemini / Groq / OpenRouter / HF     | Free-tier fallback chain                       |
+| CMS          | Contentful Delivery API             | Headless content for project briefs            |
+| Errors       | Sentry (`@sentry/angular` + tunnel) | Production error visibility                    |
+| Hosting      | Vercel                              | Static Angular `dist/` + `/api/*` functions    |
+
+---
+
+## Architecture Walkthrough
+
+```text
+Browser (Angular SPA)
+    │  HTTPS / proxy in dev
+    ▼
+MasterService  ──►  /api/employee-management/<Action>
+    │
+    ▼
+[...segments].js  →  handler.mjs  →  repository.mjs / auth.mjs / notifications.mjs / ai-providers.mjs
+    │
+    ▼
+Prisma / MongoDB
+```
+
+**Local development:** `ng serve` proxies `/api/employee-management` and `/api/monitoring` to `http://localhost:4310` (`proxy.conf.json` + `tools/dev-api-server.mjs`).
+
+**Production:** Vercel serves `dist/employee-management` and runs `api/employee-management/[...segments].js` plus `api/monitoring.js` (Sentry tunnel).
+
+---
+
+## Project Structure
+
+```text
 employee-management/
-├── api/                          # Serverless API functions
-│   ├── _lib/                    # Shared utilities
-│   │   ├── prisma-client.mjs    # Prisma client initialization
-│   │   ├── bootstrap.mjs        # Database seeding
-│   │   ├── contentful.mjs       # Contentful integration
-│   │   └── ai.mjs              # AI service integration
-│   └── employee-management/     # Main API handlers
-│       ├── [...segments].js     # Vercel serverless route
-│       ├── handler.mjs          # Request handler
-│       ├── repository.mjs       # Database operations
-│       ├── monitoring.mjs       # API monitoring system
-│       └── notifications.mjs   # Email notifications
-├── src/                         # Angular application source
-│   ├── app/
-│   │   ├── components/          # Reusable components
-│   │   │   ├── calendar-view/   # Calendar component
-│   │   │   ├── gantt-view/      # Gantt chart component
-│   │   │   ├── timeline-view/   # Timeline component
-│   │   │   └── ui/              # UI components (buttons, toasts, etc.)
-│   │   ├── pages/               # Page components
-│   │   │   ├── login/           # Login page
-│   │   │   ├── dashboard/       # Dashboard page
-│   │   │   ├── employee/        # Employee management
-│   │   │   ├── project/         # Project listing
-│   │   │   ├── project-form/    # Project create/edit
-│   │   │   ├── project-employee/ # Project assignments
-│   │   │   ├── business-insights/ # Analytics
-│   │   │   ├── calendar-timeline/ # Calendar & timeline
-│   │   │   ├── api-doc/         # API documentation
-│   │   │   └── api-status/      # API monitoring
-│   │   ├── service/             # Services
-│   │   │   └── master.service.ts # API service
-│   │   ├── model/               # Data models
-│   │   │   ├── interface/       # TypeScript interfaces
-│   │   │   └── class/          # TypeScript classes
-│   │   ├── lib/                 # Utilities
-│   │   ├── app.component.ts     # Root component
-│   │   ├── app.routes.ts        # Route configuration
-│   │   └── app.config.ts        # App configuration
-│   ├── environments/            # Environment configurations
-│   └── index.html              # Main HTML file
-├── prisma/                      # Prisma configuration
-│   └── schema.prisma           # Database schema
-├── public/                      # Static assets
-├── tools/                       # Development tools
-│   └── dev-api-server.mjs      # Local API server
-├── vercel.json                 # Vercel configuration
-├── angular.json                # Angular configuration
-├── package.json                # Dependencies
-└── README.md                   # This file
+├── src/
+│   ├── index.html                 # SEO metadata, canonical URL, JSON-LD
+│   ├── environments/              # Public client config (no secrets)
+│   └── app/
+│       ├── app.routes.ts          # Routes + guards
+│       ├── pages/                 # Feature pages (login, dashboard, CRUD, …)
+│       ├── components/            # Calendar, Gantt, timeline, UI primitives
+│       ├── service/               # MasterService, AuthService
+│       ├── guards/                # authGuard, guestGuard
+│       ├── interceptors/          # credentials + 401 handling
+│       ├── lib/sentry/            # Client Sentry init + noise filters
+│       └── model/                 # Interfaces + Employee class
+├── api/
+│   ├── monitoring.js              # Sentry same-origin tunnel
+│   ├── _lib/                      # prisma-client, sentry helpers
+│   └── employee-management/
+│       ├── [...segments].js       # Vercel entry
+│       ├── handler.mjs            # Routing + auth + notifications triggers
+│       ├── repository.mjs         # Data access + AI/CMS helpers
+│       ├── auth.mjs               # Login / session / logout
+│       ├── notifications.mjs      # Resend / SMTP
+│       ├── ai-providers.mjs       # LLM fallback chain
+│       └── monitoring.mjs         # In-memory API request metrics (not Sentry)
+├── prisma/                        # schema.prisma + seed
+├── tools/                         # dev-api-server, seed-demo-user, env/sentry scripts
+├── public/                        # favicon, robots.txt, sitemap.xml
+├── docs/                          # Playbooks, LLM selection, Sentry guide
+├── .env.example                   # Template (copy to .env)
+├── SECURITY.md                    # Private vulnerability reporting
+├── vercel.json                    # Output dir, headers, function limits
+└── package.json
 ```
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- **Node.js** 18.x or higher
-- **npm** or **yarn** package manager
-- **MongoDB** database (local or cloud instance like MongoDB Atlas)
-- **Git** for version control
+- **Node.js 24.x** (see `engines` in `package.json`; `.nvmrc` if present)
+- **npm**
+- **MongoDB** reachable via a connection string (local or Atlas / VPS)
 
-### Installation Steps
+### 1. Clone and install
 
-1. **Clone the repository**
+```bash
+git clone https://github.com/arnobt78/Employee-Management--Angular-FullStack-Fundamental-Project-1.git
+cd Employee-Management--Angular-FullStack-Fundamental-Project-1
+npm install
+```
 
-   ```bash
-   git clone <repository-url>
-   cd employee-management
-   ```
+`postinstall` generates `src/environments/environment.prod.ts` (gitignored).
 
-2. **Install dependencies**
+### 2. Environment file (optional but recommended)
 
-   ```bash
-   npm install
-   ```
+```bash
+cp .env.example .env
+```
 
-3. **Set up environment variables**
+**Minimum for a useful local demo:**
 
-   Create a `.env` file in the root directory (see [Environment Variables](#-environment-variables) section)
+1. Set `DATABASE_URL` to your MongoDB URI
+2. Seed the demo auth user: `npm run db:seed:auth`
+3. Optionally seed domain data: `npm run db:seed`
 
-4. **Set up Prisma**
+You **do not** need AI, CMS, email, or Sentry keys to explore CRUD UI. Leave those blank; features that need them simply stay disabled or no-op.
 
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
+### 3. Run frontend + API together
 
-5. **Start the development server**
+```bash
+npm start
+```
 
-   ```bash
-   npm start
-   ```
+This runs:
 
-   This will start both the Angular frontend (port 4200) and the API server (port 4310)
+- API on **<http://localhost:4310>** (`npm run api:dev`)
+- Angular on **<http://localhost:4200>** with proxy (`npm run start:frontend`)
 
-6. **Access the application**
-   - Frontend: <http://localhost:4200>
-   - API: <http://localhost:4310>
+Open [http://localhost:4200](http://localhost:4200) → sign in with the demo account.
 
-### Login Credentials
+### 4. Validate
 
-The Angular environment ships with default demo credentials (`admin` / `112233`) defined in `src/environments/environment.ts`. For production or shared environments, override them by setting `NG_APP_DEMO_USERNAME` and `NG_APP_DEMO_PASSWORD` in your `.env` file (see below).
+```bash
+npm run lint
+npm test -- --watch=false --browsers=ChromeHeadless
+npm run build
+```
 
 ---
 
-## 🔐 Environment Variables
+## Environment Variables
 
-Create a `.env` file in the root directory with the following variables:
+Copy [`.env.example`](./.env.example) → `.env`. **Never commit `.env`.**
 
-### Required Variables
+### Do we need a `.env`?
+
+| Goal                                    | Need `.env`?                                                     |
+| --------------------------------------- | ---------------------------------------------------------------- |
+| Browse the **live Vercel demo**         | No                                                               |
+| Run UI + API **locally** with real data | Yes — at least `DATABASE_URL` (+ seed auth)                      |
+| AI overview draft                       | Optional — `GOOGLE_GEMINI_API_KEY` and/or Groq / OpenRouter / HF |
+| Contentful briefs                       | Optional — `CMS_*`                                               |
+| Email notifications                     | Optional — `RESEND_TOKEN` and/or `SMTP_*`                        |
+| Sentry                                  | Optional — empty DSN disables Sentry                             |
+
+### Critical rule: do not put secrets under `NG_APP_*`
+
+This Angular build does **not** inject Vercel `NG_APP_*` secrets into a secure server-only store for the API. AI / CMS / email / DB / `SENTRY_AUTH_TOKEN` must stay **unprefixed** server env vars. `NG_APP_*` is only for **public** client-safe values (API base path, feature flags). DSN for Sentry is public by design and is baked at build from `SENTRY_DSN`.
+
+### Variable catalog
+
+#### Always useful (local / production)
+
+| Variable              | Purpose                             | Where to get it                                             |
+| --------------------- | ----------------------------------- | ----------------------------------------------------------- |
+| `DATABASE_URL`        | MongoDB connection for Prisma       | [MongoDB Atlas](https://www.mongodb.com/atlas) or your host |
+| `APP_BASE_URL`        | Links in emails; OpenRouter referer | Local: `http://localhost:4200` · Prod: your Vercel URL      |
+| `NG_APP_API_BASE_URL` | Client API prefix                   | Usually `/api/employee-management/`                         |
+| `API_PORT`            | Local API port                      | Default `4310`                                              |
+| `SESSION_TTL_HOURS`   | Session cookie lifetime             | Default `24`                                                |
+
+#### Feature flags (public / client-safe)
 
 ```env
-# Database
-DATABASE_URL="mongodb://localhost:27017/employee-management"
-# or for MongoDB Atlas:
-# DATABASE_URL="mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority"
-
-# API Configuration
-API_PORT=4310
-NG_APP_API_BASE_URL=/api/employee-management/
-
-# Demo Login Credentials (required)
-NG_APP_DEMO_USERNAME=your_username_here
-NG_APP_DEMO_PASSWORD=your_password_here
-```
-
-### Optional Variables
-
-```env
-# AI Integration
-NG_APP_GEMINI_API_KEY=your_gemini_api_key
-NG_APP_GROQ_API_KEY=your_groq_api_key
-NG_APP_OPENROUTER_API_KEY=your_openrouter_api_key
-
-# Contentful CMS
-NG_APP_CONTENTFUL_SPACE_ID=your_space_id
-NG_APP_CONTENTFUL_ENVIRONMENT=master
-NG_APP_CONTENTFUL_DELIVERY_TOKEN=your_delivery_token
-
-# Email Configuration
-NG_APP_RESEND_API_KEY=your_resend_api_key
-NG_APP_SMTP_HOST=smtp.example.com
-NG_APP_SMTP_USER=your_smtp_user
-
-# Storage (for file uploads)
-NG_APP_CLOUDINARY_UPLOAD_PRESET=your_preset
-NG_APP_IMAGEKIT_PUBLIC_KEY=your_public_key
-
-# Feature Toggles
 NG_APP_FEATURE_READINESS_V2=true
 NG_APP_FEATURE_AI_SUMMARY=false
 NG_APP_FEATURE_WORKFLOW_TIMELINE=false
-
-# Notification Recipients (comma-separated)
-NOTIFY_APPROVAL_TO=admin@example.com,manager@example.com
 ```
 
-### Environment Variable Details
+#### AI (server-only, optional)
 
-#### Database Configuration
+```env
+GOOGLE_GEMINI_API_KEY=     # https://aistudio.google.com/apikey
+GROQ_LLAMA_API_KEY=        # https://console.groq.com/keys
+OPENROUTER_API_KEY=        # https://openrouter.ai/keys  (use :free models)
+HUGGINGFACE_API_KEY=       # https://huggingface.co/settings/tokens
+```
 
-- **DATABASE_URL**: MongoDB connection string. For local development, use `mongodb://localhost:27017/employee-management`. For production, use MongoDB Atlas connection string.
+Fallback order: **Gemini → Groq → OpenRouter `:free` → Hugging Face**. See [`docs/LLM_MODEL_SELECTION.md`](./docs/LLM_MODEL_SELECTION.md).
 
-#### API Configuration
+#### Contentful (server-only, optional)
 
-- **API_PORT**: Port for the local API server (default: 4310)
-- **NG_APP_API_BASE_URL**: Base URL for API calls (default: `/api/employee-management/`)
+```env
+CMS_SPACE_ID=
+CMS_ENVIRONMENT=master
+CMS_DELIVERY_TOKEN=
+CMS_PREVIEW_TOKEN=
+```
 
-#### AI Integration
+From Contentful → **Settings → API keys**.
 
-- **NG_APP_GEMINI_API_KEY**: Google Gemini API key for AI-powered features
-- **NG_APP_GROQ_API_KEY**: Groq API key (alternative AI provider)
-- **NG_APP_OPENROUTER_API_KEY**: OpenRouter API key for additional AI services
+#### Email (server-only, optional)
 
-#### Contentful CMS
+```env
+RESEND_TOKEN=              # https://resend.com/api-keys
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+EMAIL_FROM="EmpowerHub <no-reply@example.com>"
+EMAIL_DRY_RUN=false        # true = log only, do not send
+NOTIFY_APPROVAL_TO=        # optional always-notify list (comma-separated)
+```
 
-- **NG_APP_CONTENTFUL_SPACE_ID**: Your Contentful space ID
-- **NG_APP_CONTENTFUL_ENVIRONMENT**: Contentful environment (usually "master")
-- **NG_APP_CONTENTFUL_DELIVERY_TOKEN**: Contentful delivery API token
+#### Sentry (optional)
 
-#### Email Configuration
+```env
+SENTRY_DSN=                # Project → Client Keys (DSN)
+SENTRY_ORG=
+SENTRY_PROJECT=employee-management
+SENTRY_AUTH_TOKEN=         # CI source maps only — never in the browser bundle
+```
 
-- **NG_APP_RESEND_API_KEY**: Resend API key for transactional emails
-- **NG_APP_SMTP_HOST**: SMTP server hostname
-- **NG_APP_SMTP_USER**: SMTP username
+Same-origin tunnel: `POST /api/monitoring`. Details: [`.env.example`](./.env.example) and [`docs/Redis_Sentry_PostHog_INTEGRATION_GUIDE.md`](./docs/Redis_Sentry_PostHog_INTEGRATION_GUIDE.md).
 
-#### Feature Toggles
+### Vercel checklist
 
-Control feature availability:
-
-- **NG_APP_FEATURE_READINESS_V2**: Enable version 2 of readiness checklist
-- **NG_APP_FEATURE_AI_SUMMARY**: Enable AI summary generation
-- **NG_APP_FEATURE_WORKFLOW_TIMELINE**: Enable workflow timeline feature
+Set production/preview env for at least: `DATABASE_URL`, `APP_BASE_URL` (live URL), then redeploy. Add optional AI/CMS/email/Sentry as needed. After changing env, **redeploy** so build-time DSN bake and serverless functions pick up values.
 
 ---
 
-## 🔌 API Endpoints
+## Demo Login
 
-The application provides a RESTful API with 27 endpoints organized into categories:
+| Field    | Value    |
+| -------- | -------- |
+| Username | `admin`  |
+| Password | `112233` |
 
-### Departments (2 endpoints)
+Seed / refresh the hashed user:
 
-- `GET /api/employee-management/GetParentDepartment` - Get all parent departments
-- `GET /api/employee-management/GetChildDepartmentByParentId?deptId={id}` - Get child departments by parent ID
-
-### Employees (4 endpoints)
-
-- `GET /api/employee-management/GetAllEmployees` - Get all employees
-- `POST /api/employee-management/CreateEmployee` - Create a new employee
-- `PUT /api/employee-management/UpdateEmployee/{id}` - Update an employee
-- `DELETE /api/employee-management/DeleteEmployee/{id}` - Delete an employee
-
-### Projects (5 endpoints)
-
-- `GET /api/employee-management/GetAllProjects` - Get all projects
-- `GET /api/employee-management/GetProject/{id}` - Get project by ID
-- `POST /api/employee-management/CreateProject` - Create a new project
-- `PUT /api/employee-management/UpdateProject/{id}` - Update a project
-- `DELETE /api/employee-management/DeleteProject/{id}` - Delete a project
-
-### Project Resources (1 endpoint)
-
-- `GET /api/employee-management/GetProjectResources/{id}` - Get resource insights for a project
-
-### Assignments (4 endpoints)
-
-- `GET /api/employee-management/GetAllProjectEmployees` - Get all project-employee assignments
-- `POST /api/employee-management/CreateProjectEmployee` - Create a new assignment
-- `PUT /api/employee-management/UpdateProjectEmployee/{id}` - Update an assignment
-- `DELETE /api/employee-management/DeleteProjectEmployee/{id}` - Delete an assignment
-
-### Dashboard (1 endpoint)
-
-- `GET /api/employee-management/GetDashboard` - Get dashboard snapshot with statistics
-
-### Schedule (1 endpoint)
-
-- `GET /api/employee-management/GetSchedule` - Get schedule data for calendar and timeline views
-
-### Approvals (6 endpoints)
-
-- `POST /api/employee-management/RequestApproval` - Request project approval
-- `POST /api/employee-management/ApproveProject` - Approve a project
-- `POST /api/employee-management/RejectProject` - Reject a project
-- `POST /api/employee-management/ResetProjectApproval` - Reset approval status
-- `POST /api/employee-management/AddReviewerComment` - Add reviewer comment
-- `POST /api/employee-management/ResolveReviewerComment` - Resolve reviewer comment
-
-### AI (1 endpoint)
-
-- `POST /api/employee-management/GenerateOverviewDraft` - Generate AI-powered project overview
-
-### Content (1 endpoint)
-
-- `GET /api/employee-management/GetContentfulBrief?entryId={id}&contentType={type}&slug={slug}` - Get Contentful content
-
-### Monitoring (2 endpoints)
-
-- `GET /api/employee-management/GetApiStatus` - Get API status and monitoring data
-- `GET /api/employee-management/GetApiDocumentation` - Get API documentation
-
-### Example API Request
-
-```typescript
-// Using Angular HttpClient
-import { HttpClient } from '@angular/common/http';
-
-constructor(private http: HttpClient) {}
-
-getAllEmployees() {
-  return this.http.get<Employee[]>('/api/employee-management/GetAllEmployees');
-}
-
-createEmployee(employee: Employee) {
-  return this.http.post<IApiResponse>(
-    '/api/employee-management/CreateEmployee',
-    employee
-  );
-}
+```bash
+npm run db:seed:auth
 ```
+
+Do **not** put demo passwords in Vercel as `NG_APP_DEMO_PASSWORD`. The login form autofill uses public demo constants for learning; production apps should replace this with real identity providers.
 
 ---
 
-## 🧩 Components & Reusability
+## Routes & Navigation
 
-### Reusable UI Components
+Defined in [`src/app/app.routes.ts`](./src/app/app.routes.ts):
 
-The project includes several reusable components located in `src/app/components/ui/`:
+| Path                  | Page                        | Guard        |
+| --------------------- | --------------------------- | ------------ |
+| `/`                   | Redirect → `/login`         | —            |
+| `/login`              | Sign in                     | `guestGuard` |
+| `/dashboard`          | KPIs                        | `authGuard`  |
+| `/employee`           | Employee CRUD               | `authGuard`  |
+| `/projects`           | Project list                | `authGuard`  |
+| `/new-project`        | Create project              | `authGuard`  |
+| `/update-project/:id` | Edit project                | `authGuard`  |
+| `/project-employee`   | Assignments                 | `authGuard`  |
+| `/business-insights`  | Analytics                   | `authGuard`  |
+| `/calendar-timeline`  | Calendar / timeline / Gantt | `authGuard`  |
+| `/api-doc`            | API documentation UI        | `authGuard`  |
+| `/api-status`         | Live API health UI          | `authGuard`  |
 
-#### Button Component (`button.ts`)
+Private pages nest under `LayoutComponent` (shell nav + outlet).
 
-A flexible button directive with multiple variants:
+---
 
-```typescript
-import { UbButtonDirective } from '@/app/components/ui/button';
+## API Endpoints
 
-// Usage in template
-<button ubButton variant="primary" size="md">Click Me</button>
-<button ubButton variant="outline" size="sm">Cancel</button>
-<button ubButton variant="ghost" size="lg">Submit</button>
-```
+Base path: **`/api/employee-management/<Action>`**
 
-**Variants**: `primary`, `secondary`, `outline`, `ghost`, `destructive`
-**Sizes**: `sm`, `md`, `lg`
+Most actions require an authenticated session cookie. Public-ish actions include login/demo listing (see `isPublicAction` in `auth.mjs` / handler).
 
-#### Toast Component (`toast.service.ts`, `toast-container.component.ts`)
+### Auth
 
-Display notifications to users:
+| Method | Action            | Description                     |
+| ------ | ----------------- | ------------------------------- |
+| POST   | `Login`           | Authenticate; sets `eh_session` |
+| POST   | `Logout`          | Clears session                  |
+| GET    | `Session`         | Current session                 |
+| GET    | `GetDemoAccounts` | Demo account hints              |
 
-```typescript
-import { ToastService } from '@/app/components/ui/toast.service';
+### Departments
 
-constructor(private toast: ToastService) {}
+| Method | Action                         | Description           |
+| ------ | ------------------------------ | --------------------- |
+| GET    | `GetParentDepartment`          | Parent departments    |
+| GET    | `GetChildDepartmentByParentId` | Children by parent id |
 
-showSuccess() {
-  this.toast.success({
-    title: 'Success!',
-    description: 'Operation completed successfully.'
-  });
-}
+### Employees
 
-showError() {
-  this.toast.error({
-    title: 'Error',
-    description: 'Something went wrong.'
-  });
-}
-```
+| Method | Action            | Description |
+| ------ | ----------------- | ----------- |
+| GET    | `GetAllEmployees` | List        |
+| POST   | `CreateEmployee`  | Create      |
+| PUT    | `UpdateEmployee`  | Update      |
+| DELETE | `DeleteEmployee`  | Delete      |
 
-#### Hover Tooltip Component (`hover-tooltip.component.ts`)
+### Projects
 
-Custom tooltip for hover interactions:
+| Method | Action                                                                          | Description        |
+| ------ | ------------------------------------------------------------------------------- | ------------------ |
+| GET    | `GetAllProjects` / `GetProject`                                                 | List / one         |
+| POST   | `CreateProject`                                                                 | Create             |
+| PUT    | `UpdateProject`                                                                 | Update             |
+| DELETE | `DeleteProject`                                                                 | Delete             |
+| POST   | `RequestApproval` / `ApproveProject` / `RejectProject` / `ResetProjectApproval` | Approval flow      |
+| POST   | `AddReviewerComment` / `ResolveReviewerComment`                                 | Reviewer comments  |
+| GET    | `GetProjectResources`                                                           | Resource insights  |
+| GET    | `GetContentfulBrief`                                                            | Optional CMS brief |
+| POST   | `GenerateOverviewDraft`                                                         | Optional AI draft  |
 
-```typescript
-<app-hover-tooltip
-  [trigger]="tooltipTrigger"
-  [side]="'top'"
-  [sideOffset]="8">
-  <div>Tooltip content</div>
-</app-hover-tooltip>
-```
+### Assignments
 
-#### Optimized Image Component (`optimized-image.component.ts`)
+| Method | Action                   | Description |
+| ------ | ------------------------ | ----------- |
+| GET    | `GetAllProjectEmployees` | List        |
+| POST   | `CreateProjectEmployee`  | Create      |
+| PUT    | `UpdateProjectEmployee`  | Update      |
+| DELETE | `DeleteProjectEmployee`  | Delete      |
 
-Image component with lazy loading:
+### Dashboard / schedule / meta
 
-```typescript
-<app-optimized-image
-  [src]="imageUrl"
-  [alt]="imageAlt"
-  [width]="300"
-  [height]="200">
-</app-optimized-image>
-```
+| Method | Action                | Description              |
+| ------ | --------------------- | ------------------------ |
+| GET    | `GetDashboard`        | Aggregates               |
+| GET    | `GetSchedule`         | Calendar/Gantt data      |
+| GET    | `GetApiStatus`        | Monitoring snapshot      |
+| GET    | `GetApiDocumentation` | OpenAPI-like doc payload |
 
-#### Floating Background Component (`floating-background.component.ts`)
+### Sentry tunnel (separate route)
 
-Animated background for login/auth pages:
+| Method | Path              | Description                                 |
+| ------ | ----------------- | ------------------------------------------- |
+| POST   | `/api/monitoring` | Forwards Sentry envelopes (DSN allowlisted) |
 
-```typescript
-<app-floating-background></app-floating-background>
-```
-
-### View Components
-
-#### Calendar View (`calendar-view.component.ts`)
-
-Reusable calendar component for displaying events:
-
-```typescript
-import { CalendarViewComponent } from '@/app/components/calendar-view/calendar-view.component';
-
-// Usage
-<app-calendar-view
-  [events]="scheduleEvents"
-  [currentMonth]="selectedMonth"
-  (eventClick)="onEventClick($event)">
-</app-calendar-view>
-```
-
-**Features**:
-
-- Month navigation
-- Event display with color coding
-- Click handlers for events
-- Expandable event lists
-
-#### Timeline View (`timeline-view.component.ts`)
-
-Visual timeline representation:
+Example client call pattern (`MasterService`):
 
 ```typescript
-<app-timeline-view
-  [projects]="projects"
-  [dateRange]="dateRange"
-  (projectClick)="navigateToProject($event)">
-</app-timeline-view>
-```
-
-**Features**:
-
-- Dynamic timeline calculation
-- Project bars with duration
-- Interactive dots and rings
-- Hover tooltips
-
-#### Gantt View (`gantt-view.component.ts`)
-
-Gantt chart for project visualization:
-
-```typescript
-<app-gantt-view
-  [projects]="projects"
-  [dateRange]="dateRange"
-  (projectClick)="navigateToProject($event)">
-</app-gantt-view>
-```
-
-**Features**:
-
-- Dynamic bar width calculation
-- Month/year headers
-- Hover tooltips with project details
-- Clickable bars for navigation
-
-### How to Reuse Components
-
-**Step 1: Import the component** in your module or standalone component:
-
-```typescript
-import { CalendarViewComponent } from '@/app/components/calendar-view/calendar-view.component';
-
-@Component({
-  standalone: true,
-  imports: [CalendarViewComponent],
-  // ...
-})
-```
-
-**Step 2: Use in template**:
-
-```html
-<app-calendar-view [events]="myEvents"></app-calendar-view>
-```
-
-**Step 3: Customize with inputs and outputs**:
-
-```typescript
-// Component inputs
-@Input() events: Event[] = [];
-@Input() currentMonth: Date = new Date();
-
-// Component outputs
-@Output() eventClick = new EventEmitter<Event>();
+this.http.get(`${environment.api.baseUrl}GetAllEmployees`, {
+  withCredentials: true,
+});
 ```
 
 ---
 
-## 🗺 Routes & Navigation
+## Backend & Data Layer
 
-The application uses Angular Router with the following route structure:
+### Request flow
 
-### Route Configuration
+1. Vercel (or local HTTP server) receives `/api/employee-management/...`
+2. `handler.mjs` parses action + method, checks session unless public
+3. Calls `repository.mjs` (Prisma) for persistence
+4. May trigger `notifications.mjs` or `ai-providers.mjs`
+5. Logs metrics via `monitoring.mjs` (in-memory; resets on cold start)
+
+### Prisma models (high level)
+
+- `DepartmentParent` / `DepartmentChild`
+- `Employee`
+- `Project`
+- `ProjectEmployee` (assignments)
+- `AppUser` / `Session` (auth)
+- `Counter` (id helpers where used)
+
+Schema: [`prisma/schema.prisma`](./prisma/schema.prisma).
+
+### Notifications
+
+Emails fire on many create/update/delete/approval paths. Recipients come from project stakeholders **plus** optional `NOTIFY_APPROVAL_TO`. With `EMAIL_DRY_RUN=true`, the app logs instead of sending.
+
+---
+
+## Frontend Components & Reuse
+
+### Pages (`src/app/pages/`)
+
+Each page is a **standalone** component (`.ts` + `.html` + `.css`). To reuse a page pattern in another Angular app:
+
+1. Copy the page folder
+2. Register a route
+3. Inject `MasterService` / `AuthService` (or replace with your API)
+4. Keep loading flags + skeletons so lists do not flash empty values
+
+### Shared UI & views (`src/app/components/`)
+
+| Piece                       | Role                              | Reuse tip                                          |
+| --------------------------- | --------------------------------- | -------------------------------------------------- |
+| `calendar-view`             | Month grid + events               | Pass `events[]` with `title`, dates, `description` |
+| `timeline-view`             | Horizontal timeline               | Feed schedule items from `GetSchedule`             |
+| `gantt-view`                | Bar chart by project dates        | Map projects → start/end                           |
+| `ui/button`                 | CVA-based button variants         | Import and use `btnVariants` / component           |
+| `ui/toast` + `ToastService` | Non-blocking feedback             | `toast.show({ title, description })`               |
+| `ui/select-menu`            | Accessible dropdown (CDK overlay) | Prefer over native `<select>` for styled menus     |
+| `ui/list-skeleton`          | Loading placeholders              | Bind while `isLoading`                             |
+| `ui/floating-background`    | Decorative bg                     | Drop into auth/marketing shells                    |
+| `ui/optimized-image`        | Image helper                      | Swap `src` / alt                                   |
+
+### Services
+
+- **`MasterService`** — Central HTTP API + short in-memory cache with invalidation after mutations. **Prefer extending this** for new endpoints.
+- **`AuthService`** — Login/logout/session; used by guards and interceptor.
+
+### Guards & interceptor
+
+- `authGuard` — Redirect unauthenticated users to `/login`
+- `guestGuard` — Keep logged-in users off `/login`
+- `authInterceptor` — `withCredentials: true`; handle 401
+
+---
+
+## Key Libraries Explained
+
+| Library                            | What it is       | How we use it                                  |
+| ---------------------------------- | ---------------- | ---------------------------------------------- |
+| **Angular**                        | SPA framework    | Routing, forms, DI, standalone components      |
+| **RxJS**                           | Reactive streams | `Observable` HTTP results, `shareReplay` cache |
+| **Prisma**                         | ORM              | Type-safe Mongo access from serverless Node    |
+| **bcryptjs**                       | Password hashing | Demo `AppUser` password storage                |
+| **Tailwind**                       | Utility CSS      | Layout, dark glass UI, responsive spacing      |
+| **class-variance-authority (cva)** | Variant API      | Button size/intent classes                     |
+| **Lucide**                         | Icons            | Consistent iconography                         |
+| **Nodemailer / Resend**            | Email            | Transactional notifications                    |
+| **Sentry**                         | Errors           | Client + server + quiet source maps            |
+| **dotenv**                         | Env loader       | Local API + tooling                            |
+
+---
+
+## Code Snippets for Learners
+
+### Feature flag check
 
 ```typescript
-// src/app/app.routes.ts
-export const routes: Routes = [
-  { path: "", redirectTo: "login", pathMatch: "full" },
-  { path: "login", component: LoginComponent, data: { layout: "auth" } },
-  {
-    path: "",
-    component: LayoutComponent,
-    children: [
-      { path: "dashboard", component: DashboardComponent },
-      { path: "employee", component: EmployeeComponent },
-      { path: "projects", component: ProjectComponent },
-      { path: "new-project", component: ProjectFormComponent },
-      { path: "update-project/:id", component: ProjectFormComponent },
-      { path: "project-employee", component: ProjectEmployeeComponent },
-      { path: "business-insights", component: BusinessInsightsComponent },
-      { path: "calendar-timeline", component: CalendarTimelineComponent },
-      { path: "api-doc", component: ApiDocComponent },
-      { path: "api-status", component: ApiStatusComponent },
-    ],
-  },
-];
-```
+import { environment } from "../environments/environment";
 
-### Route Data
-
-Each route can include metadata:
-
-```typescript
-{
-  path: 'dashboard',
-  component: DashboardComponent,
-  data: {
-    layout: 'private',
-    pageTitle: 'Dashboard',
-  },
+if (environment.featureToggles.aiSummaryGenerator) {
+  // show AI draft button
 }
 ```
 
-### Programmatic Navigation
+### Toast after save
 
 ```typescript
-import { Router } from '@angular/router';
-
-constructor(private router: Router) {}
-
-navigateToProject(projectId: number) {
-  this.router.navigate(['/update-project', projectId]);
-}
-
-navigateToDashboard() {
-  this.router.navigate(['/dashboard']);
-}
+this.toast.show({
+  title: "Project created",
+  description: "A new project is now tracked in the system.",
+});
 ```
 
-### Route Guards (Future Enhancement)
-
-You can add route guards for authentication:
+### Auth guard idea (simplified)
 
 ```typescript
-// auth.guard.ts
-export const authGuard: CanActivateFn = (route, state) => {
-  // Check authentication
-  return isAuthenticated ? true : router.createUrlTree(["/login"]);
+export const authGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  return auth.ensureSession().pipe(map((ok) => (ok ? true : router.createUrlTree(["/login"]))));
 };
 ```
 
----
-
-## ☁️ Serverless Architecture
-
-This project is designed to work with **Vercel's serverless functions**, making it highly scalable and cost-effective.
-
-### How Serverless Works
-
-1. **API Routes**: The `api/employee-management/[...segments].js` file is a Vercel serverless function that handles all API requests.
-
-2. **Request Handling**: When a request comes to `/api/employee-management/*`, Vercel routes it to the serverless function.
-
-3. **Cold Starts**: Functions start on-demand, with cold start times typically under 100ms.
-
-4. **Scaling**: Automatically scales based on traffic.
-
-### Serverless Function Structure
+### Server AI fallback (concept)
 
 ```javascript
-// api/employee-management/[...segments].js
-import { handleEmployeeManagementRequest } from "./handler.mjs";
-
-export default async function handler(req, res) {
-  await handleEmployeeManagementRequest(req, res);
-}
-```
-
-### Local Development
-
-For local development, use the dev server:
-
-```javascript
-// tools/dev-api-server.mjs
-import { createServer } from "node:http";
-import { handleEmployeeManagementRequest } from "../api/employee-management/handler.mjs";
-
-const server = createServer((request, response) => {
-  if (request.url.startsWith("/api/employee-management")) {
-    handleEmployeeManagementRequest(request, response);
-  }
-});
-
-server.listen(4310);
-```
-
-### Deployment to Vercel
-
-1. **Install Vercel CLI**:
-
-   ```bash
-   npm i -g vercel
-   ```
-
-2. **Deploy**:
-
-   ```bash
-   vercel
-   ```
-
-3. **Environment Variables**: Set all environment variables in Vercel dashboard.
-
-### Using in Other Projects
-
-To use this serverless architecture in other projects:
-
-1. **Copy the API structure**:
-
-   ```bash
-   api/
-     your-module/
-       [...segments].js
-       handler.mjs
-       repository.mjs
-   ```
-
-2. **Create handler**:
-
-   ```javascript
-   export async function handleYourModuleRequest(request, response) {
-     // Your logic here
-   }
-   ```
-
-3. **Set up route**:
-
-   ```javascript
-   // [...segments].js
-   import { handleYourModuleRequest } from "./handler.mjs";
-   export default async function handler(req, res) {
-     await handleYourModuleRequest(req, res);
-   }
-   ```
-
----
-
-## 🗄 Database Schema
-
-The application uses **MongoDB** with **Prisma ORM**. Here's the schema structure:
-
-### Models
-
-#### Employee
-
-```prisma
-model Employee {
-  id            String   @id @map("_id") @db.ObjectId
-  employeeId    Int      @unique
-  employeeName  String
-  emailId       String?
-  deptId        Int?
-  role          String?
-  // ... more fields
-}
-```
-
-#### Project
-
-```prisma
-model Project {
-  id             String   @id @map("_id") @db.ObjectId
-  projectId      Int      @unique
-  projectName    String
-  clientName     String?
-  status         String   @default("draft")
-  approvalStatus String   @default("draft")
-  // ... more fields
-}
-```
-
-#### ProjectEmployee
-
-```prisma
-model ProjectEmployee {
-  id           String   @id @map("_id") @db.ObjectId
-  empProjectId Int      @unique
-  projectId    Int
-  empId        Int
-  role         String?
-  isActive     Boolean  @default(true)
-  // ... more fields
-}
-```
-
-### Database Operations
-
-```typescript
-// Using Prisma
-import { prisma } from "./prisma-client";
-
-// Create
-const employee = await prisma.employee.create({
-  data: { employeeName: "John Doe", emailId: "john@example.com" },
-});
-
-// Read
-const employees = await prisma.employee.findMany();
-
-// Update
-await prisma.employee.update({
-  where: { employeeId: 1 },
-  data: { role: "Manager" },
-});
-
-// Delete
-await prisma.employee.delete({
-  where: { employeeId: 1 },
-});
+// api/employee-management/ai-providers.mjs
+// Tries Gemini → Groq → OpenRouter (:free) → Hugging Face
+const completion = await completeChatWithFallback(prompt);
 ```
 
 ---
 
-## 🔧 Key Functionalities
+## Scripts Reference
 
-### 1. Employee Management
-
-**Features**:
-
-- Create, read, update, delete employees
-- Department hierarchy management
-- Employee search and filtering
-- Role-based access (future enhancement)
-
-**Implementation**:
-
-```typescript
-// Service method
-getAllEmployees(): Observable<Employee[]> {
-  return this.http.get<Employee[]>(
-    this.getProxyUrl('GetAllEmployees')
-  );
-}
-```
-
-### 2. Project Management
-
-**Features**:
-
-- Full project lifecycle management
-- Approval workflow (draft → requested → approved/rejected)
-- Reviewer comments system
-- Timeline and milestone tracking
-- Resource planning
-- Readiness checklist
-
-**Workflow**:
-
-1. Create project (draft)
-2. Request approval
-3. Reviewer comments
-4. Approve/Reject
-5. Project execution
-
-### 3. Calendar & Timeline
-
-**Features**:
-
-- Calendar view with month navigation
-- Event display (milestones, due dates, reminders)
-- Timeline visualization
-- Gantt chart with dynamic calculations
-- Clickable events for navigation
-
-**Data Structure**:
-
-```typescript
-interface ScheduleEvent {
-  id: string;
-  date: string;
-  type: "milestone" | "due-date" | "reminder";
-  title: string;
-  projectId: number;
-  projectName: string;
-}
-```
-
-### 4. Business Insights
-
-**Features**:
-
-- Dashboard statistics
-- Project health metrics
-- Resource utilization
-- Performance analytics
-
-### 5. API Monitoring
-
-**Features**:
-
-- Real-time API status
-- Performance history (7 days)
-- Endpoint health by category
-- Recent activity log
-- Success rate tracking
-- Response time monitoring
-
-**Implementation**:
-The monitoring system uses in-memory logging:
-
-```javascript
-// api/employee-management/monitoring.mjs
-export function logRequest({ endpoint, method, status, responseTime }) {
-  // Log request to memory
-  // Calculate metrics
-  // Clean up old logs
-}
-```
-
-### 6. Email Notifications
-
-**Features**:
-
-- Automated emails for:
-  - Employee creation/update/deletion
-  - Project creation/update/deletion
-  - Approval requests
-  - Reviewer comments
-  - Assignment changes
-
-**Configuration**:
-Set up email service in environment variables (Resend or SMTP).
+| Script                      | Purpose                                                  |
+| --------------------------- | -------------------------------------------------------- |
+| `npm start`                 | API + Angular concurrently                               |
+| `npm run start:frontend`    | `ng serve` + proxy                                       |
+| `npm run api:dev`           | Local API on `API_PORT`                                  |
+| `npm run build`             | Generate prod env → `ng build` → quiet Sentry map upload |
+| `npm run lint` / `lint:fix` | ESLint via Angular                                       |
+| `npm test`                  | Karma / Jasmine                                          |
+| `npm run db:seed`           | Domain seed data                                         |
+| `npm run db:seed:auth`      | Demo `admin` user                                        |
 
 ---
 
-## 💻 Code Examples
+## Deployment (Vercel)
 
-### Creating a New Service
+1. Import the GitHub repo into Vercel
+2. Set env vars (see above); `APP_BASE_URL` = production URL
+3. Build command uses `npm run build` (Angular output: `dist/employee-management` per `vercel.json`)
+4. Redeploy after any env change
 
-```typescript
-// src/app/service/my-service.ts
-import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs";
-
-@Injectable({
-  providedIn: "root",
-})
-export class MyService {
-  private apiUrl = "/api/employee-management/";
-
-  constructor(private http: HttpClient) {}
-
-  getData(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}GetData`);
-  }
-
-  createData(data: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}CreateData`, data);
-  }
-}
-```
-
-### Creating a New Component
-
-```typescript
-// src/app/pages/my-page/my-page.component.ts
-import { Component, OnInit } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { MyService } from "@/app/service/my-service";
-
-@Component({
-  selector: "app-my-page",
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: "./my-page.component.html",
-  styleUrls: ["./my-page.component.css"],
-})
-export class MyPageComponent implements OnInit {
-  data: any[] = [];
-
-  constructor(private myService: MyService) {}
-
-  ngOnInit(): void {
-    this.loadData();
-  }
-
-  loadData(): void {
-    this.myService.getData().subscribe({
-      next: (response) => {
-        this.data = response;
-      },
-      error: (error) => {
-        console.error("Error loading data:", error);
-      },
-    });
-  }
-}
-```
-
-### Using Signals (Angular 18)
-
-```typescript
-import { signal, computed } from "@angular/core";
-
-export class MyComponent {
-  // Define signals
-  count = signal(0);
-  items = signal<string[]>([]);
-
-  // Computed signal
-  doubleCount = computed(() => this.count() * 2);
-
-  // Update signals
-  increment() {
-    this.count.update((value) => value + 1);
-  }
-
-  addItem(item: string) {
-    this.items.update((items) => [...items, item]);
-  }
-}
-```
-
-### Form Handling
-
-```typescript
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-
-export class MyFormComponent {
-  form: FormGroup;
-
-  constructor(private fb: FormBuilder) {
-    this.form = this.fb.group({
-      name: ["", Validators.required],
-      email: ["", [Validators.required, Validators.email]],
-      age: [0, [Validators.required, Validators.min(18)]],
-    });
-  }
-
-  onSubmit() {
-    if (this.form.valid) {
-      const formData = this.form.value;
-      // Submit data
-    }
-  }
-}
-```
-
-### Error Handling
-
-```typescript
-this.service.getData().subscribe({
-  next: (data) => {
-    // Handle success
-    this.data = data;
-  },
-  error: (error) => {
-    // Handle error
-    this.toast.error({
-      title: "Error",
-      description: error.message || "An error occurred",
-    });
-  },
-});
-```
+Headers in `vercel.json` discourage caching of API responses and set basic security headers.
 
 ---
 
-## 🚀 Deployment
+## Observability (Sentry)
 
-### Vercel Deployment
-
-1. **Connect Repository**:
-
-   - Push code to GitHub/GitLab
-   - Import project in Vercel
-
-2. **Configure Build Settings**:
-
-   - Framework: Angular
-   - Build Command: `npm run build`
-   - Output Directory: `dist/employee_management_app_angular18`
-
-3. **Set Environment Variables**:
-
-   - Add all required environment variables in Vercel dashboard
-
-4. **Deploy**:
-   - Vercel will automatically deploy on push to main branch
-
-### Environment-Specific Builds
-
-```bash
-# Development
-npm run build
-
-# Production
-npm run build -- --configuration production
-```
-
-### Build Optimization
-
-The Angular build process includes:
-
-- Tree shaking
-- Code splitting
-- Minification
-- AOT compilation
-- Bundle optimization
+- Client SDK posts to **`/api/monitoring`** (not directly to `ingest.sentry.io`) so ad blockers are less likely to drop events
+- Noise filters drop extension / benign browser noise
+- Source maps upload only when `SENTRY_ORG` + `SENTRY_PROJECT` + `SENTRY_AUTH_TOKEN` are set; maps are deleted from `dist/` afterward
 
 ---
 
-## 🏷 Keywords
+## Further Docs in This Repo
 
-**Technologies**: Angular 18, TypeScript, Node.js, MongoDB, Prisma, Tailwind CSS, Shadcn UI, Vercel, Serverless
-
-**Concepts**: CRUD Application, RESTful API, Serverless Architecture, Real-time Dashboard, Project Management, Employee Management, Resource Allocation, Calendar View, Gantt Chart, Timeline Visualization, API Monitoring, Business Intelligence, Email Notifications, AI Integration, CMS Integration
-
-**Features**: Authentication, Authorization, Approval Workflow, Reviewer Comments, Milestone Tracking, Due Date Reminders, Performance Analytics, API Documentation, Health Monitoring
-
-**Development**: Standalone Components, Signals, Reactive Programming, Type Safety, Component Reusability, Modular Architecture, Responsive Design, SEO Optimization
+| Doc                                                                                                  | Topic                             |
+| ---------------------------------------------------------------------------------------------------- | --------------------------------- |
+| [`.env.example`](./.env.example)                                                                     | Full env template                 |
+| [`SECURITY.md`](./SECURITY.md)                                                                       | Private vulnerability reporting   |
+| [`docs/LLM_MODEL_SELECTION.md`](./docs/LLM_MODEL_SELECTION.md)                                       | Free-tier model choices           |
+| [`docs/Redis_Sentry_PostHog_INTEGRATION_GUIDE.md`](./docs/Redis_Sentry_PostHog_INTEGRATION_GUIDE.md) | Sentry tunnel / quiet CI patterns |
+| [`docs/UI_STYLING_GUIDE.md`](./docs/UI_STYLING_GUIDE.md)                                             | UI conventions                    |
+| [`docs/VERCEL_PRODUCTION_GUARDRAILS.md`](./docs/VERCEL_PRODUCTION_GUARDRAILS.md)                     | Production tips                   |
+| [`docs/PROJECT_ENGINEERING_PLAYBOOK.md`](./docs/PROJECT_ENGINEERING_PLAYBOOK.md)                     | Engineering playbook              |
+| [`docs/AGILE_V_PROTOCOL.md`](./docs/AGILE_V_PROTOCOL.md)                                             | Agile V agent workflow            |
 
 ---
 
-## 📝 Conclusion
+## Keywords
 
-EmpowerHub is a comprehensive, production-ready Employee Management System that demonstrates modern web development practices. It showcases:
+**Technologies:** Angular 20, TypeScript, RxJS, Tailwind CSS, Shadcn-style UI, Prisma, MongoDB, Vercel Serverless, Node.js, bcrypt, Sentry, Resend, Nodemailer, Contentful, Gemini, Groq, OpenRouter, Hugging Face
 
-- **Modern Angular Development**: Using the latest Angular 18 features including standalone components, signals, and reactive programming
-- **Full-Stack Architecture**: Complete frontend and backend implementation with serverless functions
-- **Real-World Features**: Authentication, CRUD operations, approval workflows, analytics, and monitoring
-- **Best Practices**: Type safety, component reusability, error handling, and performance optimization
-- **Scalability**: Serverless architecture that scales automatically with traffic
-- **Developer Experience**: Well-structured codebase, comprehensive documentation, and reusable components
+**Concepts:** CRUD, REST-style action routes, HttpOnly sessions, route guards, HTTP interceptors, serverless cold starts, SPA SEO (`index.html` meta + sitemap), feature flags, multi-provider AI fallback, approval workflows
 
-This project serves as an excellent learning resource for:
+**Features:** Dashboard KPIs, employee/project CRUD, assignments, calendar, timeline, Gantt, business insights, API docs, API status monitoring, email notifications, AI overview drafting
 
-- Angular 18 development
-- TypeScript best practices
-- Serverless architecture
-- MongoDB with Prisma
-- Modern UI/UX design
-- API design and documentation
-- Real-time monitoring and analytics
+**Learning:** Standalone components, signals, Observables, reusable UI primitives, repository pattern in serverless handlers, environment hygiene (server vs `NG_APP_*`)
 
-The codebase is well-organized, documented, and ready for extension. You can use individual components, services, or the entire architecture as a foundation for your own projects.
+---
+
+## Conclusion
+
+EmpowerHub is a **portfolio-ready, educational full-stack** application that connects an Angular SPA to a serverless MongoDB-backed API. Use it to study:
+
+- Modern **Angular 20** patterns (standalone, guards, interceptors, signals)
+- **Serverless** request handling and Prisma data access
+- Practical **auth**, **CRUD**, **dashboards**, and optional **AI / CMS / email / Sentry** integrations
+
+Clone it, seed the demo user, explore the live demo, then extend `MasterService` and `repository.mjs` for your own domain.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT). Feel free to use, modify, and distribute the code as per the terms of the license.
 
 ---
 
 ## Happy Coding! 🎉
 
-Feel free to use this project repository and extend this project further!
+This is an **open-source project** — feel free to use, enhance, and extend this project further!
 
-If you have any questions or want to share your work, reach out via GitHub or my portfolio at [https://arnob-mahmud.vercel.app/](https://arnob-mahmud.vercel.app/).
+If you have any questions or want to share your work, reach out via GitHub or my portfolio at [https://www.arnobmahmud.com](https://www.arnobmahmud.com).
 
-**Enjoy building and learning!** 🚀
-
-Thank you! 😊
-
----
+Private security reports: [SECURITY.md](./SECURITY.md) · [contact@arnobmahmud.com](mailto:contact@arnobmahmud.com)
