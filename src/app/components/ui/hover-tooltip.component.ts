@@ -3,7 +3,6 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import {
   Component,
   ElementRef,
-  HostListener,
   input,
   signal,
   viewChild,

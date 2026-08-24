@@ -11,11 +11,22 @@ import { DatePipe, CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { UbButtonDirective } from '@/app/components/ui/button';
+import {
+  ListSkeletonComponent,
+  StatPillSkeletonComponent,
+} from '@/app/components/ui/list-skeleton.component';
 
 @Component({
   selector: 'app-project',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, UbButtonDirective, RouterLink],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    UbButtonDirective,
+    RouterLink,
+    ListSkeletonComponent,
+    StatPillSkeletonComponent,
+  ],
   providers: [DatePipe],
   templateUrl: './project.component.html',
   styleUrls: ['./project.component.css'], // Corrected from styleUrl to styleUrls
@@ -30,6 +41,8 @@ export class ProjectComponent implements OnInit {
   private readonly projectsSignal = signal<IProject[]>([]);
   readonly projects = this.projectsSignal.asReadonly();
   readonly searchTerm = signal<string>('');
+  readonly isLoading = signal(true);
+  readonly hasLoaded = signal(false);
   readonly filteredProjects = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     if (!term) {
@@ -68,11 +81,21 @@ export class ProjectComponent implements OnInit {
   }
 
   getProjects() {
-    this.masterSrv.getAllProjects().subscribe((Res: IProject[]) => {
-      this.projectsSignal.set(Res ?? []);
-      if (!this.expandedProjectId && Res?.length) {
-        this.expandedProjectId = Res[0].projectId ?? null;
-      }
+    this.isLoading.set(true);
+    this.masterSrv.getAllProjects().subscribe({
+      next: (Res: IProject[]) => {
+        this.projectsSignal.set(Res ?? []);
+        if (!this.expandedProjectId && Res?.length) {
+          this.expandedProjectId = Res[0].projectId ?? null;
+        }
+        this.isLoading.set(false);
+        this.hasLoaded.set(true);
+      },
+      error: () => {
+        this.projectsSignal.set([]);
+        this.isLoading.set(false);
+        this.hasLoaded.set(true);
+      },
     });
   }
 

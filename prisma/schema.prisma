@@ -158,6 +158,29 @@ model Project {
   @@index([status])
 }
 
+model AppUser {
+  id           String    @id @map("_id") @db.ObjectId @default(auto())
+  username     String    @unique
+  passwordHash String
+  role         String    @default("admin")
+  displayName  String?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  sessions     Session[]
+}
+
+model Session {
+  id        String   @id @map("_id") @db.ObjectId @default(auto())
+  token     String   @unique
+  userId    String   @db.ObjectId
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      AppUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+}
+
 model ProjectEmployee {
   id               String   @id @map("_id") @db.ObjectId @default(auto())
   empProjectId     Int      @unique

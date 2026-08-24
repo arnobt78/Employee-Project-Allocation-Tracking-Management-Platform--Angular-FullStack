@@ -10,11 +10,21 @@ import { Employee } from '../../model/class/Employee';
 import { CommonModule } from '@angular/common';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import { ToastService } from '@/app/components/ui/toast.service';
+import {
+  ListSkeletonComponent,
+  StatPillSkeletonComponent,
+} from '@/app/components/ui/list-skeleton.component';
 
 @Component({
   selector: 'app-employee',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, UbButtonDirective],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    UbButtonDirective,
+    ListSkeletonComponent,
+    StatPillSkeletonComponent,
+  ],
   templateUrl: './employee.component.html',
   styleUrls: ['./employee.component.css'],
 })
@@ -36,6 +46,8 @@ export class EmployeeComponent implements OnInit {
   });
 
   readonly searchTerm = signal<string>('');
+  readonly isLoading = signal(true);
+  readonly hasLoaded = signal(false);
   expandedEmployeeId: number | null = null;
   editingEmployeeId: number | null = null;
   showCreatePanel = false;
@@ -71,11 +83,21 @@ export class EmployeeComponent implements OnInit {
   }
 
   getEmployees() {
-    this.masterService.getAllEmp().subscribe((res: Employee[]) => {
-      this.employeesSignal.set(res ?? []);
-      if (!this.expandedEmployeeId && res?.length) {
-        this.expandedEmployeeId = res[0].employeeId ?? null;
-      }
+    this.isLoading.set(true);
+    this.masterService.getAllEmp().subscribe({
+      next: (res: Employee[]) => {
+        this.employeesSignal.set(res ?? []);
+        if (!this.expandedEmployeeId && res?.length) {
+          this.expandedEmployeeId = res[0].employeeId ?? null;
+        }
+        this.isLoading.set(false);
+        this.hasLoaded.set(true);
+      },
+      error: () => {
+        this.employeesSignal.set([]);
+        this.isLoading.set(false);
+        this.hasLoaded.set(true);
+      },
     });
   }
 

@@ -192,7 +192,6 @@ export class BusinessInsightsComponent implements OnInit {
     const filters = this.filterForm.value;
 
     // Step 1: Separate archived projects (excluded from calculations but counted separately)
-    const allProjectsCount = projects.length; // Total including archived
     const archivedProjects = projects.filter(
       (p) => p.archivedAt != null && p.archivedAt !== ''
     );
@@ -244,26 +243,12 @@ export class BusinessInsightsComponent implements OnInit {
         );
       });
 
-      // Also filter archived projects by department for count
-      const archivedProjectIdsWithDept = new Set(
-        archivedProjects
-          .filter((p) => {
-            const hasDeptLead =
-              p.leadByEmpId && employeeIdsInDept.has(p.leadByEmpId);
-            const hasDeptAssignment = allProjectEmployees.some(
-              (pe) =>
-                pe.projectId === p.projectId && employeeIdsInDept.has(pe.empId)
-            );
-            return hasDeptLead || hasDeptAssignment;
-          })
-          .map((p) => p.projectId)
-      );
     }
 
     // Apply date filter
     if (filters.dateRange !== 'all') {
       const now = new Date();
-      let cutoffDate = new Date();
+      const cutoffDate = new Date();
 
       // Check if custom range is selected but no dates provided - treat as "all time"
       const isCustomWithoutDates =
@@ -392,7 +377,7 @@ export class BusinessInsightsComponent implements OnInit {
     }
     if (filters.dateRange !== 'all') {
       const now = new Date();
-      let cutoffDate = new Date();
+      const cutoffDate = new Date();
       const isCustomWithoutDates =
         filters.dateRange === 'custom' &&
         (!filters.startDate || !filters.endDate);
@@ -427,29 +412,10 @@ export class BusinessInsightsComponent implements OnInit {
       }
     }
 
-    // Debug logging
-    console.log('[Business Insights] Filtering results:', {
-      department: filters.department,
-      dateRange: filters.dateRange,
-      filteredProjectsCount: filteredProjects.length,
-      archivedProjectsCount: filteredArchivedProjects.length,
-      filteredProjects: filteredProjects.map((p) => ({
-        id: p.projectId,
-        name: p.projectName,
-        status: p.status,
-        archivedAt: p.archivedAt,
-      })),
-      filteredEmployeesCount: filteredEmployees.length,
-      activeProjectEmployeesCount: activeProjectEmployees.length,
-    });
-
     // Calculate project states (only for non-archived projects)
     // When filtering by department, check for department-specific assignments
     const projectIdsWithActiveAssignments = new Set(
       activeProjectEmployees.map((pe) => pe.projectId)
-    );
-    const projectIdsWithAnyAssignments = new Set(
-      allProjectEmployees.map((pe) => pe.projectId)
     );
 
     // If department filter is applied, check for department-specific assignments
@@ -480,9 +446,6 @@ export class BusinessInsightsComponent implements OnInit {
     filteredProjects.forEach((p) => {
       // Check for department-specific active assignments (or all if no department filter)
       const hasDeptActiveAssignments = projectIdsWithDeptActiveAssignments.has(
-        p.projectId
-      );
-      const hasActiveAssignments = projectIdsWithActiveAssignments.has(
         p.projectId
       );
       const hasLead = p.leadByEmpId != null;
@@ -605,12 +568,6 @@ export class BusinessInsightsComponent implements OnInit {
         distribution.in_progress++;
       } else {
         // Default to draft for unknown statuses
-        console.log(
-          '[Business Insights] Unknown project status:',
-          status,
-          'for project:',
-          p.projectId
-        );
         distribution.draft++;
       }
     });
@@ -808,7 +765,7 @@ export class BusinessInsightsComponent implements OnInit {
     };
   }
 
-  private calculateHealthTrends(projects: IProject[]) {
+  private calculateHealthTrends(_projects: IProject[]) {
     // Simplified - would need historical data
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
     return months.map((month) => ({

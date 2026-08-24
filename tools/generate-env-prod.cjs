@@ -1,11 +1,33 @@
 const fs = require("fs");
 const path = require("path");
 
+try {
+  require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+} catch {
+  /* dotenv optional outside local */
+}
+
 const envProdPath = path.resolve(
   __dirname,
   "../src/environments/environment.prod.ts"
 );
 
+function trimEnv(key) {
+  const value = process.env[key];
+  return typeof value === "string" && value.trim().length > 0
+    ? value.trim()
+    : "";
+}
+
+// Public DSN only — never embed SENTRY_AUTH_TOKEN
+const sentryDsn =
+  trimEnv("SENTRY_DSN") ||
+  trimEnv("NG_APP_SENTRY_DSN") ||
+  trimEnv("NEXT_PUBLIC_SENTRY_DSN");
+
+const sentryDsnLiteral = JSON.stringify(sentryDsn);
+
+// Generated at postinstall / build — mirrors environment.ts; server-only secrets are not embedded.
 const content = `const runtimeEnv =
   (
     globalThis as unknown as {
@@ -16,7 +38,7 @@ const content = `const runtimeEnv =
 const fromEnv = (key: string, fallback: string) => {
   const value = runtimeEnv[key];
   return typeof value === 'string' && value.trim().length > 0
-    ? value
+    ? value.trim()
     : fallback;
 };
 
@@ -26,39 +48,14 @@ export const environment = {
     'APP_BASE_URL',
     'https://employee-project-management.vercel.app'
   ),
+  // Baked at build time from SENTRY_DSN (public). Empty = Sentry disabled.
+  sentryDsn: ${sentryDsnLiteral},
   demoLogin: {
     username: 'admin',
     password: '112233',
   },
   api: {
     baseUrl: fromEnv('NG_APP_API_BASE_URL', '/api/employee-management/'),
-    aiAssistantUrl: fromEnv('NG_APP_AI_ASSISTANT_URL', ''),
-    contentfulProxyUrl: fromEnv('NG_APP_CONTENTFUL_PROXY_URL', ''),
-  },
-  database: {
-    mongodbUri: fromEnv('NG_APP_MONGODB_URI', ''),
-    prismaDatasourceUrl: fromEnv('NG_APP_PRISMA_URL', ''),
-  },
-  integrations: {
-    contentful: {
-      spaceId: fromEnv('NG_APP_CONTENTFUL_SPACE_ID', ''),
-      environment: fromEnv('NG_APP_CONTENTFUL_ENVIRONMENT', 'master'),
-      deliveryToken: fromEnv('NG_APP_CONTENTFUL_DELIVERY_TOKEN', ''),
-    },
-    ai: {
-      geminiApiKey: fromEnv('NG_APP_GEMINI_API_KEY', ''),
-      groqApiKey: fromEnv('NG_APP_GROQ_API_KEY', ''),
-      openRouterApiKey: fromEnv('NG_APP_OPENROUTER_API_KEY', ''),
-    },
-    email: {
-      resendApiKey: fromEnv('NG_APP_RESEND_API_KEY', ''),
-      smtpHost: fromEnv('NG_APP_SMTP_HOST', ''),
-      smtpUser: fromEnv('NG_APP_SMTP_USER', ''),
-    },
-    storage: {
-      cloudinaryUploadPreset: fromEnv('NG_APP_CLOUDINARY_UPLOAD_PRESET', ''),
-      imageKitPublicKey: fromEnv('NG_APP_IMAGEKIT_PUBLIC_KEY', ''),
-    },
   },
   featureToggles: {
     readinessChecklistV2:

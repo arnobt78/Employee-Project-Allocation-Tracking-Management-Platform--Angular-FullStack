@@ -4,5 +4,11 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
+  },
+  "/api/monitoring": {
+    "target": "http://localhost:4310",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }

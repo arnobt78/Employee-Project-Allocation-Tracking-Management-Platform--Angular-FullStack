@@ -149,7 +149,7 @@ export class GanttViewComponent {
     this.router.navigate(['/update-project', projectId]);
   }
 
-  updateTooltipPosition(project: IGanttProject, event?: MouseEvent): void {
+  updateTooltipPosition(project: IGanttProject, _event?: MouseEvent): void {
     if (typeof document === 'undefined') return;
     
     setTimeout(() => {

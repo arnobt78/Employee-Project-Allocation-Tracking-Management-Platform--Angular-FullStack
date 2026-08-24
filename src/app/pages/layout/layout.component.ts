@@ -5,6 +5,7 @@ import {
   RouterLinkActive,
   RouterOutlet,
 } from '@angular/router';
+import { AuthService } from '@/app/service/auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -15,8 +16,16 @@ import {
 })
 export class LayoutComponent {
   router = inject(Router);
+  private readonly authService = inject(AuthService);
 
-  logOff() {
-    this.router.navigateByUrl('login');
+  logOff(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        void this.router.navigateByUrl('login');
+      },
+      error: () => {
+        void this.router.navigateByUrl('login');
+      },
+    });
   }
 }

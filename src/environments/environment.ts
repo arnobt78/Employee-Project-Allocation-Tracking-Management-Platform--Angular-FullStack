@@ -12,42 +12,21 @@ const fromEnv = (key: string, fallback: string) => {
     : fallback;
 };
 
+// Browser bundle: only public runtime config. DB keys, AI keys, email tokens live in Vercel/server env (see api/employee-management).
+// Sentry DSN is public by design; empty = disabled. Production value is baked in environment.prod.ts at build.
 export const environment = {
   production: false,
   appBaseUrl: fromEnv('APP_BASE_URL', 'http://localhost:4200'),
+  sentryDsn: fromEnv(
+    'SENTRY_DSN',
+    fromEnv('NG_APP_SENTRY_DSN', fromEnv('NEXT_PUBLIC_SENTRY_DSN', ''))
+  ),
   demoLogin: {
     username: 'admin',
     password: '112233',
   },
   api: {
     baseUrl: fromEnv('NG_APP_API_BASE_URL', '/api/employee-management/'),
-    aiAssistantUrl: fromEnv('NG_APP_AI_ASSISTANT_URL', ''),
-    contentfulProxyUrl: fromEnv('NG_APP_CONTENTFUL_PROXY_URL', ''),
-  },
-  database: {
-    mongodbUri: fromEnv('NG_APP_MONGODB_URI', ''),
-    prismaDatasourceUrl: fromEnv('NG_APP_PRISMA_URL', ''),
-  },
-  integrations: {
-    contentful: {
-      spaceId: fromEnv('NG_APP_CONTENTFUL_SPACE_ID', ''),
-      environment: fromEnv('NG_APP_CONTENTFUL_ENVIRONMENT', 'master'),
-      deliveryToken: fromEnv('NG_APP_CONTENTFUL_DELIVERY_TOKEN', ''),
-    },
-    ai: {
-      geminiApiKey: fromEnv('NG_APP_GEMINI_API_KEY', ''),
-      groqApiKey: fromEnv('NG_APP_GROQ_API_KEY', ''),
-      openRouterApiKey: fromEnv('NG_APP_OPENROUTER_API_KEY', ''),
-    },
-    email: {
-      resendApiKey: fromEnv('NG_APP_RESEND_API_KEY', ''),
-      smtpHost: fromEnv('NG_APP_SMTP_HOST', ''),
-      smtpUser: fromEnv('NG_APP_SMTP_USER', ''),
-    },
-    storage: {
-      cloudinaryUploadPreset: fromEnv('NG_APP_CLOUDINARY_UPLOAD_PRESET', ''),
-      imageKitPublicKey: fromEnv('NG_APP_IMAGEKIT_PUBLIC_KEY', ''),
-    },
   },
   featureToggles: {
     readinessChecklistV2:

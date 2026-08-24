@@ -1,7 +1,20 @@
-export interface IApiResponse {
+export interface IApiResponse<T = unknown> {
   message: string;
   result: boolean;
-  data: any;
+  data: T;
+}
+
+export interface AuthUser {
+  username: string;
+  role: string;
+  displayName?: string | null;
+}
+
+export interface DemoAccount {
+  id: string;
+  label: string;
+  username: string;
+  role?: string;
 }
 
 export interface IAuditMetadata {

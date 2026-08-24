@@ -1,0 +1,12 @@
+# Crawl guidance for EmpowerHub (Angular SPA). API routes are server-only — block crawlers to save edge/function quota.
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://employee-project-management.vercel.app/sitemap.xml
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /

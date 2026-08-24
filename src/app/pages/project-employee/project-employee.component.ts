@@ -19,10 +19,21 @@ import { ToastService } from '@/app/components/ui/toast.service';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import { DatePipe } from '@angular/common';
 
+import {
+  ListSkeletonComponent,
+  StatPillSkeletonComponent,
+} from '@/app/components/ui/list-skeleton.component';
+
 @Component({
   selector: 'app-project-employee',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, UbButtonDirective],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    UbButtonDirective,
+    ListSkeletonComponent,
+    StatPillSkeletonComponent,
+  ],
   providers: [DatePipe],
   templateUrl: './project-employee.component.html',
   styleUrls: ['./project-employee.component.css'],
@@ -43,6 +54,8 @@ export class ProjectEmployeeComponent implements OnInit {
   readonly employees = this.employeesSignal.asReadonly();
 
   readonly searchTerm = signal<string>('');
+  readonly isLoading = signal(true);
+  readonly hasLoaded = signal(false);
   readonly filteredAssignments = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     if (!term) {
@@ -90,21 +103,61 @@ export class ProjectEmployeeComponent implements OnInit {
   isDeleting = false;
 
   ngOnInit(): void {
-    this.masterService.getAllProjects().subscribe((projects) => {
-      this.projectsSignal.set(projects ?? []);
+    this.isLoading.set(true);
+    let projectsLoaded = false;
+    let employeesLoaded = false;
+    let assignmentsLoaded = false;
+
+    const markComplete = () => {
+      if (projectsLoaded && employeesLoaded && assignmentsLoaded) {
+        this.isLoading.set(false);
+        this.hasLoaded.set(true);
+      }
+    };
+
+    this.masterService.getAllProjects().subscribe({
+      next: (projects) => {
+        this.projectsSignal.set(projects ?? []);
+        projectsLoaded = true;
+        markComplete();
+      },
+      error: () => {
+        this.projectsSignal.set([]);
+        projectsLoaded = true;
+        markComplete();
+      },
     });
-    this.masterService.getAllEmp().subscribe((employees) => {
-      this.employeesSignal.set(employees ?? []);
+    this.masterService.getAllEmp().subscribe({
+      next: (employees) => {
+        this.employeesSignal.set(employees ?? []);
+        employeesLoaded = true;
+        markComplete();
+      },
+      error: () => {
+        this.employeesSignal.set([]);
+        employeesLoaded = true;
+        markComplete();
+      },
     });
-    this.getProjectEmployees();
+    this.getProjectEmployees(() => {
+      assignmentsLoaded = true;
+      markComplete();
+    });
   }
 
-  getProjectEmployees() {
-    this.masterService.getProjectEmp().subscribe((res: IProjectEmployee[]) => {
-      this.assignmentsSignal.set(res ?? []);
-      if (!this.expandedAssignmentId && res?.length) {
-        this.expandedAssignmentId = res[0].empProjectId ?? null;
-      }
+  getProjectEmployees(onComplete?: () => void) {
+    this.masterService.getProjectEmp().subscribe({
+      next: (res: IProjectEmployee[]) => {
+        this.assignmentsSignal.set(res ?? []);
+        if (!this.expandedAssignmentId && res?.length) {
+          this.expandedAssignmentId = res[0].empProjectId ?? null;
+        }
+        onComplete?.();
+      },
+      error: () => {
+        this.assignmentsSignal.set([]);
+        onComplete?.();
+      },
     });
   }
 
@@ -162,7 +215,7 @@ export class ProjectEmployeeComponent implements OnInit {
             this.editingAssignmentId = null;
             this.expandedAssignmentId = null;
           },
-          (error: any) => {
+          (_error: any) => {
             this.isSaving = false;
             this.toast.error({
               title: 'Update failed',
@@ -184,7 +237,7 @@ export class ProjectEmployeeComponent implements OnInit {
             this.showCreatePanel = false;
             this.resetForm();
           },
-          (error: any) => {
+          (_error: any) => {
             this.isSaving = false;
             this.toast.error({
               title: 'Creation failed',

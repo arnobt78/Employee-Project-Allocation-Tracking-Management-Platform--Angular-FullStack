@@ -1,6 +1,5 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { MasterService } from '../../service/master.service';
 import { CalendarViewComponent } from '../../components/calendar-view/calendar-view.component';
 import { TimelineViewComponent } from '../../components/timeline-view/timeline-view.component';
@@ -57,7 +56,6 @@ export interface IProjectTimeline {
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     CalendarViewComponent,
     TimelineViewComponent,
     GanttViewComponent,
