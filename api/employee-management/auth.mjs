@@ -213,12 +213,12 @@ export function sendUnauthorized(response, message = "Authentication required") 
   return 401;
 }
 
+// Session is auth-gated via requireAuth middleware (not listed here).
 export const PUBLIC_ACTIONS = new Set([
   "",
   "Login",
   "Logout",
   "GetDemoAccounts",
-  "Session",
 ]);
 
 export function isPublicAction(method, action) {

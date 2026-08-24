@@ -1,5 +1,9 @@
 # Changelog — Agile V project memory
 
+## 2026-08-25 — Session endpoint public-flag fix
+
+- Removed `Session` from `PUBLIC_ACTIONS`; gated by `requireAuth` (401 without cookie)
+
 ## 2026-08-25 — Auth, AI, Sentry, SEO/docs
 
 - Session auth (HttpOnly cookie, guards, API middleware), seed demo user

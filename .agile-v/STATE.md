@@ -10,9 +10,9 @@
 
 ## Resume Point
 
-**Last completed:** Session delivered and verify-deep PASS WITH WARNINGS: demo session auth, list loading skeletons + MasterService cache, AI multi-provider fallback, Sentry same-origin tunnel + quiet source maps, SEO metadata, educational README + SECURITY.md.
+**Last completed:** Removed `Session` from `PUBLIC_ACTIONS` (auth-gated via middleware). Prior: session auth, AI fallback, Sentry tunnel, SEO/README.
 
-**Next exact action:** Optional — formal GATE-0001 closure in APPROVALS; Vercel env confirm (`SENTRY_*`, AI keys); expand unit tests beyond smoke (TASK-0010).
+**Next exact action:** Push to GitHub so Vercel redeploys; confirm production commit is latest `feat`/`fix` (not stale `60bda45`); investigate any red GitHub/Vercel check on tip of `main`.
 
 **Resume prompt:**
 
