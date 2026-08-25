@@ -2473,6 +2473,7 @@ function mapProjectEmployee(item, projectLookup, employeeLookup) {
     isActive: item.isActive ? "Y" : "N",
     projectName: project?.projectName ?? "Unknown Project",
     employeeName: employee?.employeeName ?? "Unknown Employee",
+    employeeAvatarUrl: employee?.avatarUrl ?? null,
     allocationPct: item.allocationPct ?? null,
     billable: item.billable ?? null,
     billingRate: item.billingRate ?? null,
@@ -2484,6 +2485,8 @@ function mapProjectEmployee(item, projectLookup, employeeLookup) {
     schedule: item.schedule ?? {},
     contribution: item.contribution ?? {},
     unassignedAt: formatDate(item.unassignedAt),
+    createdAt: formatDate(item.createdAt),
+    updatedAt: formatDate(item.updatedAt),
   };
 }
 
@@ -2498,7 +2501,12 @@ export async function listProjectEmployees() {
       select: { projectId: true, projectName: true },
     }),
     prisma.employee.findMany({
-      select: { employeeId: true, employeeName: true },
+      select: {
+        employeeId: true,
+        employeeName: true,
+        avatarUrl: true,
+        emailId: true,
+      },
     }),
   ]);
 
@@ -2568,7 +2576,7 @@ export async function createProjectEmployee(payload) {
       select: { projectId: true, projectName: true },
     }),
     prisma.employee.findMany({
-      select: { employeeId: true, employeeName: true, emailId: true },
+      select: { employeeId: true, employeeName: true, emailId: true, avatarUrl: true },
     }),
   ]);
 
@@ -2670,7 +2678,7 @@ export async function updateProjectEmployee(empProjectId, payload) {
         select: { projectId: true, projectName: true },
       }),
       prisma.employee.findMany({
-        select: { employeeId: true, employeeName: true, emailId: true },
+        select: { employeeId: true, employeeName: true, emailId: true, avatarUrl: true },
       }),
     ]);
 
@@ -2789,7 +2797,7 @@ export async function updateProjectEmployee(empProjectId, payload) {
       select: { projectId: true, projectName: true },
     }),
     prisma.employee.findMany({
-      select: { employeeId: true, employeeName: true, emailId: true },
+      select: { employeeId: true, employeeName: true, emailId: true, avatarUrl: true },
     }),
   ]);
 
@@ -2826,7 +2834,7 @@ export async function deleteProjectEmployee(empProjectId) {
       select: { projectId: true, projectName: true },
     }),
     prisma.employee.findMany({
-      select: { employeeId: true, employeeName: true, emailId: true },
+      select: { employeeId: true, employeeName: true, emailId: true, avatarUrl: true },
     }),
   ]);
 
@@ -2873,6 +2881,7 @@ export async function buildDashboardSnapshot() {
         projectId: true,
         projectName: true,
         startDate: true,
+        status: true,
       },
     }),
     prisma.employee.findMany({
@@ -2881,6 +2890,11 @@ export async function buildDashboardSnapshot() {
       select: {
         employeeId: true,
         employeeName: true,
+        role: true,
+        department: true,
+        avatarUrl: true,
+        emailId: true,
+        hireDate: true,
         createdAt: true,
       },
     }),
@@ -2894,10 +2908,16 @@ export async function buildDashboardSnapshot() {
       projectId: project.projectId,
       projectName: project.projectName,
       startDate: formatDate(project.startDate),
+      status: project.status ?? null,
     })),
     recentEmployee: recentEmployees.map((employee) => ({
       employeeId: employee.employeeId,
       employeeName: employee.employeeName,
+      role: employee.role,
+      department: employee.department,
+      avatarUrl: employee.avatarUrl ?? null,
+      emailId: employee.emailId ?? null,
+      hireDate: formatDate(employee.hireDate),
       createdAt: formatDate(employee.createdAt),
     })),
   };

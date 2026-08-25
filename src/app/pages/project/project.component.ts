@@ -14,6 +14,8 @@ import {
   ListSkeletonComponent,
   StatPillSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
+import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
+import { CardCloseButtonComponent } from '@/app/components/ui/card-close-button.component';
 
 @Component({
   selector: 'app-project',
@@ -25,7 +27,9 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
     UbButtonDirective,
     RouterLink,
     ListSkeletonComponent,
-    StatPillSkeletonComponent
+    StatPillSkeletonComponent,
+    AlertDialogComponent,
+    CardCloseButtonComponent,
   ],
   providers: [DatePipe],
   templateUrl: './project.component.html',
@@ -72,6 +76,7 @@ export class ProjectComponent implements OnInit {
   editingProjectId: number | null = null;
   showCreatePanel = false;
   pendingDelete: IProject | null = null;
+  pendingSave = false;
   isSaving = false;
   isDeleting = false;
 
@@ -84,9 +89,6 @@ export class ProjectComponent implements OnInit {
     const hasLocalData = this.projects().length > 0;
     if (snapshot) {
       this.projectsSignal.set(snapshot);
-      if (!this.expandedProjectId && snapshot.length) {
-        this.expandedProjectId = snapshot[0].projectId ?? null;
-      }
       this.isLoading.set(false);
       this.hasLoaded.set(true);
     } else if (hasLocalData) {
@@ -99,9 +101,6 @@ export class ProjectComponent implements OnInit {
     this.masterSrv.getAllProjects().subscribe({
       next: (Res: IProject[]) => {
         this.projectsSignal.set(Res ?? []);
-        if (!this.expandedProjectId && Res?.length) {
-          this.expandedProjectId = Res[0].projectId ?? null;
-        }
         this.isLoading.set(false);
         this.hasLoaded.set(true);
       },
@@ -133,34 +132,47 @@ export class ProjectComponent implements OnInit {
     this.pendingDelete = project;
   }
 
-  confirmDelete(confirmed: boolean) {
-    if (!confirmed || !this.pendingDelete?.projectId) {
-      this.pendingDelete = null;
+  confirmDelete() {
+    if (!this.pendingDelete?.projectId || this.isDeleting) {
       return;
     }
     const { projectId, projectName } = this.pendingDelete;
     this.isDeleting = true;
-    this.masterSrv.deleteProjectById(projectId).subscribe(
-      () => {
-        this.isDeleting = false;
-        this.pendingDelete = null;
+    this.masterSrv.deleteProjectById(projectId).subscribe({
+      next: () => {
         this.projectsSignal.update((list) =>
           list.filter((project) => project.projectId !== projectId)
         );
+        this.isDeleting = false;
+        this.pendingDelete = null;
         this.toast.success({
           title: 'Project deleted',
-          description: `${projectName} has been removed.` });
+          description: `${projectName} has been removed.`,
+        });
         if (this.expandedProjectId === projectId) {
           this.expandedProjectId = null;
         }
       },
-      () => {
+      error: () => {
         this.isDeleting = false;
         this.toast.error({
           title: 'Delete failed',
-          description: 'Something went wrong while removing the project.' });
-      }
-    );
+          description: 'Something went wrong while removing the project.',
+        });
+      },
+    });
+  }
+
+  dismissDelete() {
+    if (this.isDeleting) {
+      return;
+    }
+    this.pendingDelete = null;
+  }
+
+  closeExpanded() {
+    this.expandedProjectId = null;
+    this.cancelEdit();
   }
 
   toggleExpand(projectId: number | null | undefined) {
@@ -195,6 +207,7 @@ export class ProjectComponent implements OnInit {
 
   cancelEdit() {
     this.isSaving = false;
+    this.pendingSave = false;
     this.editingProjectId = null;
     this.projectForm.reset({
       projectId: null,
@@ -204,7 +217,8 @@ export class ProjectComponent implements OnInit {
       leadByEmpId: null,
       contactPerson: '',
       contactNo: '',
-      emailId: '' });
+      emailId: '',
+    });
   }
 
   updateSearch(term: string) {
@@ -215,52 +229,117 @@ export class ProjectComponent implements OnInit {
     if (this.projectForm.invalid) {
       this.toast.error({
         title: 'Incomplete details',
-        description: 'Please fill all required fields before saving.' });
+        description: 'Please fill all required fields before saving.',
+      });
       return;
     }
     if (this.isSaving) {
       return;
     }
+    const projectId = this.projectForm.value.projectId;
+    if (projectId) {
+      this.pendingSave = true;
+      return;
+    }
+    this.runCreate();
+  }
+
+  dismissSave() {
+    if (this.isSaving) {
+      return;
+    }
+    this.pendingSave = false;
+  }
+
+  confirmSave() {
+    if (this.projectForm.invalid || this.isSaving) {
+      return;
+    }
     const project: IProject = {
       ...this.projectForm.value,
-      startDate: this.projectForm.value.startDate };
-    this.isSaving = true;
-    if (project.projectId) {
-      this.masterSrv.updateProject(project).subscribe(
-        () => {
-          this.isSaving = false;
-          this.getProjects();
-          this.toast.success({
-            title: 'Project updated',
-            description: 'Changes have been saved successfully.' });
-          this.cancelEdit();
-        },
-        () => {
-          this.isSaving = false;
-          this.toast.error({
-            title: 'Update failed',
-            description: 'Unable to update the project right now.' });
-        }
-      );
-    } else {
-      this.masterSrv.saveProject(project as any).subscribe(
-        () => {
-          this.isSaving = false;
-          this.getProjects();
-          this.toast.success({
-            title: 'Project created',
-            description: 'A new project is now tracked in the system.' });
-          this.showCreatePanel = false;
-          this.cancelEdit();
-        },
-        () => {
-          this.isSaving = false;
-          this.toast.error({
-            title: 'Creation failed',
-            description: 'Unable to create project right now.' });
-        }
-      );
+      startDate: this.projectForm.value.startDate,
+    };
+    if (!project.projectId) {
+      this.pendingSave = false;
+      this.runCreate();
+      return;
     }
+    this.isSaving = true;
+    this.masterSrv.updateProject(project).subscribe({
+      next: () => {
+        this.masterSrv.getAllProjects().subscribe({
+          next: (res) => {
+            this.projectsSignal.set(res ?? []);
+            this.isSaving = false;
+            this.pendingSave = false;
+            this.cancelEdit();
+            this.toast.success({
+              title: 'Project updated',
+              description: 'Changes have been saved successfully.',
+            });
+          },
+          error: () => {
+            this.isSaving = false;
+            this.pendingSave = false;
+            this.toast.error({
+              title: 'Update failed',
+              description: 'Saved on server but the list could not refresh.',
+            });
+          },
+        });
+      },
+      error: () => {
+        this.isSaving = false;
+        this.toast.error({
+          title: 'Update failed',
+          description: 'Unable to update the project right now.',
+        });
+      },
+    });
+  }
+
+  private runCreate() {
+    const project: IProject = {
+      ...this.projectForm.value,
+      startDate: this.projectForm.value.startDate,
+    };
+    this.isSaving = true;
+    this.masterSrv.saveProject(project as any).subscribe({
+      next: () => {
+        this.masterSrv.getAllProjects().subscribe({
+          next: (res) => {
+            this.projectsSignal.set(res ?? []);
+            this.isSaving = false;
+            this.showCreatePanel = false;
+            this.cancelEdit();
+            this.toast.success({
+              title: 'Project created',
+              description: 'A new project is now tracked in the system.',
+            });
+          },
+          error: () => {
+            this.isSaving = false;
+            this.showCreatePanel = false;
+            this.toast.error({
+              title: 'Creation failed',
+              description: 'Created but the list could not refresh.',
+            });
+          },
+        });
+      },
+      error: () => {
+        this.isSaving = false;
+        this.toast.error({
+          title: 'Creation failed',
+          description: 'Unable to create project right now.',
+        });
+      },
+    });
+  }
+
+  saveDialogTitle(): string {
+    const name = this.projectForm.value?.projectName?.trim();
+    return name ? `Save Changes To ${name}?` : 'Save Project Changes?';
   }
 
   formattedDate(date: string | null | undefined) {

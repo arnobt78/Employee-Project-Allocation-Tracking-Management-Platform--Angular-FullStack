@@ -174,3 +174,41 @@
 .form-select {
   border: 1px solid !important;
 }
+
+/* Native dark selects/dates: inset + vertically centered icons matching SelectMenu text-white/60 */
+.eh-native-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  /* Beat Tailwind px-* so the chevron stays inset from the edge */
+  padding-right: 2.75rem !important;
+}
+
+.eh-native-select::-ms-expand {
+  display: none;
+}
+
+.eh-native-date {
+  color-scheme: dark;
+  padding-right: 2.75rem !important;
+}
+
+.eh-native-date::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  margin-inline-end: 0.25rem;
+  padding: 0.125rem;
+}
+
+/* Alert dialog — CDK Overlay on body (viewport-centered) */
+.eh-alert-dialog-backdrop {
+  background: rgb(2 6 23 / 0.7);
+}
+
+.eh-alert-dialog-panel {
+  pointer-events: auto;
+}

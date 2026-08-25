@@ -284,6 +284,7 @@ export interface IProjectEmployee {
   isActive: string;
   projectName: string;
   employeeName: string;
+  employeeAvatarUrl?: string | null;
   allocationPct?: number;
   billable?: boolean;
   billingRate?: number;
@@ -295,6 +296,8 @@ export interface IProjectEmployee {
   schedule?: Record<string, unknown>;
   contribution?: Record<string, unknown>;
   unassignedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface IProject {

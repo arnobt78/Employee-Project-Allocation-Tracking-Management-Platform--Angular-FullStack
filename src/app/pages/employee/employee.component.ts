@@ -3,7 +3,8 @@ import {
   FormBuilder,
   FormGroup,
   Validators,
-  ReactiveFormsModule } from '@angular/forms';
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { MasterService } from '../../service/master.service';
 import { Employee } from '../../model/class/Employee';
 import { CommonModule } from '@angular/common';
@@ -11,8 +12,12 @@ import { UbButtonDirective } from '@/app/components/ui/button';
 import { ToastService } from '@/app/components/ui/toast.service';
 import {
   ListSkeletonComponent,
-  StatPillSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
+  StatPillSkeletonComponent,
+} from '@/app/components/ui/list-skeleton.component';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
+import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
+import { CardCloseButtonComponent } from '@/app/components/ui/card-close-button.component';
+import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
 
 @Component({
   selector: 'app-employee',
@@ -23,10 +28,14 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
     ReactiveFormsModule,
     UbButtonDirective,
     ListSkeletonComponent,
-    StatPillSkeletonComponent
+    StatPillSkeletonComponent,
+    AlertDialogComponent,
+    CardCloseButtonComponent,
+    UserAvatarComponent,
   ],
   templateUrl: './employee.component.html',
-  styleUrls: ['./employee.component.css'] })
+  styleUrls: ['./employee.component.css'],
+})
 export class EmployeeComponent implements OnInit {
   employeeForm: FormGroup;
   private readonly employeesSignal = signal<Employee[]>([]);
@@ -51,6 +60,7 @@ export class EmployeeComponent implements OnInit {
   editingEmployeeId: number | null = null;
   showCreatePanel = false;
   pendingDelete: Employee | null = null;
+  pendingSave = false;
   isSaving = false;
   isDeleting = false;
 
@@ -60,7 +70,7 @@ export class EmployeeComponent implements OnInit {
     private toast: ToastService
   ) {
     this.employeeForm = this.fb.group({
-      employeeId: [null], // Add employeeId to the form
+      employeeId: [null],
       employeeName: ['', Validators.required],
       department: ['', Validators.required],
       deptId: [null],
@@ -73,7 +83,8 @@ export class EmployeeComponent implements OnInit {
       timezone: [''],
       hireDate: [''],
       skills: [''],
-      tags: [''] });
+      tags: [''],
+    });
   }
 
   ngOnInit(): void {
@@ -85,9 +96,6 @@ export class EmployeeComponent implements OnInit {
     const hasLocalData = this.employees().length > 0;
     if (snapshot) {
       this.employeesSignal.set(snapshot);
-      if (!this.expandedEmployeeId && snapshot.length) {
-        this.expandedEmployeeId = snapshot[0].employeeId ?? null;
-      }
       this.isLoading.set(false);
       this.hasLoaded.set(true);
     } else if (hasLocalData) {
@@ -100,9 +108,6 @@ export class EmployeeComponent implements OnInit {
     this.masterService.getAllEmp().subscribe({
       next: (res: Employee[]) => {
         this.employeesSignal.set(res ?? []);
-        if (!this.expandedEmployeeId && res?.length) {
-          this.expandedEmployeeId = res[0].employeeId ?? null;
-        }
         this.isLoading.set(false);
         this.hasLoaded.set(true);
       },
@@ -112,7 +117,8 @@ export class EmployeeComponent implements OnInit {
         }
         this.isLoading.set(false);
         this.hasLoaded.set(true);
-      } });
+      },
+    });
   }
 
   toggleExpand(employeeId: number | null | undefined) {
@@ -122,6 +128,11 @@ export class EmployeeComponent implements OnInit {
     if (this.expandedEmployeeId !== this.editingEmployeeId) {
       this.cancelEdit();
     }
+  }
+
+  closeExpanded() {
+    this.expandedEmployeeId = null;
+    this.cancelEdit();
   }
 
   startCreate() {
@@ -143,7 +154,8 @@ export class EmployeeComponent implements OnInit {
       timezone: '',
       hireDate: '',
       skills: '',
-      tags: '' });
+      tags: '',
+    });
   }
 
   closeCreatePanel() {
@@ -155,7 +167,6 @@ export class EmployeeComponent implements OnInit {
     this.showCreatePanel = false;
     this.editingEmployeeId = employee.employeeId ?? null;
     this.expandedEmployeeId = employee.employeeId ?? null;
-    // Format hireDate for date input (YYYY-MM-DD)
     const formatDateForInput = (dateStr: string | null | undefined): string => {
       if (!dateStr) return '';
       try {
@@ -181,111 +192,164 @@ export class EmployeeComponent implements OnInit {
       timezone: employee.timezone ?? '',
       hireDate: formatDateForInput(employee.hireDate),
       skills: Array.isArray(employee.skills) ? employee.skills.join(', ') : '',
-      tags: Array.isArray(employee.tags) ? employee.tags.join(', ') : '' });
+      tags: Array.isArray(employee.tags) ? employee.tags.join(', ') : '',
+    });
   }
 
   cancelEdit() {
     this.isSaving = false;
+    this.pendingSave = false;
     this.editingEmployeeId = null;
-    this.employeeForm.reset({
-      employeeId: null,
-      employeeName: '',
-      department: '',
-      deptId: null,
-      role: '',
-      title: '',
-      employmentType: '',
-      contactNo: '',
-      emailId: '',
-      location: '',
-      timezone: '',
-      hireDate: '',
-      skills: '',
-      tags: '' });
   }
 
   promptDelete(employee: Employee) {
     this.pendingDelete = employee;
   }
 
-  confirmDelete(confirmed: boolean) {
-    if (!confirmed || !this.pendingDelete?.employeeId) {
-      this.pendingDelete = null;
+  dismissDelete() {
+    if (this.isDeleting) {
+      return;
+    }
+    this.pendingDelete = null;
+  }
+
+  confirmDelete() {
+    if (!this.pendingDelete?.employeeId || this.isDeleting) {
       return;
     }
     const { employeeId, employeeName } = this.pendingDelete;
     this.isDeleting = true;
-    this.masterService.deleteEmpById(employeeId).subscribe(
-      () => {
-        this.isDeleting = false;
-        this.pendingDelete = null;
+    this.masterService.deleteEmpById(employeeId).subscribe({
+      next: () => {
         this.employeesSignal.update((list) =>
           list.filter((emp) => emp.employeeId !== employeeId)
         );
+        this.isDeleting = false;
+        this.pendingDelete = null;
         this.toast.success({
           title: 'Employee removed',
-          description: `${employeeName} has been deleted.` });
+          description: `${employeeName} has been deleted.`,
+        });
         if (this.expandedEmployeeId === employeeId) {
           this.expandedEmployeeId = null;
         }
       },
-      () => {
+      error: () => {
         this.isDeleting = false;
         this.toast.error({
           title: 'Deletion failed',
-          description: 'Unable to delete the employee right now.' });
-      }
-    );
+          description: 'Unable to delete the employee right now.',
+        });
+      },
+    });
   }
 
   onSave() {
-    if (this.employeeForm.valid && !this.isSaving) {
-      const employee = this.normalizePayload(this.employeeForm.value);
-      this.isSaving = true;
-      if (employee.employeeId) {
-        // Update existing employee
-        this.masterService.updateEmp(employee).subscribe(
-          () => {
+    if (!this.employeeForm.valid || this.isSaving) {
+      return;
+    }
+    const employee = this.normalizePayload(this.employeeForm.value);
+    if (employee.employeeId) {
+      this.pendingSave = true;
+      return;
+    }
+    this.runCreate(employee);
+  }
+
+  dismissSave() {
+    if (this.isSaving) {
+      return;
+    }
+    this.pendingSave = false;
+  }
+
+  confirmSave() {
+    if (!this.employeeForm.valid || this.isSaving) {
+      return;
+    }
+    const employee = this.normalizePayload(this.employeeForm.value);
+    if (!employee.employeeId) {
+      this.pendingSave = false;
+      this.runCreate(employee);
+      return;
+    }
+    this.isSaving = true;
+    this.masterService.updateEmp(employee).subscribe({
+      next: () => {
+        this.masterService.getAllEmp().subscribe({
+          next: (res) => {
+            this.employeesSignal.set(res ?? []);
             this.isSaving = false;
-            this.getEmployees();
+            this.pendingSave = false;
+            this.editingEmployeeId = null;
             this.employeeForm.reset();
             this.toast.success({
               title: 'Employee updated',
-              description: 'Employee details were saved successfully.' });
-            this.editingEmployeeId = null;
+              description: 'Employee details were saved successfully.',
+            });
           },
-          () => {
+          error: () => {
             this.isSaving = false;
+            this.pendingSave = false;
             this.toast.error({
               title: 'Update failed',
-              description: 'Something went wrong while saving changes.' });
-          }
-        );
-      } else {
-        // Create new employee
-        this.masterService.saveEmp(employee).subscribe(
-          () => {
+              description: 'Saved on server but the list could not refresh.',
+            });
+          },
+        });
+      },
+      error: () => {
+        this.isSaving = false;
+        this.toast.error({
+          title: 'Update failed',
+          description: 'Something went wrong while saving changes.',
+        });
+      },
+    });
+  }
+
+  private runCreate(employee: Employee) {
+    this.isSaving = true;
+    this.masterService.saveEmp(employee).subscribe({
+      next: () => {
+        this.masterService.getAllEmp().subscribe({
+          next: (res) => {
+            this.employeesSignal.set(res ?? []);
             this.isSaving = false;
-            this.getEmployees();
             this.employeeForm.reset();
+            this.showCreatePanel = false;
             this.toast.success({
               title: 'Employee created',
-              description: 'A new employee record is now available.' });
-            this.showCreatePanel = false;
+              description: 'A new employee record is now available.',
+            });
           },
-          () => {
+          error: () => {
             this.isSaving = false;
+            this.showCreatePanel = false;
             this.toast.error({
               title: 'Creation failed',
-              description: 'Unable to save the new employee.' });
-          }
-        );
-      }
-    }
+              description: 'Created but the list could not refresh.',
+            });
+          },
+        });
+      },
+      error: () => {
+        this.isSaving = false;
+        this.toast.error({
+          title: 'Creation failed',
+          description: 'Unable to save the new employee.',
+        });
+      },
+    });
   }
 
   updateSearch(term: string) {
     this.searchTerm.set(term);
+  }
+
+  saveDialogTitle(): string {
+    const name = this.employeeForm.value?.employeeName?.trim();
+    return name ? `Save Changes To ${name}?` : 'Save Employee Changes?';
   }
 
   private normalizePayload(raw: any): Employee {
@@ -299,7 +363,6 @@ export class EmployeeComponent implements OnInit {
         .filter((item) => item.length > 0);
     };
 
-    // Convert date input (YYYY-MM-DD) to ISO string or keep as is
     const normalizeDate = (
       dateValue: string | null | undefined
     ): string | null => {
@@ -330,6 +393,7 @@ export class EmployeeComponent implements OnInit {
       timezone: raw.timezone ?? '',
       hireDate: normalizeDate(raw.hireDate),
       skills: parseCsv(raw.skills),
-      tags: parseCsv(raw.tags) } as Employee;
+      tags: parseCsv(raw.tags),
+    } as Employee;
   }
 }

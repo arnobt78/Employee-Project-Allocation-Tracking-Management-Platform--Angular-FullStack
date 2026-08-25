@@ -1,5 +1,13 @@
 # Changelog — Agile V project memory
 
+## 2026-08-25 — Rich cards, AlertDialog, avatars, dist/
+
+- CDK `AlertDialog` (body portal) for deletes + edit-save confirm with busy until list refresh
+- Default-collapsed employee/project/assignment cards + reusable close control
+- Avatars on lists/dashboard/selects; PE/dashboard API meta (status, dates, avatar)
+- Title Case UI chrome; SelectMenu polish; Angular build output `dist/` for Vercel auto-detect
+- verify-deep PASS WITH WARNINGS; lint/build/test PASS
+
 ## 2026-08-25 — Fix Vercel invalid route source
 
 - Replaced invalid hashed-asset `headers.source` regex in `vercel.json` with path-to-regexp-safe `/:path*.js|css|woff2` patterns (unblocks deploy)

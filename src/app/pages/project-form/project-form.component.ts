@@ -40,6 +40,11 @@ import { UbButtonDirective } from '@/app/components/ui/button';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Observable, startWith } from 'rxjs';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
+import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
+import {
+  SelectMenuComponent,
+  SelectMenuOption,
+} from '@/app/components/ui/select-menu.component';
 
 const readinessTaskDefinitions = [
   {
@@ -140,7 +145,9 @@ const REVIEWER_SEVERITIES = [
     CommonModule,
     RouterLink,
     ReactiveFormsModule,
-    UbButtonDirective
+    UbButtonDirective,
+    SelectMenuComponent,
+    AlertDialogComponent,
   ],
   templateUrl: './project-form.component.html',
   styleUrl: './project-form.component.css' })
@@ -155,6 +162,31 @@ export class ProjectFormComponent implements OnInit {
   private readonly employeesSignal = signal<Employee[]>([]);
   readonly employees = this.employeesSignal.asReadonly();
 
+  readonly employeeSelectOptions = computed<SelectMenuOption[]>(() =>
+    this.employees().map((employee) => ({
+      value: String(employee.employeeId),
+      label: employee.employeeName,
+      imageSeed: employee.emailId || employee.employeeName,
+      imageUrl: employee.avatarUrl ?? null,
+    }))
+  );
+
+  readonly readinessStatusOptions: SelectMenuOption[] = Object.entries(
+    READINESS_STATUS_LABELS
+  ).map(([value, label]) => ({ value, label }));
+
+  readonly reviewerSectionOptions: SelectMenuOption[] =
+    REVIEWER_COMMENT_SECTIONS.map((section) => ({
+      value: section.value,
+      label: section.label,
+    }));
+
+  readonly reviewerSeveritySelectOptions: SelectMenuOption[] =
+    REVIEWER_SEVERITIES.map((severity) => ({
+      value: severity.value,
+      label: severity.label,
+    }));
+
   private readonly currentProjectSignal = signal<IProject | null>(null);
   readonly currentProject = this.currentProjectSignal.asReadonly();
 
@@ -168,9 +200,6 @@ export class ProjectFormComponent implements OnInit {
 
   readonly readinessTasks = readinessTaskDefinitions;
   readonly readinessTotal = this.readinessTasks.length;
-  readonly readinessStatuses = Object.entries(READINESS_STATUS_LABELS).map(
-    ([value, label]) => ({ value: value as ReadinessStatus, label })
-  );
   readonly readinessForm = this.fb.group(
     this.buildReadinessControls()
   ) as unknown as FormGroup<Record<ReadinessTaskId, ReadinessTaskFormGroup>>;
@@ -266,8 +295,6 @@ export class ProjectFormComponent implements OnInit {
   );
   readonly approvalProcessing = signal<boolean>(false);
   readonly reviewerCommentProcessing = signal<boolean>(false);
-  readonly reviewerCommentSections = REVIEWER_COMMENT_SECTIONS;
-  readonly reviewerSeverityOptions = REVIEWER_SEVERITIES;
 
   private readonly collaboratorAssignmentProfileSignal =
     signal<IResourceProfile | null>(null);
@@ -517,14 +544,9 @@ export class ProjectFormComponent implements OnInit {
     this.pendingDelete.set(true);
   }
 
-  confirmDelete(confirmed: boolean) {
-    if (!confirmed) {
-      this.pendingDelete.set(false);
-      return;
-    }
+  confirmDelete() {
     const projectId = this.projectForm.controls['projectId'].value;
-    if (!projectId) {
-      this.pendingDelete.set(false);
+    if (!projectId || this.isDeleting()) {
       return;
     }
     this.isDeleting.set(true);
@@ -534,7 +556,8 @@ export class ProjectFormComponent implements OnInit {
         this.pendingDelete.set(false);
         this.toast.success({
           title: 'Project removed',
-          description: 'The project has been archived successfully.' });
+          description: 'The project has been archived successfully.',
+        });
         this.resetReadinessForm();
         this.resourceInsightsSignal.set(null);
         this.router.navigate(['/projects']);
@@ -543,8 +566,17 @@ export class ProjectFormComponent implements OnInit {
         this.isDeleting.set(false);
         this.toast.error({
           title: 'Delete failed',
-          description: 'Unable to archive the project currently.' });
-      } });
+          description: 'Unable to archive the project currently.',
+        });
+      },
+    });
+  }
+
+  dismissDelete() {
+    if (this.isDeleting()) {
+      return;
+    }
+    this.pendingDelete.set(false);
   }
 
   leadName(leadByEmpId: number | null | undefined) {

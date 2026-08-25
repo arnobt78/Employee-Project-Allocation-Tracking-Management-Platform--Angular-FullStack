@@ -157,7 +157,7 @@ Prisma / MongoDB
 
 **Local development:** `ng serve` proxies `/api/employee-management` and `/api/monitoring` to `http://localhost:4310` (`proxy.conf.json` + `tools/dev-api-server.mjs`).
 
-**Production:** Vercel serves `dist/employee-management` and runs `api/employee-management/[...segments].js` plus `api/monitoring.js` (Sentry tunnel).
+**Production:** Vercel serves Angular `dist/` (framework preset) and runs `api/employee-management/[...segments].js` plus `api/monitoring.js` (Sentry tunnel).
 
 ---
 
@@ -607,7 +607,7 @@ const completion = await completeChatWithFallback(prompt);
 
 1. Import the GitHub repo into Vercel
 2. Set env vars (see above); `APP_BASE_URL` = production URL
-3. Build command uses `npm run build` (Angular output: `dist/employee-management` per `vercel.json`)
+3. Build command uses `npm run build` (Angular output: `dist/`, detected by Vercel’s Angular preset)
 4. Redeploy after any env change
 
 Headers in `vercel.json` discourage caching of API responses and set basic security headers.

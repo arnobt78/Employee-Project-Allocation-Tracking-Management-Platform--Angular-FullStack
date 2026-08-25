@@ -46,25 +46,21 @@
     >
       <div>
         <label
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
         >
           Date Range
         </label>
-        <select
+        <app-select-menu
           formControlName="dateRange"
-          (change)="onFilterChange()"
-          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-        >
-          <option value="all">All Time</option>
-          <option value="last30">Last 30 Days</option>
-          <option value="last90">Last 90 Days</option>
-          <option value="last365">Last Year</option>
-          <option value="custom">Custom Range</option>
-        </select>
+          [options]="dateRangeOptions"
+          [clearable]="false"
+          placeholder="Select Date Range"
+          (selectionChange)="onFilterChange()"
+        ></app-select-menu>
       </div>
       <div *ngIf="filterForm.get('dateRange')?.value === 'custom'">
         <label
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
         >
           Start Date
         </label>
@@ -72,12 +68,12 @@
           type="date"
           formControlName="startDate"
           (change)="onFilterChange()"
-          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          class="eh-native-date w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
         />
       </div>
       <div *ngIf="filterForm.get('dateRange')?.value === 'custom'">
         <label
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
         >
           End Date
         </label>
@@ -85,25 +81,22 @@
           type="date"
           formControlName="endDate"
           (change)="onFilterChange()"
-          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          class="eh-native-date w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
         />
       </div>
       <div>
         <label
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
         >
           Department
         </label>
-        <select
+        <app-select-menu
           formControlName="department"
-          (change)="onFilterChange()"
-          class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-        >
-          <option value="all">All Departments</option>
-          <option *ngFor="let dept of departmentsSignal()" [value]="dept">
-            {{ dept }}
-          </option>
-        </select>
+          [options]="departmentOptions()"
+          [clearable]="false"
+          placeholder="Select Department"
+          (selectionChange)="onFilterChange()"
+        ></app-select-menu>
       </div>
     </form>
   </div>
@@ -179,7 +172,7 @@
         <div
           class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
-          <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+          <p class="text-xs text-white/45">
             Total Projects
           </p>
           <p class="mt-2 text-3xl font-medium text-white">
@@ -189,7 +182,7 @@
         <div
           class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
-          <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+          <p class="text-xs text-white/45">
             Total Employees
           </p>
           <p class="mt-2 text-3xl font-medium text-white">
@@ -203,7 +196,7 @@
         <div
           class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
-          <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+          <p class="text-xs text-white/45">
             Avg Readiness
           </p>
           <p class="mt-2 text-3xl font-medium text-white">
@@ -213,7 +206,7 @@
         <div
           class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
-          <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+          <p class="text-xs text-white/45">
             Resource Utilization
           </p>
           <p class="mt-2 text-3xl font-medium text-white">
@@ -380,22 +373,22 @@
             <thead>
               <tr class="border-b border-white/10 text-left">
                 <th
-                  class="pb-3 text-xs uppercase tracking-[0.3em] text-white/60"
+                  class="pb-3 text-xs text-white/60"
                 >
                   Department
                 </th>
                 <th
-                  class="pb-3 text-xs uppercase tracking-[0.3em] text-white/60"
+                  class="pb-3 text-xs text-white/60"
                 >
                   Employees
                 </th>
                 <th
-                  class="pb-3 text-xs uppercase tracking-[0.3em] text-white/60"
+                  class="pb-3 text-xs text-white/60"
                 >
                   Projects
                 </th>
                 <th
-                  class="pb-3 text-xs uppercase tracking-[0.3em] text-white/60"
+                  class="pb-3 text-xs text-white/60"
                 >
                   Avg Readiness
                 </th>

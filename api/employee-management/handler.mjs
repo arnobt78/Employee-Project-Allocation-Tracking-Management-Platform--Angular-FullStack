@@ -1869,6 +1869,7 @@ function buildDashboard(store) {
       projectId: project.projectId,
       projectName: project.projectName,
       startDate: project.startDate,
+      status: project.status ?? null,
     }));
 
   const recentEmployee = [...store.employees]
@@ -1880,6 +1881,12 @@ function buildDashboard(store) {
     .map((employee) => ({
       employeeId: employee.employeeId,
       employeeName: employee.employeeName,
+      role: employee.role,
+      department: employee.department,
+      avatarUrl: employee.avatarUrl ?? null,
+      emailId: employee.emailId ?? null,
+      hireDate: sanitizeDateValue(employee.hireDate),
+      createdAt: sanitizeDateValue(employee.createdAt),
     }));
 
   return {

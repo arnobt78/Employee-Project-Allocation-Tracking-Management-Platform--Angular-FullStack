@@ -1,4 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { MasterService } from '../../service/master.service';
 import { IParentDept, IProject, IProjectEmployee } from '../../model/interface/master';
 import { Employee } from '../../model/class/Employee';
@@ -6,6 +7,7 @@ import {
   ListSkeletonComponent,
   StatPillSkeletonComponent,
 } from '@/app/components/ui/list-skeleton.component';
+import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
 
 interface DashboardSnapshot {
   totalEmployee: number;
@@ -18,7 +20,12 @@ interface DashboardSnapshot {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [ListSkeletonComponent, StatPillSkeletonComponent],
+  imports: [
+    ListSkeletonComponent,
+    StatPillSkeletonComponent,
+    DatePipe,
+    UserAvatarComponent,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })

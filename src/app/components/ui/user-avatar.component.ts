@@ -27,7 +27,7 @@ import { robohashUrl } from '@/app/lib/media/robohash';
       />
     } @else {
       <span
-        class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 text-xs font-medium uppercase text-white/80"
+        class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 text-xs font-medium text-white/80"
         [style.width.px]="size"
         [style.height.px]="size"
         aria-hidden="true"

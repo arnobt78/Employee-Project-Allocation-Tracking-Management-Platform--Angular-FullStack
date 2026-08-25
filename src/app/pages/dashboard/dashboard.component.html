@@ -28,9 +28,7 @@
       >
         <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-xs uppercase tracking-[0.45em] text-white/60">
-              Total Employees
-            </p>
+            <p class="text-xs text-white/60">Total Employees</p>
             <p class="mt-3 text-3xl font-medium text-white">
               {{ dashboardData?.totalEmployee }}
             </p>
@@ -46,9 +44,7 @@
       >
         <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-xs uppercase tracking-[0.45em] text-white/60">
-              Total Projects
-            </p>
+            <p class="text-xs text-white/60">Total Projects</p>
             <p class="mt-3 text-3xl font-medium text-white">
               {{ dashboardData?.totalProject }}
             </p>
@@ -64,9 +60,7 @@
       >
         <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-xs uppercase tracking-[0.45em] text-white/60">
-              Active Project Employees
-            </p>
+            <p class="text-xs text-white/60">Active Project Employees</p>
             <p class="mt-3 text-3xl font-medium text-white">
               {{ dashboardData?.activeProjectEmployees }}
             </p>
@@ -158,9 +152,7 @@
         <header class="flex items-center justify-between gap-4 pb-4">
           <div>
             <h2 class="text-lg font-medium text-white">Latest Projects</h2>
-            <p class="text-xs uppercase tracking-[0.35em] text-white/50">
-              Recently Approved
-            </p>
+            <p class="text-xs text-white/50">Recently Approved</p>
           </div>
           <span
             class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/70"
@@ -175,19 +167,26 @@
             let i = $index
           ) {
             <li
-              class="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 shadow-sm shadow-slate-950/20"
+              class="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 shadow-sm shadow-slate-950/20"
             >
-              <div class="flex items-center gap-3">
+              <div class="flex min-w-0 items-center gap-3">
                 <span
-                  class="flex h-8 w-8 items-center justify-center rounded-xl bg-white/15 text-xs font-medium text-white/80"
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/15 text-xs font-medium text-white/80"
                   >{{ i + 1 }}</span
                 >
-                <span class="font-medium text-white">
-                  {{ item.projectName }}
-                </span>
+                <div class="min-w-0">
+                  <p class="truncate font-medium text-white">
+                    {{ item.projectName }}
+                  </p>
+                  @if (item.startDate) {
+                    <p class="text-xs text-white/40">
+                      {{ item.startDate | date: "mediumDate" }}
+                    </p>
+                  }
+                </div>
               </div>
-              <span class="text-xs text-white/50">
-                {{ item.status || "In progress" }}
+              <span class="shrink-0 text-xs text-white/50">
+                {{ item.status || "In Progress" }}
               </span>
             </li>
           }
@@ -207,9 +206,7 @@
         <header class="flex items-center justify-between gap-4 pb-4">
           <div>
             <h2 class="text-lg font-medium text-white">New Employees</h2>
-            <p class="text-xs uppercase tracking-[0.35em] text-white/50">
-              Last 30 days joined
-            </p>
+            <p class="text-xs text-white/50">Last 30 Days Joined</p>
           </div>
           <span
             class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/70"
@@ -223,14 +220,32 @@
             track item.employeeId
           ) {
             <li
-              class="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 shadow-sm shadow-slate-950/20"
+              class="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 shadow-sm shadow-slate-950/20"
             >
-              <span class="font-medium text-white">
-                {{ item.employeeName }}
+              <span class="flex min-w-0 items-center gap-3 font-medium text-white">
+                <app-user-avatar
+                  [seed]="item.emailId || item.employeeName"
+                  [imageUrl]="item.avatarUrl ?? null"
+                  [label]="item.employeeName"
+                  [size]="32"
+                  [alt]="item.employeeName"
+                ></app-user-avatar>
+                <span class="truncate">{{ item.employeeName }}</span>
               </span>
-              <span class="text-xs text-white/50">
-                {{ item.role || "New hire" }}
-              </span>
+              <div class="shrink-0 text-right text-xs text-white/50">
+                <p>
+                  {{ item.role || "Newly Hired"
+                  }}{{ item.department ? " · " + item.department : "" }}
+                </p>
+                @if (item.hireDate || item.createdAt) {
+                  <p class="mt-0.5 text-white/40">
+                    Joined
+                    {{
+                      (item.hireDate || item.createdAt)! | date: "mediumDate"
+                    }}
+                  </p>
+                }
+              </div>
             </li>
           }
           @if (hasLoaded() && !dashboardData?.recentEmployee?.length) {
@@ -252,7 +267,7 @@
       >
         <div>
           <h2 class="text-lg font-medium text-white">Employee Departments</h2>
-          <p class="text-xs uppercase tracking-[0.35em] text-white/50">
+          <p class="text-xs text-white/50">
             Parent divisions across the organization
           </p>
         </div>
@@ -266,7 +281,7 @@
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         @for (dept of parentDepartments; track dept.departmentId) {
           <div
-            class="group flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-6 text-center shadow-sm shadow-slate-950/25 transition hover:border-primary/40 hover:bg-white/10"
+            class="group flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 text-center shadow-sm shadow-slate-950/25 transition hover:border-primary/40 hover:bg-white/10"
           >
             <div
               class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/30 bg-primary/10 shadow-[0_12px_30px_rgba(59,130,246,0.25)]"
@@ -285,7 +300,7 @@
 
         @if (hasLoaded() && !parentDepartments.length) {
           <div
-            class="rounded-2xl border border-dashed border-white/15 bg-white/5 px-5 py-10 text-center text-sm text-white/60"
+            class="rounded-2xl border border-dashed border-white/15 bg-white/5 px-2 sm:px-4 py-10 text-center text-sm text-white/60"
           >
             No employee departments available.
           </div>

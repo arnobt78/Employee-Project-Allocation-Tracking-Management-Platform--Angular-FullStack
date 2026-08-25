@@ -1,5 +1,36 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-08-25 — Rich cards, AlertDialog, avatars, dist/ (commit-ready)
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | 0 errors |
+| `npm run build` | **PASS** | Bundle budget warning (~1.01 MB > 700 kB); unused OptimizedImage on login (NG8113) |
+| `npm test -- --watch=false --browsers=ChromeHeadless` | **PASS** | 12/12 specs |
+| verify-deep | **PASS WITH WARNINGS** | Advisory: stage new UI files; dashboard status fallback; save dialog on refresh fail |
+| implementation-verifier | **PASS WITH WARNINGS** | Phases A–D met; sandbox could not re-run build (parent re-ran PASS) |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| CDK body-portal AlertDialog (4 deletes + edit-save busy) | Done |
+| Default-closed list expands + CardCloseButton | Done |
+| UserAvatar / Robohash on lists, dashboard, selects | Done |
+| PE + dashboard richer meta API mapping | Done |
+| Title Case chrome + UI styling guide note | Done |
+| Angular `outputPath` `dist/`; no vercel `outputDirectory` | Done |
+
+### eval_gate_status
+
+N/A (user-directed delivery; formal GATE-0001 record optional follow-up)
+
+---
+
 ## Session 2026-08-25 — Auth UI Lucide polish + dashboard control-flow (commit-ready)
 
 **Node:** v24.x

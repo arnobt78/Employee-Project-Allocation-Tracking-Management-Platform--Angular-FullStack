@@ -34,6 +34,14 @@ The design system is built on the following principles:
 - **Subtle Shadows**: Colored shadows that match the component's color theme
 - **Smooth Transitions**: All interactive elements have transition effects
 
+### UI chrome typography (Title Case)
+
+**UI chrome strings are Title Case in source; do not rely on CSS `uppercase` for primary labels.**
+
+Applies to: button labels, page/card/section titles, form field labels, tab labels, and nav link text (e.g. `Save Changes`, `Date Range`, `Project Lead`). Write Title Case in the template; omit `uppercase` / heavy letter-spacing (`tracking-[0.3em]`) on those same elements so the casing users see matches the source.
+
+Out of scope: paragraph body copy, validation/error sentences, sentence-style placeholders, toast descriptions, and dynamic API/user content (names, comments, AI draft text).
+
 ---
 
 ## Color Palette & Variants
@@ -120,7 +128,7 @@ Cards use 3-stop gradients with colored borders and shadows.
 <article class="group rounded-[28px] border border-sky-400/30 bg-gradient-to-br from-sky-500/25 via-sky-500/10 to-sky-500/5 p-6 shadow-[0_30px_80px_rgba(2,132,199,0.35)] backdrop-blur-sm transition hover:border-sky-300/50">
   <div class="flex items-start justify-between gap-4">
     <div>
-      <p class="text-xs uppercase tracking-[0.45em] text-white/60">Title</p>
+      <p class="text-xs text-white/60">Title</p>
       <p class="mt-3 text-3xl font-medium text-white">Value</p>
     </div>
   </div>
@@ -212,6 +220,8 @@ For cards without specific color variants:
 ---
 
 ## Button Styling
+
+Button labels use **Title Case** in the template (e.g. `Save Changes`, `Create Project`). Do not add Tailwind `uppercase` on primary button text.
 
 ### Primary Button (Default)
 
@@ -383,7 +393,7 @@ For cards without specific color variants:
 ```html
 <thead class="bg-white/5 border-b border-white/10">
   <tr>
-    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-white/70">Header</th>
+    <th class="px-4 py-3 text-left text-xs font-medium text-white/70">Header</th>
   </tr>
 </thead>
 ```
@@ -642,7 +652,7 @@ hover:border-sky-300/50
 <article class="group rounded-[28px] border border-sky-400/30 bg-gradient-to-br from-sky-500/25 via-sky-500/10 to-sky-500/5 p-6 shadow-[0_30px_80px_rgba(2,132,199,0.35)] backdrop-blur-sm transition hover:border-sky-300/50">
   <div class="flex items-start justify-between gap-4">
     <div>
-      <p class="text-xs uppercase tracking-[0.45em] text-white/60">Total Employees</p>
+      <p class="text-xs text-white/60">Total Employees</p>
       <p class="mt-3 text-3xl font-medium text-white">150</p>
     </div>
   </div>
@@ -653,7 +663,7 @@ hover:border-sky-300/50
 <article class="group rounded-[28px] border border-emerald-400/30 bg-gradient-to-br from-emerald-500/25 via-emerald-500/10 to-emerald-500/5 p-6 shadow-[0_30px_80px_rgba(16,185,129,0.3)] backdrop-blur-sm transition hover:border-emerald-300/50">
   <div class="flex items-start justify-between gap-4">
     <div>
-      <p class="text-xs uppercase tracking-[0.45em] text-white/60">Total Projects</p>
+      <p class="text-xs text-white/60">Total Projects</p>
       <p class="mt-3 text-3xl font-medium text-white">42</p>
     </div>
   </div>
@@ -664,7 +674,7 @@ hover:border-sky-300/50
 <article class="group rounded-[28px] border border-amber-400/30 bg-gradient-to-br from-amber-500/30 via-amber-500/15 to-amber-500/5 p-6 shadow-[0_30px_80px_rgba(245,158,11,0.25)] backdrop-blur-sm transition hover:border-amber-300/60">
   <div class="flex items-start justify-between gap-4">
     <div>
-      <p class="text-xs uppercase tracking-[0.45em] text-white/60">Active Project Employees</p>
+      <p class="text-xs text-white/60">Active Project Employees</p>
       <p class="mt-3 text-3xl font-medium text-white">89</p>
     </div>
   </div>
@@ -679,7 +689,7 @@ hover:border-sky-300/50
 <button type="button" class="inline-flex items-center justify-center rounded-xl border border-primary/30 bg-gradient-to-r from-primary/70 via-primary/50 to-primary/30 px-4 py-2 text-sm font-medium text-white shadow-[0_15px_35px_rgba(59,130,246,0.45)] backdrop-blur-sm transition duration-200 hover:border-primary/40 hover:from-primary/80 hover:via-primary/60 hover:to-primary/40">Primary Action</button>
 
 <!-- Destructive Button (Logout) -->
-<button type="button" class="inline-flex items-center justify-center rounded-xl border border-rose-400/30 bg-gradient-to-r from-rose-500/70 via-rose-500/50 to-rose-500/30 px-4 py-2 text-sm font-medium text-white shadow-[0_15px_35px_rgba(225,29,72,0.45)] backdrop-blur-sm transition duration-200 hover:border-rose-300/40 hover:from-rose-500/80 hover:via-rose-500/60 hover:to-rose-500/40">Log out</button>
+<button type="button" class="inline-flex items-center justify-center rounded-xl border border-rose-400/30 bg-gradient-to-r from-rose-500/70 via-rose-500/50 to-rose-500/30 px-4 py-2 text-sm font-medium text-white shadow-[0_15px_35px_rgba(225,29,72,0.45)] backdrop-blur-sm transition duration-200 hover:border-rose-300/40 hover:from-rose-500/80 hover:via-rose-500/60 hover:to-rose-500/40">Log Out</button>
 ```
 
 ### Full Page Background Example

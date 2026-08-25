@@ -127,7 +127,15 @@ export class ProfileDropdownComponent {
     if (!user) {
       return '';
     }
-    return user.role ? `${user.role} · ${user.username}` : user.username;
+    const role = user.role?.trim() ?? '';
+    const username = user.username?.trim() ?? '';
+    if (!role) {
+      return username;
+    }
+    if (role.toLowerCase() === username.toLowerCase()) {
+      return username;
+    }
+    return `${role} · ${username}`;
   }
 
   toggle(): void {

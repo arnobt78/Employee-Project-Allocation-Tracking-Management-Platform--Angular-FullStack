@@ -21,6 +21,13 @@ import {
   ListSkeletonComponent,
   StatPillSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
+import {
+  SelectMenuComponent,
+  SelectMenuOption,
+} from '@/app/components/ui/select-menu.component';
+import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
+import { CardCloseButtonComponent } from '@/app/components/ui/card-close-button.component';
+import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
 
 @Component({
   selector: 'app-project-employee',
@@ -31,7 +38,11 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
     ReactiveFormsModule,
     UbButtonDirective,
     ListSkeletonComponent,
-    StatPillSkeletonComponent
+    StatPillSkeletonComponent,
+    SelectMenuComponent,
+    AlertDialogComponent,
+    CardCloseButtonComponent,
+    UserAvatarComponent,
   ],
   providers: [DatePipe],
   templateUrl: './project-employee.component.html',
@@ -50,6 +61,22 @@ export class ProjectEmployeeComponent implements OnInit {
 
   private readonly employeesSignal = signal<Employee[]>([]);
   readonly employees = this.employeesSignal.asReadonly();
+
+  readonly projectOptions = computed<SelectMenuOption[]>(() =>
+    this.projects().map((project) => ({
+      value: String(project.projectId),
+      label: project.projectName,
+    }))
+  );
+
+  readonly employeeOptions = computed<SelectMenuOption[]>(() =>
+    this.employees().map((employee) => ({
+      value: String(employee.employeeId),
+      label: employee.employeeName,
+      imageSeed: employee.emailId || employee.employeeName,
+      imageUrl: employee.avatarUrl ?? null,
+    }))
+  );
 
   readonly searchTerm = signal<string>('');
   readonly isLoading = signal(true);
@@ -94,6 +121,7 @@ export class ProjectEmployeeComponent implements OnInit {
   editingAssignmentId: number | null = null;
   showCreatePanel = false;
   pendingDelete: IProjectEmployee | null = null;
+  pendingSave = false;
   isSaving = false;
   isDeleting = false;
 
@@ -114,9 +142,6 @@ export class ProjectEmployeeComponent implements OnInit {
     }
     if (assignmentsSnap) {
       this.assignmentsSignal.set(assignmentsSnap);
-      if (!this.expandedAssignmentId && assignmentsSnap.length) {
-        this.expandedAssignmentId = assignmentsSnap[0].empProjectId ?? null;
-      }
     }
 
     this.isLoading.set(!assignmentsWarm);
@@ -171,9 +196,6 @@ export class ProjectEmployeeComponent implements OnInit {
     this.masterService.getProjectEmp().subscribe({
       next: (res: IProjectEmployee[]) => {
         this.assignmentsSignal.set(res ?? []);
-        if (!this.expandedAssignmentId && res?.length) {
-          this.expandedAssignmentId = res[0].empProjectId ?? null;
-        }
         onComplete?.();
       },
       error: () => {
@@ -216,79 +238,115 @@ export class ProjectEmployeeComponent implements OnInit {
   }
 
   onSave() {
-    if (this.projectEmployeeForm.valid && !this.isSaving) {
-      const projectEmployee = {
-        ...this.projectEmployeeForm.value,
-        allocationPct: Number(this.projectEmployeeForm.value.allocationPct) || 0,
-        isActive: this.projectEmployeeForm.value.isActive ? 'Y' : 'N' };
-      this.isSaving = true;
-      if (projectEmployee.empProjectId) {
-        // Update existing project employee
-        this.masterService.updateProjectEmp(projectEmployee).subscribe(
-          () => {
-            this.isSaving = false;
-            this.getProjectEmployees();
-            this.projectEmployeeForm.reset();
-            this.toast.success({
-              title: 'Assignment updated',
-              description: 'Changes saved successfully.' });
-            this.editingAssignmentId = null;
-            this.expandedAssignmentId = null;
-          },
-          (_error: any) => {
-            this.isSaving = false;
-            this.toast.error({
-              title: 'Update failed',
-              description: 'Unable to update project assignment.' });
-          }
-        );
-      } else {
-        // Create new project employee
-        this.masterService.saveProjectEmp(projectEmployee).subscribe(
-          () => {
-            this.isSaving = false;
-            this.getProjectEmployees();
-            this.projectEmployeeForm.reset();
-            this.toast.success({
-              title: 'Assignment created',
-              description: 'A new team assignment has been added.' });
-            this.showCreatePanel = false;
-            this.resetForm();
-          },
-          (_error: any) => {
-            this.isSaving = false;
-            this.toast.error({
-              title: 'Creation failed',
-              description: 'Unable to create project assignment.' });
-          }
-        );
-      }
-    } else {
+    if (!this.projectEmployeeForm.valid || this.isSaving) {
       if (!this.isSaving) {
         this.toast.error({
           title: 'Missing details',
-          description: 'Please complete all required fields.' });
+          description: 'Please complete all required fields.',
+        });
       }
+      return;
     }
+    if (this.projectEmployeeForm.value.empProjectId) {
+      this.pendingSave = true;
+      return;
+    }
+    this.runCreate();
   }
 
-  confirmDelete(confirmed: boolean) {
-    if (!confirmed || !this.pendingDelete) {
-      this.pendingDelete = null;
+  dismissSave() {
+    if (this.isSaving) {
+      return;
+    }
+    this.pendingSave = false;
+  }
+
+  confirmSave() {
+    if (!this.projectEmployeeForm.valid || this.isSaving) {
+      return;
+    }
+    const projectEmployee = this.buildPayload();
+    if (!projectEmployee.empProjectId) {
+      this.pendingSave = false;
+      this.runCreate();
+      return;
+    }
+    this.isSaving = true;
+    this.masterService.updateProjectEmp(projectEmployee).subscribe({
+      next: () => {
+        this.getProjectEmployees(() => {
+          this.isSaving = false;
+          this.pendingSave = false;
+          this.projectEmployeeForm.reset();
+          this.editingAssignmentId = null;
+          this.toast.success({
+            title: 'Assignment updated',
+            description: 'Changes saved successfully.',
+          });
+        });
+      },
+      error: () => {
+        this.isSaving = false;
+        this.toast.error({
+          title: 'Update failed',
+          description: 'Unable to update project assignment.',
+        });
+      },
+    });
+  }
+
+  private runCreate() {
+    const projectEmployee = this.buildPayload();
+    this.isSaving = true;
+    this.masterService.saveProjectEmp(projectEmployee).subscribe({
+      next: () => {
+        this.getProjectEmployees(() => {
+          this.isSaving = false;
+          this.showCreatePanel = false;
+          this.resetForm();
+          this.toast.success({
+            title: 'Assignment created',
+            description: 'A new team assignment has been added.',
+          });
+        });
+      },
+      error: () => {
+        this.isSaving = false;
+        this.toast.error({
+          title: 'Creation failed',
+          description: 'Unable to create project assignment.',
+        });
+      },
+    });
+  }
+
+  private buildPayload() {
+    return {
+      ...this.projectEmployeeForm.value,
+      projectId: Number(this.projectEmployeeForm.value.projectId),
+      empId: Number(this.projectEmployeeForm.value.empId),
+      allocationPct: Number(this.projectEmployeeForm.value.allocationPct) || 0,
+      isActive: this.projectEmployeeForm.value.isActive ? 'Y' : 'N',
+    };
+  }
+
+  confirmDelete() {
+    if (!this.pendingDelete || this.isDeleting) {
       return;
     }
     const { empProjectId, projectName } = this.pendingDelete;
     this.isDeleting = true;
-    this.masterService.deleteProjectEmpById(empProjectId).subscribe(
-      () => {
-        this.isDeleting = false;
-        this.pendingDelete = null;
+    this.masterService.deleteProjectEmpById(empProjectId).subscribe({
+      next: () => {
         this.assignmentsSignal.update((list) =>
           list.filter((item) => item.empProjectId !== empProjectId)
         );
+        this.isDeleting = false;
+        this.pendingDelete = null;
         this.toast.success({
           title: 'Assignment removed',
-          description: `${projectName} assignment deleted.` });
+          description: `${projectName} assignment deleted.`,
+        });
         if (this.expandedAssignmentId === empProjectId) {
           this.expandedAssignmentId = null;
         }
@@ -296,13 +354,26 @@ export class ProjectEmployeeComponent implements OnInit {
           this.editingAssignmentId = null;
         }
       },
-      () => {
+      error: () => {
         this.isDeleting = false;
         this.toast.error({
           title: 'Delete failed',
-          description: 'Unable to remove project assignment.' });
-      }
-    );
+          description: 'Unable to remove project assignment.',
+        });
+      },
+    });
+  }
+
+  dismissDelete() {
+    if (this.isDeleting) {
+      return;
+    }
+    this.pendingDelete = null;
+  }
+
+  closeExpanded() {
+    this.expandedAssignmentId = null;
+    this.cancelEdit();
   }
 
   toggleExpand(empProjectId: number | null | undefined) {
@@ -331,11 +402,21 @@ export class ProjectEmployeeComponent implements OnInit {
   }
 
   cancelEdit() {
+    this.isSaving = false;
+    this.pendingSave = false;
     if (this.editingAssignmentId !== null) {
-      this.isSaving = false;
       this.projectEmployeeForm.reset();
       this.editingAssignmentId = null;
     }
+  }
+
+  saveDialogTitle(): string {
+    const name =
+      this.employeeNameFor(this.projectEmployeeForm.value?.empId) ||
+      this.projectNameFor(this.projectEmployeeForm.value?.projectId);
+    return name && name !== '—'
+      ? `Save Changes To ${name}?`
+      : 'Save Assignment Changes?';
   }
 
   formattedDate(value: string | null | undefined) {
@@ -354,6 +435,21 @@ export class ProjectEmployeeComponent implements OnInit {
   employeeNameFor(id: number | null | undefined) {
     if (id == null) return '—';
     return this.employees().find((emp) => emp.employeeId === id)?.employeeName;
+  }
+
+  employeeAvatarSeed(item: IProjectEmployee): string {
+    const emp = this.employees().find((e) => e.employeeId === item.empId);
+    return emp?.emailId || item.employeeName || String(item.empId);
+  }
+
+  employeeAvatarUrl(item: IProjectEmployee): string | null {
+    if (item.employeeAvatarUrl) {
+      return item.employeeAvatarUrl;
+    }
+    return (
+      this.employees().find((e) => e.employeeId === item.empId)?.avatarUrl ??
+      null
+    );
   }
 
   statusBadge(isActive: string | boolean | null | undefined) {
@@ -383,6 +479,7 @@ export class ProjectEmployeeComponent implements OnInit {
       role: '',
       allocationPct: 0,
       isActive: true,
-      notes: '' });
+      notes: '',
+    });
   }
 }

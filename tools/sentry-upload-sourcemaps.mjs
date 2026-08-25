@@ -12,7 +12,7 @@ import { config as loadDotenv } from "dotenv";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 loadDotenv({ path: join(root, ".env") });
-const distDir = join(root, "dist", "employee-management");
+const distDir = join(root, "dist");
 
 function trim(value) {
   return typeof value === "string" && value.trim().length > 0

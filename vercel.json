@@ -1,5 +1,4 @@
 {
-  "outputDirectory": "dist/employee-management",
   "functions": {
     "api/employee-management/[...segments].js": {
       "maxDuration": 30

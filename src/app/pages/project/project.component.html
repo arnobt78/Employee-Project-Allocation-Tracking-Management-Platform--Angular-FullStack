@@ -1,9 +1,9 @@
 <div class="space-y-8 text-white/85">
   <section
-    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
+    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-2 sm:py-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
   >
     <div class="w-full sm:max-w-sm">
-      <label for="project-search" class="sr-only">Search projects</label>
+      <label for="project-search" class="sr-only">Search Projects</label>
       <div class="relative">
         <span
           class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/50"
@@ -13,7 +13,7 @@
         <input
           id="project-search"
           type="search"
-          placeholder="Search projects, clients, contact person…"
+          placeholder="Search Projects, clients, contact person…"
           class="w-full rounded-2xl border border-white/15 bg-white/5 px-10 py-3 text-sm text-white/80 shadow-inner shadow-slate-950/30 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white focus:shadow-[0_10px_30px_rgba(59,130,246,0.25)]"
           (input)="updateSearch($any($event.target).value)"
         />
@@ -58,8 +58,8 @@
   >
     <header class="mb-4 flex items-center justify-between">
       <div>
-        <h2 class="text-lg font-medium text-white">Create new project</h2>
-        <p class="text-xs uppercase tracking-[0.3em] text-white/50">
+        <h2 class="text-lg font-medium text-white">Create New Project</h2>
+        <p class="text-xs text-white/50">
           Track engagements from day one
         </p>
       </div>
@@ -82,8 +82,8 @@
       <div class="md:col-span-1">
         <label
           for="project-name"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Project name</label
+          class="mb-2 block text-xs text-white/60"
+          >Project Name</label
         >
         <input
           id="project-name"
@@ -96,8 +96,8 @@
       <div class="md:col-span-1">
         <label
           for="client-name"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Client name</label
+          class="mb-2 block text-xs text-white/60"
+          >Client Name</label
         >
         <input
           id="client-name"
@@ -110,8 +110,8 @@
       <div class="md:col-span-1">
         <label
           for="start-date"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Start date</label
+          class="mb-2 block text-xs text-white/60"
+          >Start Date</label
         >
         <input
           id="start-date"
@@ -123,8 +123,8 @@
       <div class="md:col-span-1">
         <label
           for="contact-person"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Contact person</label
+          class="mb-2 block text-xs text-white/60"
+          >Contact Person</label
         >
         <input
           id="contact-person"
@@ -137,8 +137,8 @@
       <div class="md:col-span-1">
         <label
           for="contact-no"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Contact number</label
+          class="mb-2 block text-xs text-white/60"
+          >Contact Number</label
         >
         <input
           id="contact-no"
@@ -151,8 +151,8 @@
       <div class="md:col-span-1">
         <label
           for="email-id"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Contact email</label
+          class="mb-2 block text-xs text-white/60"
+          >Contact Email</label
         >
         <input
           id="email-id"
@@ -190,7 +190,7 @@
     >
       <button
         type="button"
-        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
+        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
         (click)="toggleExpand(project.projectId)"
       >
         <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
@@ -202,13 +202,22 @@
           >
             {{ project.clientName }}
           </span>
+          <span
+            *ngIf="project.status"
+            class="mt-1 inline-flex rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-xs text-sky-200 md:ml-3 md:mt-0"
+          >
+            {{ project.status }}
+          </span>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3">
           <span class="text-xs text-white/60">
-            {{ formattedDate(project.startDate) }}
+            {{ formattedDate(project.startDate)
+            }}{{
+              project.endDate ? " – " + formattedDate(project.endDate) : ""
+            }}
           </span>
           <span
-            class="text-xs uppercase tracking-[0.35em] text-white/40 transition"
+            class="text-xs text-white/40 transition"
             [class.text-white]="expandedProjectId === project.projectId"
           >
             {{ expandedProjectId === project.projectId ? "Hide" : "Details" }}
@@ -218,7 +227,7 @@
 
       <div
         *ngIf="expandedProjectId === project.projectId"
-        class="border-t border-white/10 px-2 sm:px-4 py-6 text-sm text-white/75"
+        class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75"
       >
         <ng-container
           *ngIf="editingProjectId === project.projectId; else projectView"
@@ -232,8 +241,8 @@
             <div class="md:col-span-1">
               <label
                 for="edit-project-name-{{ project.projectId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
-                >Project name</label
+                class="mb-2 block text-xs text-white/50"
+                >Project Name</label
               >
               <input
                 [id]="'edit-project-name-' + project.projectId"
@@ -245,8 +254,8 @@
             <div class="md:col-span-1">
               <label
                 for="edit-client-{{ project.projectId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
-                >Client name</label
+                class="mb-2 block text-xs text-white/50"
+                >Client Name</label
               >
               <input
                 [id]="'edit-client-' + project.projectId"
@@ -258,8 +267,8 @@
             <div class="md:col-span-1">
               <label
                 for="edit-start-{{ project.projectId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
-                >Start date</label
+                class="mb-2 block text-xs text-white/50"
+                >Start Date</label
               >
               <input
                 [id]="'edit-start-' + project.projectId"
@@ -271,8 +280,8 @@
             <div class="md:col-span-1">
               <label
                 for="edit-contact-person-{{ project.projectId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
-                >Contact person</label
+                class="mb-2 block text-xs text-white/50"
+                >Contact Person</label
               >
               <input
                 [id]="'edit-contact-person-' + project.projectId"
@@ -284,8 +293,8 @@
             <div class="md:col-span-1">
               <label
                 for="edit-contact-no-{{ project.projectId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
-                >Contact number</label
+                class="mb-2 block text-xs text-white/50"
+                >Contact Number</label
               >
               <input
                 [id]="'edit-contact-no-' + project.projectId"
@@ -297,8 +306,8 @@
             <div class="md:col-span-1">
               <label
                 for="edit-email-{{ project.projectId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.3em] text-white/50"
-                >Contact email</label
+                class="mb-2 block text-xs text-white/50"
+                >Contact Email</label
               >
               <input
                 [id]="'edit-email-' + project.projectId"
@@ -338,8 +347,8 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
-                Client name
+              <p class="text-xs text-white/45">
+                Client Name
               </p>
               <p class="mt-1 text-base font-medium text-white">
                 {{ project.clientName }}
@@ -348,8 +357,8 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
-                Start date
+              <p class="text-xs text-white/45">
+                Start Date
               </p>
               <p class="mt-1 text-base font-medium text-white">
                 {{ formattedDate(project.startDate) }}
@@ -358,8 +367,53 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
-                Contact person
+              <p class="text-xs text-white/45">End Date</p>
+              <p class="mt-1 text-base font-medium text-white">
+                {{ formattedDate(project.endDate) }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Status</p>
+              <p class="mt-1 text-base font-medium text-white">
+                {{ project.status || "—" }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Progress / Health</p>
+              <p class="mt-1 text-base font-medium text-white">
+                {{
+                  project.progress !== null && project.progress !== undefined
+                    ? project.progress + "%"
+                    : "—"
+                }}
+                · {{ project.health || "—" }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Created</p>
+              <p class="mt-1 text-base font-medium text-white">
+                {{ formattedDate(project.createdAt) }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Updated</p>
+              <p class="mt-1 text-base font-medium text-white">
+                {{ formattedDate(project.updatedAt) }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs text-white/45">
+                Contact Person
               </p>
               <p class="mt-1 text-base font-medium text-white">
                 {{ project.contactPerson || "—" }}
@@ -368,8 +422,8 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
-                Contact number
+              <p class="text-xs text-white/45">
+                Contact Number
               </p>
               <p class="mt-1 text-base font-medium text-white">
                 {{ project.contactNo || "—" }}
@@ -378,14 +432,17 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:col-span-2"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
-                Contact email
+              <p class="text-xs text-white/45">
+                Contact Email
               </p>
               <p class="mt-1 text-base font-medium text-white">
                 {{ project.emailId || "—" }}
               </p>
             </div>
             <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
+              <app-card-close-button
+                (closed)="closeExpanded()"
+              ></app-card-close-button>
               <a
                 ubButton
                 size="sm"
@@ -427,53 +484,29 @@
   </section>
 </div>
 
-<div
-  *ngIf="pendingDelete as toDelete"
-  class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 px-4 py-4"
-  style="
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow-y: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+<app-alert-dialog
+  [open]="!!pendingDelete"
+  [title]="
+    pendingDelete
+      ? 'Delete ' + pendingDelete.projectName + '?'
+      : 'Delete Project?'
   "
->
-  <div
-    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-2 sm:p-4 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
-  >
-    <h2 class="text-lg font-medium text-white">
-      Delete {{ toDelete.projectName }}?
-    </h2>
-    <p class="mt-2 text-white/70">
-      This action cannot be undone. The project and its history will be removed.
-    </p>
-    <div class="mt-6 flex justify-end gap-3">
-      <button
-        type="button"
-        [disabled]="isDeleting"
-        class="inline-flex items-center justify-center gap-1 rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-        (click)="confirmDelete(false)"
-      >
-        <lucide-icon name="x" [size]="14"></lucide-icon>
-        <span>Cancel</span>
-      </button>
-      <button
-        type="button"
-        [disabled]="isDeleting"
-        class="rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
-        (click)="confirmDelete(true)"
-      >
-        @if (!isDeleting) {
-          <lucide-icon name="trash-2" [size]="14"></lucide-icon>
-          <span>Delete Project</span>
-        } @else {
-          <span>Deleting...</span>
-        }
-      </button>
-    </div>
-  </div>
-</div>
+  description="This action cannot be undone. The project and its history will be removed."
+  confirmLabel="Delete Project"
+  variant="destructive"
+  [busy]="isDeleting"
+  busyLabel="Deleting..."
+  (confirmed)="confirmDelete()"
+  (cancelled)="dismissDelete()"
+></app-alert-dialog>
+
+<app-alert-dialog
+  [open]="pendingSave"
+  [title]="saveDialogTitle()"
+  description="Confirm saving these project changes. The list will refresh when the update completes."
+  confirmLabel="Save Changes"
+  [busy]="isSaving"
+  busyLabel="Saving..."
+  (confirmed)="confirmSave()"
+  (cancelled)="dismissSave()"
+></app-alert-dialog>

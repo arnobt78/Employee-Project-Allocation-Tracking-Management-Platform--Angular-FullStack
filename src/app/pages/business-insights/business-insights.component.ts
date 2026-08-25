@@ -13,6 +13,10 @@ import {
   ListSkeletonComponent,
   StatPillSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
+import {
+  SelectMenuComponent,
+  SelectMenuOption,
+} from '@/app/components/ui/select-menu.component';
 
 export interface IBusinessInsights {
   projectStatusDistribution: {
@@ -83,7 +87,8 @@ export interface IBusinessInsights {
     ReactiveFormsModule,
     UbButtonDirective,
     ListSkeletonComponent,
-    StatPillSkeletonComponent
+    StatPillSkeletonComponent,
+    SelectMenuComponent,
   ],
   templateUrl: './business-insights.component.html',
   styleUrls: ['./business-insights.component.css'] })
@@ -100,6 +105,14 @@ export class BusinessInsightsComponent implements OnInit {
   readonly employeesSignal = signal<Employee[]>([]);
   readonly projectEmployeesSignal = signal<IProjectEmployee[]>([]);
 
+  readonly dateRangeOptions: SelectMenuOption[] = [
+    { value: 'all', label: 'All Time' },
+    { value: 'last30', label: 'Last 30 Days' },
+    { value: 'last90', label: 'Last 90 Days' },
+    { value: 'last365', label: 'Last Year' },
+    { value: 'custom', label: 'Custom Range' },
+  ];
+
   // Computed list of unique departments for dropdown
   readonly departmentsSignal = computed(() => {
     const employees = this.employeesSignal();
@@ -111,6 +124,14 @@ export class BusinessInsightsComponent implements OnInit {
     });
     return Array.from(departments).sort();
   });
+
+  readonly departmentOptions = computed<SelectMenuOption[]>(() => [
+    { value: 'all', label: 'All Departments' },
+    ...this.departmentsSignal().map((dept) => ({
+      value: dept,
+      label: dept,
+    })),
+  ]);
 
   filterForm: FormGroup;
 

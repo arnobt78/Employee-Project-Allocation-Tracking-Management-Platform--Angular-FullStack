@@ -1,9 +1,9 @@
 <div class="space-y-8 text-white/85">
   <section
-    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-6 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
+    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-2 sm:py-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
   >
     <div class="w-full sm:max-w-sm">
-      <label for="employee-search" class="sr-only">Search employees</label>
+      <label for="employee-search" class="sr-only">Search Employees</label>
       <div class="relative">
         <span
           class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/50"
@@ -13,7 +13,7 @@
         <input
           id="employee-search"
           type="search"
-          placeholder="Search employees, departments, IDs…"
+          placeholder="Search Employees, departments, IDs…"
           class="w-full rounded-2xl border border-white/15 bg-white/5 px-10 py-3 text-sm text-white/80 shadow-inner shadow-slate-950/30 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white focus:shadow-[0_10px_30px_rgba(59,130,246,0.25)]"
           (input)="updateSearch($any($event.target).value)"
         />
@@ -48,9 +48,9 @@
   >
     <header class="mb-4 flex items-center justify-between">
       <div>
-        <h2 class="text-lg font-medium text-white">Create new employee</h2>
-        <p class="text-xs uppercase tracking-[0.3em] text-white/50">
-          Quick onboarding form
+        <h2 class="text-lg font-medium text-white">Create New Employee</h2>
+        <p class="text-xs text-white/50">
+          Quick Onboarding Form
         </p>
       </div>
       <button
@@ -71,7 +71,7 @@
       <div class="sm:col-span-1">
         <label
           for="create-name"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
           >Employee Name</label
         >
         <input
@@ -85,7 +85,7 @@
       <div class="sm:col-span-1">
         <label
           for="create-dept"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
           >Department</label
         >
         <input
@@ -99,7 +99,7 @@
       <div class="sm:col-span-1">
         <label
           for="create-deptid"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
           >Department ID</label
         >
         <input
@@ -113,7 +113,7 @@
       <div class="sm:col-span-1">
         <label
           for="create-role"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
           >Role</label
         >
         <input
@@ -127,7 +127,7 @@
       <div class="sm:col-span-1">
         <label
           for="create-title"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
           >Title</label
         >
         <input
@@ -141,8 +141,8 @@
       <div class="sm:col-span-1">
         <label
           for="create-employment"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Employment type</label
+          class="mb-2 block text-xs text-white/60"
+          >Employment Type</label
         >
         <input
           id="create-employment"
@@ -155,8 +155,8 @@
       <div class="sm:col-span-1">
         <label
           for="create-phone"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
-          >Contact number</label
+          class="mb-2 block text-xs text-white/60"
+          >Contact Number</label
         >
         <input
           id="create-phone"
@@ -169,7 +169,7 @@
       <div class="sm:col-span-1">
         <label
           for="create-email"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
           >Email</label
         >
         <input
@@ -183,7 +183,7 @@
       <div class="sm:col-span-1">
         <label
           for="create-location"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
           >Location</label
         >
         <input
@@ -197,7 +197,7 @@
       <div class="sm:col-span-1">
         <label
           for="create-timezone"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
           >Timezone</label
         >
         <input
@@ -211,7 +211,7 @@
       <div class="sm:col-span-1">
         <label
           for="create-hireDate"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
           >Hire Date</label
         >
         <input
@@ -224,7 +224,7 @@
       <div class="sm:col-span-1">
         <label
           for="create-skills"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
           >Skills (comma separated)</label
         >
         <input
@@ -238,7 +238,7 @@
       <div class="sm:col-span-1">
         <label
           for="create-tags"
-          class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/60"
+          class="mb-2 block text-xs text-white/60"
           >Tags (comma separated)</label
         >
         <input
@@ -277,10 +277,18 @@
     >
       <button
         type="button"
-        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-5 text-left text-sm text-white/80 transition hover:bg-white/5"
+        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
         (click)="toggleExpand(employee.employeeId)"
       >
         <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
+          <app-user-avatar
+            class="shrink-0"
+            [seed]="employee.emailId || employee.employeeName"
+            [imageUrl]="employee.avatarUrl ?? null"
+            [label]="employee.employeeName"
+            [size]="32"
+            [alt]="employee.employeeName"
+          ></app-user-avatar>
           <span
             class="inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-xs font-medium text-white/80 shadow-inner shadow-slate-950/25"
           >
@@ -300,9 +308,18 @@
           >
             {{ employee.role }}
           </span>
+          <span
+            *ngIf="employee.hireDate || employee.createdAt"
+            class="mt-1 text-xs text-white/45 md:ml-3 md:mt-0"
+          >
+            Joined
+            {{
+              (employee.hireDate || employee.createdAt)! | date: "mediumDate"
+            }}
+          </span>
         </div>
         <span
-          class="text-xs uppercase tracking-[0.35em] text-white/40 transition"
+          class="text-xs text-white/40 transition"
           [class.text-white]="expandedEmployeeId === employee.employeeId"
         >
           {{ expandedEmployeeId === employee.employeeId ? "Hide" : "Details" }}
@@ -311,7 +328,7 @@
 
       <div
         *ngIf="expandedEmployeeId === employee.employeeId"
-        class="border-t border-white/10 px-2 sm:px-4 py-6 text-sm text-white/75"
+        class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75"
       >
         <ng-container
           *ngIf="editingEmployeeId === employee.employeeId; else viewMode"
@@ -325,8 +342,8 @@
             <div class="md:col-span-1">
               <label
                 for="edit-name-{{ employee.employeeId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
-                >Employee name</label
+                class="mb-2 block text-xs text-white/50"
+                >Employee Name</label
               >
               <input
                 [id]="'edit-name-' + employee.employeeId"
@@ -338,7 +355,7 @@
             <div class="md:col-span-1">
               <label
                 for="edit-dept-{{ employee.employeeId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                class="mb-2 block text-xs text-white/50"
                 >Department</label
               >
               <input
@@ -351,7 +368,7 @@
             <div class="md:col-span-1">
               <label
                 for="edit-deptid-{{ employee.employeeId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                class="mb-2 block text-xs text-white/50"
                 >Department ID</label
               >
               <input
@@ -364,7 +381,7 @@
             <div class="md:col-span-1">
               <label
                 for="edit-role-{{ employee.employeeId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                class="mb-2 block text-xs text-white/50"
                 >Role</label
               >
               <input
@@ -377,7 +394,7 @@
             <div class="md:col-span-1">
               <label
                 for="edit-title-{{ employee.employeeId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                class="mb-2 block text-xs text-white/50"
                 >Title</label
               >
               <input
@@ -390,8 +407,8 @@
             <div class="md:col-span-1">
               <label
                 for="edit-employment-{{ employee.employeeId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
-                >Employment type</label
+                class="mb-2 block text-xs text-white/50"
+                >Employment Type</label
               >
               <input
                 [id]="'edit-employment-' + employee.employeeId"
@@ -403,8 +420,8 @@
             <div class="md:col-span-1">
               <label
                 for="edit-phone-{{ employee.employeeId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
-                >Contact number</label
+                class="mb-2 block text-xs text-white/50"
+                >Contact Number</label
               >
               <input
                 [id]="'edit-phone-' + employee.employeeId"
@@ -416,7 +433,7 @@
             <div class="md:col-span-1">
               <label
                 for="edit-email-{{ employee.employeeId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                class="mb-2 block text-xs text-white/50"
                 >Email</label
               >
               <input
@@ -429,7 +446,7 @@
             <div class="md:col-span-1">
               <label
                 for="edit-location-{{ employee.employeeId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                class="mb-2 block text-xs text-white/50"
                 >Location</label
               >
               <input
@@ -442,7 +459,7 @@
             <div class="md:col-span-1">
               <label
                 for="edit-timezone-{{ employee.employeeId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                class="mb-2 block text-xs text-white/50"
                 >Timezone</label
               >
               <input
@@ -455,7 +472,7 @@
             <div class="md:col-span-1">
               <label
                 for="edit-hireDate-{{ employee.employeeId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                class="mb-2 block text-xs text-white/50"
                 >Hire Date</label
               >
               <input
@@ -468,7 +485,7 @@
             <div class="md:col-span-1">
               <label
                 for="edit-skills-{{ employee.employeeId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                class="mb-2 block text-xs text-white/50"
                 >Skills</label
               >
               <input
@@ -481,7 +498,7 @@
             <div class="md:col-span-1">
               <label
                 for="edit-tags-{{ employee.employeeId }}"
-                class="mb-2 block text-xs uppercase tracking-[0.35em] text-white/50"
+                class="mb-2 block text-xs text-white/50"
                 >Tags</label
               >
               <input
@@ -522,7 +539,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+              <p class="text-xs text-white/45">
                 Employee ID
               </p>
               <p class="mt-1 text-base font-medium text-white">
@@ -532,7 +549,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+              <p class="text-xs text-white/45">
                 Department
               </p>
               <p class="mt-1 text-base font-medium text-white">
@@ -542,7 +559,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+              <p class="text-xs text-white/45">
                 Department ID
               </p>
               <p class="mt-1 text-base font-medium text-white">
@@ -552,7 +569,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+              <p class="text-xs text-white/45">
                 Role & Title
               </p>
               <p class="mt-1 text-base font-medium text-white">
@@ -565,8 +582,8 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
-                Employment type
+              <p class="text-xs text-white/45">
+                Employment Type
               </p>
               <p class="mt-1 text-base font-medium text-white">
                 {{ employee.employmentType || "—" }}
@@ -575,7 +592,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+              <p class="text-xs text-white/45">
                 Contact
               </p>
               <p class="mt-1 text-base font-medium text-white">
@@ -588,7 +605,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+              <p class="text-xs text-white/45">
                 Location
               </p>
               <p class="mt-1 text-base font-medium text-white">
@@ -601,7 +618,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+              <p class="text-xs text-white/45">
                 Hire Date
               </p>
               <p class="mt-1 text-base font-medium text-white">
@@ -615,9 +632,33 @@
               </p>
             </div>
             <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Updated</p>
+              <p class="mt-1 text-base font-medium text-white">
+                {{
+                  employee.updatedAt
+                    ? (employee.updatedAt | date: "mediumDate")
+                    : "—"
+                }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Last Active</p>
+              <p class="mt-1 text-base font-medium text-white">
+                {{
+                  employee.lastActiveAt
+                    ? (employee.lastActiveAt | date: "mediumDate")
+                    : "—"
+                }}
+              </p>
+            </div>
+            <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:col-span-2"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+              <p class="text-xs text-white/45">
                 Skills
               </p>
               <p class="mt-1 text-base font-medium text-white">
@@ -631,7 +672,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:col-span-2"
             >
-              <p class="text-xs uppercase tracking-[0.3em] text-white/45">
+              <p class="text-xs text-white/45">
                 Tags
               </p>
               <p class="mt-1 text-base font-medium text-white">
@@ -643,6 +684,9 @@
               </p>
             </div>
             <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
+              <app-card-close-button
+                (closed)="closeExpanded()"
+              ></app-card-close-button>
               <button
                 type="button"
                 class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
@@ -674,58 +718,29 @@
   </section>
 </div>
 
-<div
-  *ngIf="pendingDelete as toDelete"
-  class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/70 px-4 py-4"
-  style="
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow-y: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+<app-alert-dialog
+  [open]="!!pendingDelete"
+  [title]="
+    pendingDelete
+      ? 'Delete ' + pendingDelete.employeeName + '?'
+      : 'Delete Employee?'
   "
->
-  <div
-    class="w-full max-w-md rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-900/95 p-2 sm:p-4 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.65)]"
-  >
-    <h2 class="text-lg font-medium text-white">
-      Delete {{ toDelete.employeeName }}?
-    </h2>
-    <p class="mt-2 text-white/70">
-      This action cannot be undone. The employee record will be permanently
-      removed from the system.
-    </p>
-    <div class="mt-6 flex justify-end gap-3">
-      <button
-        type="button"
-        [disabled]="isDeleting"
-        class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-        (click)="confirmDelete(false)"
-      >
-        Cancel
-      </button>
-      <button
-        type="button"
-        [disabled]="isDeleting"
-        class="inline-flex items-center justify-center gap-2 rounded-xl border border-rose-500/40 bg-rose-500/20 px-4 py-2 text-xs text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] transition hover:border-rose-400/60 hover:bg-rose-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
-        (click)="confirmDelete(true)"
-      >
-        @if (!isDeleting) {
-          <lucide-icon name="trash-2" [size]="16"></lucide-icon>
-          <span>Delete Employee</span>
-        } @else {
-          <lucide-icon
-            name="loader-circle"
-            [size]="16"
-            class="animate-spin"
-          ></lucide-icon>
-          <span>Deleting...</span>
-        }
-      </button>
-    </div>
-  </div>
-</div>
+  description="This action cannot be undone. The employee record will be permanently removed from the system."
+  confirmLabel="Delete Employee"
+  variant="destructive"
+  [busy]="isDeleting"
+  busyLabel="Deleting..."
+  (confirmed)="confirmDelete()"
+  (cancelled)="dismissDelete()"
+></app-alert-dialog>
+
+<app-alert-dialog
+  [open]="pendingSave"
+  [title]="saveDialogTitle()"
+  description="Confirm saving these employee changes. The list will refresh when the update completes."
+  confirmLabel="Save Changes"
+  [busy]="isSaving"
+  busyLabel="Saving..."
+  (confirmed)="confirmSave()"
+  (cancelled)="dismissSave()"
+></app-alert-dialog>

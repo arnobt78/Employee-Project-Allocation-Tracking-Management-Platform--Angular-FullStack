@@ -5,11 +5,14 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnChanges,
   Output,
+  SimpleChanges,
   ViewChild,
   forwardRef,
   inject,
-  signal } from '@angular/core';
+  signal,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
@@ -26,23 +29,12 @@ export interface SelectMenuOption {
 @Component({
   selector: 'app-select-menu-panel',
   standalone: true,
-  imports: [
-    AppIconComponent,CommonModule, UserAvatarComponent],
+  imports: [AppIconComponent, CommonModule, UserAvatarComponent],
   template: `
     <ul
       role="listbox"
       class="w-full max-h-72 overflow-auto rounded-2xl border border-white/15 bg-slate-950/95 p-2 shadow-[0_25px_70px_rgba(9,14,33,0.65)] backdrop-blur-xl"
     >
-      @if (showClear) {
-        <li
-          role="option"
-          class="mb-1 flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 px-3 py-2.5 text-sm text-rose-200 transition hover:bg-white/10"
-          (click)="pick('clear')"
-        >
-          <lucide-icon name="eraser" [size]="16" class="shrink-0"></lucide-icon>
-          <span class="font-medium">Clear Selection</span>
-        </li>
-      }
       @for (option of options; track option.value; let index = $index) {
         <li
           role="option"
@@ -55,13 +47,15 @@ export interface SelectMenuOption {
           (click)="pick(option.value)"
           (mouseenter)="activeIndex = index"
         >
-          <app-user-avatar
-            [seed]="option.imageSeed || option.value"
-            [imageUrl]="option.imageUrl ?? null"
-            [label]="option.label"
-            [size]="36"
-            [alt]="''"
-          ></app-user-avatar>
+          @if (option.imageUrl || option.imageSeed) {
+            <app-user-avatar
+              [seed]="option.imageSeed || option.value"
+              [imageUrl]="option.imageUrl ?? null"
+              [label]="option.label"
+              [size]="36"
+              [alt]="''"
+            ></app-user-avatar>
+          }
           <div class="min-w-0 flex-1">
             <p class="truncate text-sm font-medium">{{ option.label }}</p>
             @if (option.subtitle) {
@@ -70,8 +64,19 @@ export interface SelectMenuOption {
           </div>
         </li>
       }
+      @if (showClear) {
+        <li
+          role="option"
+          class="mt-1 flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 px-3 py-2.5 text-sm text-rose-200 transition hover:bg-white/10"
+          (click)="pick('clear')"
+        >
+          <lucide-icon name="eraser" [size]="16" class="shrink-0"></lucide-icon>
+          <span class="font-medium">Clear Selection</span>
+        </li>
+      }
     </ul>
-  ` })
+  `,
+})
 class SelectMenuPanelComponent {
   options: SelectMenuOption[] = [];
   selectedValue = '';
@@ -83,21 +88,19 @@ class SelectMenuPanelComponent {
 @Component({
   selector: 'app-select-menu',
   standalone: true,
-  imports: [
-    CommonModule,
-    OverlayModule,
-    UserAvatarComponent
-  ],
+  imports: [CommonModule, OverlayModule, UserAvatarComponent],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SelectMenuComponent),
-      multi: true }],
+      multi: true,
+    },
+  ],
   template: `
     <button
       #trigger
       type="button"
-      class="flex w-full items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-left text-sm text-white/85 outline-none backdrop-blur-sm transition focus:border-amber-400/60 focus:bg-white/10 focus:text-white disabled:cursor-not-allowed disabled:opacity-60"
+      class="flex h-[3.25rem] w-full items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/5 px-4 text-left text-sm text-white/85 outline-none backdrop-blur-sm transition focus:border-amber-400/60 focus:bg-white/10 focus:text-white disabled:cursor-not-allowed disabled:opacity-60"
       [attr.aria-expanded]="isOpen()"
       aria-haspopup="listbox"
       [disabled]="disabled"
@@ -106,25 +109,20 @@ class SelectMenuPanelComponent {
     >
       <span class="flex min-w-0 flex-1 items-center gap-3">
         @if (selectedOption(); as selected) {
-          <app-user-avatar
-            [seed]="selected.imageSeed || selected.value"
-            [imageUrl]="selected.imageUrl ?? null"
-            [label]="selected.label"
-            [size]="32"
-            [alt]="''"
-          ></app-user-avatar>
-          <span class="min-w-0">
-            <span class="block truncate font-medium text-white">{{
-              selected.label
-            }}</span>
-            @if (selected.subtitle) {
-              <span class="block truncate text-xs text-white/55">{{
-                selected.subtitle
-              }}</span>
-            }
-          </span>
+          @if (selected.imageUrl || selected.imageSeed) {
+            <app-user-avatar
+              [seed]="selected.imageSeed || selected.value"
+              [imageUrl]="selected.imageUrl ?? null"
+              [label]="selected.label"
+              [size]="24"
+              [alt]="''"
+            ></app-user-avatar>
+          }
+          <span class="min-w-0 truncate font-medium text-white">{{
+            selected.label
+          }}</span>
         } @else {
-          <span class="text-white/40">{{ placeholder }}</span>
+          <span class="truncate text-white/40">{{ placeholder }}</span>
         }
       </span>
       <svg
@@ -139,8 +137,9 @@ class SelectMenuPanelComponent {
         <path d="M6 9l6 6 6-6" />
       </svg>
     </button>
-  ` })
-export class SelectMenuComponent implements ControlValueAccessor {
+  `,
+})
+export class SelectMenuComponent implements ControlValueAccessor, OnChanges {
   private readonly overlay = inject(Overlay);
 
   @ViewChild('trigger', { static: true })
@@ -149,6 +148,10 @@ export class SelectMenuComponent implements ControlValueAccessor {
   @Input() options: SelectMenuOption[] = [];
   @Input() placeholder = 'Select An Option';
   @Input() disabled = false;
+  /** When false, hide Clear Selection (filters / required fields). */
+  @Input() clearable = true;
+  /** Emit `number | null` via CVA (empty → null). */
+  @Input() numeric = false;
 
   @Output() selectionChange = new EventEmitter<string>();
 
@@ -157,15 +160,24 @@ export class SelectMenuComponent implements ControlValueAccessor {
 
   private value = '';
   private overlayRef: OverlayRef | null = null;
-  private onChange: (value: string) => void = () => {};
+  private onChange: (value: string | number | null) => void = () => {};
   private onTouched: () => void = () => {};
 
-  writeValue(value: string | null): void {
-    this.value = value ?? '';
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['options']) {
+      this.syncSelection();
+    }
+  }
+
+  writeValue(value: string | number | null): void {
+    this.value =
+      value === null || value === undefined || value === ''
+        ? ''
+        : String(value);
     this.syncSelection();
   }
 
-  registerOnChange(fn: (value: string) => void): void {
+  registerOnChange(fn: (value: string | number | null) => void): void {
     this.onChange = fn;
   }
 
@@ -193,22 +205,28 @@ export class SelectMenuComponent implements ControlValueAccessor {
       return;
     }
 
+    const triggerWidth = this.trigger.nativeElement.offsetWidth;
+
     const positionStrategy = this.overlay
       .position()
       .flexibleConnectedTo(this.trigger)
+      .withFlexibleDimensions(false)
       .withPositions([
         {
           originX: 'start',
           originY: 'bottom',
           overlayX: 'start',
           overlayY: 'top',
-          offsetY: 8 },
+          offsetY: 8,
+        },
         {
           originX: 'start',
           originY: 'top',
           overlayX: 'start',
           overlayY: 'bottom',
-          offsetY: -8 }])
+          offsetY: -8,
+        },
+      ])
       .withPush(true);
 
     this.overlayRef = this.overlay.create({
@@ -216,13 +234,16 @@ export class SelectMenuComponent implements ControlValueAccessor {
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
       hasBackdrop: true,
       backdropClass: 'cdk-overlay-transparent-backdrop',
-      width: this.trigger.nativeElement.offsetWidth });
+      width: triggerWidth,
+      minWidth: triggerWidth,
+    });
 
     const portal = new ComponentPortal(SelectMenuPanelComponent);
     const componentRef = this.overlayRef.attach(portal);
     componentRef.instance.options = this.options;
     componentRef.instance.selectedValue = this.value;
-    componentRef.instance.showClear = !!this.value && this.value !== 'clear';
+    componentRef.instance.showClear =
+      this.clearable && !!this.value && this.value !== 'clear';
     componentRef.instance.pick = (nextValue: string) => {
       this.selectValue(nextValue);
       this.close();
@@ -260,7 +281,12 @@ export class SelectMenuComponent implements ControlValueAccessor {
   private selectValue(nextValue: string): void {
     this.value = nextValue === 'clear' ? '' : nextValue;
     this.syncSelection();
-    this.onChange(this.value);
+    const emitted: string | number | null = this.numeric
+      ? this.value === ''
+        ? null
+        : Number(this.value)
+      : this.value;
+    this.onChange(emitted);
     this.selectionChange.emit(nextValue === 'clear' ? 'clear' : this.value);
   }
 
