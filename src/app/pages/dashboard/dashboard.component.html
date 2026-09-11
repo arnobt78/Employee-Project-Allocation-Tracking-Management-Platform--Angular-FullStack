@@ -29,12 +29,14 @@
         <div class="flex items-start justify-between gap-4">
           <div>
             <p class="text-xs text-white/60">Total Employees</p>
-            <p class="mt-3 text-3xl font-medium text-white">
+            <p
+              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+            >
               {{ dashboardData?.totalEmployee }}
             </p>
           </div>
         </div>
-        <p class="mt-4 text-sm text-white/70">
+        <p class="mt-4 text-xs sm:text-sm text-white/70">
           Track your entire organisation workforce across locations.
         </p>
       </article>
@@ -45,12 +47,14 @@
         <div class="flex items-start justify-between gap-4">
           <div>
             <p class="text-xs text-white/60">Total Projects</p>
-            <p class="mt-3 text-3xl font-medium text-white">
+            <p
+              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+            >
               {{ dashboardData?.totalProject }}
             </p>
           </div>
         </div>
-        <p class="mt-4 text-sm text-white/70">
+        <p class="mt-4 text-xs sm:text-sm text-white/70">
           Monitor project health and velocity with real-time status.
         </p>
       </article>
@@ -61,12 +65,14 @@
         <div class="flex items-start justify-between gap-4">
           <div>
             <p class="text-xs text-white/60">Active Project Employees</p>
-            <p class="mt-3 text-3xl font-medium text-white">
+            <p
+              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+            >
               {{ dashboardData?.activeProjectEmployees }}
             </p>
           </div>
         </div>
-        <p class="mt-4 text-sm text-white/70">
+        <p class="mt-4 text-xs sm:text-sm text-white/70">
           Know exactly who is booked and where the next gaps appear.
         </p>
       </article>
@@ -151,7 +157,11 @@
       >
         <header class="flex items-center justify-between gap-4 pb-4">
           <div>
-            <h2 class="text-lg font-medium text-white">Latest Projects</h2>
+            <h2
+              class="text-xl sm:text-2xl leading-tight font-medium text-white"
+            >
+              Latest Projects
+            </h2>
             <p class="text-xs text-white/50">Recently Approved</p>
           </div>
           <span
@@ -205,7 +215,11 @@
       >
         <header class="flex items-center justify-between gap-4 pb-4">
           <div>
-            <h2 class="text-lg font-medium text-white">New Employees</h2>
+            <h2
+              class="text-xl sm:text-2xl leading-tight font-medium text-white"
+            >
+              New Employees
+            </h2>
             <p class="text-xs text-white/50">Last 30 Days Joined</p>
           </div>
           <span
@@ -222,7 +236,9 @@
             <li
               class="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 shadow-sm shadow-slate-950/20"
             >
-              <span class="flex min-w-0 items-center gap-3 font-medium text-white">
+              <span
+                class="flex min-w-0 items-center gap-3 font-medium text-white"
+              >
                 <app-user-avatar
                   [seed]="item.emailId || item.employeeName"
                   [imageUrl]="item.avatarUrl ?? null"
@@ -266,7 +282,9 @@
         class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <h2 class="text-lg font-medium text-white">Employee Departments</h2>
+          <h2 class="text-xl sm:text-2xl leading-tight font-medium text-white">
+            Employee Departments
+          </h2>
           <p class="text-xs text-white/50">
             Parent divisions across the organization
           </p>
@@ -292,7 +310,7 @@
                 class="h-10 w-10 object-contain"
               />
             </div>
-            <p class="text-sm font-medium text-white">
+            <p class="text-xs sm:text- sm font-medium text-white">
               {{ dept.departmentName }}
             </p>
           </div>

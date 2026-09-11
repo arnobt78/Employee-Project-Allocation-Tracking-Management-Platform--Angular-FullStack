@@ -4,8 +4,10 @@
     class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
   >
     <div>
-      <h1 class="text-2xl font-medium text-white">Business Insights</h1>
-      <p class="text-sm text-white/60">
+      <h1 class="text-xl sm:text-2xl leading-tight font-medium text-white">
+        Business Insights
+      </h1>
+      <p class="text-xs sm:text-sm text-white/60">
         Analytics and reporting for projects, resources, and performance
       </p>
     </div>
@@ -157,7 +159,9 @@
           class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
           <p class="text-xs text-white/45">Total Projects</p>
-          <p class="mt-2 text-3xl font-medium text-white">
+          <p
+            class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+          >
             {{ insights()?.totalProjectCount ?? projectsSignal().length }}
           </p>
         </div>
@@ -165,7 +169,9 @@
           class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
           <p class="text-xs text-white/45">Total Employees</p>
-          <p class="mt-2 text-3xl font-medium text-white">
+          <p
+            class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+          >
             {{
               (insights()?.filteredEmployeeCount ??
                 insights()?.resourceUtilization?.totalEmployees) ||
@@ -177,7 +183,9 @@
           class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
           <p class="text-xs text-white/45">Avg Readiness</p>
-          <p class="mt-2 text-3xl font-medium text-white">
+          <p
+            class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+          >
             {{ insights()?.readinessScores?.average || 0 }}%
           </p>
         </div>
@@ -185,7 +193,9 @@
           class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
           <p class="text-xs text-white/45">Resource Utilization</p>
-          <p class="mt-2 text-3xl font-medium text-white">
+          <p
+            class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+          >
             {{ insights()?.teamCapacity?.utilizationPercentage || 0 }}%
           </p>
         </div>
@@ -289,7 +299,9 @@
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-xs text-white/60">{{ item.label }}</p>
-                <p class="text-2xl font-medium text-white">
+                <p
+                  class="text-xl sm:text-2xl leading-none font-medium text-white"
+                >
                   {{ item.value }}
                 </p>
               </div>
@@ -394,7 +406,11 @@
             class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-sm font-medium text-white">{{ type.type }}</p>
-            <p class="mt-2 text-2xl font-medium text-white">{{ type.count }}</p>
+            <p
+              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+            >
+              {{ type.count }}
+            </p>
             <p class="text-xs text-white/60">
               Avg Readiness: {{ type.averageReadiness }}%
             </p>
@@ -424,7 +440,9 @@
             class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Total Employees</p>
-            <p class="mt-2 text-3xl font-medium text-white">
+            <p
+              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+            >
               {{ insights()?.resourceUtilization?.totalEmployees || 0 }}
             </p>
           </div>
@@ -432,7 +450,9 @@
             class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Active Assignments</p>
-            <p class="mt-2 text-3xl font-medium text-white">
+            <p
+              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+            >
               {{ insights()?.resourceUtilization?.activeAssignments || 0 }}
             </p>
           </div>
@@ -440,7 +460,9 @@
             class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Average Allocation</p>
-            <p class="mt-2 text-3xl font-medium text-white">
+            <p
+              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+            >
               {{ insights()?.resourceUtilization?.averageAllocation || 0 }}%
             </p>
           </div>
@@ -448,7 +470,9 @@
             class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Available Resources</p>
-            <p class="mt-2 text-3xl font-medium text-white">
+            <p
+              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+            >
               {{ insights()?.resourceUtilization?.availableCount || 0 }}
             </p>
           </div>
@@ -479,19 +503,25 @@
           <div class="grid gap-4 sm:grid-cols-3">
             <div>
               <p class="text-xs text-white/60">Total Capacity</p>
-              <p class="text-xl font-medium text-white">
+              <p
+                class="text-xl sm:text-2xl leading-none font-medium text-white"
+              >
                 {{ insights()?.teamCapacity?.totalCapacity || 0 }}%
               </p>
             </div>
             <div>
               <p class="text-xs text-white/60">Utilized</p>
-              <p class="text-xl font-medium text-white">
+              <p
+                class="text-xl sm:text-2xl leading-none font-medium text-white"
+              >
                 {{ insights()?.teamCapacity?.utilizedCapacity || 0 }}%
               </p>
             </div>
             <div>
               <p class="text-xs text-white/60">Available</p>
-              <p class="text-xl font-medium text-white">
+              <p
+                class="text-xl sm:text-2xl leading-none font-medium text-white"
+              >
                 {{ insights()?.teamCapacity?.availableCapacity || 0 }}%
               </p>
             </div>
@@ -511,7 +541,9 @@
             class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Total Budget</p>
-            <p class="mt-2 text-2xl font-medium text-white">
+            <p
+              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+            >
               ${{
                 insights()?.budgetMetrics?.totalBudget || 0 | number: "1.0-0"
               }}
@@ -521,7 +553,9 @@
             class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Allocated</p>
-            <p class="mt-2 text-2xl font-medium text-white">
+            <p
+              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+            >
               ${{
                 insights()?.budgetMetrics?.allocatedBudget || 0
                   | number: "1.0-0"
@@ -532,7 +566,9 @@
             class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Spent</p>
-            <p class="mt-2 text-2xl font-medium text-white">
+            <p
+              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+            >
               ${{
                 insights()?.budgetMetrics?.spentBudget || 0 | number: "1.0-0"
               }}
@@ -542,7 +578,9 @@
             class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
           >
             <p class="text-xs text-white/60">Remaining</p>
-            <p class="mt-2 text-2xl font-medium text-white">
+            <p
+              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+            >
               ${{
                 insights()?.budgetMetrics?.remainingBudget || 0
                   | number: "1.0-0"
@@ -599,7 +637,7 @@
                   editing/input from frontend UI is not yet implemented
                 </li>
               </ul>
-              <p class="mt-3 text-xs text-white/50">
+              <p class="mt-2 text-xs text-white/50">
                 Budget values are currently read-only and managed through the
                 database. Frontend editing capabilities will be added in a
                 future update.
