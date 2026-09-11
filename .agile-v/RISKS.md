@@ -12,6 +12,9 @@
 | RISK-0008 | Thin unit tests (`should create` only) allow silent regressions | Medium | Confirmed | REQ-0108 | Expand critical path tests | Open |
 | RISK-0009 | Backup `handler.mjs.bak*` may confuse agents or be accidentally edited | Low | Confirmed | REQ-0107 | Delete with DEC | Mitigated |
 | RISK-0010 | `.env` present locally; accidental commit or AI ingestion of secrets | High | Possible | REQ-0102 | Keep gitignored; add `.env.example`; never read `.env` into agent context | Mitigated (policy) |
+| RISK-0011 | Fresh install audit dirty (6 vulns) — js-yaml, nodemailer, qs, hono transitive | High | Confirmed 2026-09-11 | REQ-0112 | Patch + scoped overrides; avoid `audit fix --force` majors | Mitigated (audit 0) |
+| RISK-0012 | Blind major bumps (Angular 21+, Prisma 7+, Tailwind 4, ESLint 10, lucide → `@lucide/angular`) break peers / UI | High | Confirmed by outdated map | REQ-0112 | Stay on Angular 20 LTS + Prisma 6 + Tailwind 3 | Mitigated (plan lock) |
+| RISK-0013 | Vercel dashboard Node still on 20 despite `engines` 24.x | Medium | Possible | REQ-0111 | Confirm Project Settings → Node 24 (package.json overrides when set) | Open |
 
 ## Notes
 

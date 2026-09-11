@@ -54,6 +54,8 @@ Legend: `BASELINE` = verified as-built behavior · `GAP` = docs/code mismatch or
 | REQ-0108 | Automated validation: production build + meaningful unit/integration coverage for critical CRUD paths. | PROPOSED | Specs are mostly `should create`; no lint script in package.json |
 | REQ-0109 | Prefer extending `MasterService` + repository exports over parallel API clients; keep Angular standalone + signals conventions. | BASELINE constraint | Architecture preservation |
 | REQ-0110 | Large UI modules (`project-form` ~1.9k LOC, `business-insights` ~1k LOC, handler/repository ~3.4k each) SHOULD be split only with approved vertical slices. | PROPOSED (deferrable) | Avoid big-bang rewrite |
+| REQ-0111 | `engines.node` MUST remain `24.x` with `.nvmrc` `24`; Vercel dashboard Node must not force EOL Node 20 after Oct 1. | DONE (repo); dashboard Human-Action | Guardrails §1.5 / §8 |
+| REQ-0112 | `npm audit` MUST report **0** vulnerabilities on Node 24 after compatible upgrades/overrides; lint + production build MUST pass. | DONE | Verified 2026-09-11 |
 
 ---
 

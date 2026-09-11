@@ -1,5 +1,35 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-11 — GATE-0012 deps/audit 0 + Node 24 (commit-ready)
+
+**Node:** v24.21.0 (`engines.node: 24.x`, `.nvmrc` = `24`)
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm audit` | **PASS (0 vulnerabilities)** | After clean reinstall + overrides |
+| `npm run lint` | **PASS** | Re-run after build also PASS |
+| `npm run build` | **PASS** | Bundle budget warning; unused OptimizedImage on login (NG8113) |
+| `npm test -- --watch=false --browsers=ChromeHeadless` | **PASS** | 12/12 specs |
+| verify-deep | **PASS WITH WARNINGS** | Lockfile gitignored; Vercel Node dashboard Human-Action |
+| review-security | **PASS WITH WARNINGS** | No blockers; supply-chain lockfile visibility low |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| nodemailer `^9.1.1` | Done |
+| overrides `js-yaml` / `qs` / `hono` | Done |
+| Angular 20.3.x + Sentry 10.x patches | Done |
+| Node 24 engines + `.nvmrc` confirmed | Done |
+
+### eval_gate_status
+
+N/A (user-directed delivery; formal GATE-0001 record optional follow-up)
+
+---
+
 ## Session 2026-08-25 — Rich cards, AlertDialog, avatars, dist/ (commit-ready)
 
 **Node:** v24.x

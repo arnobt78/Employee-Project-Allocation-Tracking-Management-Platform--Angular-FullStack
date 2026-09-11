@@ -1,5 +1,12 @@
 # Changelog — Agile V project memory
 
+## 2026-09-11 — GATE-0012 npm audit 0 + Node 24
+
+- Bumped nodemailer to ^9.1.1; Angular 20.3.31 / CLI 20.3.37; Sentry 10.74.x
+- Scoped overrides: js-yaml ^4.3.2, qs ^6.16.0, hono ^4.13.7
+- Confirmed engines.node 24.x + .nvmrc; `npm audit` 0; lint/build/test PASS
+- Security review PASS WITH WARNINGS (lockfile gitignored; Vercel Node dashboard Human-Action)
+
 ## 2026-08-25 — Rich cards, AlertDialog, avatars, dist/
 
 - CDK `AlertDialog` (body portal) for deletes + edit-save confirm with busy until list refresh

@@ -52,4 +52,15 @@ Append-only. Do not rewrite prior entries.
 | Decision | Implement session auth, API auth, `.env.example`, SECURITY.md, AI fallback, Sentry tunnel, SEO/README without waiting for formal GATE-0001 row |
 | Rationale | User explicitly directed implementation and verify-deep / commit-ready |
 | Linked REQ | REQ-0101–0105, REQ-0107–0108 |
-| Alternatives | Pause until GATE-0001 APPROVALS entry (rejected by user direction) |
+
+---
+
+## DEC-0012 — Compatible dep patches only (GATE-0012)
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-11 |
+| Decision | Drive `npm audit` to 0 via nodemailer ≥9.1.1 + overrides (`js-yaml` ≥4.3.2, `qs` ≥6.16.0, `hono` ≥4.13.7) + Angular 20.3.x / Sentry 10.x patch bumps; **do not** migrate Angular 21+, Prisma 7+, Tailwind 4, ESLint 10, or `@lucide/angular` in this slice |
+| Rationale | Guardrails §8; terminal shows 6 vulns all fixable in-major; majors would break peers |
+| Linked REQ | REQ-0111, REQ-0112 |
+| Status | APPROVED and executed (audit 0; lint/build/test PASS) |

@@ -45,7 +45,18 @@
 | TASK-0012 | Extract notification builders from `handler.mjs` into dedicated module | REQ-0110 | Vertical slice; no behavior change |
 | TASK-0013 | Split `project-form.component.ts` into form sections / services | REQ-0110 | High risk of regressions; needs own gate |
 | TASK-0014 | Clarify employee password handling (hash, omit from API responses) | REQ-0106 | Security review |
-| TASK-0015 | Evaluate Redis/Sentry/PostHog guide vs product need | — | Sentry implemented; Redis/PostHog deferred |
+
+---
+
+## Wave — Node 24 + audit 0 (2026-09-11)
+
+| ID | Task | REQ | Status |
+|---|---|---|---|
+| TASK-0015 | Confirm Node 24 pins (`engines`, `.nvmrc`); note Vercel dashboard Node Human-Action | REQ-0111 | DONE |
+| TASK-0016 | Patch direct deps within compatible majors (nodemailer ≥9.1.1; Angular 20.3.x latest; Sentry 10.x patch) | REQ-0112 | DONE |
+| TASK-0017 | Scoped `overrides` for transitive `js-yaml`, `qs`, `hono` to patched versions | REQ-0112 | DONE |
+| TASK-0018 | Clean reinstall; `npm audit` = 0; `npm run lint` + `npm run build` (+ test if green) | REQ-0112 | DONE |
+| TASK-0019 | Evaluate Redis/Sentry/PostHog guide vs product need | — | Sentry implemented; Redis/PostHog deferred |
 
 ---
 
