@@ -42,6 +42,20 @@ Applies to: button labels, page/card/section titles, form field labels, tab labe
 
 Out of scope: paragraph body copy, validation/error sentences, sentence-style placeholders, toast descriptions, and dynamic API/user content (names, comments, AI draft text).
 
+### UI Consistency Rules (central tokens)
+
+Prefer shared tokens in `src/styles.css` and reusable components under `src/app/components/ui/*`. Do **not** invent one-off padding, gap, or fixed heights for the same control type on a single page.
+
+| Rule | Token / Component | Notes |
+|---|---|---|
+| Control height | `.eh-control` / `.eh-select-trigger` | Always `px-4 py-3`; never fixed `h-[…]` on SelectMenu triggers |
+| Dropdown panel width | `app-select-menu` + `.eh-select-menu-pane` | Panel width must match the trigger (responsive); set via CDK overlay + `--eh-select-trigger-width` |
+| Dropdown option leading visual | `SelectMenuOption.icon` or avatar | Lucide icon when no avatar; avatars keep Robohash/`UserAvatar` |
+| Icon + label buttons | `gap-1`, `ubButton`, `.eh-btn-icon` | One gap for icon↔text; layout gaps between sibling buttons may stay `gap-3` |
+| Button-looking actions | `<button>` | Do not use `<a ubButton>` for actions; real nav chrome may stay as links |
+
+When polishing UI in future prompts: extend these tokens/components first, then distribute across consumers.
+
 ---
 
 ## Color Palette & Variants

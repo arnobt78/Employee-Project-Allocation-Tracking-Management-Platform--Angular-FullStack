@@ -79,6 +79,20 @@
   .input {
     @apply w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-base text-white/90 outline-none transition-all duration-200 placeholder:text-white/60 focus:border-primary/60 focus:bg-white/15 focus:ring-2 focus:ring-primary/40;
   }
+
+  /* Shared glass control height — inputs + SelectMenu trigger (px-4 py-3, no fixed h-*) */
+  .eh-control {
+    @apply w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none backdrop-blur-sm transition placeholder:text-white/40 focus:border-amber-400/60 focus:bg-white/10 focus:text-white disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .eh-select-trigger {
+    @apply flex w-full items-center justify-between gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-left text-sm text-white/85 outline-none backdrop-blur-sm transition focus:border-amber-400/60 focus:bg-white/10 focus:text-white disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  /* Icon + label buttons: single gap token */
+  .eh-btn-icon {
+    @apply inline-flex items-center justify-center gap-1;
+  }
 }
 
 @layer utilities {
@@ -211,4 +225,16 @@
 
 .eh-alert-dialog-panel {
   pointer-events: auto;
+}
+
+/* SelectMenu panel must match trigger width (set via --eh-select-trigger-width) */
+.eh-select-menu-pane.cdk-overlay-pane {
+  width: var(--eh-select-trigger-width) !important;
+  min-width: var(--eh-select-trigger-width) !important;
+  max-width: none !important;
+}
+
+.eh-select-menu-pane.cdk-overlay-pane > * {
+  width: 100%;
+  box-sizing: border-box;
 }

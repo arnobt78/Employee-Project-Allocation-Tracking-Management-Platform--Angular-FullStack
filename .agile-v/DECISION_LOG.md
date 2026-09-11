@@ -64,3 +64,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | Guardrails §8; terminal shows 6 vulns all fixable in-major; majors would break peers |
 | Linked REQ | REQ-0111, REQ-0112 |
 | Status | APPROVED and executed (audit 0; lint/build/test PASS) |
+
+---
+
+## DEC-0013 — Track package-lock.json + exact Angular pins (GATE-0013)
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-11 |
+| Decision | Stop gitignoring `package-lock.json`; pin `@angular/*` / CLI / build-angular to exact versions; remove `http-proxy-middleware` ^3 override |
+| Rationale | Vercel `npm install` hit ERESOLVE (mixed 20.3.29/20.3.31 peers without lockfile); HPM v3 override broke WDS proxy (`Missing target`) |
+| Linked | GATE-0013, Vercel deploy |
+| Status | APPROVED and executed |

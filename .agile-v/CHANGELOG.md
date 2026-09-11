@@ -1,5 +1,13 @@
 # Changelog — Agile V project memory
 
+## 2026-09-11 — GATE-0013 UI polish + lockfile (Vercel ERESOLVE)
+
+- SelectMenu overlay width matches trigger; option icons; `.eh-control` / `.eh-select-trigger` / `.eh-btn-icon`
+- Button icon↔label `gap-1`; Full Editor uses `<button routerLink>`
+- Pin Angular/CLI exact versions; stop gitignoring `package-lock.json` (fixes Vercel npm ERESOLVE)
+- Remove `http-proxy-middleware` ^3 override so WDS keeps HPM v2
+- verify-deep PASS WITH WARNINGS; security review PASS; lint/audit/build PASS
+
 ## 2026-09-11 — GATE-0012 npm audit 0 + Node 24
 
 - Bumped nodemailer to ^9.1.1; Angular 20.3.31 / CLI 20.3.37; Sentry 10.74.x

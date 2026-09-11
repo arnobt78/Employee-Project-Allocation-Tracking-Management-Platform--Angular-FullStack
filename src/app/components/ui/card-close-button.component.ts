@@ -9,7 +9,7 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
   template: `
     <button
       type="button"
-      class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+      class="eh-btn-icon rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
       aria-label="Close Details"
       (click)="closed.emit()"
     >

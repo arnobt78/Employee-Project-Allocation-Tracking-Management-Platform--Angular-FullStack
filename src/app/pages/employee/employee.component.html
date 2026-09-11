@@ -33,7 +33,7 @@
       <button
         ubButton
         size="sm"
-        class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+        class="eh-btn-icon bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
         (click)="startCreate()"
       >
         <lucide-icon name="plus" [size]="16"></lucide-icon>
@@ -522,7 +522,7 @@
                 ubButton
                 size="sm"
                 [disabled]="isSaving"
-                class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+                class="eh-btn-icon bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 @if (!isSaving) {
                   <lucide-icon name="save" [size]="16"></lucide-icon>
@@ -689,7 +689,7 @@
               ></app-card-close-button>
               <button
                 type="button"
-                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                class="eh-btn-icon rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
                 (click)="onEdit(employee)"
               >
                 <lucide-icon name="pencil" [size]="14"></lucide-icon>
@@ -697,7 +697,7 @@
               </button>
               <button
                 type="button"
-                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
+                class="eh-btn-icon rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
                 (click)="promptDelete(employee)"
               >
                 <lucide-icon name="trash-2" [size]="14"></lucide-icon>

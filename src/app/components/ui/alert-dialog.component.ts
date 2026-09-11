@@ -53,7 +53,7 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
           <button
             type="button"
             [disabled]="busy"
-            class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs transition disabled:cursor-not-allowed disabled:opacity-50"
+            class="eh-btn-icon rounded-xl px-4 py-2 text-xs transition disabled:cursor-not-allowed disabled:opacity-50"
             [ngClass]="
               variant === 'destructive'
                 ? 'border border-rose-500/40 bg-rose-500/20 text-rose-100 shadow-[0_20px_45px_rgba(244,63,94,0.35)] hover:border-rose-400/60 hover:bg-rose-500/30'

@@ -66,6 +66,7 @@ export class ProjectEmployeeComponent implements OnInit {
     this.projects().map((project) => ({
       value: String(project.projectId),
       label: project.projectName,
+      icon: 'folder-kanban',
     }))
   );
 

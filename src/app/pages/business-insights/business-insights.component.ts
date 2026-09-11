@@ -106,11 +106,11 @@ export class BusinessInsightsComponent implements OnInit {
   readonly projectEmployeesSignal = signal<IProjectEmployee[]>([]);
 
   readonly dateRangeOptions: SelectMenuOption[] = [
-    { value: 'all', label: 'All Time' },
-    { value: 'last30', label: 'Last 30 Days' },
-    { value: 'last90', label: 'Last 90 Days' },
-    { value: 'last365', label: 'Last Year' },
-    { value: 'custom', label: 'Custom Range' },
+    { value: 'all', label: 'All Time', icon: 'infinity' },
+    { value: 'last30', label: 'Last 30 Days', icon: 'calendar-days' },
+    { value: 'last90', label: 'Last 90 Days', icon: 'calendar-range' },
+    { value: 'last365', label: 'Last Year', icon: 'calendar' },
+    { value: 'custom', label: 'Custom Range', icon: 'sliders-horizontal' },
   ];
 
   // Computed list of unique departments for dropdown
@@ -126,10 +126,11 @@ export class BusinessInsightsComponent implements OnInit {
   });
 
   readonly departmentOptions = computed<SelectMenuOption[]>(() => [
-    { value: 'all', label: 'All Departments' },
+    { value: 'all', label: 'All Departments', icon: 'building-2' },
     ...this.departmentsSignal().map((dept) => ({
       value: dept,
       label: dept,
+      icon: 'building-2',
     })),
   ]);
 

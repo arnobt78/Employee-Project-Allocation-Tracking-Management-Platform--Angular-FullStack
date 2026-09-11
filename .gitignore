@@ -54,7 +54,6 @@ Thumbs.db
 # Angular & tooling
 .angular
 .vscode
-package-lock.json
 .vercel
 .cursorignore
 

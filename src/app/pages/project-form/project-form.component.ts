@@ -173,18 +173,43 @@ export class ProjectFormComponent implements OnInit {
 
   readonly readinessStatusOptions: SelectMenuOption[] = Object.entries(
     READINESS_STATUS_LABELS
-  ).map(([value, label]) => ({ value, label }));
+  ).map(([value, label]) => ({
+    value,
+    label,
+    icon:
+      value === 'done'
+        ? 'circle-check'
+        : value === 'in_progress'
+          ? 'loader'
+          : value === 'blocked'
+            ? 'octagon-alert'
+            : 'circle-dashed',
+  }));
 
   readonly reviewerSectionOptions: SelectMenuOption[] =
     REVIEWER_COMMENT_SECTIONS.map((section) => ({
       value: section.value,
       label: section.label,
+      icon:
+        section.value === 'overview'
+          ? 'file-text'
+          : section.value === 'team'
+            ? 'users'
+            : section.value === 'contact'
+              ? 'contact'
+              : 'git-pull-request',
     }));
 
   readonly reviewerSeveritySelectOptions: SelectMenuOption[] =
     REVIEWER_SEVERITIES.map((severity) => ({
       value: severity.value,
       label: severity.label,
+      icon:
+        severity.value === 'critical'
+          ? 'siren'
+          : severity.value === 'warning'
+            ? 'triangle-alert'
+            : 'info',
     }));
 
   private readonly currentProjectSignal = signal<IProject | null>(null);

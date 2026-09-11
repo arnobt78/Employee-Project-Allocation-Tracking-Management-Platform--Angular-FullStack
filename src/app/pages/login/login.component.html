@@ -134,7 +134,7 @@
                 name="username"
                 placeholder="Enter your username"
                 required
-                class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 placeholder:text-white/40 outline-none backdrop-blur-sm transition focus:border-blue-400/60 focus:bg-white/10 focus:text-white"
+                class="eh-control focus:border-blue-400/60"
               />
             </div>
           </article>
@@ -154,7 +154,7 @@
                 name="password"
                 placeholder="Enter your password"
                 required
-                class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 placeholder:text-white/40 outline-none backdrop-blur-sm transition focus:border-emerald-400/60 focus:bg-white/10 focus:text-white"
+                class="eh-control focus:border-emerald-400/60"
               />
             </div>
           </article>
@@ -164,7 +164,7 @@
             [disabled]="isSubmitting"
             ubButton
             size="lg"
-            class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-gradient-to-r from-purple-500/70 via-pink-500/50 to-rose-500/30 px-2 sm:px-4 py-3 text-base font-medium text-white shadow-[0_20px_60px_rgba(168,85,247,0.45)] backdrop-blur-sm transition duration-200 hover:border-purple-300/40 hover:from-purple-500/80 hover:via-pink-500/60 hover:to-rose-500/40 hover:shadow-[0_25px_70px_rgba(168,85,247,0.55)] disabled:opacity-80"
+            class="eh-btn-icon w-full rounded-2xl border border-white/10 bg-gradient-to-r from-purple-500/70 via-pink-500/50 to-rose-500/30 px-2 sm:px-4 py-3 text-base font-medium text-white shadow-[0_20px_60px_rgba(168,85,247,0.45)] backdrop-blur-sm transition duration-200 hover:border-purple-300/40 hover:from-purple-500/80 hover:via-pink-500/60 hover:to-rose-500/40 hover:shadow-[0_25px_70px_rgba(168,85,247,0.55)] disabled:opacity-80"
           >
             @if (isSubmitting) {
               <lucide-icon

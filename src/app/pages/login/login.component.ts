@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FloatingBackgroundComponent } from '@/app/components/ui/floating-background.component';
 import { UbButtonDirective } from '@/app/components/ui/button';
-import { OptimizedImageComponent } from '@/app/components/ui/optimized-image.component';
 import {
   SelectMenuComponent,
   SelectMenuOption } from '@/app/components/ui/select-menu.component';
@@ -24,7 +23,6 @@ import { DemoAccount } from '@/app/model/interface/master';
     FormsModule,
     FloatingBackgroundComponent,
     UbButtonDirective,
-    OptimizedImageComponent,
     SelectMenuComponent
   ],
   templateUrl: './login.component.html',
@@ -44,7 +42,10 @@ export class LoginComponent {
       value: 'admin',
       label: 'Admin Account',
       subtitle: 'admin',
-      imageSeed: 'admin' }]);
+      icon: 'shield-user',
+      imageSeed: 'admin',
+    },
+  ]);
 
   private readonly authService = inject(AuthService);
   private readonly masterService = inject(MasterService);
@@ -79,7 +80,9 @@ export class LoginComponent {
               value: account.id,
               label: account.label,
               subtitle: account.username,
-              imageSeed: account.username }))
+              icon: account.role === 'admin' ? 'shield-user' : 'user',
+              imageSeed: account.username,
+            }))
           );
         }
       },
@@ -95,7 +98,10 @@ export class LoginComponent {
             value: 'admin',
             label: 'Admin Account',
             subtitle: this.demoCredentials.username,
-            imageSeed: this.demoCredentials.username }]);
+            icon: 'shield-user',
+            imageSeed: this.demoCredentials.username,
+          },
+        ]);
       } });
   }
 

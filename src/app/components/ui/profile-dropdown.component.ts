@@ -36,7 +36,7 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
           <a
             [routerLink]="item.route"
             role="menuitem"
-            class="flex items-center gap-2 px-4 py-2.5 text-sm text-white/85 transition hover:bg-white/10 hover:text-white"
+            class="flex items-center gap-1 px-4 py-2.5 text-sm text-white/85 transition hover:bg-white/10 hover:text-white"
             (click)="onNavigate()"
           >
             <lucide-icon [name]="item.iconName" [size]="16"></lucide-icon>
@@ -48,7 +48,7 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
       <button
         type="button"
         role="menuitem"
-        class="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-rose-200 transition hover:bg-white/10 disabled:opacity-60"
+        class="flex w-full items-center gap-1 px-4 py-2.5 text-left text-sm text-rose-200 transition hover:bg-white/10 disabled:opacity-60"
         [disabled]="loggingOut"
         (click)="onLogout()"
       >

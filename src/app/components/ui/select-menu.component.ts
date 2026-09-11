@@ -6,6 +6,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   Output,
   SimpleChanges,
   ViewChild,
@@ -22,6 +23,8 @@ export interface SelectMenuOption {
   value: string;
   label: string;
   subtitle?: string;
+  /** Lucide icon name when no avatar is provided. */
+  icon?: string;
   imageSeed?: string;
   imageUrl?: string | null;
 }
@@ -33,13 +36,13 @@ export interface SelectMenuOption {
   template: `
     <ul
       role="listbox"
-      class="w-full max-h-72 overflow-auto rounded-2xl border border-white/15 bg-slate-950/95 p-2 shadow-[0_25px_70px_rgba(9,14,33,0.65)] backdrop-blur-xl"
+      class="box-border w-full max-h-72 overflow-auto rounded-2xl border border-white/15 bg-slate-950/95 p-2 shadow-[0_25px_70px_rgba(9,14,33,0.65)] backdrop-blur-xl"
     >
       @for (option of options; track option.value; let index = $index) {
         <li
           role="option"
           [attr.aria-selected]="option.value === selectedValue"
-          class="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition"
+          class="flex cursor-pointer items-center gap-1 rounded-xl px-3 py-2.5 text-sm transition"
           [class.bg-white/10]="option.value === selectedValue"
           [class.text-white]="option.value === selectedValue"
           [class.text-white/80]="option.value !== selectedValue"
@@ -55,6 +58,12 @@ export interface SelectMenuOption {
               [size]="36"
               [alt]="''"
             ></app-user-avatar>
+          } @else {
+            <lucide-icon
+              [name]="option.icon || 'circle'"
+              [size]="16"
+              class="shrink-0 text-white/70"
+            ></lucide-icon>
           }
           <div class="min-w-0 flex-1">
             <p class="truncate text-sm font-medium">{{ option.label }}</p>
@@ -67,7 +76,7 @@ export interface SelectMenuOption {
       @if (showClear) {
         <li
           role="option"
-          class="mt-1 flex cursor-pointer items-center gap-2 rounded-xl border border-white/10 px-3 py-2.5 text-sm text-rose-200 transition hover:bg-white/10"
+          class="mt-1 flex cursor-pointer items-center gap-1 rounded-xl border border-white/10 px-3 py-2.5 text-sm text-rose-200 transition hover:bg-white/10"
           (click)="pick('clear')"
         >
           <lucide-icon name="eraser" [size]="16" class="shrink-0"></lucide-icon>
@@ -88,7 +97,7 @@ class SelectMenuPanelComponent {
 @Component({
   selector: 'app-select-menu',
   standalone: true,
-  imports: [CommonModule, OverlayModule, UserAvatarComponent],
+  imports: [AppIconComponent, CommonModule, OverlayModule, UserAvatarComponent],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -100,14 +109,14 @@ class SelectMenuPanelComponent {
     <button
       #trigger
       type="button"
-      class="flex h-[3.25rem] w-full items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/5 px-4 text-left text-sm text-white/85 outline-none backdrop-blur-sm transition focus:border-amber-400/60 focus:bg-white/10 focus:text-white disabled:cursor-not-allowed disabled:opacity-60"
+      class="eh-select-trigger"
       [attr.aria-expanded]="isOpen()"
       aria-haspopup="listbox"
       [disabled]="disabled"
       (click)="toggle()"
       (keydown)="onTriggerKeydown($event)"
     >
-      <span class="flex min-w-0 flex-1 items-center gap-3">
+      <span class="flex min-w-0 flex-1 items-center gap-1">
         @if (selectedOption(); as selected) {
           @if (selected.imageUrl || selected.imageSeed) {
             <app-user-avatar
@@ -117,6 +126,12 @@ class SelectMenuPanelComponent {
               [size]="24"
               [alt]="''"
             ></app-user-avatar>
+          } @else if (selected.icon) {
+            <lucide-icon
+              [name]="selected.icon"
+              [size]="16"
+              class="shrink-0 text-white/70"
+            ></lucide-icon>
           }
           <span class="min-w-0 truncate font-medium text-white">{{
             selected.label
@@ -125,21 +140,18 @@ class SelectMenuPanelComponent {
           <span class="truncate text-white/40">{{ placeholder }}</span>
         }
       </span>
-      <svg
-        class="h-4 w-4 shrink-0 text-white/60 transition"
+      <lucide-icon
+        name="chevron-down"
+        [size]="16"
+        class="shrink-0 text-white/60 transition"
         [class.rotate-180]="isOpen()"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        aria-hidden="true"
-      >
-        <path d="M6 9l6 6 6-6" />
-      </svg>
+      ></lucide-icon>
     </button>
   `,
 })
-export class SelectMenuComponent implements ControlValueAccessor, OnChanges {
+export class SelectMenuComponent
+  implements ControlValueAccessor, OnChanges, OnDestroy
+{
   private readonly overlay = inject(Overlay);
 
   @ViewChild('trigger', { static: true })
@@ -160,6 +172,7 @@ export class SelectMenuComponent implements ControlValueAccessor, OnChanges {
 
   private value = '';
   private overlayRef: OverlayRef | null = null;
+  private resizeObserver: ResizeObserver | null = null;
   private onChange: (value: string | number | null) => void = () => {};
   private onTouched: () => void = () => {};
 
@@ -167,6 +180,11 @@ export class SelectMenuComponent implements ControlValueAccessor, OnChanges {
     if (changes['options']) {
       this.syncSelection();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.teardownResizeSync();
+    this.close();
   }
 
   writeValue(value: string | number | null): void {
@@ -205,12 +223,14 @@ export class SelectMenuComponent implements ControlValueAccessor, OnChanges {
       return;
     }
 
-    const triggerWidth = this.trigger.nativeElement.offsetWidth;
+    const triggerEl = this.trigger.nativeElement;
+    const triggerWidth = this.measureTriggerWidth();
 
     const positionStrategy = this.overlay
       .position()
       .flexibleConnectedTo(this.trigger)
       .withFlexibleDimensions(false)
+      .withGrowAfterOpen(false)
       .withPositions([
         {
           originX: 'start',
@@ -234,9 +254,13 @@ export class SelectMenuComponent implements ControlValueAccessor, OnChanges {
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
       hasBackdrop: true,
       backdropClass: 'cdk-overlay-transparent-backdrop',
+      panelClass: 'eh-select-menu-pane',
       width: triggerWidth,
       minWidth: triggerWidth,
+      maxWidth: 'none',
     });
+
+    this.applyPaneWidth(triggerWidth);
 
     const portal = new ComponentPortal(SelectMenuPanelComponent);
     const componentRef = this.overlayRef.attach(portal);
@@ -257,10 +281,12 @@ export class SelectMenuComponent implements ControlValueAccessor, OnChanges {
       }
     });
 
+    this.setupResizeSync(triggerEl);
     this.isOpen.set(true);
   }
 
   close(): void {
+    this.teardownResizeSync();
     this.overlayRef?.dispose();
     this.overlayRef = null;
     this.isOpen.set(false);
@@ -293,5 +319,38 @@ export class SelectMenuComponent implements ControlValueAccessor, OnChanges {
   private syncSelection(): void {
     const match = this.options.find((option) => option.value === this.value);
     this.selectedOption.set(match ?? null);
+  }
+
+  /** Match overlay pane to the live trigger width (responsive screens). */
+  private measureTriggerWidth(): number {
+    return Math.ceil(this.trigger.nativeElement.getBoundingClientRect().width);
+  }
+
+  private applyPaneWidth(width: number): void {
+    if (!this.overlayRef) {
+      return;
+    }
+    const pane = this.overlayRef.overlayElement;
+    pane.style.setProperty('--eh-select-trigger-width', `${width}px`);
+    this.overlayRef.updateSize({ width, minWidth: width, maxWidth: 'none' });
+  }
+
+  private setupResizeSync(triggerEl: HTMLElement): void {
+    this.teardownResizeSync();
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    this.resizeObserver = new ResizeObserver(() => {
+      if (!this.overlayRef) {
+        return;
+      }
+      this.applyPaneWidth(this.measureTriggerWidth());
+    });
+    this.resizeObserver.observe(triggerEl);
+  }
+
+  private teardownResizeSync(): void {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
   }
 }

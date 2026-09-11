@@ -1,5 +1,38 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-11 — GATE-0013 UI polish + lockfile / Vercel ERESOLVE (commit-ready)
+
+**Node:** v24.21.0
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm audit` | **PASS (0)** | Final gate |
+| `npm run lint` | **PASS** | Final gate + verifier |
+| `npm run build` | **PASS** | Bundle budget warning (~1.02 MB > 700 kB) |
+| `npm test -- --watch=false --browsers=ChromeHeadless` | **PASS** | 12/12 (verify-deep session) |
+| `npm ci` (clean tmp) | **PASS** | Resolves prior Vercel ERESOLVE |
+| Browser smoke | **PASS** | Login + routes; SelectMenu trigger/panel width equal |
+| verify-deep | **PASS WITH WARNINGS** | Budget warn; CDK 20.2.14 skew |
+| review-security | **PASS** | No Critical/High/Medium; lockfile clean |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| SelectMenu width sync + option icons + tokens | Done |
+| gap-1 buttons; Full Editor `button`+`routerLink` | Done |
+| Exact Angular pins; track `package-lock.json` | Done |
+| Remove HPM ^3 override (WDS proxy) | Done |
+| UI_STYLING_GUIDE consistency rules | Done |
+
+### eval_gate_status
+
+N/A (user-directed delivery; formal GATE-0001 record optional follow-up)
+
+---
+
 ## Session 2026-09-11 — GATE-0012 deps/audit 0 + Node 24 (commit-ready)
 
 **Node:** v24.21.0 (`engines.node: 24.x`, `.nvmrc` = `24`)
