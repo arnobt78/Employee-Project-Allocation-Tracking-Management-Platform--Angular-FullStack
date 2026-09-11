@@ -84,7 +84,7 @@
                     {{ project.projectName }}
                   </div>
                   <div class="text-white/60 mb-1">{{ project.clientName }}</div>
-                  <div class="border-t border-white/10 pt-1 mt-1 space-y-0.5">
+                  <div class="border-t border-white/10 pt-1 space-y-0.5">
                     <div class="text-white/60">
                       <span class="font-medium text-white">Start:</span>
                       {{ project.start | date: "MMM d, y" }}
@@ -120,7 +120,7 @@
             <div class="text-white/80 font-medium">
               {{ getDurationDisplay(project) }}
             </div>
-            <div class="mt-1 text-white/60">
+            <div class="text-white/60">
               {{ project.start | date: "MMM d" }}
               <span *ngIf="project.end">
                 - {{ project.end | date: "MMM d" }}

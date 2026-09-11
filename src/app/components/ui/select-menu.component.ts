@@ -76,7 +76,7 @@ export interface SelectMenuOption {
       @if (showClear) {
         <li
           role="option"
-          class="mt-1 flex cursor-pointer items-center gap-1 rounded-xl border border-white/10 px-3 py-2.5 text-sm text-rose-200 transition hover:bg-white/10"
+          class=" flex cursor-pointer items-center gap-1 rounded-xl border border-white/10 px-3 py-2.5 text-sm text-rose-200 transition hover:bg-white/10"
           (click)="pick('clear')"
         >
           <lucide-icon name="eraser" [size]="16" class="shrink-0"></lucide-icon>

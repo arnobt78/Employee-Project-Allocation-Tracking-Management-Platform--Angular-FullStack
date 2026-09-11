@@ -68,9 +68,7 @@
   >
     <header class="mb-6">
       <h2 class="text-lg font-medium text-white">Add Project Assignment</h2>
-      <p class="text-xs text-white/55">
-        Connect employees to projects
-      </p>
+      <p class="text-xs text-white/55">Connect employees to projects</p>
     </header>
     <form
       [formGroup]="projectEmployeeForm"
@@ -79,9 +77,7 @@
       [class.opacity-50]="isSaving"
     >
       <div>
-        <label
-          for="create-project"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-project" class="mb-2 block text-xs text-white/60"
           >Project</label
         >
         <app-select-menu
@@ -94,9 +90,7 @@
         ></app-select-menu>
       </div>
       <div>
-        <label
-          for="create-employee"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-employee" class="mb-2 block text-xs text-white/60"
           >Team Member</label
         >
         <app-select-menu
@@ -109,9 +103,7 @@
         ></app-select-menu>
       </div>
       <div>
-        <label
-          for="create-date"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-date" class="mb-2 block text-xs text-white/60"
           >Assigned Date</label
         >
         <input
@@ -122,9 +114,7 @@
         />
       </div>
       <div>
-        <label
-          for="create-role"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-role" class="mb-2 block text-xs text-white/60"
           >Project Role</label
         >
         <input
@@ -139,9 +129,7 @@
         />
       </div>
       <div>
-        <label
-          for="create-allocation"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-allocation" class="mb-2 block text-xs text-white/60"
           >Allocation (%)</label
         >
         <input
@@ -159,15 +147,13 @@
             (projectEmployeeForm.controls['allocationPct'].dirty ||
               projectEmployeeForm.controls['allocationPct'].touched)
           "
-          class="mt-1 text-xs text-rose-300"
+          class="text-xs text-rose-300"
         >
           Enter a value between 0 and 200.
         </p>
       </div>
       <div class="flex items-center gap-3 pt-2">
-        <span class="text-xs text-white/60"
-          >Active</span
-        >
+        <span class="text-xs text-white/60">Active</span>
         <button
           type="button"
           class="relative inline-flex h-9 w-16 items-center rounded-full border border-white/15 bg-white/10 px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -194,9 +180,7 @@
         </span>
       </div>
       <div class="md:col-span-2">
-        <label
-          for="create-notes"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-notes" class="mb-2 block text-xs text-white/60"
           >Notes (Optional)</label
         >
         <textarea
@@ -243,7 +227,7 @@
             {{ item.projectName }}
           </span>
           <span
-            class="mt-1 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
+            class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
           >
             <app-user-avatar
               [seed]="employeeAvatarSeed(item)"
@@ -256,7 +240,7 @@
           </span>
           <span
             *ngIf="item.role"
-            class="mt-1 inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 md:ml-3 md:mt-0"
+            class="inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 md:ml-3 md:mt-0"
           >
             {{ item.role }}
           </span>
@@ -368,15 +352,13 @@
                   (projectEmployeeForm.controls['allocationPct'].dirty ||
                     projectEmployeeForm.controls['allocationPct'].touched)
                 "
-                class="mt-1 text-xs text-rose-300"
+                class="text-xs text-rose-300"
               >
                 Enter a value between 0 and 200.
               </p>
             </div>
             <div class="flex items-center gap-3 pt-2">
-              <span class="text-xs text-white/55"
-                >Active</span
-              >
+              <span class="text-xs text-white/55">Active</span>
               <button
                 type="button"
                 class="relative inline-flex h-9 w-16 items-center rounded-full border border-white/15 bg-white/10 px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -447,40 +429,32 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Assigned Role
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Assigned Role</p>
+              <p class="text-base font-medium text-white">
                 {{ item.role }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Assigned on
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Assigned on</p>
+              <p class="text-base font-medium text-white">
                 {{ formattedDate(item.assignedDate) }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Employee ID
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Employee ID</p>
+              <p class="text-base font-medium text-white">
                 {{ item.empId }} · {{ employeeNameFor(item.empId) || "—" }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Project ID
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Project ID</p>
+              <p class="text-base font-medium text-white">
                 {{ item.projectId }} ·
                 {{ projectNameFor(item.projectId) || "—" }}
               </p>
@@ -488,10 +462,8 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Allocation
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Allocation</p>
+              <p class="text-base font-medium text-white">
                 {{ item.allocationPct ?? 0 }}%
               </p>
             </div>
@@ -499,7 +471,7 @@
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs text-white/45">Unassigned</p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-base font-medium text-white">
                 {{ formattedDate(item.unassignedAt) }}
               </p>
             </div>
@@ -507,7 +479,7 @@
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs text-white/45">Created</p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-base font-medium text-white">
                 {{ formattedDate(item.createdAt) }}
               </p>
             </div>
@@ -515,7 +487,7 @@
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs text-white/45">Updated</p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-base font-medium text-white">
                 {{ formattedDate(item.updatedAt) }}
               </p>
             </div>
@@ -523,9 +495,7 @@
               *ngIf="item.notes && item.notes.trim()"
               class="sm:col-span-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Notes
-              </p>
+              <p class="text-xs text-white/45">Notes</p>
               <p
                 class="mt-2 text-sm leading-relaxed text-white/80 whitespace-pre-wrap"
               >

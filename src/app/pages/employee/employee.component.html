@@ -49,9 +49,7 @@
     <header class="mb-4 flex items-center justify-between">
       <div>
         <h2 class="text-lg font-medium text-white">Create New Employee</h2>
-        <p class="text-xs text-white/50">
-          Quick Onboarding Form
-        </p>
+        <p class="text-xs text-white/50">Quick Onboarding Form</p>
       </div>
       <button
         type="button"
@@ -69,9 +67,7 @@
       [class.opacity-50]="isSaving"
     >
       <div class="sm:col-span-1">
-        <label
-          for="create-name"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-name" class="mb-2 block text-xs text-white/60"
           >Employee Name</label
         >
         <input
@@ -83,9 +79,7 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label
-          for="create-dept"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-dept" class="mb-2 block text-xs text-white/60"
           >Department</label
         >
         <input
@@ -97,9 +91,7 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label
-          for="create-deptid"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-deptid" class="mb-2 block text-xs text-white/60"
           >Department ID</label
         >
         <input
@@ -111,9 +103,7 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label
-          for="create-role"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-role" class="mb-2 block text-xs text-white/60"
           >Role</label
         >
         <input
@@ -125,9 +115,7 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label
-          for="create-title"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-title" class="mb-2 block text-xs text-white/60"
           >Title</label
         >
         <input
@@ -139,9 +127,7 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label
-          for="create-employment"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-employment" class="mb-2 block text-xs text-white/60"
           >Employment Type</label
         >
         <input
@@ -153,9 +139,7 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label
-          for="create-phone"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-phone" class="mb-2 block text-xs text-white/60"
           >Contact Number</label
         >
         <input
@@ -167,9 +151,7 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label
-          for="create-email"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-email" class="mb-2 block text-xs text-white/60"
           >Email</label
         >
         <input
@@ -181,9 +163,7 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label
-          for="create-location"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-location" class="mb-2 block text-xs text-white/60"
           >Location</label
         >
         <input
@@ -195,9 +175,7 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label
-          for="create-timezone"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-timezone" class="mb-2 block text-xs text-white/60"
           >Timezone</label
         >
         <input
@@ -209,9 +187,7 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label
-          for="create-hireDate"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-hireDate" class="mb-2 block text-xs text-white/60"
           >Hire Date</label
         >
         <input
@@ -222,9 +198,7 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label
-          for="create-skills"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-skills" class="mb-2 block text-xs text-white/60"
           >Skills (comma separated)</label
         >
         <input
@@ -236,9 +210,7 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label
-          for="create-tags"
-          class="mb-2 block text-xs text-white/60"
+        <label for="create-tags" class="mb-2 block text-xs text-white/60"
           >Tags (comma separated)</label
         >
         <input
@@ -298,19 +270,19 @@
             {{ employee.employeeName }}
           </span>
           <span
-            class="mt-1 inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
+            class="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
           >
             {{ employee.department }}
           </span>
           <span
             *ngIf="employee.role"
-            class="mt-1 inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 md:ml-3 md:mt-0"
+            class="inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 md:ml-3 md:mt-0"
           >
             {{ employee.role }}
           </span>
           <span
             *ngIf="employee.hireDate || employee.createdAt"
-            class="mt-1 text-xs text-white/45 md:ml-3 md:mt-0"
+            class="text-xs text-white/45 md:ml-3 md:mt-0"
           >
             Joined
             {{
@@ -539,40 +511,32 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Employee ID
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Employee ID</p>
+              <p class="text-base font-medium text-white">
                 {{ employee.employeeId }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Department
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Department</p>
+              <p class="text-base font-medium text-white">
                 {{ employee.department }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Department ID
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Department ID</p>
+              <p class="text-base font-medium text-white">
                 {{ employee.deptId || "—" }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Role & Title
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Role & Title</p>
+              <p class="text-base font-medium text-white">
                 {{ employee.role || "—" }}
               </p>
               <p class="text-xs text-white/55">
@@ -582,20 +546,16 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Employment Type
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Employment Type</p>
+              <p class="text-base font-medium text-white">
                 {{ employee.employmentType || "—" }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Contact
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Contact</p>
+              <p class="text-base font-medium text-white">
                 {{ employee.contactNo || "—" }}
               </p>
               <p class="text-xs text-white/55">
@@ -605,10 +565,8 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Location
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Location</p>
+              <p class="text-base font-medium text-white">
                 {{ employee.location || "—" }}
               </p>
               <p class="text-xs text-white/55">
@@ -618,10 +576,8 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Hire Date
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Hire Date</p>
+              <p class="text-base font-medium text-white">
                 {{
                   employee.hireDate
                     ? (employee.hireDate | date: "mediumDate")
@@ -635,7 +591,7 @@
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs text-white/45">Updated</p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-base font-medium text-white">
                 {{
                   employee.updatedAt
                     ? (employee.updatedAt | date: "mediumDate")
@@ -647,7 +603,7 @@
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs text-white/45">Last Active</p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-base font-medium text-white">
                 {{
                   employee.lastActiveAt
                     ? (employee.lastActiveAt | date: "mediumDate")
@@ -658,10 +614,8 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:col-span-2"
             >
-              <p class="text-xs text-white/45">
-                Skills
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Skills</p>
+              <p class="text-base font-medium text-white">
                 {{
                   employee.skills && employee.skills.length
                     ? employee.skills.join(", ")
@@ -672,10 +626,8 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:col-span-2"
             >
-              <p class="text-xs text-white/45">
-                Tags
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Tags</p>
+              <p class="text-base font-medium text-white">
                 {{
                   employee.tags && employee.tags.length
                     ? employee.tags.join(", ")

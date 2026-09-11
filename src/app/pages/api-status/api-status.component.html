@@ -5,7 +5,7 @@
   >
     <div>
       <h1 class="text-2xl font-medium text-white">API Status</h1>
-      <p class="text-sm text-white/60 mt-1">
+      <p class="text-sm text-white/60">
         Monitor API health, performance, and activity in real-time
       </p>
     </div>
@@ -70,7 +70,7 @@
         <div class="text-2xl font-medium text-white">
           {{ status()?.metrics?.totalEndpoints ?? 0 }}
         </div>
-        <div class="text-xs text-green-400 mt-1">
+        <div class="text-xs text-green-400">
           {{ status()?.metrics?.activeEndpoints ?? 0 }} active
         </div>
       </div>
@@ -81,7 +81,7 @@
         <div class="text-2xl font-medium text-white">
           {{ status()?.metrics?.avgResponseTime ?? 0 }}ms
         </div>
-        <div class="text-xs text-white/60 mt-1">Last 24 hours</div>
+        <div class="text-xs text-white/60">Last 24 hours</div>
       </div>
       <div
         class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
@@ -90,7 +90,7 @@
         <div class="text-2xl font-medium text-white">
           {{ status()?.metrics?.totalRequests ?? 0 | number }}
         </div>
-        <div class="text-xs text-white/60 mt-1">Last 7 days</div>
+        <div class="text-xs text-white/60">Last 7 days</div>
       </div>
       <div
         class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
@@ -99,7 +99,7 @@
         <div class="text-2xl font-medium text-white">
           {{ status()?.metrics?.errorRate ?? 0 }}%
         </div>
-        <div class="text-xs text-red-400 mt-1">Requires attention</div>
+        <div class="text-xs text-red-400">Requires attention</div>
       </div>
     </div>
 

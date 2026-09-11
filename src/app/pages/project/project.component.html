@@ -60,9 +60,7 @@
     <header class="mb-4 flex items-center justify-between">
       <div>
         <h2 class="text-lg font-medium text-white">Create New Project</h2>
-        <p class="text-xs text-white/50">
-          Track engagements from day one
-        </p>
+        <p class="text-xs text-white/50">Track engagements from day one</p>
       </div>
       <button
         type="button"
@@ -81,9 +79,7 @@
       [class.opacity-50]="isSaving"
     >
       <div class="md:col-span-1">
-        <label
-          for="project-name"
-          class="mb-2 block text-xs text-white/60"
+        <label for="project-name" class="mb-2 block text-xs text-white/60"
           >Project Name</label
         >
         <input
@@ -95,9 +91,7 @@
         />
       </div>
       <div class="md:col-span-1">
-        <label
-          for="client-name"
-          class="mb-2 block text-xs text-white/60"
+        <label for="client-name" class="mb-2 block text-xs text-white/60"
           >Client Name</label
         >
         <input
@@ -109,9 +103,7 @@
         />
       </div>
       <div class="md:col-span-1">
-        <label
-          for="start-date"
-          class="mb-2 block text-xs text-white/60"
+        <label for="start-date" class="mb-2 block text-xs text-white/60"
           >Start Date</label
         >
         <input
@@ -122,9 +114,7 @@
         />
       </div>
       <div class="md:col-span-1">
-        <label
-          for="contact-person"
-          class="mb-2 block text-xs text-white/60"
+        <label for="contact-person" class="mb-2 block text-xs text-white/60"
           >Contact Person</label
         >
         <input
@@ -136,9 +126,7 @@
         />
       </div>
       <div class="md:col-span-1">
-        <label
-          for="contact-no"
-          class="mb-2 block text-xs text-white/60"
+        <label for="contact-no" class="mb-2 block text-xs text-white/60"
           >Contact Number</label
         >
         <input
@@ -150,9 +138,7 @@
         />
       </div>
       <div class="md:col-span-1">
-        <label
-          for="email-id"
-          class="mb-2 block text-xs text-white/60"
+        <label for="email-id" class="mb-2 block text-xs text-white/60"
           >Contact Email</label
         >
         <input
@@ -199,18 +185,20 @@
             {{ project.projectName }}
           </span>
           <span
-            class="mt-1 inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
+            class="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
           >
             {{ project.clientName }}
           </span>
           <span
             *ngIf="project.status"
-            class="mt-1 inline-flex rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-xs text-sky-200 md:ml-3 md:mt-0"
+            class="inline-flex rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-xs text-sky-200 md:ml-3 md:mt-0"
           >
             {{ project.status }}
           </span>
         </div>
-        <div class="flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3">
+        <div
+          class="flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"
+        >
           <span class="text-xs text-white/60">
             {{ formattedDate(project.startDate)
             }}{{
@@ -348,20 +336,16 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Client Name
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Client Name</p>
+              <p class="text-base font-medium text-white">
                 {{ project.clientName }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Start Date
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Start Date</p>
+              <p class="text-base font-medium text-white">
                 {{ formattedDate(project.startDate) }}
               </p>
             </div>
@@ -369,7 +353,7 @@
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs text-white/45">End Date</p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-base font-medium text-white">
                 {{ formattedDate(project.endDate) }}
               </p>
             </div>
@@ -377,7 +361,7 @@
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs text-white/45">Status</p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-base font-medium text-white">
                 {{ project.status || "—" }}
               </p>
             </div>
@@ -385,7 +369,7 @@
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs text-white/45">Progress / Health</p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-base font-medium text-white">
                 {{
                   project.progress !== null && project.progress !== undefined
                     ? project.progress + "%"
@@ -398,7 +382,7 @@
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs text-white/45">Created</p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-base font-medium text-white">
                 {{ formattedDate(project.createdAt) }}
               </p>
             </div>
@@ -406,37 +390,31 @@
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
               <p class="text-xs text-white/45">Updated</p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-base font-medium text-white">
                 {{ formattedDate(project.updatedAt) }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Contact Person
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Contact Person</p>
+              <p class="text-base font-medium text-white">
                 {{ project.contactPerson || "—" }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
             >
-              <p class="text-xs text-white/45">
-                Contact Number
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Contact Number</p>
+              <p class="text-base font-medium text-white">
                 {{ project.contactNo || "—" }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 sm:col-span-2"
             >
-              <p class="text-xs text-white/45">
-                Contact Email
-              </p>
-              <p class="mt-1 text-base font-medium text-white">
+              <p class="text-xs text-white/45">Contact Email</p>
+              <p class="text-base font-medium text-white">
                 {{ project.emailId || "—" }}
               </p>
             </div>

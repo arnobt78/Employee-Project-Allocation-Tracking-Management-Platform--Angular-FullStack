@@ -22,7 +22,7 @@ import { ToastService } from './toast.service';
         <div class="flex items-start justify-between gap-3">
           <div>
             <p class="font-medium leading-none">{{ toast.title }}</p>
-            <p *ngIf="toast.description" class="mt-1 text-xs text-white/70">
+            <p *ngIf="toast.description" class=" text-xs text-white/70">
               {{ toast.description }}
             </p>
           </div>

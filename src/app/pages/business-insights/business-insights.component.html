@@ -5,7 +5,7 @@
   >
     <div>
       <h1 class="text-2xl font-medium text-white">Business Insights</h1>
-      <p class="text-sm text-white/60 mt-1">
+      <p class="text-sm text-white/60">
         Analytics and reporting for projects, resources, and performance
       </p>
     </div>
@@ -45,11 +45,7 @@
       class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
     >
       <div>
-        <label
-          class="mb-2 block text-xs text-white/60"
-        >
-          Date Range
-        </label>
+        <label class="mb-2 block text-xs text-white/60"> Date Range </label>
         <app-select-menu
           formControlName="dateRange"
           [options]="dateRangeOptions"
@@ -59,11 +55,7 @@
         ></app-select-menu>
       </div>
       <div *ngIf="filterForm.get('dateRange')?.value === 'custom'">
-        <label
-          class="mb-2 block text-xs text-white/60"
-        >
-          Start Date
-        </label>
+        <label class="mb-2 block text-xs text-white/60"> Start Date </label>
         <input
           type="date"
           formControlName="startDate"
@@ -72,11 +64,7 @@
         />
       </div>
       <div *ngIf="filterForm.get('dateRange')?.value === 'custom'">
-        <label
-          class="mb-2 block text-xs text-white/60"
-        >
-          End Date
-        </label>
+        <label class="mb-2 block text-xs text-white/60"> End Date </label>
         <input
           type="date"
           formControlName="endDate"
@@ -85,11 +73,7 @@
         />
       </div>
       <div>
-        <label
-          class="mb-2 block text-xs text-white/60"
-        >
-          Department
-        </label>
+        <label class="mb-2 block text-xs text-white/60"> Department </label>
         <app-select-menu
           formControlName="department"
           [options]="departmentOptions()"
@@ -172,9 +156,7 @@
         <div
           class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
-          <p class="text-xs text-white/45">
-            Total Projects
-          </p>
+          <p class="text-xs text-white/45">Total Projects</p>
           <p class="mt-2 text-3xl font-medium text-white">
             {{ insights()?.totalProjectCount ?? projectsSignal().length }}
           </p>
@@ -182,9 +164,7 @@
         <div
           class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
-          <p class="text-xs text-white/45">
-            Total Employees
-          </p>
+          <p class="text-xs text-white/45">Total Employees</p>
           <p class="mt-2 text-3xl font-medium text-white">
             {{
               (insights()?.filteredEmployeeCount ??
@@ -196,9 +176,7 @@
         <div
           class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
-          <p class="text-xs text-white/45">
-            Avg Readiness
-          </p>
+          <p class="text-xs text-white/45">Avg Readiness</p>
           <p class="mt-2 text-3xl font-medium text-white">
             {{ insights()?.readinessScores?.average || 0 }}%
           </p>
@@ -206,9 +184,7 @@
         <div
           class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
         >
-          <p class="text-xs text-white/45">
-            Resource Utilization
-          </p>
+          <p class="text-xs text-white/45">Resource Utilization</p>
           <p class="mt-2 text-3xl font-medium text-white">
             {{ insights()?.teamCapacity?.utilizationPercentage || 0 }}%
           </p>
@@ -313,7 +289,7 @@
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-xs text-white/60">{{ item.label }}</p>
-                <p class="mt-1 text-2xl font-medium text-white">
+                <p class="text-2xl font-medium text-white">
                   {{ item.value }}
                 </p>
               </div>
@@ -372,26 +348,10 @@
           <table class="w-full text-sm">
             <thead>
               <tr class="border-b border-white/10 text-left">
-                <th
-                  class="pb-3 text-xs text-white/60"
-                >
-                  Department
-                </th>
-                <th
-                  class="pb-3 text-xs text-white/60"
-                >
-                  Employees
-                </th>
-                <th
-                  class="pb-3 text-xs text-white/60"
-                >
-                  Projects
-                </th>
-                <th
-                  class="pb-3 text-xs text-white/60"
-                >
-                  Avg Readiness
-                </th>
+                <th class="pb-3 text-xs text-white/60">Department</th>
+                <th class="pb-3 text-xs text-white/60">Employees</th>
+                <th class="pb-3 text-xs text-white/60">Projects</th>
+                <th class="pb-3 text-xs text-white/60">Avg Readiness</th>
               </tr>
             </thead>
             <tbody>
@@ -435,7 +395,7 @@
           >
             <p class="text-sm font-medium text-white">{{ type.type }}</p>
             <p class="mt-2 text-2xl font-medium text-white">{{ type.count }}</p>
-            <p class="mt-1 text-xs text-white/60">
+            <p class="text-xs text-white/60">
               Avg Readiness: {{ type.averageReadiness }}%
             </p>
           </div>
@@ -519,19 +479,19 @@
           <div class="grid gap-4 sm:grid-cols-3">
             <div>
               <p class="text-xs text-white/60">Total Capacity</p>
-              <p class="mt-1 text-xl font-medium text-white">
+              <p class="text-xl font-medium text-white">
                 {{ insights()?.teamCapacity?.totalCapacity || 0 }}%
               </p>
             </div>
             <div>
               <p class="text-xs text-white/60">Utilized</p>
-              <p class="mt-1 text-xl font-medium text-white">
+              <p class="text-xl font-medium text-white">
                 {{ insights()?.teamCapacity?.utilizedCapacity || 0 }}%
               </p>
             </div>
             <div>
               <p class="text-xs text-white/60">Available</p>
-              <p class="mt-1 text-xl font-medium text-white">
+              <p class="text-xl font-medium text-white">
                 {{ insights()?.teamCapacity?.availableCapacity || 0 }}%
               </p>
             </div>
