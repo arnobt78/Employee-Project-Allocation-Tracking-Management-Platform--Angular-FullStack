@@ -313,10 +313,3 @@ function formatUptime(days, hours, minutes) {
   return `${minutes}m`;
 }
 
-/**
- * Get server start time
- */
-export function getServerStartTime() {
-  return SERVER_START_TIME;
-}
-

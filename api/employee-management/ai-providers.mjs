@@ -357,16 +357,3 @@ export async function completeChatWithFallback(prompt) {
 
   return lastFailure;
 }
-
-/**
- * Which providers currently have keys present (for diagnostics / docs).
- */
-export function listConfiguredProviders() {
-  return AI_PROVIDERS.filter((provider) => firstEnv(provider.envKeys)).map(
-    (provider) => ({
-      id: provider.id,
-      label: provider.label,
-      models: provider.models,
-    })
-  );
-}

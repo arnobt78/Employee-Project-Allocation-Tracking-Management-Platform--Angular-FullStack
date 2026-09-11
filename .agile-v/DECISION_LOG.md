@@ -76,3 +76,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | Vercel `npm install` hit ERESOLVE (mixed 20.3.29/20.3.31 peers without lockfile); HPM v3 override broke WDS proxy (`Missing target`) |
 | Linked | GATE-0013, Vercel deploy |
 | Status | APPROVED and executed |
+
+---
+
+## DEC-0014 — Raise initial budget + delete proven unused (GATE-0014)
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-11 |
+| Decision | Raise initial `maximumWarning` to 1.2MB; delete zero-ref files/deps/helpers only (cors-proxy, hover-tooltip, unused SVGs, font-awesome, dead API helpers) |
+| Rationale | Honest demo SPA size; reduce attack surface (open cors-proxy) and maintenance noise without Angular major upgrade |
+| Linked | GATE-0014 |
+| Status | APPROVED and executed |

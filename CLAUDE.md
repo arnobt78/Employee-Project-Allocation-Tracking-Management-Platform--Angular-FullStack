@@ -5,15 +5,15 @@
 Project Name: EmpowerHub — Employee & Project Management (employee-management)  
 Description: Angular 20 SPA + Vercel serverless API + Prisma/MongoDB for employees, projects, assignments, dashboards, calendar/Gantt, insights, API docs/status, email notifications, optional Contentful + AI drafting, Sentry tunnel.
 
-Current Status: GATE-0013 UI polish + tracked lockfile (Vercel ERESOLVE fix) commit-ready  
+Current Status: GATE-0014 dead-code cleanup + bundle budget raise commit-ready  
 Current Agile V Cycle: C1  
-Current Gate: GATE-0001 (formal gate still open in memory; GATE-0013 complete)
+Current Gate: GATE-0001 (formal gate still open in memory; GATE-0014 complete)
 
 ---
 
 ## Tech Stack
 
-Frontend: Angular 20 (standalone), TypeScript 5.8, Tailwind 3.4, RxJS 7.8, Lucide / Font Awesome, `@sentry/angular`  
+Frontend: Angular 20 (standalone), TypeScript 5.8, Tailwind 3.4, RxJS 7.8, Lucide, `@sentry/angular`  
 Backend: Node serverless on Vercel (`api/employee-management` + `api/monitoring.js` Sentry tunnel)  
 Database: MongoDB via Prisma 6.19  
 Authentication: HttpOnly session cookie (`eh_session`), bcrypt `AppUser`, `authGuard` / `guestGuard`, API auth middleware  

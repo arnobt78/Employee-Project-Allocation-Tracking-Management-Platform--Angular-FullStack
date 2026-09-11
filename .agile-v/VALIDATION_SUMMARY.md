@@ -1,5 +1,34 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-11 — GATE-0014 dead-code cleanup + bundle budget (commit-ready)
+
+**Node:** v24.21.0
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm audit` | **PASS (0)** | Final gate |
+| `npm run lint` | **PASS** | Final gate + verifier |
+| `npm run build` | **PASS** | No initial-budget warning (~1.02 MB < 1.2MB) |
+| verify-deep | **PASS** | Independent verifier PASS |
+| review-security | **PASS** | cors-proxy removal improves posture |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| `angular.json` initial warning → 1.2MB | Done |
+| Delete unused UI/API/assets | Done |
+| Drop `font-awesome` + direct `@sentry/browser` | Done |
+| Strip dead handler/store/monitoring/ai helpers | Done |
+
+### eval_gate_status
+
+N/A (user-directed delivery; formal GATE-0001 record optional follow-up)
+
+---
+
 ## Session 2026-09-11 — GATE-0013 UI polish + lockfile / Vercel ERESOLVE (commit-ready)
 
 **Node:** v24.21.0

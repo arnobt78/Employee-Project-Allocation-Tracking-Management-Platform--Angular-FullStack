@@ -32,14 +32,7 @@ import {
   buildNotificationTemplate,
 } from "./notifications.mjs";
 import { prisma } from "../_lib/prisma-client.mjs";
-import {
-  logRequest,
-  getPerformanceHistory,
-  getRecentActivity,
-  getOverallStats,
-  getEndpointHealth,
-  getUptime,
-} from "./monitoring.mjs";
+import { logRequest } from "./monitoring.mjs";
 import { captureApiException } from "../_lib/sentry/server.mjs";
 import {
   authenticateUser,
@@ -144,45 +137,6 @@ async function notifyApprovalChange(project, action) {
       error,
     });
   }
-}
-
-// This function is no longer used - logic moved to getProjectStakeholderEmails
-// Keeping for backwards compatibility if needed elsewhere
-function buildApprovalRecipients(project, stakeholderEmails = {}) {
-  const to = new Set();
-  const cc = new Set();
-
-  const defaults =
-    process.env.NOTIFY_APPROVAL_TO?.split(",")
-      .map((entry) => entry.trim())
-      .filter((entry) => entry.length > 0) ?? [];
-  defaults.forEach((email) => to.add(email));
-
-  // Handle both old array format and new object format
-  if (Array.isArray(stakeholderEmails)) {
-    stakeholderEmails.forEach((email) => {
-      if (email && email.includes("@")) {
-        to.add(email);
-      }
-    });
-  } else if (stakeholderEmails && typeof stakeholderEmails === "object") {
-    (stakeholderEmails.to || []).forEach((email) => {
-      if (email && email.includes("@")) {
-        to.add(email);
-      }
-    });
-    (stakeholderEmails.cc || []).forEach((email) => {
-      if (email && email.includes("@")) {
-        cc.add(email);
-      }
-    });
-  }
-
-  return {
-    to: Array.from(to),
-    cc: Array.from(cc),
-    bcc: [],
-  };
 }
 
 function buildApprovalSubject(project, action) {
@@ -1826,100 +1780,6 @@ function normalizePathname(url) {
 
   // Last resort: return empty string
     return "";
-}
-
-function findEmployee(store, id) {
-  return store.employees.find((emp) => emp.employeeId === id);
-}
-
-function findProject(store, id) {
-  return store.projects.find((proj) => proj.projectId === id);
-}
-
-function findProjectEmployee(store, id) {
-  return store.projectEmployees.find((item) => item.empProjectId === id);
-}
-
-function withJoinedProjectEmployees(store) {
-  return store.projectEmployees.map((item) => {
-    const project = findProject(store, item.projectId);
-    const employee = findEmployee(store, item.empId);
-    return {
-      ...item,
-      projectName: project ? project.projectName : "Unknown Project",
-      employeeName: employee ? employee.employeeName : "Unknown Employee",
-    };
-  });
-}
-
-function buildDashboard(store) {
-  const totalEmployee = store.employees.length;
-  const totalProject = store.projects.length;
-  const activeProjectEmployees = store.projectEmployees.filter(
-    (item) => item.isActive === "Y"
-  ).length;
-
-  const recentProjects = [...store.projects]
-    .sort(
-      (a, b) =>
-        new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
-    )
-    .slice(0, 5)
-    .map((project) => ({
-      projectId: project.projectId,
-      projectName: project.projectName,
-      startDate: project.startDate,
-      status: project.status ?? null,
-    }));
-
-  const recentEmployee = [...store.employees]
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
-    .slice(0, 5)
-    .map((employee) => ({
-      employeeId: employee.employeeId,
-      employeeName: employee.employeeName,
-      role: employee.role,
-      department: employee.department,
-      avatarUrl: employee.avatarUrl ?? null,
-      emailId: employee.emailId ?? null,
-      hireDate: sanitizeDateValue(employee.hireDate),
-      createdAt: sanitizeDateValue(employee.createdAt),
-    }));
-
-  return {
-    totalEmployee,
-    totalProject,
-    activeProjectEmployees,
-    recentProjects,
-    recentEmployee,
-  };
-}
-
-function sanitizeDateValue(value) {
-  if (!value) {
-    return value;
-  }
-  return value.split("T")[0];
-}
-
-function normalizeIsActive(value) {
-  if (value === "Y" || value === "y") {
-    return "Y";
-  }
-  if (value === true || value === "true" || value === 1) {
-    return "Y";
-  }
-  return "N";
-}
-
-function resolveDepartmentName(store, deptId, fallback) {
-  const child = store.departments.children.find(
-    (dept) => dept.childDeptId === deptId
-  );
-  return child ? child.departmentName : fallback || "";
 }
 
 function buildApiDocumentation(request) {

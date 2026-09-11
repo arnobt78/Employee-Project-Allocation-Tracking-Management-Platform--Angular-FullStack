@@ -127,7 +127,7 @@ You can run the UI against the **live demo** immediately, or clone and run **loc
 | UI           | Angular 20 (standalone)             | Components without NgModules; modern default   |
 | Language     | TypeScript ~5.8                     | Types catch mistakes before runtime            |
 | Styling      | Tailwind CSS 3.4 + shadcn-style UI  | Utility classes + reusable button/cva patterns |
-| Icons        | Lucide Angular, Font Awesome        | Icon sets for nav and actions                  |
+| Icons        | Lucide Angular                      | Icon sets for nav and actions                  |
 | State / HTTP | RxJS + `HttpClient`                 | Streams for async API calls                    |
 | API          | Vercel Serverless Functions         | Pay-per-request backend, no always-on server   |
 | ORM / DB     | Prisma 6 + MongoDB                  | Schema in code; Mongo for flexible documents   |

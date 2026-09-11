@@ -1,5 +1,12 @@
 # Changelog — Agile V project memory
 
+## 2026-09-11 — GATE-0014 dead-code cleanup + bundle budget
+
+- Raise production initial `maximumWarning` to 1.2MB (clears Vercel budget noise)
+- Delete unused hover-tooltip, cors-proxy, unused SVGs, unused api sentry constants
+- Remove `font-awesome` and direct `@sentry/browser`; strip dead API helpers
+- verify-deep PASS; security review PASS (open-proxy surface removed)
+
 ## 2026-09-11 — GATE-0013 UI polish + lockfile (Vercel ERESOLVE)
 
 - SelectMenu overlay width matches trigger; option icons; `.eh-control` / `.eh-select-trigger` / `.eh-btn-icon`
