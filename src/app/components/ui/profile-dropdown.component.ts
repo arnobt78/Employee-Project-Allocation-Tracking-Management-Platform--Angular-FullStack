@@ -6,7 +6,8 @@ import {
   ElementRef,
   ViewChild,
   inject,
-  signal } from '@angular/core';
+  signal,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@/app/service/auth.service';
 import { UserAvatarComponent } from './user-avatar.component';
@@ -16,14 +17,10 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 @Component({
   selector: 'app-profile-dropdown-panel',
   standalone: true,
-  imports: [
-    AppIconComponent,
-    CommonModule,
-    RouterLink
-  ],
+  imports: [AppIconComponent, CommonModule, RouterLink],
   template: `
     <div
-      class="w-56 overflow-hidden rounded-2xl border border-white/15 bg-slate-950/95 py-2 shadow-[0_25px_70px_rgba(9,14,33,0.75)] backdrop-blur-xl sm:w-64"
+      class="w-56 overflow-hidden rounded-2xl border border-white/15 bg-slate-950/95 py-2 shadow-[0_25px_70px_rgba(9,14,33,0.75)] backdrop-blur-md sm:w-64"
       role="menu"
     >
       <div class="px-4 py-3">
@@ -65,7 +62,8 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
         }
       </button>
     </div>
-  ` })
+  `,
+})
 class ProfileDropdownPanelComponent {
   displayName = '';
   subtitle = '';
@@ -96,7 +94,8 @@ class ProfileDropdownPanelComponent {
         [alt]="displayName"
       ></app-user-avatar>
     </button>
-  ` })
+  `,
+})
 export class ProfileDropdownComponent {
   private readonly overlay = inject(Overlay);
   private readonly authService = inject(AuthService);
@@ -160,20 +159,24 @@ export class ProfileDropdownComponent {
           originY: 'bottom',
           overlayX: 'end',
           overlayY: 'top',
-          offsetY: 8 },
+          offsetY: 8,
+        },
         {
           originX: 'end',
           originY: 'top',
           overlayX: 'end',
           overlayY: 'bottom',
-          offsetY: -8 }])
+          offsetY: -8,
+        },
+      ])
       .withPush(true);
 
     this.overlayRef = this.overlay.create({
       positionStrategy,
       scrollStrategy: this.overlay.scrollStrategies.reposition(),
       hasBackdrop: true,
-      backdropClass: 'cdk-overlay-transparent-backdrop' });
+      backdropClass: 'cdk-overlay-transparent-backdrop',
+    });
 
     const portal = new ComponentPortal(ProfileDropdownPanelComponent);
     const componentRef = this.overlayRef.attach(portal);
@@ -216,6 +219,7 @@ export class ProfileDropdownComponent {
       error: () => {
         this.close();
         void this.router.navigateByUrl('/login');
-      } });
+      },
+    });
   }
 }

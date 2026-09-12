@@ -39,7 +39,7 @@
 
   <!-- Filters -->
   <div
-    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
   >
     <form
       [formGroup]="filterForm"
@@ -156,9 +156,9 @@
       <!-- Key Metrics Cards -->
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div
-          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
         >
-          <p class="text-xs text-white/45">Total Projects</p>
+          <p class="text-sm text-white/45">Total Projects</p>
           <p
             class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
           >
@@ -166,9 +166,9 @@
           </p>
         </div>
         <div
-          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
         >
-          <p class="text-xs text-white/45">Total Employees</p>
+          <p class="text-sm text-white/45">Total Employees</p>
           <p
             class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
           >
@@ -180,9 +180,9 @@
           </p>
         </div>
         <div
-          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
         >
-          <p class="text-xs text-white/45">Avg Readiness</p>
+          <p class="text-sm text-white/45">Avg Readiness</p>
           <p
             class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
           >
@@ -190,9 +190,9 @@
           </p>
         </div>
         <div
-          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
         >
-          <p class="text-xs text-white/45">Resource Utilization</p>
+          <p class="text-sm text-white/45">Resource Utilization</p>
           <p
             class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
           >
@@ -203,7 +203,7 @@
 
       <!-- Project Breakdown Badges - Full Width Row Below Cards -->
       <div
-        class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+        class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
       >
         <div class="flex flex-wrap gap-2 items-center">
           <span
@@ -257,9 +257,9 @@
 
       <!-- Project Status Distribution Chart -->
       <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
       >
-        <h2 class="mb-4 text-lg font-medium text-white">
+        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
           Project Status Distribution
         </h2>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -294,11 +294,11 @@
                 },
               ]
             "
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
           >
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-xs text-white/60">{{ item.label }}</p>
+                <p class="text-sm text-white/60">{{ item.label }}</p>
                 <p
                   class="text-xl sm:text-2xl leading-none font-medium text-white"
                 >
@@ -315,9 +315,9 @@
 
       <!-- Readiness Score Distribution -->
       <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
       >
-        <h2 class="mb-4 text-lg font-medium text-white">
+        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
           Readiness Score Distribution
         </h2>
         <div class="space-y-3">
@@ -351,19 +351,23 @@
     <!-- Projects Tab -->
     <div *ngIf="activeTab() === 'projects'" class="space-y-6">
       <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
       >
-        <h2 class="mb-4 text-lg font-medium text-white">
+        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
           Department Breakdown
         </h2>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
               <tr class="border-b border-white/10 text-left">
-                <th class="pb-3 text-xs text-white/60">Department</th>
-                <th class="pb-3 text-xs text-white/60">Employees</th>
-                <th class="pb-3 text-xs text-white/60">Projects</th>
-                <th class="pb-3 text-xs text-white/60">Avg Readiness</th>
+                <th class="pb-3 text-xs sm:text-sm text-white/60">
+                  Department
+                </th>
+                <th class="pb-3 text-xs sm:text-sm text-white/60">Employees</th>
+                <th class="pb-3 text-xs sm:text-sm text-white/60">Projects</th>
+                <th class="pb-3 text-xs sm:text-sm text-white/60">
+                  Avg Readiness
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -395,15 +399,15 @@
       </div>
 
       <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
       >
-        <h2 class="mb-4 text-lg font-medium text-white">
+        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
           Project Type Breakdown
         </h2>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div
             *ngFor="let type of insights()?.projectTypeBreakdown || []"
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
           >
             <p class="text-sm font-medium text-white">{{ type.type }}</p>
             <p
@@ -411,7 +415,7 @@
             >
               {{ type.count }}
             </p>
-            <p class="text-xs text-white/60">
+            <p class="mt-2 text-xs sm:text-sm text-white/60">
               Avg Readiness: {{ type.averageReadiness }}%
             </p>
           </div>
@@ -430,16 +434,16 @@
     <!-- Resources Tab -->
     <div *ngIf="activeTab() === 'resources'" class="space-y-6">
       <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
       >
-        <h2 class="mb-4 text-lg font-medium text-white">
+        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
           Resource Utilization
         </h2>
         <div class="grid gap-4 sm:grid-cols-2">
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
           >
-            <p class="text-xs text-white/60">Total Employees</p>
+            <p class="text-xs sm:text-sm text-white/60">Total Employees</p>
             <p
               class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
             >
@@ -447,9 +451,9 @@
             </p>
           </div>
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
           >
-            <p class="text-xs text-white/60">Active Assignments</p>
+            <p class="text-xs sm:text-sm text-white/60">Active Assignments</p>
             <p
               class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
             >
@@ -457,9 +461,9 @@
             </p>
           </div>
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
           >
-            <p class="text-xs text-white/60">Average Allocation</p>
+            <p class="text-xs sm:text-sm text-white/60">Average Allocation</p>
             <p
               class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
             >
@@ -467,9 +471,9 @@
             </p>
           </div>
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
           >
-            <p class="text-xs text-white/60">Available Resources</p>
+            <p class="text-xs sm:text-sm text-white/60">Available Resources</p>
             <p
               class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
             >
@@ -480,9 +484,11 @@
       </div>
 
       <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
       >
-        <h2 class="mb-4 text-lg font-medium text-white">Team Capacity</h2>
+        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
+          Team Capacity
+        </h2>
         <div class="space-y-4">
           <div>
             <div class="mb-2 flex items-center justify-between text-sm">
@@ -502,7 +508,7 @@
           </div>
           <div class="grid gap-4 sm:grid-cols-3">
             <div>
-              <p class="text-xs text-white/60">Total Capacity</p>
+              <p class="text-xs sm:text-sm text-white/60">Total Capacity</p>
               <p
                 class="text-xl sm:text-2xl leading-none font-medium text-white"
               >
@@ -510,7 +516,7 @@
               </p>
             </div>
             <div>
-              <p class="text-xs text-white/60">Utilized</p>
+              <p class="text-xs sm:text-sm text-white/60">Utilized</p>
               <p
                 class="text-xl sm:text-2xl leading-none font-medium text-white"
               >
@@ -518,7 +524,7 @@
               </p>
             </div>
             <div>
-              <p class="text-xs text-white/60">Available</p>
+              <p class="text-xs sm:text-sm text-white/60">Available</p>
               <p
                 class="text-xl sm:text-2xl leading-none font-medium text-white"
               >
@@ -533,14 +539,16 @@
     <!-- Financials Tab -->
     <div *ngIf="activeTab() === 'financials'" class="space-y-6">
       <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
       >
-        <h2 class="mb-4 text-lg font-medium text-white">Budget Metrics</h2>
+        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
+          Budget Metrics
+        </h2>
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
           >
-            <p class="text-xs text-white/60">Total Budget</p>
+            <p class="text-xs sm:text-sm text-white/60">Total Budget</p>
             <p
               class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
             >
@@ -550,9 +558,9 @@
             </p>
           </div>
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
           >
-            <p class="text-xs text-white/60">Allocated</p>
+            <p class="text-xs sm:text-sm text-white/60">Allocated</p>
             <p
               class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
             >
@@ -563,9 +571,9 @@
             </p>
           </div>
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
           >
-            <p class="text-xs text-white/60">Spent</p>
+            <p class="text-xs sm:text-sm text-white/60">Spent</p>
             <p
               class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
             >
@@ -575,9 +583,9 @@
             </p>
           </div>
           <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-xl"
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
           >
-            <p class="text-xs text-white/60">Remaining</p>
+            <p class="text-xs sm:text-sm text-white/60">Remaining</p>
             <p
               class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
             >
@@ -592,7 +600,7 @@
 
       <!-- Budget Management Status Info -->
       <div
-        class="rounded-[28px] border border-blue-500/20 bg-blue-500/5 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+        class="rounded-[28px] border border-blue-500/20 bg-blue-500/5 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
       >
         <div class="flex items-start gap-4">
           <div class="flex-shrink-0">

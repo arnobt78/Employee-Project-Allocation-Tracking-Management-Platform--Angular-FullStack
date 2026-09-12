@@ -1,6 +1,6 @@
 <div class="space-y-8 text-white/85">
   <section
-    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-2 sm:py-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
+    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-2 sm:py-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md sm:flex-row sm:items-center sm:justify-between"
   >
     <div class="w-full sm:max-w-sm">
       <label for="employee-search" class="sr-only">Search Employees</label>
@@ -44,11 +44,13 @@
 
   <section
     *ngIf="showCreatePanel"
-    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
   >
     <header class="mb-4 flex items-center justify-between">
       <div>
-        <h2 class="text-lg font-medium text-white">Create New Employee</h2>
+        <h2 class="text-base sm:text-xl font-medium text-white">
+          Create New Employee
+        </h2>
         <p class="text-xs text-white/50">Quick Onboarding Form</p>
       </div>
       <button
@@ -245,7 +247,7 @@
 
     <div
       *ngFor="let employee of filteredEmployees(); let idx = index"
-      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-xl transition duration-200 hover:border-white/20"
+      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition duration-200 hover:border-white/20"
     >
       <button
         type="button"

@@ -1,7 +1,7 @@
 <div class="space-y-6">
   <!-- Header -->
   <div
-    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
   >
     <div
       class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
@@ -57,7 +57,7 @@
     <!-- Upcoming Reminders -->
     <div
       *ngIf="upcomingReminders().length > 0"
-      class="rounded-[28px] border border-yellow-500/20 bg-yellow-500/5 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+      class="rounded-[28px] border border-yellow-500/20 bg-yellow-500/5 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
     >
       <h2
         class="mb-4 flex items-center gap-2 text-xl sm:text-2xl leading-tight font-medium text-white"
@@ -80,7 +80,7 @@
       <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <div
           *ngFor="let reminder of upcomingReminders()"
-          class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-xl"
+          class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md"
         >
           <div class="flex items-start justify-between">
             <div class="flex-1">
@@ -116,7 +116,7 @@
 
     <!-- Tabs -->
     <div
-      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
     >
       <div class="mb-6 flex gap-2 border-b border-white/10">
         <button

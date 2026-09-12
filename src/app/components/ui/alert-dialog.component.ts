@@ -32,10 +32,10 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
         aria-modal="true"
         [attr.aria-labelledby]="titleId"
         [attr.aria-describedby]="descId"
-        class="w-[min(100vw-2rem,28rem)] rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-slate-900/95 p-4 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.75)] backdrop-blur-xl sm:p-6"
+        class="w-[min(100vw-2rem,28rem)] rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-slate-900/95 p-4 text-sm text-white shadow-[0_40px_120px_rgba(9,9,16,0.75)] backdrop-blur-md sm:p-6"
         (click)="$event.stopPropagation()"
       >
-        <h2 [id]="titleId" class="text-lg font-medium text-white">
+        <h2 [id]="titleId" class="text-base sm:text-xl font-medium text-white">
           {{ title }}
         </h2>
         @if (description) {

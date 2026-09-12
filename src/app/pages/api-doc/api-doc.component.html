@@ -48,7 +48,7 @@
   <div *ngIf="apiDoc() && !loading()" class="space-y-6">
     <!-- API Info Card -->
     <div
-      class="rounded-2xl border border-white/10 bg-white/5 p-2 sm:p-4 backdrop-blur-xl"
+      class="rounded-2xl border border-white/10 bg-white/5 p-2 sm:p-4 backdrop-blur-md"
     >
       <h2 class="mb-4 text-xl font-medium text-white">
         {{ apiDoc()!.info.title }}
@@ -74,7 +74,7 @@
 
     <!-- Tabs for HTTP Methods -->
     <div
-      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
     >
       <div class="mb-6 flex gap-2 border-b border-white/10">
         <button
@@ -169,7 +169,7 @@
                   {{ endpoint.category }}
                 </span>
               </div>
-              <h3 class="mb-2 text-lg font-medium text-white">
+              <h3 class="mb-2 text-base sm:text-xl font-medium text-white">
                 {{ endpoint.path }}
               </h3>
               <p class="text-sm text-white/70">{{ endpoint.description }}</p>

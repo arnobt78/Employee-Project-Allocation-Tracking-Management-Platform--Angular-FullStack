@@ -37,11 +37,13 @@
   <div *ngIf="!loading() && !error() && status()" class="space-y-6">
     <!-- Overall Status Card -->
     <div
-      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
     >
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-lg font-medium text-white mb-2">Overall Status</h2>
+          <h2 class="text-base sm:text-xl font-medium text-white mb-2">
+            Overall Status
+          </h2>
           <div class="flex items-center gap-3">
             <span
               class="inline-flex rounded-full border px-3 py-1 text-sm font-medium capitalize"
@@ -61,7 +63,7 @@
           >
             {{ status()?.metrics?.successRate ?? 0 }}%
           </div>
-          <div class="text-xs text-white/60">Success Rate</div>
+          <div class="text-xs sm:text-sm text-white/60">Success Rate</div>
         </div>
       </div>
     </div>
@@ -71,46 +73,48 @@
       <div
         class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
       >
-        <div class="text-sm text-white/60 mb-1">Total Endpoints</div>
+        <div class="text-sm text-white/60 mb-2">Total Endpoints</div>
         <div class="text-xl sm:text-2xl leading-none font-medium text-white">
           {{ status()?.metrics?.totalEndpoints ?? 0 }}
         </div>
-        <div class="text-xs text-green-400">
+        <div class="mt-2 text-xs sm:text-sm text-green-400">
           {{ status()?.metrics?.activeEndpoints ?? 0 }} active
         </div>
       </div>
       <div
         class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
       >
-        <div class="text-sm text-white/60 mb-1">Avg Response Time</div>
+        <div class="text-sm text-white/60 mb-2">Avg Response Time</div>
         <div class="text-xl sm:text-2xl leading-none font-medium text-white">
           {{ status()?.metrics?.avgResponseTime ?? 0 }}ms
         </div>
-        <div class="text-xs text-white/60">Last 24 hours</div>
+        <div class="mt-2 text-xs sm:text-sm text-white/60">Last 24 hours</div>
       </div>
       <div
         class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
       >
-        <div class="text-sm text-white/60 mb-1">Total Requests</div>
+        <div class="text-sm text-white/60 mb-2">Total Requests</div>
         <div class="text-xl sm:text-2xl leading-none font-medium text-white">
           {{ status()?.metrics?.totalRequests ?? 0 | number }}
         </div>
-        <div class="text-xs text-white/60">Last 7 days</div>
+        <div class="mt-2 text-xs sm:text-sm text-white/60">Last 7 days</div>
       </div>
       <div
         class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
       >
-        <div class="text-sm text-white/60 mb-1">Error Rate</div>
+        <div class="text-sm text-white/60 mb-2">Error Rate</div>
         <div class="text-xl sm:text-2xl leading-none font-medium text-white">
           {{ status()?.metrics?.errorRate ?? 0 }}%
         </div>
-        <div class="text-xs text-red-400">Requires attention</div>
+        <div class="mt-2 text-xs sm:text-sm text-red-400">
+          Requires attention
+        </div>
       </div>
     </div>
 
     <!-- Tabs -->
     <div
-      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-xl"
+      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
     >
       <div class="mb-6 flex flex-wrap gap-2 border-b border-white/10">
         <button
@@ -159,7 +163,9 @@
       <div *ngIf="activeTab() === 'overview'" class="space-y-6">
         <!-- System Health -->
         <div>
-          <h3 class="text-lg font-medium text-white mb-4">System Health</h3>
+          <h3 class="text-base sm:text-xl font-medium text-white mb-4">
+            System Health
+          </h3>
           <div class="grid gap-4 sm:grid-cols-2">
             <!-- Database -->
             <div class="rounded-xl border border-white/10 bg-white/5 p-4">
@@ -174,11 +180,11 @@
                   {{ status()!.systemHealth.database.status }}
                 </span>
               </div>
-              <div class="text-xs text-white/60">
+              <div class="text-xs sm:text-sm text-white/60">
                 Response Time:
                 {{ status()!.systemHealth.database.responseTime }}ms
               </div>
-              <div class="text-xs text-white/60">
+              <div class="text-xs sm:text-sm text-white/60">
                 Connected:
                 {{ status()!.systemHealth.database.connected ? "Yes" : "No" }}
               </div>
@@ -195,10 +201,10 @@
                   {{ status()!.systemHealth.api.status }}
                 </span>
               </div>
-              <div class="text-xs text-white/60">
+              <div class="text-xs sm:text-sm text-white/60">
                 Uptime: {{ status()!.systemHealth.api.uptime }}
               </div>
-              <div class="text-xs text-white/60">
+              <div class="text-xs sm:text-sm text-white/60">
                 Avg Response: {{ status()!.systemHealth.api.avgResponseTime }}ms
               </div>
             </div>
@@ -207,10 +213,12 @@
 
         <!-- Data Statistics -->
         <div>
-          <h3 class="text-lg font-medium text-white mb-4">Data Statistics</h3>
+          <h3 class="text-base sm:text-xl font-medium text-white mb-4">
+            Data Statistics
+          </h3>
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div class="rounded-xl border border-white/10 bg-white/5 p-4">
-              <div class="text-sm text-white/60 mb-1">Employees</div>
+              <div class="text-sm text-white/60 mb-2">Employees</div>
               <div
                 class="text-xl sm:text-2xl leading-none font-medium text-white"
               >
@@ -218,7 +226,7 @@
               </div>
             </div>
             <div class="rounded-xl border border-white/10 bg-white/5 p-4">
-              <div class="text-sm text-white/60 mb-1">Projects</div>
+              <div class="text-sm text-white/60 mb-2">Projects</div>
               <div
                 class="text-xl sm:text-2xl leading-none font-medium text-white"
               >
@@ -226,7 +234,7 @@
               </div>
             </div>
             <div class="rounded-xl border border-white/10 bg-white/5 p-4">
-              <div class="text-sm text-white/60 mb-1">Assignments</div>
+              <div class="text-sm text-white/60 mb-2">Assignments</div>
               <div
                 class="text-xl sm:text-2xl leading-none font-medium text-white"
               >
@@ -247,7 +255,7 @@
 
       <!-- Endpoints Tab -->
       <div *ngIf="activeTab() === 'endpoints'" class="space-y-4">
-        <h3 class="text-lg font-medium text-white mb-4">
+        <h3 class="text-base sm:text-xl font-medium text-white mb-4">
           Endpoint Health by Category
         </h3>
         <div
@@ -270,7 +278,7 @@
               {{ endpoint.healthy }}/{{ endpoint.total }} healthy
             </div>
           </div>
-          <div class="flex items-center gap-4 text-xs text-white/60">
+          <div class="flex items-center gap-4 text-xs sm:text-sm text-white/60">
             <span>Avg Response: {{ endpoint.avgResponseTime }}ms</span>
             <div class="flex-1">
               <div class="h-1.5 rounded-full bg-white/10">
@@ -286,7 +294,7 @@
 
       <!-- Performance Tab -->
       <div *ngIf="activeTab() === 'performance'" class="space-y-4">
-        <h3 class="text-lg font-medium text-white mb-4">
+        <h3 class="text-base sm:text-xl font-medium text-white mb-4">
           Performance History (Last 7 Days)
         </h3>
         <div class="space-y-3">
@@ -299,27 +307,33 @@
                 <span class="text-sm font-medium text-white">{{
                   day.day
                 }}</span>
-                <span class="text-xs text-white/60 ml-2">{{ day.date }}</span>
+                <span class="text-xs sm:text-sm text-white/60 ml-2">{{
+                  day.date
+                }}</span>
               </div>
-              <div class="text-sm text-white/60">
+              <div class="text-xs sm:text-sm text-white/60">
                 {{ day.requests | number }} requests
               </div>
             </div>
             <div class="grid gap-3 sm:grid-cols-3 mt-2">
               <div>
-                <div class="text-xs text-white/60 mb-1">Avg Response Time</div>
+                <div class="text-xs sm:text-sm text-white/60 mb-1">
+                  Avg Response Time
+                </div>
                 <div class="text-sm font-medium text-white">
                   {{ day.avgResponseTime }}ms
                 </div>
               </div>
               <div>
-                <div class="text-xs text-white/60 mb-1">Success Rate</div>
+                <div class="text-xs sm:text-sm text-white/60 mb-1">
+                  Success Rate
+                </div>
                 <div class="text-sm font-medium text-green-400">
                   {{ day.successRate.toFixed(1) }}%
                 </div>
               </div>
               <div>
-                <div class="text-xs text-white/60 mb-1">Errors</div>
+                <div class="text-xs sm:text-sm text-white/60 mb-1">Errors</div>
                 <div class="text-sm font-medium text-red-400">
                   {{ day.errors }}
                 </div>
@@ -339,7 +353,9 @@
 
       <!-- Activity Tab -->
       <div *ngIf="activeTab() === 'activity'" class="space-y-4">
-        <h3 class="text-lg font-medium text-white mb-4">Recent Activity</h3>
+        <h3 class="text-base sm:text-xl font-medium text-white mb-4">
+          Recent Activity
+        </h3>
         <div class="space-y-2">
           <div
             *ngFor="let activity of status()!.recentActivity"
@@ -363,7 +379,9 @@
                   {{ activity.status }}
                 </span>
               </div>
-              <div class="flex items-center gap-4 text-xs text-white/60">
+              <div
+                class="flex items-center gap-4 text-xs sm:text-sm text-white/60"
+              >
                 <span>{{ activity.responseTime }}ms</span>
                 <span>{{ formatTimeAgo(activity.timestamp) }}</span>
               </div>

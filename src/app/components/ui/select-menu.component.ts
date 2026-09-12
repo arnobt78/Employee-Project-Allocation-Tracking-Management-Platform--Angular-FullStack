@@ -36,7 +36,7 @@ export interface SelectMenuOption {
   template: `
     <ul
       role="listbox"
-      class="box-border w-full max-h-72 overflow-auto rounded-2xl border border-white/15 bg-slate-950/95 p-2 shadow-[0_25px_70px_rgba(9,14,33,0.65)] backdrop-blur-xl"
+      class="box-border w-full max-h-72 overflow-auto rounded-2xl border border-white/15 bg-slate-950/95 p-2 shadow-[0_25px_70px_rgba(9,14,33,0.65)] backdrop-blur-md"
     >
       @for (option of options; track option.value; let index = $index) {
         <li
