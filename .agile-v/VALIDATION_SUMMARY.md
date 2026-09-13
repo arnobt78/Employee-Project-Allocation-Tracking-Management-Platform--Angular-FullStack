@@ -1,5 +1,37 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-13 — Shell UX polish + list-query normalize (commit-ready)
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm audit` | **PASS (0)** | Final gate |
+| `npm run lint` | **PASS** | Final gate |
+| `npm test` (ChromeHeadless) | **PASS (21/21)** | Includes `list-query.spec.ts` |
+| `npm run build` | **PASS** | ~1.08 MB initial |
+| Browser smoke | **PASS** | Login; Location-first active nav; `scrollbar-gutter: stable`; hairlines 0px |
+| API smoke | **PASS** | Login + GetDashboard/Employees/Projects/ProjectEmployees 200 |
+| verify-deep | **PASS WITH WARNINGS** | Independent verifier |
+| review-security | **PASS** | No medium+ findings |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Location-first `isPrimaryNavActive` / `resolveBrowserPath` | Done |
+| Stable thin scrollbar + `.eh-scrollbar` | Done |
+| Header/footer hairlines removed | Done |
+| `normalizeListSearchQuery` + unit specs (Agent Review clear) | Done |
+
+### eval_gate_status
+
+N/A (user-directed UX polish)
+
+---
+
 ## Session 2026-09-13 — Instant private shell paint (commit-ready)
 
 **Node:** v24.x

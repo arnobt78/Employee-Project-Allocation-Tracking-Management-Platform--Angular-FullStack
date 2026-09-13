@@ -65,3 +65,42 @@ export function isPrivateShellUrl(url: string): boolean {
     (prefix) => path === prefix || path.startsWith(`${prefix}/`)
   );
 }
+
+/**
+ * Pathname usable before NavigationEnd (hard refresh).
+ * Prefer Location — during bootstrap router.url can still be "/".
+ */
+export function resolveBrowserPath(
+  locationPath: string,
+  routerUrl: string,
+  fallback = '/'
+): string {
+  const fromLocation = locationPath.split('?')[0];
+  if (fromLocation) {
+    return fromLocation.startsWith('/') ? fromLocation : `/${fromLocation}`;
+  }
+
+  const fromRouter = routerUrl.split('?')[0];
+  if (fromRouter && fromRouter !== '/') {
+    return fromRouter;
+  }
+
+  if (typeof window !== 'undefined' && window.location?.pathname) {
+    return window.location.pathname;
+  }
+
+  return fallback;
+}
+
+/** Same exact/prefix rules as former routerLinkActiveOptions on primary nav. */
+export function isPrimaryNavActive(
+  path: string,
+  item: PrimaryNavItem
+): boolean {
+  const current = path.split('?')[0];
+  const route = item.route.startsWith('/') ? item.route : `/${item.route}`;
+  if (item.exact) {
+    return current === route;
+  }
+  return current === route || current.startsWith(`${route}/`);
+}

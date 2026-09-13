@@ -98,6 +98,19 @@ describe('AppComponent', () => {
     expect(compiled.querySelector('[data-testid="primary-nav"]')).toBeTruthy();
   });
 
+  it('should highlight active nav from Location before session resolves', () => {
+    authStub.setSessionState(null, false);
+    const location = TestBed.inject(Location);
+    spyOn(location, 'path').and.returnValue('/project-employee');
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const active = compiled.querySelector(
+      '[data-testid="primary-nav"] a.eh-nav-link-active'
+    );
+    expect(active?.textContent?.trim()).toBe('Project Team');
+  });
+
   it('should show primary nav when authenticated on private shell', async () => {
     authStub.setSessionState(
       {

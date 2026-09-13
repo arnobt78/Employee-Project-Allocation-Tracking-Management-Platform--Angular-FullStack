@@ -50,7 +50,32 @@
 
   html {
     color-scheme: dark;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.2) transparent;
     @apply bg-background;
+  }
+
+  html::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  html::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  html::-webkit-scrollbar-thumb {
+    background-color: rgb(255 255 255 / 0.18);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  html::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(255 255 255 / 0.35);
+    border: 2px solid transparent;
+    background-clip: content-box;
   }
 
   body {
@@ -69,9 +94,37 @@
     @apply mx-auto max-w-9xl px-2 sm:px-4 lg:px-8;
   }
 
-  /* Shared shell content width — header/footer borders align with page padding */
+  /* Shared shell content width — header / main / footer padding align */
   .eh-shell-inner {
     @apply mx-auto w-full max-w-9xl px-2 sm:px-4 lg:px-8;
+  }
+
+  /* Thin transparent scrollbar for overflow panels (select, mobile nav) */
+  .eh-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.2) transparent;
+  }
+
+  .eh-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .eh-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .eh-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgb(255 255 255 / 0.18);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .eh-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(255 255 255 / 0.35);
+    border: 2px solid transparent;
+    background-clip: content-box;
   }
 
   .eh-shell-header {

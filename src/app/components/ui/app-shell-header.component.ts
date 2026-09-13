@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import {
   Component,
   DestroyRef,
@@ -7,12 +7,15 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { filter, map, startWith } from 'rxjs/operators';
 import {
   HELP_URL,
+  isPrimaryNavActive,
   PRIMARY_NAVIGATION_ITEMS,
+  type PrimaryNavItem,
+  resolveBrowserPath,
 } from '@/app/constants/primary-navigation';
 import { AuthService } from '@/app/service/auth.service';
 import { AppIconComponent } from './app-icon.component';
@@ -25,7 +28,6 @@ import { ProfileDropdownComponent } from './profile-dropdown.component';
   imports: [
     CommonModule,
     RouterLink,
-    RouterLinkActive,
     AppIconComponent,
     UbButtonDirective,
     ProfileDropdownComponent,
@@ -37,7 +39,7 @@ import { ProfileDropdownComponent } from './profile-dropdown.component';
     >
       <div class="eh-shell-inner">
         <div
-          class="flex w-full items-center justify-between gap-3 border-b border-white/10 py-2"
+          class="flex w-full items-center justify-between gap-3 py-2"
         >
           <a
             routerLink="/dashboard"
@@ -69,11 +71,9 @@ import { ProfileDropdownComponent } from './profile-dropdown.component';
             @for (item of navItems; track item.route) {
               <a
                 [routerLink]="item.route"
-                routerLinkActive="eh-nav-link-active"
-                [routerLinkActiveOptions]="
-                  item.exact ? { exact: true } : { exact: false }
-                "
                 class="eh-nav-link whitespace-nowrap transition-colors hover:text-foreground"
+                [class.eh-nav-link-active]="isNavActive(item)"
+                [attr.aria-current]="isNavActive(item) ? 'page' : null"
               >
                 {{ item.label }}
               </a>
@@ -127,15 +127,16 @@ import { ProfileDropdownComponent } from './profile-dropdown.component';
               <lucide-icon name="x" [size]="16"></lucide-icon>
             </button>
           </div>
-          <nav class="flex flex-1 flex-col gap-1 overflow-y-auto p-3" aria-label="Mobile">
+          <nav
+            class="eh-scrollbar flex flex-1 flex-col gap-1 overflow-y-auto p-3"
+            aria-label="Mobile"
+          >
             @for (item of navItems; track item.route) {
               <a
                 [routerLink]="item.route"
-                routerLinkActive="eh-mobile-nav-active"
-                [routerLinkActiveOptions]="
-                  item.exact ? { exact: true } : { exact: false }
-                "
                 class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 hover:text-white"
+                [class.eh-mobile-nav-active]="isNavActive(item)"
+                [attr.aria-current]="isNavActive(item) ? 'page' : null"
                 (click)="closeMobileMenu()"
               >
                 <span
@@ -170,12 +171,22 @@ import { ProfileDropdownComponent } from './profile-dropdown.component';
 export class AppShellHeaderComponent implements OnInit {
   readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly navItems = PRIMARY_NAVIGATION_ITEMS;
   readonly helpUrl = HELP_URL;
   readonly scrolled = signal(false);
   readonly mobileOpen = signal(false);
+
+  private readonly currentPath = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      startWith(null),
+      map(() => this.resolvePath())
+    ),
+    { initialValue: this.resolvePath() }
+  );
 
   ngOnInit(): void {
     this.syncScroll();
@@ -185,6 +196,10 @@ export class AppShellHeaderComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => this.closeMobileMenu());
+  }
+
+  isNavActive(item: PrimaryNavItem): boolean {
+    return isPrimaryNavActive(this.currentPath(), item);
   }
 
   @HostListener('window:scroll')
@@ -205,6 +220,10 @@ export class AppShellHeaderComponent implements OnInit {
 
   closeMobileMenu(): void {
     this.mobileOpen.set(false);
+  }
+
+  private resolvePath(): string {
+    return resolveBrowserPath(this.location.path(), this.router.url);
   }
 
   private syncScroll(): void {

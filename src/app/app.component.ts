@@ -9,7 +9,7 @@ import {
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest } from 'rxjs';
 import { filter, map, startWith, tap } from 'rxjs/operators';
-import { isPrivateShellUrl } from '@/app/constants/primary-navigation';
+import { isPrivateShellUrl, resolveBrowserPath } from '@/app/constants/primary-navigation';
 import { ToastContainerComponent } from '@/app/components/ui/toast-container.component';
 import { AppShellHeaderComponent } from '@/app/components/ui/app-shell-header.component';
 import { AppShellFooterComponent } from '@/app/components/ui/app-shell-footer.component';
@@ -91,20 +91,6 @@ export class AppComponent {
 
   /** Pathname usable before NavigationEnd (hard refresh). */
   private currentPath(): string {
-    const fromLocation = this.location.path().split('?')[0];
-    if (fromLocation) {
-      return fromLocation.startsWith('/') ? fromLocation : `/${fromLocation}`;
-    }
-
-    const fromRouter = this.router.url.split('?')[0];
-    if (fromRouter && fromRouter !== '/') {
-      return fromRouter;
-    }
-
-    if (typeof window !== 'undefined' && window.location?.pathname) {
-      return window.location.pathname;
-    }
-
-    return '/';
+    return resolveBrowserPath(this.location.path(), this.router.url);
   }
 }

@@ -10,8 +10,13 @@ export interface ListQueryState {
   page: number;
 }
 
+/** Single normalize path for signal + URL `?q=` (trim + length cap). */
+export function normalizeListSearchQuery(term: string): string {
+  return term.trim().slice(0, MAX_LIST_QUERY_LENGTH);
+}
+
 export function parseListQueryParams(params: ParamMap): ListQueryState {
-  const q = (params.get('q') ?? '').trim().slice(0, MAX_LIST_QUERY_LENGTH);
+  const q = normalizeListSearchQuery(params.get('q') ?? '');
   const rawPage = Number(params.get('page') ?? '1');
   const page =
     Number.isFinite(rawPage) && rawPage >= 1 ? Math.floor(rawPage) : 1;
@@ -61,7 +66,7 @@ export function bindListQuery(
     });
 
   const writeUrl = (q: string, nextPage: number) => {
-    const safeQ = q.trim().slice(0, MAX_LIST_QUERY_LENGTH);
+    const safeQ = normalizeListSearchQuery(q);
     void router.navigate([], {
       relativeTo: route,
       queryParams: {
@@ -75,7 +80,7 @@ export function bindListQuery(
 
   return {
     setSearch: (term: string) => {
-      const safe = term.trim().slice(0, MAX_LIST_QUERY_LENGTH);
+      const safe = normalizeListSearchQuery(term);
       searchTerm.set(safe);
       writeUrl(safe, 1);
     },

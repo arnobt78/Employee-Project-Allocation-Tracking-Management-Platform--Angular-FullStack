@@ -4,6 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs/operators';
 import { resolvePrivatePageMeta } from '@/app/constants/private-page-meta';
+import { resolveBrowserPath } from '@/app/constants/primary-navigation';
 import { PageHeaderComponent } from './page-header.component';
 import {
   ListSkeletonComponent,
@@ -74,17 +75,10 @@ export class RouteContentPlaceholderComponent {
   readonly meta = computed(() => resolvePrivatePageMeta(this.path()));
 
   private currentPath(): string {
-    const fromLocation = this.location.path().split('?')[0];
-    if (fromLocation) {
-      return fromLocation.startsWith('/') ? fromLocation : `/${fromLocation}`;
-    }
-    const fromRouter = this.router.url.split('?')[0];
-    if (fromRouter && fromRouter !== '/') {
-      return fromRouter;
-    }
-    if (typeof window !== 'undefined' && window.location?.pathname) {
-      return window.location.pathname;
-    }
-    return '/dashboard';
+    return resolveBrowserPath(
+      this.location.path(),
+      this.router.url,
+      '/dashboard'
+    );
   }
 }
