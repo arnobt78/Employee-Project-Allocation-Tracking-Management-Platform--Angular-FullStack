@@ -1,49 +1,33 @@
 <div class="space-y-10 text-white/85" [formGroup]="projectForm">
-  <header
-    class="rounded-[28px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-2 sm:py-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
+  <app-page-header
+    [title]="projectTitle()"
+    subtitle="Configure the essentials before rolling the project out to your teams. Organize the information into focused sections, edit inline, and save when you are ready."
+    [icon]="isEditMode() ? 'pencil' : 'folder-kanban'"
   >
-    <div
-      class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+    <a
+      routerLink="/projects"
+      class="eh-btn-icon text-xs font-medium text-white/60 transition hover:text-white"
     >
-      <div class="space-y-2">
-        <a
-          routerLink="/projects"
-          class="eh-btn-icon text-xs font-medium text-white/60 transition hover:text-white"
-        >
-          ← Back To Projects
-        </a>
-        <div class="flex items-center gap-3">
-          <h1 class="text-2xl font-medium text-white">
-            {{ projectTitle() }}
-          </h1>
-          <span
-            class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] text-white/60"
-          >
-            {{ isEditMode() ? "Editing" : "Draft" }}
-          </span>
-        </div>
-        <p class="max-w-2xl text-sm text-white/65">
-          Configure the essentials before rolling the project out to your teams.
-          Organize the information into focused sections, edit inline, and save
-          when you are ready.
-        </p>
+      ← Back To Projects
+    </a>
+    <span
+      class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] text-white/60"
+    >
+      {{ isEditMode() ? "Editing" : "Draft" }}
+    </span>
+    <div class="min-w-[10rem] space-y-2 text-sm text-white/70">
+      <div class="flex items-center justify-between gap-4">
+        <span>Readiness</span>
+        <span class="font-medium text-white">{{ progress() }}%</span>
       </div>
-      <div class="space-y-4 text-sm text-white/70">
-        <div class="flex items-center justify-between gap-6">
-          <span>Readiness Checklist</span>
-          <span class="text-base font-medium text-white"
-            >{{ progress() }}%</span
-          >
-        </div>
-        <div class="h-2 w-full rounded-full bg-white/10">
-          <div
-            class="h-2 rounded-full bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 transition-all duration-300"
-            [style.width.%]="progress()"
-          ></div>
-        </div>
+      <div class="h-2 w-full rounded-full bg-white/10">
+        <div
+          class="h-2 rounded-full bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 transition-all duration-300"
+          [style.width.%]="progress()"
+        ></div>
       </div>
     </div>
-  </header>
+  </app-page-header>
 
   <section
     class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"

@@ -1,10 +1,11 @@
-import { Component, OnInit, computed, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MasterService } from '../../service/master.service';
 import { Employee } from '../../model/class/Employee';
 import { CommonModule } from '@angular/common';
@@ -18,6 +19,13 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
 import { CardCloseButtonComponent } from '@/app/components/ui/card-close-button.component';
 import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
+import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
+import { ListPaginationComponent } from '@/app/components/ui/list-pagination.component';
+import {
+  bindListQuery,
+  ListQueryController,
+  paginateList,
+} from '@/app/lib/list-query';
 
 @Component({
   selector: 'app-employee',
@@ -32,6 +40,8 @@ import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
     AlertDialogComponent,
     CardCloseButtonComponent,
     UserAvatarComponent,
+    PageHeaderComponent,
+    ListPaginationComponent,
   ],
   templateUrl: './employee.component.html',
   styleUrls: ['./employee.component.css'],
@@ -52,8 +62,12 @@ export class EmployeeComponent implements OnInit {
         employee.employeeId?.toString().includes(term)
     );
   });
+  readonly pagedEmployees = computed(() =>
+    paginateList(this.filteredEmployees(), this.listPage())
+  );
 
   readonly searchTerm = signal<string>('');
+  readonly listPage = signal(1);
   readonly isLoading = signal(true);
   readonly hasLoaded = signal(false);
   expandedEmployeeId: number | null = null;
@@ -63,6 +77,11 @@ export class EmployeeComponent implements OnInit {
   pendingSave = false;
   isSaving = false;
   isDeleting = false;
+
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private listQuery!: ListQueryController;
 
   constructor(
     private fb: FormBuilder,
@@ -88,6 +107,13 @@ export class EmployeeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.listQuery = bindListQuery(
+      this.route,
+      this.router,
+      this.destroyRef,
+      this.searchTerm,
+      this.listPage
+    );
     this.getEmployees();
   }
 
@@ -344,7 +370,11 @@ export class EmployeeComponent implements OnInit {
   }
 
   updateSearch(term: string) {
-    this.searchTerm.set(term);
+    this.listQuery.setSearch(term);
+  }
+
+  goToPage(page: number) {
+    this.listQuery.setPage(page);
   }
 
   saveDialogTitle(): string {

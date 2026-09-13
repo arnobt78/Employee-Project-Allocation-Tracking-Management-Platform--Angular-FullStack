@@ -15,6 +15,7 @@
 | RISK-0011 | Fresh install audit dirty (6 vulns) — js-yaml, nodemailer, qs, hono transitive | High | Confirmed 2026-09-11 | REQ-0112 | Patch + scoped overrides; avoid `audit fix --force` majors | Mitigated (audit 0) |
 | RISK-0012 | Blind major bumps (Angular 21+, Prisma 7+, Tailwind 4, ESLint 10, lucide → `@lucide/angular`) break peers / UI | High | Confirmed by outdated map | REQ-0112 | Stay on Angular 20 LTS + Prisma 6 + Tailwind 3 | Mitigated (plan lock) |
 | RISK-0013 | Vercel dashboard Node still on 20 despite `engines` 24.x | Medium | Possible | REQ-0111 | Confirm Project Settings → Node 24 (package.json overrides when set) | Open |
+| RISK-0014 | Private shell shown before session fails could briefly flash chrome then redirect to login | Medium | Possible after TASK-0022 | REQ-0114 | Auth-gated nav; layout → auth when sessionResolved && !auth; brand-only pending | Mitigated |
 
 ## Notes
 

@@ -1,6 +1,8 @@
 import { Component, OnInit, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MasterService } from '../../service/master.service';
+import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
+import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
 
 export interface IApiStatus {
   timestamp: string;
@@ -60,7 +62,7 @@ export interface IApiStatus {
 @Component({
   selector: 'app-api-status',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PageHeaderComponent, ListSkeletonComponent],
   templateUrl: './api-status.component.html',
   styleUrls: ['./api-status.component.css'],
 })

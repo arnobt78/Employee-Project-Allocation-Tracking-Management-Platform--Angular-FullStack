@@ -1,6 +1,8 @@
 import { Component, OnInit, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MasterService } from '../../service/master.service';
+import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
+import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
 
 export interface IApiEndpoint {
   path: string;
@@ -46,7 +48,7 @@ export interface IApiDocumentation {
 @Component({
   selector: 'app-api-doc',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PageHeaderComponent, ListSkeletonComponent],
   templateUrl: './api-doc.component.html',
   styleUrls: ['./api-doc.component.css'],
 })

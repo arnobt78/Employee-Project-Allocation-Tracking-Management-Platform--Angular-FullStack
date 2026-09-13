@@ -13,6 +13,7 @@ import { AuthService } from '@/app/service/auth.service';
 import { MasterService } from '@/app/service/master.service';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { DemoAccount } from '@/app/model/interface/master';
+import { parseLoginCredentials } from '@/app/lib/validation/auth.schema';
 
 @Component({
   selector: 'app-login',
@@ -128,15 +129,16 @@ export class LoginComponent {
       return;
     }
 
-    const username = this.loginObj.username.trim();
-    const password = this.loginObj.password;
-    if (!username || !password) {
+    const parsed = parseLoginCredentials(this.loginObj);
+    if (!parsed.success) {
       this.toast.error({
         title: 'Missing Credentials',
-        description: 'Enter both username and password.' });
+        description: parsed.message,
+      });
       return;
     }
 
+    const { username, password } = parsed.data;
     this.isSubmitting = true;
     this.authService.login(username, password).subscribe({
       next: (response) => {

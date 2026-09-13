@@ -33,6 +33,7 @@ import {
 } from "./notifications.mjs";
 import { prisma } from "../_lib/prisma-client.mjs";
 import { logRequest } from "./monitoring.mjs";
+import { parseLoginCredentials } from "../_lib/validation/auth.schema.mjs";
 import { captureApiException } from "../_lib/sentry/server.mjs";
 import {
   authenticateUser,
@@ -2691,17 +2692,17 @@ export async function handleEmployeeManagementRequest(request, response) {
             );
           }
 
-          const username = body?.username?.trim?.() || "";
-          const password = body?.password || "";
-          if (!username || !password) {
+          const parsed = parseLoginCredentials(body ?? {});
+          if (!parsed.success) {
             return sendJson(
               response,
               400,
-              createApiResponse(false, "Username and password are required"),
+              createApiResponse(false, parsed.message),
               statusCodeRef
             );
           }
 
+          const { username, password } = parsed.data;
           const user = await authenticateUser(username, password);
           if (!user) {
             recordFailedLogin(request);

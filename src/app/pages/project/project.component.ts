@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, signal, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, signal, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -7,7 +7,7 @@ import {
 import { IProject } from '../../model/interface/master';
 import { MasterService } from '../../service/master.service';
 import { DatePipe, CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import {
@@ -16,6 +16,13 @@ import {
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
 import { CardCloseButtonComponent } from '@/app/components/ui/card-close-button.component';
+import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
+import { ListPaginationComponent } from '@/app/components/ui/list-pagination.component';
+import {
+  bindListQuery,
+  ListQueryController,
+  paginateList,
+} from '@/app/lib/list-query';
 
 @Component({
   selector: 'app-project',
@@ -30,6 +37,8 @@ import { CardCloseButtonComponent } from '@/app/components/ui/card-close-button.
     StatPillSkeletonComponent,
     AlertDialogComponent,
     CardCloseButtonComponent,
+    PageHeaderComponent,
+    ListPaginationComponent,
   ],
   providers: [DatePipe],
   templateUrl: './project.component.html',
@@ -41,10 +50,15 @@ export class ProjectComponent implements OnInit {
   private readonly datePipe = inject(DatePipe);
   private readonly toast = inject(ToastService);
   private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private listQuery!: ListQueryController;
 
   private readonly projectsSignal = signal<IProject[]>([]);
   readonly projects = this.projectsSignal.asReadonly();
   readonly searchTerm = signal<string>('');
+  readonly listPage = signal(1);
   readonly isLoading = signal(true);
   readonly hasLoaded = signal(false);
   readonly filteredProjects = computed(() => {
@@ -61,6 +75,9 @@ export class ProjectComponent implements OnInit {
       );
     });
   });
+  readonly pagedProjects = computed(() =>
+    paginateList(this.filteredProjects(), this.listPage())
+  );
 
   projectForm: FormGroup = this.fb.group({
     projectId: [null],
@@ -81,6 +98,13 @@ export class ProjectComponent implements OnInit {
   isDeleting = false;
 
   ngOnInit(): void {
+    this.listQuery = bindListQuery(
+      this.route,
+      this.router,
+      this.destroyRef,
+      this.searchTerm,
+      this.listPage
+    );
     this.getProjects();
   }
 
@@ -222,7 +246,11 @@ export class ProjectComponent implements OnInit {
   }
 
   updateSearch(term: string) {
-    this.searchTerm.set(term);
+    this.listQuery.setSearch(term);
+  }
+
+  goToPage(page: number) {
+    this.listQuery.setPage(page);
   }
 
   onSave() {

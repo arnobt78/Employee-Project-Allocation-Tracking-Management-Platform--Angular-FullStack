@@ -1,44 +1,32 @@
 <div class="space-y-6">
   <!-- Header -->
-  <div
-    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
+  <app-page-header
+    title="Calendar & Timeline"
+    subtitle="View project milestones, timelines, and due date reminders"
+    icon="calendar-range"
   >
-    <div
-      class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+    <span
+      *ngIf="scheduleData()"
+      class="rounded-full bg-primary/20 px-3 py-1 text-xs font-medium text-primary"
     >
-      <div>
-        <h1 class="text-xl sm:text-2xl leading-tight font-medium text-white">
-          Calendar & Timeline
-        </h1>
-        <p class="text-xs sm:text-sm text-white/60">
-          View project milestones, timelines, and due date reminders
-        </p>
-      </div>
-      <div class="flex items-center gap-2">
-        <span
-          *ngIf="scheduleData()"
-          class="rounded-full bg-primary/20 px-3 py-1 text-xs font-medium text-primary"
-        >
-          {{ scheduleData()?.totalProjects || 0 }} Projects
-        </span>
-        <span
-          *ngIf="scheduleData()"
-          class="rounded-full bg-blue-500/20 px-3 py-1 text-xs font-medium text-blue-400"
-        >
-          {{ scheduleData()?.totalMilestones || 0 }} Milestones
-        </span>
-        <span
-          *ngIf="scheduleData()"
-          class="rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-medium text-yellow-400"
-        >
-          {{ scheduleData()?.totalDueDates || 0 }} Due Dates
-        </span>
-      </div>
-    </div>
-  </div>
+      {{ scheduleData()?.totalProjects || 0 }} Projects
+    </span>
+    <span
+      *ngIf="scheduleData()"
+      class="rounded-full bg-blue-500/20 px-3 py-1 text-xs font-medium text-blue-400"
+    >
+      {{ scheduleData()?.totalMilestones || 0 }} Milestones
+    </span>
+    <span
+      *ngIf="scheduleData()"
+      class="rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-medium text-yellow-400"
+    >
+      {{ scheduleData()?.totalDueDates || 0 }} Due Dates
+    </span>
+  </app-page-header>
 
   <!-- Loading State (inline skeletons — first paint only when cache is cold) -->
-  <div *ngIf="loading()" class="space-y-6">
+  <div *ngIf="loading() && !scheduleData()" class="space-y-6">
     <section
       class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-4"
     >
@@ -53,7 +41,7 @@
   </div>
 
   <!-- Content -->
-  <div *ngIf="!loading() && scheduleData()" class="space-y-6">
+  <div *ngIf="scheduleData()" class="space-y-6">
     <!-- Upcoming Reminders -->
     <div
       *ngIf="upcomingReminders().length > 0"

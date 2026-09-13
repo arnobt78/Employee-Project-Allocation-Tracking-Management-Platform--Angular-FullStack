@@ -8,6 +8,7 @@ import {
   StatPillSkeletonComponent,
 } from '@/app/components/ui/list-skeleton.component';
 import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
+import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 
 interface DashboardSnapshot {
   totalEmployee: number;
@@ -25,6 +26,7 @@ interface DashboardSnapshot {
     StatPillSkeletonComponent,
     DatePipe,
     UserAvatarComponent,
+    PageHeaderComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],

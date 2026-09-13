@@ -1,4 +1,10 @@
 <div class="space-y-8 text-white/85">
+  <app-page-header
+    title="Dashboard"
+    subtitle="Monitor workforce, projects, and assignment health in one place"
+    icon="layout-dashboard"
+  ></app-page-header>
+
   @if (isLoading()) {
     <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       @for (card of [1, 2, 3]; track card) {

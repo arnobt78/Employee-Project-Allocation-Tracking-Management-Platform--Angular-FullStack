@@ -17,6 +17,7 @@ import {
   SelectMenuComponent,
   SelectMenuOption,
 } from '@/app/components/ui/select-menu.component';
+import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 
 export interface IBusinessInsights {
   projectStatusDistribution: {
@@ -89,6 +90,7 @@ export interface IBusinessInsights {
     ListSkeletonComponent,
     StatPillSkeletonComponent,
     SelectMenuComponent,
+    PageHeaderComponent,
   ],
   templateUrl: './business-insights.component.html',
   styleUrls: ['./business-insights.component.css'] })

@@ -55,10 +55,10 @@ export class FloatingBackgroundComponent {
   readonly primaryPublicAsset = input<boolean>(true);
   readonly secondaryPublicAsset = input<boolean>(true);
 
-  readonly baseBackgroundClass = input<string>('bg-[#04071d]');
+  readonly baseBackgroundClass = input<string>('bg-[#020817]');
   readonly overlayLayers = input<string[]>([
-    'absolute inset-0 bg-[#04071d]',
-    'absolute inset-0 bg-gradient-to-br from-[#0b1753] via-[#10123f] to-[#320a72] opacity-95',
+    'absolute inset-0 bg-[#020817]',
+    'absolute inset-0 bg-gradient-to-br from-[#0b1753]/80 via-[#020817] to-[#320a72]/70 opacity-95',
     'absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(58,130,246,0.25),transparent_60%)]',
     'absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_rgba(236,72,153,0.22),transparent_65%)]',
   ]);

@@ -1,16 +1,10 @@
 <div class="space-y-6 text-white/85">
   <!-- Header -->
-  <div
-    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+  <app-page-header
+    title="API Status"
+    subtitle="Monitor API health, performance, and activity in real-time"
+    icon="activity"
   >
-    <div>
-      <h1 class="text-xl sm:text-2xl leading-tight font-medium text-white">
-        API Status
-      </h1>
-      <p class="text-xs sm:text-sm text-white/60">
-        Monitor API health, performance, and activity in real-time
-      </p>
-    </div>
     <button
       (click)="loadApiStatus()"
       [disabled]="loading()"
@@ -18,11 +12,11 @@
     >
       {{ loading() ? "Refreshing..." : "Refresh" }}
     </button>
-  </div>
+  </app-page-header>
 
   <!-- Loading State -->
-  <div *ngIf="loading() && !status()" class="text-center text-white/60 py-12">
-    Loading API status...
+  <div *ngIf="loading() && !status()">
+    <app-list-skeleton [rows]="4"></app-list-skeleton>
   </div>
 
   <!-- Error State -->
@@ -34,7 +28,7 @@
   </div>
 
   <!-- Main Content -->
-  <div *ngIf="!loading() && !error() && status()" class="space-y-6">
+  <div *ngIf="status() && !error()" class="space-y-6">
     <!-- Overall Status Card -->
     <div
       class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"

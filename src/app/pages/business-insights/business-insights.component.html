@@ -1,41 +1,33 @@
 <div class="space-y-6 text-white/85">
   <!-- Header -->
-  <div
-    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+  <app-page-header
+    title="Business Insights"
+    subtitle="Analytics and reporting for projects, resources, and performance"
+    icon="chart-column"
   >
-    <div>
-      <h1 class="text-xl sm:text-2xl leading-tight font-medium text-white">
-        Business Insights
-      </h1>
-      <p class="text-xs sm:text-sm text-white/60">
-        Analytics and reporting for projects, resources, and performance
-      </p>
-    </div>
-    <div class="flex items-center gap-3">
-      <button
-        ubButton
-        size="sm"
-        variant="secondary"
-        class="eh-btn-icon border border-white/20 bg-white/5 hover:bg-white/10"
-        (click)="exportToCSV()"
-        [disabled]="loading() || !insights()"
-      >
-        <lucide-icon name="download" [size]="16"></lucide-icon>
-        <span>Export CSV</span>
-      </button>
-      <button
-        ubButton
-        size="sm"
-        variant="secondary"
-        class="eh-btn-icon border border-white/20 bg-white/5 hover:bg-white/10"
-        (click)="exportToPDF()"
-        [disabled]="loading() || !insights()"
-      >
-        <lucide-icon name="file-down" [size]="16"></lucide-icon>
-        <span>Export PDF</span>
-      </button>
-    </div>
-  </div>
+    <button
+      ubButton
+      size="sm"
+      variant="secondary"
+      class="eh-btn-icon border border-white/20 bg-white/5 hover:bg-white/10"
+      (click)="exportToCSV()"
+      [disabled]="loading() || !insights()"
+    >
+      <lucide-icon name="download" [size]="16"></lucide-icon>
+      <span>Export CSV</span>
+    </button>
+    <button
+      ubButton
+      size="sm"
+      variant="secondary"
+      class="eh-btn-icon border border-white/20 bg-white/5 hover:bg-white/10"
+      (click)="exportToPDF()"
+      [disabled]="loading() || !insights()"
+    >
+      <lucide-icon name="file-down" [size]="16"></lucide-icon>
+      <span>Export PDF</span>
+    </button>
+  </app-page-header>
 
   <!-- Filters -->
   <div
@@ -88,7 +80,7 @@
   </div>
 
   <!-- Loading State (inline skeletons — first paint only when cache is cold) -->
-  <div *ngIf="loading()" class="space-y-6">
+  <div *ngIf="loading() && !insights()" class="space-y-6">
     <section
       class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
     >
@@ -103,7 +95,7 @@
   </div>
 
   <!-- Tabs -->
-  <div *ngIf="!loading() && insights()" class="space-y-6">
+  <div *ngIf="insights()" class="space-y-6">
     <div class="flex gap-2 border-b border-white/10">
       <button
         type="button"

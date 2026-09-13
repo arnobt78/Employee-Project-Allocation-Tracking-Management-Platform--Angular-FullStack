@@ -1,5 +1,36 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-13 — GATE-0015 shell UX + Zod/list-query (commit-ready)
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm audit` | **PASS (0)** | Final gate |
+| `npm run lint` | **PASS** | Final gate |
+| `npm test` (ChromeHeadless) | **PASS (15/15)** | Final gate |
+| `npm run build` | **PASS** | ~1.07 MB initial |
+| verify-deep | **PASS WITH WARNINGS** | Independent verifier; dual Zod copies noted |
+| review-security | **PASS WITH WARNINGS** | Low only (shell chrome, authDenial metrics, q capped) |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| App shell header/footer + page-header + primary nav | Done |
+| FOUC / refresh-stable private chrome; auth-gated nav | Done |
+| Monitoring excludes 401/403 from health math | Done |
+| Zod login client + server | Done |
+| List `?q=`/`?page=` + client pagination | Done |
+
+### eval_gate_status
+
+N/A (user-directed delivery; formal GATE-0001 record optional follow-up)
+
+---
+
 ## Session 2026-09-11 — GATE-0014 dead-code cleanup + bundle budget (commit-ready)
 
 **Node:** v24.21.0

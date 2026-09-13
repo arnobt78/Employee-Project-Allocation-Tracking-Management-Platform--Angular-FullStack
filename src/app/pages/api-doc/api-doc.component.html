@@ -1,16 +1,10 @@
 <div class="space-y-6">
   <!-- Header -->
-  <div
-    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+  <app-page-header
+    title="API Documentation"
+    subtitle="Complete API reference for Employee Management System"
+    icon="file-text"
   >
-    <div>
-      <h1 class="text-xl sm:text-2xl leading-tight font-medium text-white">
-        API Documentation
-      </h1>
-      <p class="text-xs sm:text-sm text-white/60">
-        Complete API reference for Employee Management System
-      </p>
-    </div>
     <div
       *ngIf="apiDoc()"
       class="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2"
@@ -20,14 +14,11 @@
         apiDoc()!.info.version
       }}</span>
     </div>
-  </div>
+  </app-page-header>
 
   <!-- Loading State -->
-  <div
-    *ngIf="loading()"
-    class="rounded-lg border border-white/10 bg-white/5 p-8 text-center"
-  >
-    <p class="text-white/60">Loading API documentation...</p>
+  <div *ngIf="loading() && !apiDoc()">
+    <app-list-skeleton [rows]="4"></app-list-skeleton>
   </div>
 
   <!-- Error State -->
@@ -45,7 +36,7 @@
   </div>
 
   <!-- API Documentation Content -->
-  <div *ngIf="apiDoc() && !loading()" class="space-y-6">
+  <div *ngIf="apiDoc()" class="space-y-6">
     <!-- API Info Card -->
     <div
       class="rounded-2xl border border-white/10 bg-white/5 p-2 sm:p-4 backdrop-blur-md"

@@ -8,13 +8,22 @@ const SERVER_START_TIME = Date.now();
 const requestLogs = new Map();
 
 // Endpoint usage counters
-const endpointUsage = new Map(); // { endpoint: { count, totalResponseTime, errors, successes } }
+// { endpoint: { count, totalResponseTime, errors, successes, authDenials } }
+const endpointUsage = new Map();
 
 // Maximum logs to keep per day (to prevent memory issues)
 const MAX_LOGS_PER_DAY = 10000;
 
 // Maximum days to keep logs
 const MAX_DAYS_TO_KEEP = 30;
+
+/**
+ * Expected access-control responses — not endpoint failures.
+ * @param {number} status
+ */
+export function isAuthDenialStatus(status) {
+  return status === 401 || status === 403;
+}
 
 /**
  * Get current date as YYYY-MM-DD string
@@ -39,6 +48,13 @@ function cleanupOldLogs() {
 }
 
 /**
+ * Logs used for health / success-rate (excludes auth denials).
+ */
+function healthRelevantLogs(logs) {
+  return logs.filter((log) => !log.authDenial);
+}
+
+/**
  * Log an API request
  */
 export function logRequest({
@@ -50,20 +66,22 @@ export function logRequest({
   timestamp = Date.now(),
 }) {
   const dateKey = getDateKey(timestamp);
-  
+  const authDenial = isAuthDenialStatus(status);
+  const success = status >= 200 && status < 400;
+
   // Initialize date bucket if needed
   if (!requestLogs.has(dateKey)) {
     requestLogs.set(dateKey, []);
   }
 
   const dayLogs = requestLogs.get(dateKey);
-  
+
   // Limit logs per day
   if (dayLogs.length >= MAX_LOGS_PER_DAY) {
     dayLogs.shift(); // Remove oldest
   }
 
-  // Add new log entry
+  // Add new log entry (auth denials kept for activity, excluded from health)
   dayLogs.push({
     timestamp,
     endpoint,
@@ -71,7 +89,8 @@ export function logRequest({
     status,
     responseTime,
     error: error ? error.message : null,
-    success: status >= 200 && status < 400,
+    success,
+    authDenial,
   });
 
   // Update endpoint usage statistics
@@ -81,23 +100,29 @@ export function logRequest({
       totalResponseTime: 0,
       errors: 0,
       successes: 0,
+      authDenials: 0,
       lastUsed: timestamp,
     });
   }
 
   const usage = endpointUsage.get(endpoint);
-  usage.count++;
-  usage.totalResponseTime += responseTime;
   usage.lastUsed = timestamp;
-  
-  if (status >= 200 && status < 400) {
-    usage.successes++;
+
+  if (authDenial) {
+    usage.authDenials++;
   } else {
-    usage.errors++;
+    usage.count++;
+    usage.totalResponseTime += responseTime;
+    if (success) {
+      usage.successes++;
+    } else {
+      usage.errors++;
+    }
   }
 
   // Periodic cleanup
-  if (Math.random() < 0.01) { // 1% chance to cleanup on each request
+  if (Math.random() < 0.01) {
+    // 1% chance to cleanup on each request
     cleanupOldLogs();
   }
 }
@@ -114,9 +139,9 @@ export function getPerformanceHistory(days = 7) {
     date.setDate(date.getDate() - i);
     const dateKey = getDateKey(date.getTime());
     const dayLogs = requestLogs.get(dateKey) || [];
+    const healthLogs = healthRelevantLogs(dayLogs);
 
-    if (dayLogs.length === 0) {
-      // No data for this day
+    if (healthLogs.length === 0) {
       history.push({
         date: dateKey,
         day: date.toLocaleDateString("en-US", { weekday: "short" }),
@@ -128,19 +153,21 @@ export function getPerformanceHistory(days = 7) {
       continue;
     }
 
-    const totalResponseTime = dayLogs.reduce((sum, log) => sum + log.responseTime, 0);
-    const avgResponseTime = Math.round(totalResponseTime / dayLogs.length);
-    const successes = dayLogs.filter((log) => log.success).length;
-    const errors = dayLogs.filter((log) => !log.success).length;
-    const successRate = dayLogs.length > 0 
-      ? Math.round((successes / dayLogs.length) * 1000) / 10 
-      : 100;
+    const totalResponseTime = healthLogs.reduce(
+      (sum, log) => sum + log.responseTime,
+      0
+    );
+    const avgResponseTime = Math.round(totalResponseTime / healthLogs.length);
+    const successes = healthLogs.filter((log) => log.success).length;
+    const errors = healthLogs.filter((log) => !log.success).length;
+    const successRate =
+      Math.round((successes / healthLogs.length) * 1000) / 10;
 
     history.push({
       date: dateKey,
       day: date.toLocaleDateString("en-US", { weekday: "short" }),
       avgResponseTime,
-      requests: dayLogs.length,
+      requests: healthLogs.length,
       successRate,
       errors,
     });
@@ -154,7 +181,7 @@ export function getPerformanceHistory(days = 7) {
  */
 export function getRecentActivity(limit = 20) {
   const allLogs = [];
-  
+
   // Collect logs from all days, sorted by timestamp
   for (const [dateKey, logs] of requestLogs) {
     for (const log of logs) {
@@ -180,13 +207,14 @@ export function getRecentActivity(limit = 20) {
  */
 export function getOverallStats() {
   const allLogs = [];
-  
-  // Collect all logs
+
   for (const logs of requestLogs.values()) {
     allLogs.push(...logs);
   }
 
-  if (allLogs.length === 0) {
+  const healthLogs = healthRelevantLogs(allLogs);
+
+  if (healthLogs.length === 0) {
     return {
       totalRequests: 0,
       avgResponseTime: 0,
@@ -196,12 +224,15 @@ export function getOverallStats() {
     };
   }
 
-  const totalRequests = allLogs.length;
-  const totalResponseTime = allLogs.reduce((sum, log) => sum + log.responseTime, 0);
+  const totalRequests = healthLogs.length;
+  const totalResponseTime = healthLogs.reduce(
+    (sum, log) => sum + log.responseTime,
+    0
+  );
   const avgResponseTime = Math.round(totalResponseTime / totalRequests);
-  const successes = allLogs.filter((log) => log.success).length;
+  const successes = healthLogs.filter((log) => log.success).length;
   const successRate = Math.round((successes / totalRequests) * 1000) / 10;
-  const errors = allLogs.filter((log) => !log.success).length;
+  const errors = healthLogs.filter((log) => !log.success).length;
   const errorRate = Math.round((errors / totalRequests) * 1000) / 10;
 
   return {
@@ -219,12 +250,35 @@ export function getOverallStats() {
 export function getEndpointHealth() {
   const categories = {
     Departments: ["GetParentDepartment", "GetChildDepartmentByParentId"],
-    Employees: ["GetAllEmployees", "CreateEmployee", "UpdateEmployee", "DeleteEmployee"],
-    Projects: ["GetAllProjects", "GetProject", "CreateProject", "UpdateProject", "DeleteProject"],
-    Assignments: ["GetAllProjectEmployees", "CreateProjectEmployee", "UpdateProjectEmployee", "DeleteProjectEmployee"],
+    Employees: [
+      "GetAllEmployees",
+      "CreateEmployee",
+      "UpdateEmployee",
+      "DeleteEmployee",
+    ],
+    Projects: [
+      "GetAllProjects",
+      "GetProject",
+      "CreateProject",
+      "UpdateProject",
+      "DeleteProject",
+    ],
+    Assignments: [
+      "GetAllProjectEmployees",
+      "CreateProjectEmployee",
+      "UpdateProjectEmployee",
+      "DeleteProjectEmployee",
+    ],
     Dashboard: ["GetDashboard"],
     Schedule: ["GetSchedule"],
-    Approvals: ["RequestApproval", "ApproveProject", "RejectProject", "ResetProjectApproval", "AddReviewerComment", "ResolveReviewerComment"],
+    Approvals: [
+      "RequestApproval",
+      "ApproveProject",
+      "RejectProject",
+      "ResetProjectApproval",
+      "AddReviewerComment",
+      "ResolveReviewerComment",
+    ],
     AI: ["GenerateOverviewDraft"],
     Content: ["GetContentfulBrief"],
   };
@@ -240,30 +294,33 @@ export function getEndpointHealth() {
     for (const endpoint of endpoints) {
       total++;
       const usage = endpointUsage.get(endpoint);
-      
+
       if (usage && usage.count > 0) {
         totalRequests += usage.count;
         totalResponseTime += usage.totalResponseTime;
-        
+
         // Consider healthy if success rate > 95% or no errors
-        const successRate = usage.count > 0 
-          ? (usage.successes / usage.count) * 100 
-          : 100;
-        
+        const successRate =
+          usage.count > 0 ? (usage.successes / usage.count) * 100 : 100;
+
         if (successRate >= 95) {
           healthy++;
         }
       } else {
-        // Endpoint not used yet, assume healthy
+        // Endpoint not used yet (or only auth denials), assume healthy
         healthy++;
       }
     }
 
-    const avgResponseTime = totalRequests > 0 
-      ? Math.round(totalResponseTime / totalRequests) 
-      : 0;
-    
-    const status = healthy === total ? "operational" : healthy > total * 0.5 ? "degraded" : "down";
+    const avgResponseTime =
+      totalRequests > 0 ? Math.round(totalResponseTime / totalRequests) : 0;
+
+    const status =
+      healthy === total
+        ? "operational"
+        : healthy > total * 0.5
+          ? "degraded"
+          : "down";
 
     health.push({
       category,
@@ -290,7 +347,8 @@ export function getUptime() {
   // Calculate uptime percentage (assuming 24/7 operation)
   // For simplicity, we'll use a high percentage if server has been up for a while
   const daysUp = uptimeDays + uptimeHours / 24;
-  const uptimePercentage = daysUp > 0 ? Math.min(99.9, 100 - (0.1 / daysUp)) : 99.9;
+  const uptimePercentage =
+    daysUp > 0 ? Math.min(99.9, 100 - 0.1 / daysUp) : 99.9;
 
   return {
     milliseconds: uptimeMs,
@@ -312,4 +370,3 @@ function formatUptime(days, hours, minutes) {
   }
   return `${minutes}m`;
 }
-

@@ -1,5 +1,6 @@
 import {
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
@@ -9,6 +10,7 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MasterService } from '../../service/master.service';
 import { IProjectEmployee, IProject } from '../../model/interface/master';
 import { CommonModule } from '@angular/common';
@@ -28,6 +30,13 @@ import {
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
 import { CardCloseButtonComponent } from '@/app/components/ui/card-close-button.component';
 import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
+import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
+import { ListPaginationComponent } from '@/app/components/ui/list-pagination.component';
+import {
+  bindListQuery,
+  ListQueryController,
+  paginateList,
+} from '@/app/lib/list-query';
 
 @Component({
   selector: 'app-project-employee',
@@ -43,6 +52,8 @@ import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
     AlertDialogComponent,
     CardCloseButtonComponent,
     UserAvatarComponent,
+    PageHeaderComponent,
+    ListPaginationComponent,
   ],
   providers: [DatePipe],
   templateUrl: './project-employee.component.html',
@@ -52,6 +63,10 @@ export class ProjectEmployeeComponent implements OnInit {
   private readonly toast = inject(ToastService);
   private readonly datePipe = inject(DatePipe);
   private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private listQuery!: ListQueryController;
 
   private readonly assignmentsSignal = signal<IProjectEmployee[]>([]);
   readonly assignments = this.assignmentsSignal.asReadonly();
@@ -80,6 +95,7 @@ export class ProjectEmployeeComponent implements OnInit {
   );
 
   readonly searchTerm = signal<string>('');
+  readonly listPage = signal(1);
   readonly isLoading = signal(true);
   readonly hasLoaded = signal(false);
   readonly filteredAssignments = computed(() => {
@@ -96,6 +112,9 @@ export class ProjectEmployeeComponent implements OnInit {
       );
     });
   });
+  readonly pagedAssignments = computed(() =>
+    paginateList(this.filteredAssignments(), this.listPage())
+  );
 
   readonly metrics = computed(() => {
     const data = this.assignments();
@@ -127,6 +146,13 @@ export class ProjectEmployeeComponent implements OnInit {
   isDeleting = false;
 
   ngOnInit(): void {
+    this.listQuery = bindListQuery(
+      this.route,
+      this.router,
+      this.destroyRef,
+      this.searchTerm,
+      this.listPage
+    );
     const projectsSnap = this.masterService.peekProjects();
     const employeesSnap = this.masterService.peekEmployees();
     const assignmentsSnap = this.masterService.peekProjectEmployees();
@@ -399,7 +425,11 @@ export class ProjectEmployeeComponent implements OnInit {
   }
 
   updateSearch(term: string) {
-    this.searchTerm.set(term);
+    this.listQuery.setSearch(term);
+  }
+
+  goToPage(page: number) {
+    this.listQuery.setPage(page);
   }
 
   cancelEdit() {

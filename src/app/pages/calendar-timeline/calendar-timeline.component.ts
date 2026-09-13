@@ -8,6 +8,7 @@ import {
   ListSkeletonComponent,
   StatPillSkeletonComponent,
 } from '@/app/components/ui/list-skeleton.component';
+import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 
 export interface IScheduleData {
   milestones: IMilestone[];
@@ -65,6 +66,7 @@ export interface IProjectTimeline {
     GanttViewComponent,
     ListSkeletonComponent,
     StatPillSkeletonComponent,
+    PageHeaderComponent,
   ],
   templateUrl: './calendar-timeline.component.html',
   styleUrls: ['./calendar-timeline.component.css'],

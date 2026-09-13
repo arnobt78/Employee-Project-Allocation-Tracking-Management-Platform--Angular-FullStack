@@ -6,6 +6,7 @@
 | CP-0012 | Human-Decision | GATE-0012 | `c1-gate12-deps-audit-2026-09-11` | **RESOLVED** | 2026-09-11 | Plan approved in chat; implement + verify-deep + commit-ready complete |
 | CP-0013 | Human-Decision | GATE-0013 | `c1-gate13-ui-lockfile-2026-09-11` | **RESOLVED** | 2026-09-11 | UI polish + lockfile; verify-deep + security + commit-ready complete |
 | CP-0014 | Human-Decision | GATE-0014 | `c1-gate14-cleanup-budget-2026-09-11` | **RESOLVED** | 2026-09-11 | Dead-code + budget; verify-deep + security + commit-ready complete |
+| CP-0015 | Human-Decision | GATE-0015 | `c1-gate15-refresh-ux-2026-09-13` | **RESOLVED** | 2026-09-13 | Shell/nav FOUC + Phase A/B Zod/list-query; verify-deep + security + commit-ready |
 
 ## Resume rules
 

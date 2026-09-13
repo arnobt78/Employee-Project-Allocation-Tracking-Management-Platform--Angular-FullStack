@@ -60,10 +60,34 @@
 
 ---
 
+## Wave — Refresh / loading UX polish (GATE-0015 — COMPLETE)
+
+| ID | Task | REQ | Status | Affected areas |
+|---|---|---|---|---|
+| TASK-0020 | Critical CSS / inline `html,body` background + `color-scheme` matching `--background`; align `theme-color` | REQ-0113 | DONE | `src/index.html`, `src/styles.css` |
+| TASK-0021 | Solid `bg-background` under `.app-shell` gradients | REQ-0113 | DONE | `app.component.html` / css |
+| TASK-0022 | Private-URL refresh: keep private shell during `ensureSession`; auth-gated nav; update specs | REQ-0114 | DONE | `app.component.ts`, shell header, specs |
+| TASK-0023 | Localize remaining text loaders (api-doc / api-status) to `app-list-skeleton`; tighten dashboard if still full-swap | REQ-0115 | DONE | api-doc, api-status, dashboard templates |
+| TASK-0024 | Align login floating background base with shell `--background` | REQ-0116 | DONE | floating-background / login |
+| TASK-0025 | Zod login validation client + server | REQ-0117 | DONE | auth.schema + login + handler |
+| TASK-0026 | List URL `?q=`/`?page=` + client pagination | REQ-0118 | DONE | list-query + employee/projects/assignments |
+
+---
+
 ## Recommended approval options
+
+**Option A — Refresh FOUC + shell stability only:** Approve TASK-0020…0022 (REQ-0113–0114).  
+**Option B — Full WAVE GATE-0015:** Approve TASK-0020…0024 (REQ-0113–0116).  
+**Option C — Defer:** Keep GATE-0014 resume; wait for screenshots before coding.
+
+Default recommendation: **Option B** once screenshots confirm acceptance criteria (or Option A if screenshots only show blank refresh flash).
+
+---
+
+## Legacy recommended approval options (C1 bootstrap)
 
 **Option A — Security-first C1:** Approve Wave 1 (TASK-0001…0006) now; Wave 2 after Gate re-check.  
 **Option B — Docs + hygiene first:** Approve TASK-0001…0003, 0007…0009 only; defer auth API work.  
 **Option C — Full Wave 1+2:** Approve all P0+P1 tasks; defer Wave 3.
 
-Default recommendation: **Option A**.
+(Historical; Wave 1 largely delivered under user direction.)

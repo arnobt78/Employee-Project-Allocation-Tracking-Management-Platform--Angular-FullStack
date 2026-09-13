@@ -41,6 +41,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Observable, startWith } from 'rxjs';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
+import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 import {
   SelectMenuComponent,
   SelectMenuOption,
@@ -148,6 +149,7 @@ const REVIEWER_SEVERITIES = [
     UbButtonDirective,
     SelectMenuComponent,
     AlertDialogComponent,
+    PageHeaderComponent,
   ],
   templateUrl: './project-form.component.html',
   styleUrl: './project-form.component.css' })

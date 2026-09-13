@@ -1,112 +1,27 @@
 <div
-  class="app-shell relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.15),transparent_55%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.12),transparent_65%)]"
+  class="app-shell relative min-h-screen overflow-hidden bg-background bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.15),transparent_55%),radial-gradient(circle_at_bottom,_rgba(236,72,153,0.12),transparent_65%)]"
 >
   <div
     class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05),transparent_60%)]"
   ></div>
   <div class="relative z-10 flex min-h-screen flex-col">
     @if (layout() === "private") {
-      <header
-        class="sticky top-0 z-20 border-b border-white/10 bg-background/85 backdrop-blur-2xl shadow-[0_10px_30px_rgba(15,23,42,0.25)]"
-      >
-        <div
-          class="mx-auto flex w-full max-w-9xl items-center justify-between gap-6 px-2 sm:px-4 py-2 lg:px-8"
-        >
-          <a
-            routerLink="/dashboard"
-            class="group flex items-center gap-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            aria-label="Go to dashboard"
-          >
-            <span
-              class="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/15 bg-white/10 shadow-inner shadow-primary/30 backdrop-blur"
-            >
-              <img
-                src="/favicon.ico"
-                alt="Employee Management logo"
-                class="h-9 w-9 object-contain"
-              />
-            </span>
-            <span
-              class="text-base font-medium tracking-tight text-foreground"
-              data-testid="app-brand"
-            >
-              EmpowerHub
-            </span>
-          </a>
-          <nav
-            class="hidden items-center gap-4 text-sm font-medium text-muted-foreground md:flex"
-          >
-            <a
-              routerLink="/business-insights"
-              class="transition-colors hover:text-foreground"
-              >Business Insights</a
-            >
-            <a
-              routerLink="/calendar-timeline"
-              class="transition-colors hover:text-foreground"
-              >Calendar & Timeline</a
-            >
-          </nav>
-          <div class="flex items-center gap-3">
-            <a
-              href="https://www.arnobmahmud.com/"
-              target="_blank"
-              rel="noreferrer noopener"
-              ubButton
-              size="sm"
-              variant="secondary"
-              class="hidden items-center justify-center gap-2 shadow-lg shadow-primary/25 md:inline-flex"
-            >
-              <lucide-icon name="life-buoy" [size]="16"></lucide-icon>
-              <span>Need Help</span>
-            </a>
-            @if (authService.isAuthenticated()) {
-              <app-profile-dropdown></app-profile-dropdown>
-            } @else if (!authService.sessionResolved()) {
-              <span
-                class="size-10 animate-pulse rounded-full border border-white/15 bg-white/10"
-                aria-hidden="true"
-              ></span>
-            }
-          </div>
-        </div>
-      </header>
+      <app-shell-header />
     }
 
     <main
       class="flex-grow"
       [ngClass]="
         layout() === 'auth'
-          ? 'px-0 sm:px-0 lg:px-0 py-0'
-          : 'mx-auto w-full max-w-9xl px-4 py-4 flex flex-col'
+          ? 'px-0 py-0'
+          : 'eh-shell-inner flex flex-col py-4'
       "
     >
       <router-outlet />
     </main>
 
     @if (layout() === "private") {
-      <footer
-        class="border-t border-white/10 bg-background/80 backdrop-blur-md"
-      >
-        <div
-          class="mx-auto flex w-full max-w-9xl flex-col items-center justify-between gap-4 px-4 py-2 sm:py-4 text-xs text-muted-foreground sm:flex-row"
-        >
-          <p>&copy; {{ currentYear }}. All rights reserved.</p>
-          <div class="flex items-center gap-4">
-            <span class="hidden text-muted-foreground/60 sm:inline"
-              >Tailwind CSS + shadcn/ui ready.</span
-            >
-            <a
-              href="https://ui.adrianub.dev/"
-              target="_blank"
-              rel="noreferrer"
-              class="text-primary transition-colors hover:text-primary/80"
-            >
-              Explore components
-            </a>
-          </div>
-        </div>
-      </footer>
+      <app-shell-footer />
     }
   </div>
 </div>

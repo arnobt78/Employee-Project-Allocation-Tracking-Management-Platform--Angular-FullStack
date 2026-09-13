@@ -48,6 +48,11 @@
     --ring: 263.4 70% 50.4%;
   }
 
+  html {
+    color-scheme: dark;
+    @apply bg-background;
+  }
+
   body {
     @apply bg-background text-foreground antialiased min-h-screen;
   }
@@ -62,6 +67,40 @@
 @layer components {
   .container {
     @apply mx-auto max-w-9xl px-2 sm:px-4 lg:px-8;
+  }
+
+  /* Shared shell content width — header/footer borders align with page padding */
+  .eh-shell-inner {
+    @apply mx-auto w-full max-w-9xl px-2 sm:px-4 lg:px-8;
+  }
+
+  .eh-shell-header {
+    @apply bg-transparent;
+  }
+
+  .eh-shell-header--scrolled {
+    @apply bg-background/55 backdrop-blur-md shadow-[0_10px_30px_rgba(15,23,42,0.28)];
+  }
+
+  .eh-shell-footer {
+    @apply bg-transparent;
+  }
+
+  .eh-nav-link {
+    @apply rounded-full px-3 py-1.5 text-muted-foreground;
+  }
+
+  .eh-nav-link-active {
+    @apply bg-white/10 text-foreground shadow-inner shadow-primary/20;
+  }
+
+  .eh-mobile-nav-active {
+    @apply bg-white/10 text-white;
+  }
+
+  /* Single page content gutter (avoid stacking px/py with shell main) */
+  .eh-page {
+    @apply flex w-full flex-col gap-6;
   }
 
   .btn {

@@ -1,4 +1,10 @@
 <div class="space-y-8 text-white/85">
+  <app-page-header
+    title="Employees"
+    subtitle="Search, add, and manage your organisation workforce"
+    icon="users"
+  ></app-page-header>
+
   <section
     class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-2 sm:py-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md sm:flex-row sm:items-center sm:justify-between"
   >
@@ -15,6 +21,7 @@
           type="search"
           placeholder="Search Employees, departments, IDs…"
           class="w-full rounded-2xl border border-white/15 bg-white/5 px-10 py-3 text-sm text-white/80 shadow-inner shadow-slate-950/30 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white focus:shadow-[0_10px_30px_rgba(59,130,246,0.25)]"
+          [value]="searchTerm()"
           (input)="updateSearch($any($event.target).value)"
         />
       </div>
@@ -26,6 +33,11 @@
         >
           {{ filteredEmployees().length }} of {{ employees().length }} employees
         </div>
+        <app-list-pagination
+          [page]="pagedEmployees().page"
+          [totalPages]="pagedEmployees().totalPages"
+          (pageChange)="goToPage($event)"
+        ></app-list-pagination>
       </ng-container>
       <ng-template #employeeCountSkeleton>
         <app-stat-pill-skeleton [width]="150"></app-stat-pill-skeleton>
@@ -246,7 +258,7 @@
     <app-list-skeleton *ngIf="isLoading()" [rows]="4"></app-list-skeleton>
 
     <div
-      *ngFor="let employee of filteredEmployees(); let idx = index"
+      *ngFor="let employee of pagedEmployees().items; let idx = index"
       class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition duration-200 hover:border-white/20"
     >
       <button

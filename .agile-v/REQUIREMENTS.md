@@ -59,6 +59,19 @@ Legend: `BASELINE` = verified as-built behavior · `GAP` = docs/code mismatch or
 
 ---
 
+## UX — refresh / loading polish (GATE-0015)
+
+| ID | Statement | Status | Notes |
+|---|---|---|---|
+| REQ-0113 | Hard refresh and cold navigation MUST NOT show a white/blank background flash; document + shell background MUST match app theme before/while CSS and session resolve. | DONE | Inline `#020817` + theme-color; `bg-background` under shell |
+| REQ-0114 | Authenticated route refresh MUST keep a stable private layout shell (header/nav footprint) with local loading indicators; MUST NOT flash guest/auth chrome then private chrome. | DONE | Early private shell + auth-gated nav; guest drops to auth layout |
+| REQ-0115 | Data regions MUST use local skeletons (or equivalent) while fetching; avoid full-page loading overlays and text-only “Loading…” where list-skeleton already exists. | DONE | api-doc / api-status / pages use local skeletons |
+| REQ-0116 | Login ↔ app background transition SHOULD use the same base surface token so crossing routes does not jump color. | DONE | floating-background aligned to `#020817` |
+| REQ-0117 | Login credentials MUST be validated with shared Zod schemas on client and server. | DONE | `auth.schema.ts` / `.mjs` |
+| REQ-0118 | List pages SHOULD sync search/page to URL query params with client pagination. | DONE | `list-query.ts` on employee / projects / project-employee |
+
+---
+
 ## Explicit non-goals (unless human expands scope)
 
 - Replacing Angular SPA with Next.js/SSR
