@@ -1,5 +1,35 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-13 — Instant private shell paint (commit-ready)
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm audit` | **PASS (0)** | Final gate |
+| `npm run lint` | **PASS** | Final gate |
+| `npm test` (ChromeHeadless) | **PASS (16/16)** | Final gate |
+| `npm run build` | **PASS** | ~1.08 MB initial |
+| verify-deep | **PASS WITH WARNINGS** | Plan items met; inter-route placeholder flash noted |
+| review-security | **PASS WITH WARNINGS** | Low: intentional pre-auth shell enumeration |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| `canActivateChild` (Layout paints before session) | Done |
+| Always-visible primary nav in private shell | Done |
+| Route content placeholder + private-page-meta | Done |
+| list-query `setSearch` trim | Done |
+
+### eval_gate_status
+
+N/A (user-directed follow-up to GATE-0015)
+
+---
+
 ## Session 2026-09-13 — GATE-0015 shell UX + Zod/list-query (commit-ready)
 
 **Node:** v24.x

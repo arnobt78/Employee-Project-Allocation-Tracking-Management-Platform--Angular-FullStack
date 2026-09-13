@@ -27,4 +27,12 @@ describe('LayoutComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should show route content placeholder before a child activates', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(
+      compiled.querySelector('[data-testid="route-content-placeholder"]')
+    ).toBeTruthy();
+    expect(component.childActive()).toBe(false);
+  });
 });

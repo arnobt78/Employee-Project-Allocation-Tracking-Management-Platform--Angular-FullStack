@@ -82,7 +82,7 @@ describe('AppComponent', () => {
       compiled.querySelector('[data-testid="app-brand"]')?.textContent
     ).toContain('EmpowerHub');
     expect(compiled.querySelector('app-shell-footer')).toBeTruthy();
-    expect(compiled.querySelector('[data-testid="primary-nav"]')).toBeNull();
+    expect(compiled.querySelector('[data-testid="primary-nav"]')).toBeTruthy();
   });
 
   it('should prefer private shell for known private path even before NavigationEnd', () => {
@@ -95,7 +95,7 @@ describe('AppComponent', () => {
     expect(
       compiled.querySelector('[data-testid="app-brand"]')?.textContent
     ).toContain('EmpowerHub');
-    expect(compiled.querySelector('[data-testid="primary-nav"]')).toBeNull();
+    expect(compiled.querySelector('[data-testid="primary-nav"]')).toBeTruthy();
   });
 
   it('should show primary nav when authenticated on private shell', async () => {

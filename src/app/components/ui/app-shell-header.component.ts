@@ -61,37 +61,36 @@ import { ProfileDropdownComponent } from './profile-dropdown.component';
             </span>
           </a>
 
-          @if (authService.isAuthenticated()) {
-            <nav
-              class="hidden items-center gap-1 text-sm font-medium text-muted-foreground xl:flex"
-              aria-label="Primary"
-              data-testid="primary-nav"
-            >
-              @for (item of navItems; track item.route) {
-                <a
-                  [routerLink]="item.route"
-                  routerLinkActive="eh-nav-link-active"
-                  [routerLinkActiveOptions]="
-                    item.exact ? { exact: true } : { exact: false }
-                  "
-                  class="eh-nav-link whitespace-nowrap transition-colors hover:text-foreground"
-                >
-                  {{ item.label }}
-                </a>
-              }
-            </nav>
-          }
+          <nav
+            class="hidden items-center gap-1 text-sm font-medium text-muted-foreground xl:flex"
+            aria-label="Primary"
+            data-testid="primary-nav"
+          >
+            @for (item of navItems; track item.route) {
+              <a
+                [routerLink]="item.route"
+                routerLinkActive="eh-nav-link-active"
+                [routerLinkActiveOptions]="
+                  item.exact ? { exact: true } : { exact: false }
+                "
+                class="eh-nav-link whitespace-nowrap transition-colors hover:text-foreground"
+              >
+                {{ item.label }}
+              </a>
+            }
+          </nav>
 
           <div class="flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/5 text-white/80 transition hover:bg-white/10 xl:hidden"
+              (click)="openMobileMenu()"
+              aria-label="Open navigation menu"
+            >
+              <lucide-icon name="menu" [size]="18"></lucide-icon>
+            </button>
+
             @if (authService.isAuthenticated()) {
-              <button
-                type="button"
-                class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 bg-white/5 text-white/80 transition hover:bg-white/10 xl:hidden"
-                (click)="openMobileMenu()"
-                aria-label="Open navigation menu"
-              >
-                <lucide-icon name="menu" [size]="18"></lucide-icon>
-              </button>
               <app-profile-dropdown></app-profile-dropdown>
             } @else if (!authService.sessionResolved()) {
               <span
@@ -104,7 +103,7 @@ import { ProfileDropdownComponent } from './profile-dropdown.component';
       </div>
     </header>
 
-    @if (authService.isAuthenticated() && mobileOpen()) {
+    @if (mobileOpen()) {
       <div class="fixed inset-0 z-40 xl:hidden" role="dialog" aria-modal="true">
         <button
           type="button"

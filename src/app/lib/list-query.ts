@@ -75,7 +75,7 @@ export function bindListQuery(
 
   return {
     setSearch: (term: string) => {
-      const safe = term.slice(0, MAX_LIST_QUERY_LENGTH);
+      const safe = term.trim().slice(0, MAX_LIST_QUERY_LENGTH);
       searchTerm.set(safe);
       writeUrl(safe, 1);
     },
