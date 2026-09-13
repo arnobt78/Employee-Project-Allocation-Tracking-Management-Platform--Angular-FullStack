@@ -96,6 +96,12 @@ describe('AppComponent', () => {
       compiled.querySelector('[data-testid="app-brand"]')?.textContent
     ).toContain('EmpowerHub');
     expect(compiled.querySelector('[data-testid="primary-nav"]')).toBeTruthy();
+    expect(
+      compiled.querySelector('[data-testid="early-route-placeholder"]')
+    ).toBeTruthy();
+    expect(
+      compiled.querySelector('[data-testid="route-content-placeholder"]')
+    ).toBeTruthy();
   });
 
   it('should highlight active nav from Location before session resolves', () => {

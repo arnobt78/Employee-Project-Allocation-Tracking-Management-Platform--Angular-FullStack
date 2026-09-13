@@ -74,6 +74,18 @@
 
 ---
 
+## Wave — Page shell + list/dashboard redesign (2026-09-13 — COMPLETE)
+
+| ID | Task | Status | Affected areas |
+|---|---|---|---|
+| TASK-0027 | Shared `list-page-shell` / `kpi-stat-card` / `list-toolbar` + placeholder alignment | DONE | `components/ui/*`, `route-content-placeholder`, `private-page-meta` |
+| TASK-0028 | Employees / Projects / Project Team KPI + filter redesign (`?f=`) | DONE | employee, project, project-employee, list-query |
+| TASK-0029 | Dashboard badge strip → KPI cards | DONE | dashboard |
+| TASK-0030 | Projects route-only create/edit (remove inline dual editor) | DONE | project list + existing project-form routes |
+| TASK-0031 | Chrome-first loading on insights/calendar/API pages | DONE | business-insights, calendar-timeline, api-doc, api-status |
+
+---
+
 ## Recommended approval options
 
 **Option A — Refresh FOUC + shell stability only:** Approve TASK-0020…0022 (REQ-0113–0114).  

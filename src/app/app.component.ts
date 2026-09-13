@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import {
   ActivatedRoute,
   NavigationEnd,
@@ -13,7 +13,9 @@ import { isPrivateShellUrl, resolveBrowserPath } from '@/app/constants/primary-n
 import { ToastContainerComponent } from '@/app/components/ui/toast-container.component';
 import { AppShellHeaderComponent } from '@/app/components/ui/app-shell-header.component';
 import { AppShellFooterComponent } from '@/app/components/ui/app-shell-footer.component';
+import { RouteContentPlaceholderComponent } from '@/app/components/ui/route-content-placeholder.component';
 import { AuthService } from '@/app/service/auth.service';
+import { ShellContentState } from '@/app/service/shell-content.state';
 
 @Component({
   selector: 'app-root',
@@ -24,6 +26,7 @@ import { AuthService } from '@/app/service/auth.service';
     ToastContainerComponent,
     AppShellHeaderComponent,
     AppShellFooterComponent,
+    RouteContentPlaceholderComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
@@ -34,9 +37,10 @@ export class AppComponent {
   private readonly location = inject(Location);
   private readonly activatedRoute = inject(ActivatedRoute);
   readonly authService = inject(AuthService);
+  private readonly shellContent = inject(ShellContentState);
 
-  /** True after first NavigationEnd (guards finished for that navigation). */
   private navigationSettled = false;
+  readonly rootOutletActive = signal(false);
 
   readonly layout = toSignal(
     combineLatest([
@@ -49,9 +53,23 @@ export class AppComponent {
       ),
       toObservable(this.authService.sessionResolved),
       toObservable(this.authService.isAuthenticated),
+      toObservable(this.shellContent.childActive),
     ]).pipe(map(() => this.resolveLayout(this.activatedRoute))),
     { initialValue: this.resolveLayout(this.activatedRoute) }
   );
+
+  readonly showContentPlaceholder = computed(
+    () => this.layout() === 'private' && !this.shellContent.childActive()
+  );
+
+  onRootActivate(): void {
+    this.rootOutletActive.set(true);
+  }
+
+  onRootDeactivate(): void {
+    this.rootOutletActive.set(false);
+    this.shellContent.childActive.set(false);
+  }
 
   private resolveLayout(route: ActivatedRoute): string {
     const url = this.currentPath();
@@ -60,11 +78,7 @@ export class AppComponent {
       return 'auth';
     }
 
-    // Instant private chrome on known private URLs — avoids blank-shell flash on refresh.
-    // Prefer browser/Location path: during bootstrap router.url can still be "/" while
-    // authGuard awaits ensureSession() for the real URL (e.g. /dashboard).
     if (isPrivateShellUrl(url)) {
-      // Guest after session resolve: drop private chrome before NavigationEnd redirect.
       if (
         this.authService.sessionResolved() &&
         !this.authService.isAuthenticated()
@@ -89,7 +103,6 @@ export class AppComponent {
     return current.snapshot.data['layout'] ?? 'default';
   }
 
-  /** Pathname usable before NavigationEnd (hard refresh). */
   private currentPath(): string {
     return resolveBrowserPath(this.location.path(), this.router.url);
   }

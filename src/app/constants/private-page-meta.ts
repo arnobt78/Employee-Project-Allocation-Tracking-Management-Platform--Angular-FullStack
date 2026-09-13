@@ -1,7 +1,11 @@
+export type PrivateSkeletonKind = 'dashboard' | 'list' | 'insights' | 'simple';
+
 export interface PrivatePageMeta {
   title: string;
   subtitle: string;
   icon: string;
+  /** Shape of the shared refresh placeholder (not the page’s own data skeleton). */
+  skeleton: PrivateSkeletonKind;
 }
 
 /** Static page chrome for instant refresh paint (matches app-page-header copy). */
@@ -11,53 +15,63 @@ export const PRIVATE_PAGE_META: Record<string, PrivatePageMeta> = {
     subtitle:
       'Monitor workforce, projects, and assignment health in one place',
     icon: 'layout-dashboard',
+    skeleton: 'dashboard',
   },
   '/employee': {
     title: 'Employees',
     subtitle: 'Search, add, and manage your organisation workforce',
     icon: 'users',
+    skeleton: 'list',
   },
   '/projects': {
     title: 'Projects',
     subtitle: 'Create, track, and update project delivery status',
     icon: 'folder-kanban',
+    skeleton: 'list',
   },
   '/new-project': {
     title: 'Untitled project',
     subtitle:
       'Configure the essentials before rolling the project out to your teams. Organize the information into focused sections, edit inline, and save when you are ready.',
     icon: 'folder-kanban',
+    skeleton: 'simple',
   },
   '/update-project': {
     title: 'Project setup',
     subtitle:
       'Configure the essentials before rolling the project out to your teams. Organize the information into focused sections, edit inline, and save when you are ready.',
     icon: 'pencil',
+    skeleton: 'simple',
   },
   '/project-employee': {
     title: 'Project Team',
     subtitle: 'Assign teammates to projects and track allocation',
     icon: 'contact',
+    skeleton: 'list',
   },
   '/business-insights': {
     title: 'Business Insights',
     subtitle: 'Analytics and reporting for projects, resources, and performance',
     icon: 'chart-column',
+    skeleton: 'insights',
   },
   '/calendar-timeline': {
     title: 'Calendar & Timeline',
     subtitle: 'View project milestones, timelines, and due date reminders',
     icon: 'calendar-range',
+    skeleton: 'insights',
   },
   '/api-doc': {
     title: 'API Documentation',
     subtitle: 'Complete API reference for Employee Management System',
     icon: 'file-text',
+    skeleton: 'simple',
   },
   '/api-status': {
     title: 'API Status',
     subtitle: 'Monitor API health, performance, and activity in real-time',
     icon: 'activity',
+    skeleton: 'simple',
   },
 };
 
@@ -65,6 +79,7 @@ const DEFAULT_PAGE_META: PrivatePageMeta = {
   title: 'EmpowerHub',
   subtitle: 'Loading workspace…',
   icon: 'layout-dashboard',
+  skeleton: 'simple',
 };
 
 export function resolvePrivatePageMeta(url: string): PrivatePageMeta {

@@ -1,5 +1,39 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-13 — Page shell + list/dashboard redesign (commit-ready)
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm audit` | **PASS (0)** | Final gate |
+| `npm run lint` | **PASS** | Final gate |
+| `npm test` (ChromeHeadless) | **PASS (23/23)** | Includes `list-query` `f` + length-cap specs |
+| `npm run build` | **PASS** | ~1.08 MB initial |
+| Browser smoke | **PASS** | Private routes; KPI shells; Lucide search; Projects Add/Details routes; `?f=` filter sync |
+| API smoke | **PASS** | Login + CRUD lists + GetSchedule + API doc/status; unauth 401 |
+| verify-deep | **PASS WITH WARNINGS** | Independent verifier + live browser |
+| review-security | **PASS WITH WARNINGS** | No medium+; `f` length-capped to match `q` |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| `kpi-stat-card`, `list-toolbar`, `list-page-shell` | Done |
+| Employees / Projects / Project Team shell + KPIs + filters | Done |
+| Projects route-only create/edit (no inline dual editor) | Done |
+| Dashboard `projectStats` → KPI cards | Done |
+| Chrome-first loading + route placeholder alignment | Done |
+| list-query `?f=` + normalize/cap + select sync | Done |
+
+### eval_gate_status
+
+N/A (user-directed UX redesign)
+
+---
+
 ## Session 2026-09-13 — Shell UX polish + list-query normalize (commit-ready)
 
 **Node:** v24.x

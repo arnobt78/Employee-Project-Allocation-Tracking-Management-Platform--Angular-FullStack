@@ -17,10 +17,18 @@ describe('list-query', () => {
 
   it('parseListQueryParams trims q the same way as the signal path', () => {
     const parsed = parseListQueryParams(
-      convertToParamMap({ q: '  team lead  ', page: '2' })
+      convertToParamMap({ q: '  team lead  ', page: '2', f: '  Engineering  ' })
     );
     expect(parsed.q).toBe('team lead');
     expect(parsed.page).toBe(2);
+    expect(parsed.f).toBe('Engineering');
+  });
+
+  it('parseListQueryParams caps f length like q', () => {
+    const parsed = parseListQueryParams(
+      convertToParamMap({ f: 'x'.repeat(300) })
+    );
+    expect(parsed.f.length).toBe(256);
   });
 
   it('paginateList clamps page within bounds', () => {
@@ -60,6 +68,48 @@ describe('list-query', () => {
     expect(navigateSpy).toHaveBeenCalled();
     const navArgs = navigateSpy.calls.mostRecent().args;
     expect(navArgs[1].queryParams.q).toBe('aurora');
+    expect(navArgs[1].queryParams.page).toBeNull();
+    expect(navArgs[1].queryParams.f).toBeNull();
+  });
+
+  it('setFilter and clearFilters sync f and reset page', () => {
+    const queryParamMap$ = new Subject();
+    const navigateSpy = jasmine.createSpy('navigate').and.resolveTo(true);
+    const route = {
+      queryParamMap: queryParamMap$.asObservable(),
+    } as never;
+    const router = { navigate: navigateSpy } as unknown as Router;
+    const destroyRef = {
+      onDestroy: () => () => undefined,
+    } as unknown as DestroyRef;
+    const searchTerm = signal('kept');
+    const page = signal(4);
+    const filterValue = signal('');
+
+    const ctrl = bindListQuery(
+      route,
+      router,
+      destroyRef,
+      searchTerm,
+      page,
+      filterValue
+    );
+
+    ctrl.setFilter('  Active  ');
+    expect(filterValue()).toBe('Active');
+    expect(page()).toBe(1);
+    let navArgs = navigateSpy.calls.mostRecent().args;
+    expect(navArgs[1].queryParams.f).toBe('Active');
+    expect(navArgs[1].queryParams.q).toBe('kept');
+    expect(navArgs[1].queryParams.page).toBeNull();
+
+    ctrl.clearFilters();
+    expect(searchTerm()).toBe('');
+    expect(filterValue()).toBe('');
+    expect(page()).toBe(1);
+    navArgs = navigateSpy.calls.mostRecent().args;
+    expect(navArgs[1].queryParams.q).toBeNull();
+    expect(navArgs[1].queryParams.f).toBeNull();
     expect(navArgs[1].queryParams.page).toBeNull();
   });
 });

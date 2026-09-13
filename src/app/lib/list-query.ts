@@ -8,6 +8,7 @@ export const MAX_LIST_QUERY_LENGTH = 256;
 export interface ListQueryState {
   q: string;
   page: number;
+  f: string;
 }
 
 /** Single normalize path for signal + URL `?q=` (trim + length cap). */
@@ -17,10 +18,11 @@ export function normalizeListSearchQuery(term: string): string {
 
 export function parseListQueryParams(params: ParamMap): ListQueryState {
   const q = normalizeListSearchQuery(params.get('q') ?? '');
+  const f = normalizeListSearchQuery(params.get('f') ?? '');
   const rawPage = Number(params.get('page') ?? '1');
   const page =
     Number.isFinite(rawPage) && rawPage >= 1 ? Math.floor(rawPage) : 1;
-  return { q, page };
+  return { q, page, f };
 }
 
 export function paginateList<T>(
@@ -41,17 +43,20 @@ export function paginateList<T>(
 export interface ListQueryController {
   setSearch: (term: string) => void;
   setPage: (page: number) => void;
+  setFilter: (value: string) => void;
+  clearFilters: () => void;
 }
 
 /**
- * Sync list search/page signals with URL ?q=&page= (TanStack useSearch analogue).
+ * Sync list search/page/filter signals with URL ?q=&page=&f=
  */
 export function bindListQuery(
   route: ActivatedRoute,
   router: Router,
   destroyRef: DestroyRef,
   searchTerm: WritableSignal<string>,
-  page: WritableSignal<number>
+  page: WritableSignal<number>,
+  filterValue?: WritableSignal<string>
 ): ListQueryController {
   route.queryParamMap
     .pipe(takeUntilDestroyed(destroyRef))
@@ -63,31 +68,51 @@ export function bindListQuery(
       if (page() !== parsed.page) {
         page.set(parsed.page);
       }
+      if (filterValue && filterValue() !== parsed.f) {
+        filterValue.set(parsed.f);
+      }
     });
 
-  const writeUrl = (q: string, nextPage: number) => {
+  const writeUrl = (q: string, nextPage: number, f: string) => {
     const safeQ = normalizeListSearchQuery(q);
+    const safeF = normalizeListSearchQuery(f);
     void router.navigate([], {
       relativeTo: route,
       queryParams: {
         q: safeQ || null,
         page: nextPage > 1 ? nextPage : null,
+        f: safeF || null,
       },
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });
   };
 
+  const currentFilter = () => filterValue?.() ?? '';
+
   return {
     setSearch: (term: string) => {
       const safe = normalizeListSearchQuery(term);
       searchTerm.set(safe);
-      writeUrl(safe, 1);
+      page.set(1);
+      writeUrl(safe, 1, currentFilter());
     },
     setPage: (nextPage: number) => {
       const safe = Math.max(1, Math.floor(nextPage) || 1);
       page.set(safe);
-      writeUrl(searchTerm(), safe);
+      writeUrl(searchTerm(), safe, currentFilter());
+    },
+    setFilter: (value: string) => {
+      const safe = normalizeListSearchQuery(value);
+      filterValue?.set(safe);
+      page.set(1);
+      writeUrl(searchTerm(), 1, safe);
+    },
+    clearFilters: () => {
+      searchTerm.set('');
+      filterValue?.set('');
+      page.set(1);
+      writeUrl('', 1, '');
     },
   };
 }

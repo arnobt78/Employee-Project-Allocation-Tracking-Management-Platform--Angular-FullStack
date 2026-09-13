@@ -1,5 +1,12 @@
 # Changelog — Agile V project memory
 
+## 2026-09-13 — Page shell + list/dashboard redesign
+
+- Shared `list-page-shell`, `kpi-stat-card`, `list-toolbar` (Lucide search); list-query `?f=` with length cap
+- Employees / Projects / Project Team: KPIs, header Add, filters; Projects route-only create/edit
+- Dashboard badge strip → KPI cards; chrome-first loading on insights/calendar/API
+- verify-deep PASS WITH WARNINGS; review-security PASS WITH WARNINGS; lint/test(23)/build/audit PASS
+
 ## 2026-09-11 — GATE-0014 dead-code cleanup + bundle budget
 
 - Raise production initial `maximumWarning` to 1.2MB (clears Vercel budget noise)

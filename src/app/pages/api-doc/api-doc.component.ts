@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MasterService } from '../../service/master.service';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
+import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 
 export interface IApiEndpoint {
   path: string;
@@ -55,6 +56,7 @@ export interface IApiDocumentation {
 export class ApiDocComponent implements OnInit {
   private readonly masterService = inject(MasterService);
 
+  readonly pageMeta = PRIVATE_PAGE_META['/api-doc'];
   readonly apiDocSignal = signal<IApiDocumentation | null>(null);
   readonly apiDoc = this.apiDocSignal.asReadonly();
   readonly loadingSignal = signal<boolean>(false);

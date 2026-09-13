@@ -1,88 +1,101 @@
-<div class="space-y-8 text-white/85">
-  <app-page-header
-    title="Project Team"
-    subtitle="Assign teammates to projects and track allocation"
-    icon="contact"
-  ></app-page-header>
-
-  <section
-    class="flex flex-col gap-4 rounded-[28px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-2 sm:py-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md lg:flex-row lg:items-center lg:justify-between"
-  >
-    <div class="w-full lg:max-w-xl">
-      <label for="assignment-search" class="sr-only">Search Assignments</label>
-      <div class="relative">
-        <span
-          aria-hidden="true"
-          class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/50"
-          >🔍</span
-        >
-        <input
-          id="assignment-search"
-          type="search"
-          placeholder="Search project, employee, role or date…"
-          class="w-full rounded-2xl border border-white/15 bg-white/5 px-10 py-3 text-sm text-white/80 shadow-inner shadow-slate-950/30 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white focus:shadow-[0_10px_30px_rgba(99,102,241,0.25)]"
-          [value]="searchTerm()"
-          (input)="updateSearch($any($event.target).value)"
-        />
-      </div>
-    </div>
-    <div
-      class="flex flex-wrap items-center justify-end gap-3 text-xs text-white/60"
+<app-list-page-shell
+  [title]="pageMeta.title"
+  [subtitle]="pageMeta.subtitle"
+  [icon]="pageMeta.icon"
+>
+  @if (showCreatePanel) {
+    <button
+      listShellActions
+      type="button"
+      ubButton
+      size="sm"
+      variant="outline"
+      class="eh-btn-icon border-white/20 bg-white/5 text-white/80 hover:border-white/40 hover:text-white"
+      (click)="closeCreatePanel()"
     >
-      <ng-container *ngIf="!isLoading(); else assignmentMetricsSkeleton">
-        <span
-          class="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium"
-        >
-          {{ filteredAssignments().length }} of {{ assignments().length }}
-          assignments
-        </span>
-        <app-list-pagination
-          [page]="pagedAssignments().page"
-          [totalPages]="pagedAssignments().totalPages"
-          (pageChange)="goToPage($event)"
-        ></app-list-pagination>
-        <span
-          class="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-4 py-2 text-xs font-medium text-emerald-200"
-        >
-          Active: {{ metrics().active }}
-        </span>
-        <span
-          class="rounded-full border border-slate-400/30 bg-slate-500/20 px-4 py-2 text-xs font-medium text-slate-200"
-        >
-          Inactive: {{ metrics().inactive }}
-        </span>
-      </ng-container>
-      <ng-template #assignmentMetricsSkeleton>
-        <app-stat-pill-skeleton [width]="150"></app-stat-pill-skeleton>
-        <app-stat-pill-skeleton [width]="100"></app-stat-pill-skeleton>
-        <app-stat-pill-skeleton [width]="110"></app-stat-pill-skeleton>
-      </ng-template>
-      <button
-        ubButton
-        size="sm"
-        class="eh-btn-icon bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
-        (click)="toggleCreatePanel()"
-      >
-        @if (showCreatePanel) {
-          <lucide-icon name="x" [size]="16"></lucide-icon>
-          <span>Close Form</span>
-        } @else {
-          <lucide-icon name="plus" [size]="16"></lucide-icon>
-          <span>Add Assignment</span>
-        }
-      </button>
-    </div>
-  </section>
+      <lucide-icon name="x" [size]="16"></lucide-icon>
+      <span>Close Form</span>
+    </button>
+  } @else {
+    <button
+      listShellActions
+      type="button"
+      ubButton
+      size="sm"
+      class="eh-btn-icon bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+      (click)="startCreate()"
+    >
+      <lucide-icon name="plus" [size]="16"></lucide-icon>
+      <span>Add Assignment</span>
+    </button>
+  }
+
+  <app-kpi-stat-card
+    listShellKpis
+    label="Total assignments"
+    [value]="isLoading() ? '—' : metrics().total"
+    icon="contact"
+    tone="sky"
+  ></app-kpi-stat-card>
+  <app-kpi-stat-card
+    listShellKpis
+    label="Active"
+    [value]="isLoading() ? '—' : metrics().active"
+    icon="check-circle"
+    tone="emerald"
+  ></app-kpi-stat-card>
+  <app-kpi-stat-card
+    listShellKpis
+    label="Inactive"
+    [value]="isLoading() ? '—' : metrics().inactive"
+    icon="pause-circle"
+    tone="slate"
+  ></app-kpi-stat-card>
+
+  <app-list-toolbar
+    listShellToolbar
+    searchId="assignment-search"
+    searchLabel="Search assignments"
+    searchPlaceholder="Search project, employee, role or date…"
+    [searchValue]="searchTerm()"
+    filterId="assignment-status-filter"
+    filterLabel="Status"
+    filterIcon="circle-dot"
+    [filterValue]="filterValue()"
+    [filterOptions]="statusFilterOptions"
+    [hasActiveFilters]="hasActiveFilters()"
+    (searchChange)="updateSearch($event)"
+    (filterChange)="setStatusFilter($event)"
+    (clearFilters)="clearListFilters()"
+  >
+    @if (!isLoading()) {
+      <app-list-pagination
+        [page]="pagedAssignments().page"
+        [totalPages]="pagedAssignments().totalPages"
+        (pageChange)="goToPage($event)"
+      ></app-list-pagination>
+    }
+  </app-list-toolbar>
 
   <section
     *ngIf="showCreatePanel"
-    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
+    class="mb-6 rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
   >
-    <header class="mb-6">
-      <h2 class="text-base sm:text-xl font-medium text-white">
-        Add Project Assignment
-      </h2>
-      <p class="text-xs text-white/55">Connect employees to projects</p>
+    <header class="mb-6 flex items-center justify-between gap-3">
+      <div>
+        <h2 class="text-base sm:text-xl font-medium text-white">
+          Add Project Assignment
+        </h2>
+        <p class="text-xs text-white/55">Connect employees to projects</p>
+      </div>
+      <button
+        type="button"
+        [disabled]="isSaving"
+        class="text-xs text-white/60 transition hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        (click)="closeCreatePanel()"
+      >
+        Cancel
+      </button>
     </header>
     <form
       [formGroup]="projectEmployeeForm"
@@ -227,329 +240,334 @@
   <section class="space-y-4">
     <app-list-skeleton *ngIf="isLoading()" [rows]="4"></app-list-skeleton>
 
-    <div
-      *ngFor="let item of pagedAssignments().items"
-      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition duration-200 hover:border-white/20"
-    >
-      <button
-        type="button"
-        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
-        (click)="toggleExpand(item.empProjectId)"
+    <ng-container *ngIf="!isLoading()">
+      <div
+        *ngFor="let item of pagedAssignments().items"
+        class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition duration-200 hover:border-white/20"
       >
-        <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
-          <span class="text-base font-medium text-white">
-            {{ item.projectName }}
-          </span>
-          <span
-            class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
+        <button
+          type="button"
+          class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
+          (click)="toggleExpand(item.empProjectId)"
+        >
+          <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
+            <span class="text-base font-medium text-white">
+              {{ item.projectName }}
+            </span>
+            <span
+              class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
+            >
+              <app-user-avatar
+                [seed]="employeeAvatarSeed(item)"
+                [imageUrl]="employeeAvatarUrl(item)"
+                [label]="item.employeeName"
+                [size]="20"
+                [alt]="item.employeeName"
+              ></app-user-avatar>
+              {{ item.employeeName }}
+            </span>
+            <span
+              *ngIf="item.role"
+              class="inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 md:ml-3 md:mt-0"
+            >
+              {{ item.role }}
+            </span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span [class]="statusBadge(item.isActive)" class="transition">
+              {{ isActive(item.isActive) ? "Active" : "Inactive" }}
+            </span>
+            <span class="text-xs text-white/60">
+              {{ formattedDate(item.assignedDate) }}
+            </span>
+            <span
+              class="text-xs text-white/40 transition"
+              [class.text-white]="expandedAssignmentId === item.empProjectId"
+            >
+              {{
+                expandedAssignmentId === item.empProjectId ? "Hide" : "Details"
+              }}
+            </span>
+          </div>
+        </button>
+
+        <div
+          *ngIf="expandedAssignmentId === item.empProjectId"
+          class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75"
+        >
+          <ng-container
+            *ngIf="
+              editingAssignmentId === item.empProjectId;
+              else assignmentView
+            "
           >
-            <app-user-avatar
-              [seed]="employeeAvatarSeed(item)"
-              [imageUrl]="employeeAvatarUrl(item)"
-              [label]="item.employeeName"
-              [size]="20"
-              [alt]="item.employeeName"
-            ></app-user-avatar>
-            {{ item.employeeName }}
-          </span>
-          <span
-            *ngIf="item.role"
-            class="inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 md:ml-3 md:mt-0"
-          >
-            {{ item.role }}
-          </span>
+            <form
+              [formGroup]="projectEmployeeForm"
+              (ngSubmit)="onSave()"
+              class="grid gap-4 md:grid-cols-2"
+              [class.opacity-50]="isSaving"
+            >
+              <div>
+                <label
+                  [for]="'edit-project-' + item.empProjectId"
+                  class="mb-2 block text-xs text-white/55"
+                  >Project</label
+                >
+                <app-select-menu
+                  [id]="'edit-project-' + item.empProjectId"
+                  formControlName="projectId"
+                  [options]="projectOptions()"
+                  [clearable]="false"
+                  [numeric]="true"
+                  placeholder="Select Project"
+                ></app-select-menu>
+              </div>
+              <div>
+                <label
+                  [for]="'edit-employee-' + item.empProjectId"
+                  class="mb-2 block text-xs text-white/55"
+                  >Team Member</label
+                >
+                <app-select-menu
+                  [id]="'edit-employee-' + item.empProjectId"
+                  formControlName="empId"
+                  [options]="employeeOptions()"
+                  [clearable]="false"
+                  [numeric]="true"
+                  placeholder="Select Teammate"
+                ></app-select-menu>
+              </div>
+              <div>
+                <label
+                  [for]="'edit-date-' + item.empProjectId"
+                  class="mb-2 block text-xs text-white/55"
+                  >Assigned Date</label
+                >
+                <input
+                  [id]="'edit-date-' + item.empProjectId"
+                  type="date"
+                  formControlName="assignedDate"
+                  class="eh-native-date w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+                />
+              </div>
+              <div>
+                <label
+                  [for]="'edit-role-' + item.empProjectId"
+                  class="mb-2 block text-xs text-white/55"
+                  >Role</label
+                >
+                <input
+                  [id]="'edit-role-' + item.empProjectId"
+                  type="text"
+                  formControlName="role"
+                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+                />
+              </div>
+              <div>
+                <label
+                  [for]="'edit-allocation-' + item.empProjectId"
+                  class="mb-2 block text-xs text-white/55"
+                  >Allocation (%)</label
+                >
+                <input
+                  [id]="'edit-allocation-' + item.empProjectId"
+                  type="number"
+                  min="0"
+                  max="200"
+                  formControlName="allocationPct"
+                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+                />
+                <p
+                  *ngIf="
+                    projectEmployeeForm.controls['allocationPct'].invalid &&
+                    (projectEmployeeForm.controls['allocationPct'].dirty ||
+                      projectEmployeeForm.controls['allocationPct'].touched)
+                  "
+                  class="text-xs text-rose-300"
+                >
+                  Enter a value between 0 and 200.
+                </p>
+              </div>
+              <div class="flex items-center gap-3 pt-2">
+                <span class="text-xs text-white/55">Active</span>
+                <button
+                  type="button"
+                  class="relative inline-flex h-9 w-16 items-center rounded-full border border-white/15 bg-white/10 px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  (click)="
+                    projectEmployeeForm.patchValue({
+                      isActive: !projectEmployeeForm.value.isActive,
+                    })
+                  "
+                  [ngClass]="{
+                    'bg-emerald-500/30': projectEmployeeForm.value.isActive,
+                  }"
+                >
+                  <span
+                    class="h-7 w-7 rounded-full bg-white/80 transition"
+                    [class.translate-x-7]="projectEmployeeForm.value.isActive"
+                  ></span>
+                </button>
+                <span class="text-xs text-white/70">
+                  {{
+                    projectEmployeeForm.value.isActive
+                      ? "Active assignment"
+                      : "Inactive"
+                  }}
+                </span>
+              </div>
+              <div class="md:col-span-2">
+                <label
+                  [for]="'edit-notes-' + item.empProjectId"
+                  class="mb-2 block text-xs text-white/55"
+                  >Notes (Optional)</label
+                >
+                <textarea
+                  [id]="'edit-notes-' + item.empProjectId"
+                  formControlName="notes"
+                  rows="3"
+                  placeholder="Add any notes or context about this assignment..."
+                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white resize-none"
+                ></textarea>
+              </div>
+              <div class="md:col-span-2 flex justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  [disabled]="isSaving"
+                  class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  (click)="cancelEdit()"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  ubButton
+                  size="sm"
+                  [disabled]="isSaving"
+                  class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  @if (!isSaving) {
+                    <lucide-icon name="save" [size]="16"></lucide-icon>
+                    <span>Save Changes</span>
+                  } @else {
+                    <span>Updating...</span>
+                  }
+                </button>
+              </div>
+            </form>
+          </ng-container>
+          <ng-template #assignmentView>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Assigned Role</p>
+                <p class="text-base font-medium text-white">
+                  {{ item.role }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Assigned on</p>
+                <p class="text-base font-medium text-white">
+                  {{ formattedDate(item.assignedDate) }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Employee ID</p>
+                <p class="text-base font-medium text-white">
+                  {{ item.empId }} · {{ employeeNameFor(item.empId) || "—" }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Project ID</p>
+                <p class="text-base font-medium text-white">
+                  {{ item.projectId }} ·
+                  {{ projectNameFor(item.projectId) || "—" }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Allocation</p>
+                <p class="text-base font-medium text-white">
+                  {{ item.allocationPct ?? 0 }}%
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Unassigned</p>
+                <p class="text-base font-medium text-white">
+                  {{ formattedDate(item.unassignedAt) }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Created</p>
+                <p class="text-base font-medium text-white">
+                  {{ formattedDate(item.createdAt) }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Updated</p>
+                <p class="text-base font-medium text-white">
+                  {{ formattedDate(item.updatedAt) }}
+                </p>
+              </div>
+              <div
+                *ngIf="item.notes && item.notes.trim()"
+                class="sm:col-span-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Notes</p>
+                <p
+                  class="mt-2 text-sm leading-relaxed text-white/80 whitespace-pre-wrap"
+                >
+                  {{ item.notes }}
+                </p>
+              </div>
+              <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
+                <app-card-close-button
+                  (closed)="closeExpanded()"
+                ></app-card-close-button>
+                <button
+                  type="button"
+                  (click)="onEdit(item)"
+                  class="eh-btn-icon rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                >
+                  <lucide-icon name="pencil" [size]="14"></lucide-icon>
+                  <span>Edit</span>
+                </button>
+                <button
+                  type="button"
+                  class="eh-btn-icon rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
+                  (click)="onDelete(item.empProjectId)"
+                >
+                  <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+          </ng-template>
         </div>
-        <div class="flex items-center gap-4">
-          <span [class]="statusBadge(item.isActive)" class="transition">
-            {{ isActive(item.isActive) ? "Active" : "Inactive" }}
-          </span>
-          <span class="text-xs text-white/60">
-            {{ formattedDate(item.assignedDate) }}
-          </span>
-          <span
-            class="text-xs text-white/40 transition"
-            [class.text-white]="expandedAssignmentId === item.empProjectId"
-          >
-            {{
-              expandedAssignmentId === item.empProjectId ? "Hide" : "Details"
-            }}
-          </span>
-        </div>
-      </button>
+      </div>
 
       <div
-        *ngIf="expandedAssignmentId === item.empProjectId"
-        class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75"
+        *ngIf="hasLoaded() && !filteredAssignments().length"
+        class="rounded-[28px] border border-dashed border-white/15 bg-white/5/60 px-2 sm:px-4 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
       >
-        <ng-container
-          *ngIf="editingAssignmentId === item.empProjectId; else assignmentView"
-        >
-          <form
-            [formGroup]="projectEmployeeForm"
-            (ngSubmit)="onSave()"
-            class="grid gap-4 md:grid-cols-2"
-            [class.opacity-50]="isSaving"
-          >
-            <div>
-              <label
-                [for]="'edit-project-' + item.empProjectId"
-                class="mb-2 block text-xs text-white/55"
-                >Project</label
-              >
-              <app-select-menu
-                [id]="'edit-project-' + item.empProjectId"
-                formControlName="projectId"
-                [options]="projectOptions()"
-                [clearable]="false"
-                [numeric]="true"
-                placeholder="Select Project"
-              ></app-select-menu>
-            </div>
-            <div>
-              <label
-                [for]="'edit-employee-' + item.empProjectId"
-                class="mb-2 block text-xs text-white/55"
-                >Team Member</label
-              >
-              <app-select-menu
-                [id]="'edit-employee-' + item.empProjectId"
-                formControlName="empId"
-                [options]="employeeOptions()"
-                [clearable]="false"
-                [numeric]="true"
-                placeholder="Select Teammate"
-              ></app-select-menu>
-            </div>
-            <div>
-              <label
-                [for]="'edit-date-' + item.empProjectId"
-                class="mb-2 block text-xs text-white/55"
-                >Assigned Date</label
-              >
-              <input
-                [id]="'edit-date-' + item.empProjectId"
-                type="date"
-                formControlName="assignedDate"
-                class="eh-native-date w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
-              />
-            </div>
-            <div>
-              <label
-                [for]="'edit-role-' + item.empProjectId"
-                class="mb-2 block text-xs text-white/55"
-                >Role</label
-              >
-              <input
-                [id]="'edit-role-' + item.empProjectId"
-                type="text"
-                formControlName="role"
-                class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
-              />
-            </div>
-            <div>
-              <label
-                [for]="'edit-allocation-' + item.empProjectId"
-                class="mb-2 block text-xs text-white/55"
-                >Allocation (%)</label
-              >
-              <input
-                [id]="'edit-allocation-' + item.empProjectId"
-                type="number"
-                min="0"
-                max="200"
-                formControlName="allocationPct"
-                class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
-              />
-              <p
-                *ngIf="
-                  projectEmployeeForm.controls['allocationPct'].invalid &&
-                  (projectEmployeeForm.controls['allocationPct'].dirty ||
-                    projectEmployeeForm.controls['allocationPct'].touched)
-                "
-                class="text-xs text-rose-300"
-              >
-                Enter a value between 0 and 200.
-              </p>
-            </div>
-            <div class="flex items-center gap-3 pt-2">
-              <span class="text-xs text-white/55">Active</span>
-              <button
-                type="button"
-                class="relative inline-flex h-9 w-16 items-center rounded-full border border-white/15 bg-white/10 px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                (click)="
-                  projectEmployeeForm.patchValue({
-                    isActive: !projectEmployeeForm.value.isActive,
-                  })
-                "
-                [ngClass]="{
-                  'bg-emerald-500/30': projectEmployeeForm.value.isActive,
-                }"
-              >
-                <span
-                  class="h-7 w-7 rounded-full bg-white/80 transition"
-                  [class.translate-x-7]="projectEmployeeForm.value.isActive"
-                ></span>
-              </button>
-              <span class="text-xs text-white/70">
-                {{
-                  projectEmployeeForm.value.isActive
-                    ? "Active assignment"
-                    : "Inactive"
-                }}
-              </span>
-            </div>
-            <div class="md:col-span-2">
-              <label
-                [for]="'edit-notes-' + item.empProjectId"
-                class="mb-2 block text-xs text-white/55"
-                >Notes (Optional)</label
-              >
-              <textarea
-                [id]="'edit-notes-' + item.empProjectId"
-                formControlName="notes"
-                rows="3"
-                placeholder="Add any notes or context about this assignment..."
-                class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white resize-none"
-              ></textarea>
-            </div>
-            <div class="md:col-span-2 flex justify-end gap-3 pt-4">
-              <button
-                type="button"
-                [disabled]="isSaving"
-                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                (click)="cancelEdit()"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                ubButton
-                size="sm"
-                [disabled]="isSaving"
-                class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                @if (!isSaving) {
-                  <lucide-icon name="save" [size]="16"></lucide-icon>
-                  <span>Save Changes</span>
-                } @else {
-                  <span>Updating...</span>
-                }
-              </button>
-            </div>
-          </form>
-        </ng-container>
-        <ng-template #assignmentView>
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Assigned Role</p>
-              <p class="text-base font-medium text-white">
-                {{ item.role }}
-              </p>
-            </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Assigned on</p>
-              <p class="text-base font-medium text-white">
-                {{ formattedDate(item.assignedDate) }}
-              </p>
-            </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Employee ID</p>
-              <p class="text-base font-medium text-white">
-                {{ item.empId }} · {{ employeeNameFor(item.empId) || "—" }}
-              </p>
-            </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Project ID</p>
-              <p class="text-base font-medium text-white">
-                {{ item.projectId }} ·
-                {{ projectNameFor(item.projectId) || "—" }}
-              </p>
-            </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Allocation</p>
-              <p class="text-base font-medium text-white">
-                {{ item.allocationPct ?? 0 }}%
-              </p>
-            </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Unassigned</p>
-              <p class="text-base font-medium text-white">
-                {{ formattedDate(item.unassignedAt) }}
-              </p>
-            </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Created</p>
-              <p class="text-base font-medium text-white">
-                {{ formattedDate(item.createdAt) }}
-              </p>
-            </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Updated</p>
-              <p class="text-base font-medium text-white">
-                {{ formattedDate(item.updatedAt) }}
-              </p>
-            </div>
-            <div
-              *ngIf="item.notes && item.notes.trim()"
-              class="sm:col-span-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Notes</p>
-              <p
-                class="mt-2 text-sm leading-relaxed text-white/80 whitespace-pre-wrap"
-              >
-                {{ item.notes }}
-              </p>
-            </div>
-            <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
-              <app-card-close-button
-                (closed)="closeExpanded()"
-              ></app-card-close-button>
-              <button
-                type="button"
-                (click)="onEdit(item)"
-                class="eh-btn-icon rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-              >
-                <lucide-icon name="pencil" [size]="14"></lucide-icon>
-                <span>Edit</span>
-              </button>
-              <button
-                type="button"
-                class="eh-btn-icon rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
-                (click)="onDelete(item.empProjectId)"
-              >
-                <lucide-icon name="trash-2" [size]="14"></lucide-icon>
-                <span>Delete</span>
-              </button>
-            </div>
-          </div>
-        </ng-template>
+        No assignments match your filters.
       </div>
-    </div>
-
-    <div
-      *ngIf="hasLoaded() && !filteredAssignments().length"
-      class="rounded-[28px] border border-dashed border-white/15 bg-white/5/60 px-2 sm:px-4 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
-    >
-      No assignments match your filters.
-    </div>
+    </ng-container>
   </section>
-</div>
+</app-list-page-shell>
 
 <app-alert-dialog
   [open]="!!pendingDelete"

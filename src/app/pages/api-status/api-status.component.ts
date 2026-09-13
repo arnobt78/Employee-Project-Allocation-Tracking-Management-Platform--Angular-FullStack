@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MasterService } from '../../service/master.service';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
+import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 
 export interface IApiStatus {
   timestamp: string;
@@ -69,6 +70,7 @@ export interface IApiStatus {
 export class ApiStatusComponent implements OnInit {
   private readonly masterService = inject(MasterService);
 
+  readonly pageMeta = PRIVATE_PAGE_META['/api-status'];
   readonly statusSignal = signal<IApiStatus | null>(null);
   readonly status = this.statusSignal.asReadonly();
   readonly loadingSignal = signal<boolean>(false);

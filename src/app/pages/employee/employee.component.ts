@@ -11,16 +11,19 @@ import { Employee } from '../../model/class/Employee';
 import { CommonModule } from '@angular/common';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import { ToastService } from '@/app/components/ui/toast.service';
-import {
-  ListSkeletonComponent,
-  StatPillSkeletonComponent,
-} from '@/app/components/ui/list-skeleton.component';
+import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
 import { CardCloseButtonComponent } from '@/app/components/ui/card-close-button.component';
 import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
-import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 import { ListPaginationComponent } from '@/app/components/ui/list-pagination.component';
+import { ListPageShellComponent } from '@/app/components/ui/list-page-shell.component';
+import { KpiStatCardComponent } from '@/app/components/ui/kpi-stat-card.component';
+import {
+  ListToolbarComponent,
+  ListToolbarFilterOption,
+} from '@/app/components/ui/list-toolbar.component';
+import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 import {
   bindListQuery,
   ListQueryController,
@@ -36,40 +39,90 @@ import {
     ReactiveFormsModule,
     UbButtonDirective,
     ListSkeletonComponent,
-    StatPillSkeletonComponent,
     AlertDialogComponent,
     CardCloseButtonComponent,
     UserAvatarComponent,
-    PageHeaderComponent,
     ListPaginationComponent,
+    ListPageShellComponent,
+    KpiStatCardComponent,
+    ListToolbarComponent,
   ],
   templateUrl: './employee.component.html',
   styleUrls: ['./employee.component.css'],
 })
 export class EmployeeComponent implements OnInit {
+  readonly pageMeta = PRIVATE_PAGE_META['/employee'];
+
   employeeForm: FormGroup;
   private readonly employeesSignal = signal<Employee[]>([]);
   readonly employees = this.employeesSignal.asReadonly();
+
+  readonly searchTerm = signal('');
+  readonly filterValue = signal('');
+  readonly listPage = signal(1);
+  readonly isLoading = signal(true);
+  readonly hasLoaded = signal(false);
+
   readonly filteredEmployees = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
-    if (!term) {
-      return this.employees();
-    }
-    return this.employees().filter(
-      (employee) =>
+    const deptFilter = this.filterValue().trim().toLowerCase();
+
+    return this.employees().filter((employee) => {
+      const matchesDept =
+        !deptFilter ||
+        (employee.department?.toLowerCase() ?? '') === deptFilter;
+      if (!matchesDept) {
+        return false;
+      }
+      if (!term) {
+        return true;
+      }
+      return (
         employee.employeeName?.toLowerCase().includes(term) ||
         employee.department?.toLowerCase().includes(term) ||
         employee.employeeId?.toString().includes(term)
-    );
+      );
+    });
   });
+
   readonly pagedEmployees = computed(() =>
     paginateList(this.filteredEmployees(), this.listPage())
   );
 
-  readonly searchTerm = signal<string>('');
-  readonly listPage = signal(1);
-  readonly isLoading = signal(true);
-  readonly hasLoaded = signal(false);
+  readonly departmentFilterOptions = computed((): ListToolbarFilterOption[] => {
+    const seen = new Set<string>();
+    const options: ListToolbarFilterOption[] = [];
+    for (const employee of this.employees()) {
+      const dept = employee.department?.trim();
+      if (!dept) {
+        continue;
+      }
+      const key = dept.toLowerCase();
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      options.push({ value: dept, label: dept });
+    }
+    return options.sort((a, b) => a.label.localeCompare(b.label));
+  });
+
+  readonly totalEmployeesKpi = computed(() =>
+    this.isLoading() ? '—' : this.employees().length
+  );
+  readonly matchingEmployeesKpi = computed(() =>
+    this.isLoading() ? '—' : this.filteredEmployees().length
+  );
+  readonly departmentsKpi = computed(() =>
+    this.isLoading() ? '—' : this.departmentFilterOptions().length
+  );
+
+  readonly hasActiveFilters = computed(
+    () =>
+      this.searchTerm().trim().length > 0 ||
+      this.filterValue().trim().length > 0
+  );
+
   expandedEmployeeId: number | null = null;
   editingEmployeeId: number | null = null;
   showCreatePanel = false;
@@ -112,7 +165,8 @@ export class EmployeeComponent implements OnInit {
       this.router,
       this.destroyRef,
       this.searchTerm,
-      this.listPage
+      this.listPage,
+      this.filterValue
     );
     this.getEmployees();
   }
@@ -371,6 +425,14 @@ export class EmployeeComponent implements OnInit {
 
   updateSearch(term: string) {
     this.listQuery.setSearch(term);
+  }
+
+  setDepartmentFilter(value: string) {
+    this.listQuery.setFilter(value);
+  }
+
+  clearListFilters() {
+    this.listQuery.clearFilters();
   }
 
   goToPage(page: number) {

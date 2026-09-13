@@ -28,11 +28,11 @@ describe('LayoutComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should show route content placeholder before a child activates', () => {
+  it('should start with no child active (placeholder owned by App shell)', () => {
+    expect(component.childActive()).toBe(false);
     const compiled = fixture.nativeElement as HTMLElement;
     expect(
       compiled.querySelector('[data-testid="route-content-placeholder"]')
-    ).toBeTruthy();
-    expect(component.childActive()).toBe(false);
+    ).toBeNull();
   });
 });

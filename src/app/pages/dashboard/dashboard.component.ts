@@ -3,12 +3,11 @@ import { DatePipe } from '@angular/common';
 import { MasterService } from '../../service/master.service';
 import { IParentDept, IProject, IProjectEmployee } from '../../model/interface/master';
 import { Employee } from '../../model/class/Employee';
-import {
-  ListSkeletonComponent,
-  StatPillSkeletonComponent,
-} from '@/app/components/ui/list-skeleton.component';
+import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
 import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
+import { KpiStatCardComponent } from '@/app/components/ui/kpi-stat-card.component';
+import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 
 interface DashboardSnapshot {
   totalEmployee: number;
@@ -23,15 +22,16 @@ interface DashboardSnapshot {
   standalone: true,
   imports: [
     ListSkeletonComponent,
-    StatPillSkeletonComponent,
     DatePipe,
     UserAvatarComponent,
     PageHeaderComponent,
+    KpiStatCardComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
+  readonly pageMeta = PRIVATE_PAGE_META['/dashboard'];
   readonly isLoading = signal(true);
   readonly hasLoaded = signal(false);
   dashboardData: DashboardSnapshot | null = null;

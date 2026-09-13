@@ -1,10 +1,11 @@
-<div class="eh-page">
+<div
+  class="eh-page"
+  [hidden]="!childActive()"
+  [attr.aria-hidden]="!childActive()"
+>
   <section
     class="rounded-[30px] border border-white/10 bg-white/5/80 p-2 shadow-[0_45px_120px_rgba(8,12,32,0.55)] backdrop-blur-md sm:p-4"
   >
-    @if (!childActive()) {
-      <app-route-content-placeholder />
-    }
     <router-outlet
       (activate)="onChildActivate()"
       (deactivate)="onChildDeactivate()"

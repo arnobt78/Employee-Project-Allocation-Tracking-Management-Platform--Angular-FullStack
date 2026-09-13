@@ -88,3 +88,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | Honest demo SPA size; reduce attack surface (open cors-proxy) and maintenance noise without Angular major upgrade |
 | Linked | GATE-0014 |
 | Status | APPROVED and executed |
+
+---
+
+## DEC-0015 — Page shell redesign: shared list chrome + route-only project editor
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-13 |
+| Decision | Introduce reusable list page shell (KPIs + Lucide toolbar + header CTA); URL filter `?f=`; merge Projects create/edit into `/new-project` and `/update-project/:id` only; keep Employees/Project Team inline create |
+| Rationale | Consistent loading contract (chrome first, data-region skeletons); remove dual Full Editor + inline project forms; align live pages with route placeholders |
+| Linked | Page shell redesign plan; GATE-0015 follow-on UX |
+| Status | APPROVED and executed |

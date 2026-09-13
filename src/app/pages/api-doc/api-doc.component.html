@@ -1,9 +1,9 @@
 <div class="space-y-6">
   <!-- Header -->
   <app-page-header
-    title="API Documentation"
-    subtitle="Complete API reference for Employee Management System"
-    icon="file-text"
+    [title]="pageMeta.title"
+    [subtitle]="pageMeta.subtitle"
+    [icon]="pageMeta.icon"
   >
     <div
       *ngIf="apiDoc()"

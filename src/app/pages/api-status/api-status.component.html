@@ -1,9 +1,9 @@
 <div class="space-y-6 text-white/85">
   <!-- Header -->
   <app-page-header
-    title="API Status"
-    subtitle="Monitor API health, performance, and activity in real-time"
-    icon="activity"
+    [title]="pageMeta.title"
+    [subtitle]="pageMeta.subtitle"
+    [icon]="pageMeta.icon"
   >
     <button
       (click)="loadApiStatus()"

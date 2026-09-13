@@ -1,8 +1,8 @@
 <div class="space-y-8 text-white/85">
   <app-page-header
-    title="Dashboard"
-    subtitle="Monitor workforce, projects, and assignment health in one place"
-    icon="layout-dashboard"
+    [title]="pageMeta.title"
+    [subtitle]="pageMeta.subtitle"
+    [icon]="pageMeta.icon"
   ></app-page-header>
 
   @if (isLoading()) {
@@ -17,14 +17,21 @@
         </article>
       }
     </section>
-    <section
-      class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-4"
-    >
-      <div class="flex flex-wrap gap-2">
-        @for (pill of [1, 2, 3, 4, 5]; track pill) {
-          <app-stat-pill-skeleton [width]="120"></app-stat-pill-skeleton>
-        }
-      </div>
+    <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      @for (kpi of [1, 2, 3, 4, 5, 6]; track kpi) {
+        <article
+          class="animate-pulse rounded-2xl border border-white/10 bg-white/5 p-4"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div class="space-y-3 flex-1">
+              <div class="h-3 w-24 rounded-full bg-white/10"></div>
+              <div class="h-8 w-14 rounded-full bg-white/10"></div>
+              <div class="h-3 w-40 rounded-full bg-white/10"></div>
+            </div>
+            <div class="h-10 w-10 rounded-xl bg-white/10"></div>
+          </div>
+        </article>
+      }
     </section>
     <app-list-skeleton [rows]="4"></app-list-skeleton>
   } @else {
@@ -85,75 +92,76 @@
     </section>
 
     @if (projectStats) {
-      <section
-        class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-4 backdrop-blur-md"
-      >
-        <div class="flex flex-wrap gap-2 items-center">
-          <span
-            class="inline-flex items-center rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs font-medium text-cyan-400 border border-cyan-500/30"
-            title="Non-archived projects (used for all calculations below)"
-          >
-            {{ projectStats.nonArchived }} Non-Archived
-          </span>
-          @if (projectStats.archived > 0) {
-            <span
-              class="inline-flex items-center rounded-full bg-gray-500/20 px-2 py-0.5 text-xs font-medium text-gray-400 border border-gray-500/30"
-              title="Archived projects (excluded from calculations, display only)"
-            >
-              {{ projectStats.archived }} Archived
-            </span>
-          }
-          <span
-            class="inline-flex items-center rounded-full bg-green-500/20 px-2 py-0.5 text-xs font-medium text-green-400 border border-green-500/30"
-            title="Projects with active assignments or leads"
-          >
-            {{ projectStats.active }} Active
-          </span>
-          <span
-            class="inline-flex items-center rounded-full bg-slate-500/20 px-2 py-0.5 text-xs font-medium text-slate-400 border border-slate-500/30"
-            title="Projects with no active assignments and no lead"
-          >
-            {{ projectStats.inactive }} Inactive
-          </span>
-          @if (projectStats.planning > 0) {
-            <span
-              class="inline-flex items-center rounded-full bg-blue-500/20 px-2 py-0.5 text-xs font-medium text-blue-400 border border-blue-500/30"
-              title="Projects with lead but no active assignments (planning/startup phase)"
-            >
-              {{ projectStats.planning }} Planning
-            </span>
-          }
-          @if (projectStats.assigned > 0) {
-            <span
-              class="inline-flex items-center rounded-full bg-purple-500/20 px-2 py-0.5 text-xs font-medium text-purple-400 border border-purple-500/30"
-              title="Projects with active employee assignments"
-            >
-              {{ projectStats.assigned }} Assigned
-            </span>
-          }
-          @if (projectStats.nonAssigned > 0) {
-            <span
-              class="inline-flex items-center rounded-full bg-orange-500/20 px-2 py-0.5 text-xs font-medium text-orange-400 border border-orange-500/30"
-              title="Projects with no active employee assignments"
-            >
-              {{ projectStats.nonAssigned }} Non-Assigned
-            </span>
-          }
-          <span
-            class="inline-flex items-center rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-medium text-emerald-400 border border-emerald-500/30"
-            title="Active project-employee assignments"
-          >
-            {{ projectStats.activeAssignments }} Active Assignments
-          </span>
-          @if (projectStats.inactiveAssignments > 0) {
-            <span
-              class="inline-flex items-center rounded-full bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-400 border border-red-500/30"
-              title="Inactive project-employee assignments"
-            >
-              {{ projectStats.inactiveAssignments }} Inactive Assignments
-            </span>
-          }
-        </div>
+      <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <app-kpi-stat-card
+          label="Non-archived"
+          [value]="projectStats.nonArchived"
+          hint="Included in delivery calculations"
+          icon="folder-open"
+          tone="sky"
+        ></app-kpi-stat-card>
+        <app-kpi-stat-card
+          label="Active projects"
+          [value]="projectStats.active"
+          hint="With active assignments or leads"
+          icon="zap"
+          tone="emerald"
+        ></app-kpi-stat-card>
+        <app-kpi-stat-card
+          label="Inactive projects"
+          [value]="projectStats.inactive"
+          hint="No active assignments and no lead"
+          icon="pause-circle"
+          tone="slate"
+        ></app-kpi-stat-card>
+        <app-kpi-stat-card
+          label="Planning"
+          [value]="projectStats.planning"
+          hint="Lead assigned, no active team yet"
+          icon="compass"
+          tone="violet"
+        ></app-kpi-stat-card>
+        <app-kpi-stat-card
+          label="Assigned"
+          [value]="projectStats.assigned"
+          hint="Projects with active employee assignments"
+          icon="users"
+          tone="amber"
+        ></app-kpi-stat-card>
+        <app-kpi-stat-card
+          label="Active assignments"
+          [value]="projectStats.activeAssignments"
+          hint="Live project–employee links"
+          icon="link"
+          tone="emerald"
+        ></app-kpi-stat-card>
+        @if (projectStats.archived > 0) {
+          <app-kpi-stat-card
+            label="Archived"
+            [value]="projectStats.archived"
+            hint="Excluded from active calculations"
+            icon="archive"
+            tone="slate"
+          ></app-kpi-stat-card>
+        }
+        @if (projectStats.nonAssigned > 0) {
+          <app-kpi-stat-card
+            label="Unassigned"
+            [value]="projectStats.nonAssigned"
+            hint="No active employee assignments"
+            icon="user-x"
+            tone="rose"
+          ></app-kpi-stat-card>
+        }
+        @if (projectStats.inactiveAssignments > 0) {
+          <app-kpi-stat-card
+            label="Inactive assignments"
+            [value]="projectStats.inactiveAssignments"
+            hint="Paused or ended allocations"
+            icon="unlink"
+            tone="rose"
+          ></app-kpi-stat-card>
+        }
       </section>
     }
 

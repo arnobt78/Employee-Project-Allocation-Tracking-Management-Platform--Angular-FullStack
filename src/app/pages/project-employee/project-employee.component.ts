@@ -4,24 +4,22 @@ import {
   OnInit,
   computed,
   inject,
-  signal } from '@angular/core';
+  signal,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   Validators,
-  ReactiveFormsModule } from '@angular/forms';
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MasterService } from '../../service/master.service';
 import { IProjectEmployee, IProject } from '../../model/interface/master';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Employee } from '../../model/class/Employee';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { UbButtonDirective } from '@/app/components/ui/button';
-import { DatePipe } from '@angular/common';
-
-import {
-  ListSkeletonComponent,
-  StatPillSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
+import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import {
   SelectMenuComponent,
@@ -30,8 +28,14 @@ import {
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
 import { CardCloseButtonComponent } from '@/app/components/ui/card-close-button.component';
 import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
-import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 import { ListPaginationComponent } from '@/app/components/ui/list-pagination.component';
+import { ListPageShellComponent } from '@/app/components/ui/list-page-shell.component';
+import { KpiStatCardComponent } from '@/app/components/ui/kpi-stat-card.component';
+import {
+  ListToolbarComponent,
+  ListToolbarFilterOption,
+} from '@/app/components/ui/list-toolbar.component';
+import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 import {
   bindListQuery,
   ListQueryController,
@@ -47,17 +51,19 @@ import {
     ReactiveFormsModule,
     UbButtonDirective,
     ListSkeletonComponent,
-    StatPillSkeletonComponent,
     SelectMenuComponent,
     AlertDialogComponent,
     CardCloseButtonComponent,
     UserAvatarComponent,
-    PageHeaderComponent,
     ListPaginationComponent,
+    ListPageShellComponent,
+    KpiStatCardComponent,
+    ListToolbarComponent,
   ],
   providers: [DatePipe],
   templateUrl: './project-employee.component.html',
-  styleUrls: ['./project-employee.component.css'] })
+  styleUrls: ['./project-employee.component.css'],
+})
 export class ProjectEmployeeComponent implements OnInit {
   private readonly masterService = inject(MasterService);
   private readonly toast = inject(ToastService);
@@ -67,6 +73,8 @@ export class ProjectEmployeeComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private listQuery!: ListQueryController;
+
+  readonly pageMeta = PRIVATE_PAGE_META['/project-employee'];
 
   private readonly assignmentsSignal = signal<IProjectEmployee[]>([]);
   readonly assignments = this.assignmentsSignal.asReadonly();
@@ -95,15 +103,34 @@ export class ProjectEmployeeComponent implements OnInit {
   );
 
   readonly searchTerm = signal<string>('');
+  readonly filterValue = signal<string>('');
   readonly listPage = signal(1);
   readonly isLoading = signal(true);
   readonly hasLoaded = signal(false);
+
+  readonly statusFilterOptions: ListToolbarFilterOption[] = [
+    { value: 'active', label: 'Active' },
+    { value: 'inactive', label: 'Inactive' },
+  ];
+
+  readonly hasActiveFilters = computed(
+    () => this.searchTerm().trim().length > 0 || this.filterValue().trim().length > 0
+  );
+
   readonly filteredAssignments = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
-    if (!term) {
-      return this.assignments();
-    }
+    const filter = this.filterValue().trim().toLowerCase();
     return this.assignments().filter((item) => {
+      const active = this.isActive(item.isActive);
+      if (filter === 'active' && !active) {
+        return false;
+      }
+      if (filter === 'inactive' && active) {
+        return false;
+      }
+      if (!term) {
+        return true;
+      }
       return (
         item.projectName?.toLowerCase().includes(term) ||
         item.employeeName?.toLowerCase().includes(term) ||
@@ -122,7 +149,8 @@ export class ProjectEmployeeComponent implements OnInit {
     return {
       total: data.length,
       active,
-      inactive: data.length - active };
+      inactive: data.length - active,
+    };
   });
 
   projectEmployeeForm: FormGroup = this.fb.group({
@@ -151,7 +179,8 @@ export class ProjectEmployeeComponent implements OnInit {
       this.router,
       this.destroyRef,
       this.searchTerm,
-      this.listPage
+      this.listPage,
+      this.filterValue
     );
     const projectsSnap = this.masterService.peekProjects();
     const employeesSnap = this.masterService.peekEmployees();
@@ -412,20 +441,29 @@ export class ProjectEmployeeComponent implements OnInit {
     }
   }
 
-  toggleCreatePanel() {
+  startCreate() {
     this.isSaving = false;
-    this.showCreatePanel = !this.showCreatePanel;
+    this.showCreatePanel = true;
     this.editingAssignmentId = null;
     this.expandedAssignmentId = null;
-    if (this.showCreatePanel) {
-      this.resetForm();
-    } else {
-      this.projectEmployeeForm.reset();
-    }
+    this.resetForm();
+  }
+
+  closeCreatePanel() {
+    this.isSaving = false;
+    this.showCreatePanel = false;
   }
 
   updateSearch(term: string) {
     this.listQuery.setSearch(term);
+  }
+
+  setStatusFilter(value: string) {
+    this.listQuery.setFilter(value);
+  }
+
+  clearListFilters() {
+    this.listQuery.clearFilters();
   }
 
   goToPage(page: number) {

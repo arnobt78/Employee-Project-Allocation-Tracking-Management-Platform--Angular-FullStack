@@ -9,6 +9,7 @@ import {
   StatPillSkeletonComponent,
 } from '@/app/components/ui/list-skeleton.component';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
+import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 
 export interface IScheduleData {
   milestones: IMilestone[];
@@ -74,6 +75,7 @@ export interface IProjectTimeline {
 export class CalendarTimelineComponent implements OnInit {
   private readonly masterService = inject(MasterService);
 
+  readonly pageMeta = PRIVATE_PAGE_META['/calendar-timeline'];
   readonly scheduleDataSignal = signal<IScheduleData | null>(null);
   readonly scheduleData = this.scheduleDataSignal.asReadonly();
   readonly loadingSignal = signal<boolean>(false);

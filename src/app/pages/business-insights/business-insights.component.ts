@@ -18,6 +18,7 @@ import {
   SelectMenuOption,
 } from '@/app/components/ui/select-menu.component';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
+import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 
 export interface IBusinessInsights {
   projectStatusDistribution: {
@@ -98,6 +99,7 @@ export class BusinessInsightsComponent implements OnInit {
   private readonly masterService = inject(MasterService);
   private readonly fb = inject(FormBuilder);
 
+  readonly pageMeta = PRIVATE_PAGE_META['/business-insights'];
   readonly insightsSignal = signal<IBusinessInsights | null>(null);
   readonly insights = this.insightsSignal.asReadonly();
   readonly loadingSignal = signal<boolean>(false);

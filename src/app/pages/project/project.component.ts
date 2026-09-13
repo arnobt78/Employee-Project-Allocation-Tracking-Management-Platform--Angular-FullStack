@@ -1,23 +1,28 @@
-import { Component, DestroyRef, OnInit, computed, signal, inject } from '@angular/core';
 import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators } from '@angular/forms';
-import { IProject } from '../../model/interface/master';
-import { MasterService } from '../../service/master.service';
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  signal,
+  inject,
+} from '@angular/core';
 import { DatePipe, CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { IProject } from '../../model/interface/master';
+import { MasterService } from '../../service/master.service';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { UbButtonDirective } from '@/app/components/ui/button';
-import {
-  ListSkeletonComponent,
-  StatPillSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
+import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
-import { CardCloseButtonComponent } from '@/app/components/ui/card-close-button.component';
-import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 import { ListPaginationComponent } from '@/app/components/ui/list-pagination.component';
+import { ListPageShellComponent } from '@/app/components/ui/list-page-shell.component';
+import { KpiStatCardComponent } from '@/app/components/ui/kpi-stat-card.component';
+import {
+  ListToolbarComponent,
+  ListToolbarFilterOption,
+} from '@/app/components/ui/list-toolbar.component';
+import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 import {
   bindListQuery,
   ListQueryController,
@@ -30,71 +35,83 @@ import {
   imports: [
     AppIconComponent,
     CommonModule,
-    ReactiveFormsModule,
     UbButtonDirective,
     RouterLink,
     ListSkeletonComponent,
-    StatPillSkeletonComponent,
     AlertDialogComponent,
-    CardCloseButtonComponent,
-    PageHeaderComponent,
     ListPaginationComponent,
+    ListPageShellComponent,
+    KpiStatCardComponent,
+    ListToolbarComponent,
   ],
   providers: [DatePipe],
   templateUrl: './project.component.html',
-  styleUrls: ['./project.component.css'], // Corrected from styleUrl to styleUrls
+  styleUrls: ['./project.component.css'],
 })
 export class ProjectComponent implements OnInit {
-  protected readonly routerLinkDirective = RouterLink;
   private readonly masterSrv = inject(MasterService);
   private readonly datePipe = inject(DatePipe);
   private readonly toast = inject(ToastService);
-  private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private listQuery!: ListQueryController;
 
+  readonly pageMeta = PRIVATE_PAGE_META['/projects'];
+
   private readonly projectsSignal = signal<IProject[]>([]);
   readonly projects = this.projectsSignal.asReadonly();
-  readonly searchTerm = signal<string>('');
+  readonly searchTerm = signal('');
+  readonly filterValue = signal('');
   readonly listPage = signal(1);
   readonly isLoading = signal(true);
   readonly hasLoaded = signal(false);
+
+  readonly statusFilterOptions = computed<ListToolbarFilterOption[]>(() => {
+    const statuses = new Set<string>();
+    for (const p of this.projects()) {
+      const s = (p.status ?? '').trim();
+      if (s) statuses.add(s);
+    }
+    return [...statuses].sort().map((value) => ({ value, label: value }));
+  });
+
   readonly filteredProjects = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
-    if (!term) {
-      return this.projects();
-    }
+    const status = this.filterValue().trim().toLowerCase();
     return this.projects().filter((project) => {
+      const matchesStatus =
+        !status || (project.status ?? '').trim().toLowerCase() === status;
+      if (!matchesStatus) return false;
+      if (!term) return true;
       return (
         project.projectName?.toLowerCase().includes(term) ||
         project.clientName?.toLowerCase().includes(term) ||
         project.contactPerson?.toLowerCase().includes(term) ||
-        project.startDate?.toLowerCase().includes(term)
+        project.startDate?.toLowerCase().includes(term) ||
+        project.status?.toLowerCase().includes(term)
       );
     });
   });
+
   readonly pagedProjects = computed(() =>
     paginateList(this.filteredProjects(), this.listPage())
   );
 
-  projectForm: FormGroup = this.fb.group({
-    projectId: [null],
-    projectName: ['', Validators.required],
-    clientName: ['', Validators.required],
-    startDate: ['', Validators.required],
-    leadByEmpId: [null],
-    contactPerson: [''],
-    contactNo: [''],
-    emailId: ['', Validators.email] });
+  readonly kpiTotal = computed(() => this.projects().length);
+  readonly kpiFiltered = computed(() => this.filteredProjects().length);
+  readonly kpiActiveStatuses = computed(() => {
+    const activeLike = ['approved', 'active', 'in_review', 'in progress'];
+    return this.projects().filter((p) =>
+      activeLike.includes((p.status ?? '').trim().toLowerCase())
+    ).length;
+  });
 
-  expandedProjectId: number | null = null;
-  editingProjectId: number | null = null;
-  showCreatePanel = false;
+  readonly hasActiveFilters = computed(
+    () => !!this.searchTerm().trim() || !!this.filterValue().trim()
+  );
+
   pendingDelete: IProject | null = null;
-  pendingSave = false;
-  isSaving = false;
   isDeleting = false;
 
   ngOnInit(): void {
@@ -103,7 +120,8 @@ export class ProjectComponent implements OnInit {
       this.router,
       this.destroyRef,
       this.searchTerm,
-      this.listPage
+      this.listPage,
+      this.filterValue
     );
     this.getProjects();
   }
@@ -134,20 +152,12 @@ export class ProjectComponent implements OnInit {
         }
         this.isLoading.set(false);
         this.hasLoaded.set(true);
-      } });
+      },
+    });
   }
 
-  onEdit(id: number) {
-    const project = this.projects().find((p) => p.projectId === id);
-    if (!project) {
-      return;
-    }
-    this.showCreatePanel = false;
-    this.editingProjectId = id;
-    this.expandedProjectId = id;
-    this.projectForm.patchValue({
-      ...project,
-      startDate: project.startDate ? project.startDate.substring(0, 10) : '' });
+  startCreate() {
+    void this.router.navigateByUrl('/new-project');
   }
 
   onDelete(id: number) {
@@ -173,9 +183,6 @@ export class ProjectComponent implements OnInit {
           title: 'Project deleted',
           description: `${projectName} has been removed.`,
         });
-        if (this.expandedProjectId === projectId) {
-          this.expandedProjectId = null;
-        }
       },
       error: () => {
         this.isDeleting = false;
@@ -194,180 +201,20 @@ export class ProjectComponent implements OnInit {
     this.pendingDelete = null;
   }
 
-  closeExpanded() {
-    this.expandedProjectId = null;
-    this.cancelEdit();
-  }
-
-  toggleExpand(projectId: number | null | undefined) {
-    const target = projectId ?? null;
-    this.expandedProjectId = this.expandedProjectId === target ? null : target;
-    if (this.expandedProjectId !== this.editingProjectId) {
-      this.cancelEdit();
-    }
-  }
-
-  startCreate() {
-    this.isSaving = false;
-    this.showCreatePanel = true;
-    this.editingProjectId = null;
-    this.expandedProjectId = null;
-    const today = new Date().toISOString().substring(0, 10);
-    this.projectForm.reset({
-      projectId: null,
-      projectName: '',
-      clientName: '',
-      startDate: today,
-      leadByEmpId: null,
-      contactPerson: '',
-      contactNo: '',
-      emailId: '' });
-  }
-
-  closeCreatePanel() {
-    this.isSaving = false;
-    this.showCreatePanel = false;
-  }
-
-  cancelEdit() {
-    this.isSaving = false;
-    this.pendingSave = false;
-    this.editingProjectId = null;
-    this.projectForm.reset({
-      projectId: null,
-      projectName: '',
-      clientName: '',
-      startDate: '',
-      leadByEmpId: null,
-      contactPerson: '',
-      contactNo: '',
-      emailId: '',
-    });
-  }
-
   updateSearch(term: string) {
     this.listQuery.setSearch(term);
   }
 
+  setStatusFilter(value: string) {
+    this.listQuery.setFilter(value);
+  }
+
+  clearListFilters() {
+    this.listQuery.clearFilters();
+  }
+
   goToPage(page: number) {
     this.listQuery.setPage(page);
-  }
-
-  onSave() {
-    if (this.projectForm.invalid) {
-      this.toast.error({
-        title: 'Incomplete details',
-        description: 'Please fill all required fields before saving.',
-      });
-      return;
-    }
-    if (this.isSaving) {
-      return;
-    }
-    const projectId = this.projectForm.value.projectId;
-    if (projectId) {
-      this.pendingSave = true;
-      return;
-    }
-    this.runCreate();
-  }
-
-  dismissSave() {
-    if (this.isSaving) {
-      return;
-    }
-    this.pendingSave = false;
-  }
-
-  confirmSave() {
-    if (this.projectForm.invalid || this.isSaving) {
-      return;
-    }
-    const project: IProject = {
-      ...this.projectForm.value,
-      startDate: this.projectForm.value.startDate,
-    };
-    if (!project.projectId) {
-      this.pendingSave = false;
-      this.runCreate();
-      return;
-    }
-    this.isSaving = true;
-    this.masterSrv.updateProject(project).subscribe({
-      next: () => {
-        this.masterSrv.getAllProjects().subscribe({
-          next: (res) => {
-            this.projectsSignal.set(res ?? []);
-            this.isSaving = false;
-            this.pendingSave = false;
-            this.cancelEdit();
-            this.toast.success({
-              title: 'Project updated',
-              description: 'Changes have been saved successfully.',
-            });
-          },
-          error: () => {
-            this.isSaving = false;
-            this.pendingSave = false;
-            this.toast.error({
-              title: 'Update failed',
-              description: 'Saved on server but the list could not refresh.',
-            });
-          },
-        });
-      },
-      error: () => {
-        this.isSaving = false;
-        this.toast.error({
-          title: 'Update failed',
-          description: 'Unable to update the project right now.',
-        });
-      },
-    });
-  }
-
-  private runCreate() {
-    const project: IProject = {
-      ...this.projectForm.value,
-      startDate: this.projectForm.value.startDate,
-    };
-    this.isSaving = true;
-    this.masterSrv.saveProject(project as any).subscribe({
-      next: () => {
-        this.masterSrv.getAllProjects().subscribe({
-          next: (res) => {
-            this.projectsSignal.set(res ?? []);
-            this.isSaving = false;
-            this.showCreatePanel = false;
-            this.cancelEdit();
-            this.toast.success({
-              title: 'Project created',
-              description: 'A new project is now tracked in the system.',
-            });
-          },
-          error: () => {
-            this.isSaving = false;
-            this.showCreatePanel = false;
-            this.toast.error({
-              title: 'Creation failed',
-              description: 'Created but the list could not refresh.',
-            });
-          },
-        });
-      },
-      error: () => {
-        this.isSaving = false;
-        this.toast.error({
-          title: 'Creation failed',
-          description: 'Unable to create project right now.',
-        });
-      },
-    });
-  }
-
-  saveDialogTitle(): string {
-    const name = this.projectForm.value?.projectName?.trim();
-    return name ? `Save Changes To ${name}?` : 'Save Project Changes?';
   }
 
   formattedDate(date: string | null | undefined) {
