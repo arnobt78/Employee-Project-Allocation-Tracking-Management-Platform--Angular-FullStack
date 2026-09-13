@@ -48,9 +48,9 @@ Prefer shared tokens in `src/styles.css` and reusable components under `src/app/
 
 | Rule                           | Token / Component                          | Notes                                                                                              |
 | ------------------------------ | ------------------------------------------ | -------------------------------------------------------------------------------------------------- |
-| Control height                 | `.eh-control` / `.eh-select-trigger`       | Always `px-4 py-3`; never fixed `h-[…]` on SelectMenu triggers                                     |
+| Control height                 | `.eh-control` / `.eh-select-trigger`       | Shared fixed `h-11` + `px-4` + `leading-none` so SelectMenu selection cannot grow the trigger      |
 | Dropdown panel width           | `app-select-menu` + `.eh-select-menu-pane` | Panel width must match the trigger (responsive); set via CDK overlay + `--eh-select-trigger-width` |
-| Dropdown option leading visual | `SelectMenuOption.icon` or avatar          | Lucide icon when no avatar; avatars keep Robohash/`UserAvatar`                                     |
+| Dropdown option leading visual | `SelectMenuOption.icon` or avatar          | Avatar **or** Lucide icon (not both); login empty state may set `emptyIcon="users"`                 |
 | Icon + label buttons           | `gap-1`, `ubButton`, `.eh-btn-icon`        | One gap for icon↔text; layout gaps between sibling buttons may stay `gap-3`                        |
 | Button-looking actions         | `<button>`                                 | Do not use `<a ubButton>` for actions; real nav chrome may stay as links                           |
 

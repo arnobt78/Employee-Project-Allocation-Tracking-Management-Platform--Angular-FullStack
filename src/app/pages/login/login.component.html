@@ -8,29 +8,30 @@
 
 <div class="relative flex min-h-screen items-center justify-center p-4">
   <div
-    class="relative z-10 grid w-full max-w-9xl grid-cols-1 gap-4 lg:grid-cols-2 items-center"
+    class="relative z-10 grid w-full max-w-9xl grid-cols-1 items-center gap-4 lg:grid-cols-2"
   >
     <div
-      class="hidden w-full flex-col gap-4 lg:flex items-center justify-center"
+      class="hidden w-full flex-col items-center justify-center gap-3 lg:flex"
       aria-label="Employee Management"
     >
       <article
-        class="group w-full rounded-[28px] border border-indigo-400/30 bg-gradient-to-br from-[#3c1bff]/65 via-[#11163f]/85 to-[#07112a]/95 p-2 sm:p-4 text-white shadow-[0_30px_80px_rgba(99,102,241,0.35)] backdrop-blur-sm transition hover:border-indigo-300/50"
+        class="login-feature-enter feature-card group w-full rounded-[28px] border border-indigo-400/30 bg-gradient-to-br from-[#3c1bff]/65 via-[#11163f]/85 to-[#07112a]/95 p-2 text-white shadow-[0_30px_80px_rgba(99,102,241,0.35)] backdrop-blur-md transition hover:border-indigo-300/50 sm:p-4"
+        style="--login-stagger: 0"
       >
         <div class="flex items-start justify-between gap-4">
           <div>
             <span
-              class="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.35em] text-white/75 backdrop-blur-sm"
+              class="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.35em] text-white/75 backdrop-blur-md"
             >
               Employee Management
             </span>
             <h1
-              class="mt-2 text-balance break-words text-2xl sm:text-2xl font-medium leading-tight text-white drop-shadow-xl"
+              class="mt-2 text-balance break-words text-2xl font-medium leading-tight text-white drop-shadow-xl sm:text-2xl"
             >
               Streamline Your Team Operations
             </h1>
             <p
-              class="mt-2 max-w-xl break-words text-sm sm:text-md text-white/70 drop-shadow"
+              class="mt-2 max-w-xl break-words text-sm text-white/70 drop-shadow sm:text-md"
             >
               Monitor projects, empower your people, and keep everything moving
               in one place with insights that surface exactly when you need
@@ -39,31 +40,25 @@
           </div>
         </div>
       </article>
-      @for (feature of featureHighlights; track feature.title) {
+
+      @for (feature of featureHighlights; track feature.title; let i = $index) {
         <article
-          class="group w-full rounded-[28px] border border-sky-400/30 bg-gradient-to-br from-[#3c1bff]/65 via-[#11163f]/85 to-[#07112a]/95 p-2 sm:p-4 text-white shadow-[0_30px_80px_rgba(2,132,199,0.35)] backdrop-blur-sm transition hover:border-sky-300/50"
+          class="login-feature-enter feature-card group w-full rounded-[28px] border bg-gradient-to-br p-2 text-white backdrop-blur-md transition sm:p-4"
+          [ngClass]="featureToneClasses[feature.tone]"
+          [style.--login-stagger]="i + 1"
         >
           <div class="flex items-center gap-4">
             <span
-              class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm shadow-inner shadow-primary/30"
+              class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white shadow-inner shadow-primary/30 backdrop-blur-md"
+              aria-hidden="true"
             >
-              <svg
-                class="h-5 w-5 text-white"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M5 13l4 4L19 7" />
-              </svg>
+              <lucide-icon [name]="feature.icon" [size]="20"></lucide-icon>
             </span>
             <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium text-white break-words">
+              <p class="break-words text-sm font-medium text-white">
                 {{ feature.title }}
               </p>
-              <p class="text-xs text-white/65 break-words">
+              <p class="break-words text-xs text-white/65">
                 {{ feature.description }}
               </p>
             </div>
@@ -81,49 +76,96 @@
         aria-hidden="true"
       ></div>
       <div
-        class="relative z-10 flex w-full sm:max-w-xl flex-col rounded-[30px] border border-purple-400/30 bg-gradient-to-br from-[#3c1bff]/65 via-[#11163f]/85 to-[#07112a]/95 p-2 sm:p-4 lg:p-8 shadow-[0_45px_140px_rgba(168,85,247,0.4)] backdrop-blur-sm transition hover:border-purple-300/50"
+        class="relative z-10 flex w-full flex-col rounded-[30px] border border-purple-400/30 bg-gradient-to-br from-[#3c1bff]/65 via-[#11163f]/85 to-[#07112a]/95 p-2 shadow-[0_45px_140px_rgba(168,85,247,0.4)] backdrop-blur-md transition hover:border-purple-300/50 sm:max-w-xl sm:p-4"
       >
-        <article
-          class="mb-6 rounded-[24px] border border-white/10 bg-white/5 p-2 sm:p-4 backdrop-blur-sm"
+        <div
+          class="login-feature-enter mb-4 text-center"
+          style="--login-stagger: 0"
         >
-          <div class="flex flex-col items-center text-center">
-            <h2 class="text-xl sm:text-2xl font-medium text-white break-words">
-              Let's work together!
-            </h2>
-            <p class="mt-2 text-xs sm:text-sm text-white/70 break-words">
-              Welcome back! Enter your credentials to continue.
-            </p>
-          </div>
-        </article>
+          <h2 class="break-words text-xl font-medium text-white sm:text-2xl">
+            Let's work together!
+          </h2>
+          <p class="break-words text-xs text-white/70 sm:text-sm">
+            Welcome back! Enter your credentials to continue.
+          </p>
+        </div>
 
-        <form class="space-y-5" (submit)="$event.preventDefault()">
+        <form class="space-y-4" (submit)="$event.preventDefault()">
           <article
-            class="rounded-[24px] border border-amber-400/30 bg-gradient-to-br from-amber-500/20 via-amber-500/10 to-amber-500/5 p-4 shadow-[0_20px_60px_rgba(245,158,11,0.25)] backdrop-blur-sm transition hover:border-amber-300/50"
+            class="login-feature-enter rounded-[24px] border border-amber-400/30 bg-gradient-to-br from-amber-500/20 via-amber-500/10 to-amber-500/5 p-4 shadow-[0_20px_60px_rgba(245,158,11,0.25)] backdrop-blur-md transition hover:border-amber-300/50"
+            style="--login-stagger: 1"
           >
-            <div class="space-y-2">
+            <div class="space-y-1">
               <label
-                class="text-xs font-medium uppercase tracking-[0.35em] text-white/80 break-words"
+                class="break-words text-xs font-medium uppercase tracking-[0.35em] text-white/80"
                 >Test Accounts To Login With</label
               >
               <app-select-menu
                 [options]="accountOptions()"
                 placeholder="Select Test Account"
+                emptyIcon="users"
                 [(ngModel)]="selectedTestAccount"
                 name="testAccount"
                 (selectionChange)="onTestAccountSelect($event)"
               ></app-select-menu>
-              <p class="text-xs text-amber-100/80">
-                Demo credentials: {{ demoCredentials.username }} /
-                {{ demoCredentials.password }}
+              <p
+                class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-amber-100/80"
+              >
+                <span>Demo credentials:</span>
+                <span
+                  class="inline-flex items-center gap-1 font-medium text-amber-50"
+                >
+                  {{ demoCredentials.username }}
+                  <button
+                    type="button"
+                    class="inline-flex items-center text-amber-100/90 transition hover:text-white"
+                    [attr.aria-label]="
+                      'Copy username ' + demoCredentials.username
+                    "
+                    (click)="
+                      copyCredential('username', demoCredentials.username)
+                    "
+                  >
+                    <lucide-icon
+                      [name]="
+                        copiedField === 'username' ? 'copy-check' : 'copy'
+                      "
+                      [size]="14"
+                    ></lucide-icon>
+                  </button>
+                </span>
+                <span class="text-amber-200/50" aria-hidden="true">·</span>
+                <span
+                  class="inline-flex items-center gap-1 font-medium text-amber-50"
+                >
+                  {{ demoCredentials.password }}
+                  <button
+                    type="button"
+                    class="inline-flex items-center text-amber-100/90 transition hover:text-white"
+                    [attr.aria-label]="'Copy password'"
+                    (click)="
+                      copyCredential('password', demoCredentials.password)
+                    "
+                  >
+                    <lucide-icon
+                      [name]="
+                        copiedField === 'password' ? 'copy-check' : 'copy'
+                      "
+                      [size]="14"
+                    ></lucide-icon>
+                  </button>
+                </span>
               </p>
             </div>
           </article>
+
           <article
-            class="rounded-[24px] border border-blue-400/30 bg-gradient-to-br from-blue-500/20 via-blue-500/10 to-blue-500/5 p-4 shadow-[0_20px_60px_rgba(59,130,246,0.25)] backdrop-blur-sm transition hover:border-blue-300/50"
+            class="login-feature-enter rounded-[24px] border border-blue-400/30 bg-gradient-to-br from-blue-500/20 via-blue-500/10 to-blue-500/5 p-4 shadow-[0_20px_60px_rgba(59,130,246,0.25)] backdrop-blur-md transition hover:border-blue-300/50"
+            style="--login-stagger: 2"
           >
-            <div class="space-y-2">
+            <div>
               <label
-                for="email"
+                for="username"
                 class="text-xs font-medium uppercase tracking-[0.35em] text-white/80"
                 >Username</label
               >
@@ -138,10 +180,12 @@
               />
             </div>
           </article>
+
           <article
-            class="rounded-[24px] border border-emerald-400/30 bg-gradient-to-br from-emerald-500/20 via-emerald-500/10 to-emerald-500/5 p-4 shadow-[0_20px_60px_rgba(16,185,129,0.25)] backdrop-blur-sm transition hover:border-emerald-300/50"
+            class="login-feature-enter rounded-[24px] border border-emerald-400/30 bg-gradient-to-br from-emerald-500/20 via-emerald-500/10 to-emerald-500/5 p-4 shadow-[0_20px_60px_rgba(16,185,129,0.25)] backdrop-blur-md transition hover:border-emerald-300/50"
+            style="--login-stagger: 3"
           >
-            <div class="space-y-2">
+            <div>
               <label
                 for="password"
                 class="text-xs font-medium uppercase tracking-[0.35em] text-white/80"
@@ -158,13 +202,14 @@
               />
             </div>
           </article>
+
           <button
             type="button"
             (click)="onLogin()"
             [disabled]="isSubmitting"
             ubButton
-            size="lg"
-            class="eh-btn-icon w-full rounded-2xl border border-white/10 bg-gradient-to-r from-purple-500/70 via-pink-500/50 to-rose-500/30 px-2 sm:px-4 py-3 text-base font-medium text-white shadow-[0_20px_60px_rgba(168,85,247,0.45)] backdrop-blur-sm transition duration-200 hover:border-purple-300/40 hover:from-purple-500/80 hover:via-pink-500/60 hover:to-rose-500/40 hover:shadow-[0_25px_70px_rgba(168,85,247,0.55)] disabled:opacity-80"
+            class="login-feature-enter eh-btn-icon inline-flex h-auto min-h-0 w-full items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-r from-purple-500/70 via-pink-500/50 to-rose-500/30 px-2 py-3 text-sm font-medium text-white shadow-[0_20px_60px_rgba(168,85,247,0.45)] backdrop-blur-md transition duration-200 hover:border-purple-300/40 hover:from-purple-500/80 hover:via-pink-500/60 hover:to-rose-500/40 hover:shadow-[0_25px_70px_rgba(168,85,247,0.55)] disabled:opacity-80 sm:px-4"
+            style="--login-stagger: 4"
           >
             @if (isSubmitting) {
               <lucide-icon
@@ -179,24 +224,24 @@
             }
           </button>
         </form>
-        <article
-          class="mt-6 rounded-[20px] border border-white/10 bg-white/5 p-4 backdrop-blur-sm"
+
+        <p
+          class="login-feature-enter mt-4 text-center text-xs text-white/60"
+          style="--login-stagger: 5"
         >
-          <div class="text-center text-xs text-white/60 break-words">
-            By continuing you agree to our
-            <a
-              href="#"
-              class="text-purple-300 hover:text-purple-200 transition-colors"
-              >Terms</a
-            >
-            and
-            <a
-              href="#"
-              class="text-purple-300 hover:text-purple-200 transition-colors"
-              >Privacy Policy</a
-            >.
-          </div>
-        </article>
+          By continuing you agree to our
+          <a
+            href="#"
+            class="text-purple-300 transition-colors hover:text-purple-200"
+            >Terms</a
+          >
+          and
+          <a
+            href="#"
+            class="text-purple-300 transition-colors hover:text-purple-200"
+            >Privacy Policy</a
+          >.
+        </p>
       </div>
     </section>
   </div>

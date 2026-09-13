@@ -36,13 +36,13 @@ export interface SelectMenuOption {
   template: `
     <ul
       role="listbox"
-      class="eh-scrollbar box-border w-full max-h-72 overflow-auto rounded-2xl border border-white/15 bg-slate-950/95 p-2 shadow-[0_25px_70px_rgba(9,14,33,0.65)] backdrop-blur-md"
+      class="eh-scrollbar box-border flex w-full max-h-72 flex-col gap-1 overflow-auto rounded-2xl border border-white/15 bg-slate-950/95 p-2 shadow-[0_25px_70px_rgba(9,14,33,0.65)] backdrop-blur-md"
     >
       @for (option of options; track option.value; let index = $index) {
         <li
           role="option"
           [attr.aria-selected]="option.value === selectedValue"
-          class="flex cursor-pointer items-center gap-1 rounded-xl px-3 py-2.5 text-sm transition"
+          class="flex cursor-pointer items-center gap-1 rounded-xl px-3 py-1.5 text-sm transition"
           [class.bg-white/10]="option.value === selectedValue"
           [class.text-white]="option.value === selectedValue"
           [class.text-white/80]="option.value !== selectedValue"
@@ -55,7 +55,7 @@ export interface SelectMenuOption {
               [seed]="option.imageSeed || option.value"
               [imageUrl]="option.imageUrl ?? null"
               [label]="option.label"
-              [size]="36"
+              [size]="28"
               [alt]="''"
             ></app-user-avatar>
           } @else {
@@ -65,21 +65,28 @@ export interface SelectMenuOption {
               class="shrink-0 text-white/70"
             ></lucide-icon>
           }
-          <div class="min-w-0 flex-1">
+          <div class="min-w-0 flex-1 leading-tight">
             <p class="truncate text-sm font-medium">{{ option.label }}</p>
             @if (option.subtitle) {
-              <p class="truncate text-xs opacity-70">{{ option.subtitle }}</p>
+              <p class="truncate text-xs text-white/50">{{ option.subtitle }}</p>
             }
           </div>
+          @if (option.value === selectedValue) {
+            <lucide-icon
+              name="check"
+              [size]="16"
+              class="shrink-0 text-white/80"
+            ></lucide-icon>
+          }
         </li>
       }
       @if (showClear) {
         <li
           role="option"
-          class=" flex cursor-pointer items-center gap-1 rounded-xl border border-white/10 px-3 py-2.5 text-sm text-rose-200 transition hover:bg-white/10"
+          class="flex cursor-pointer items-center gap-1 rounded-xl border-t border-white/10 px-3 py-1.5 text-sm text-white/60 transition hover:bg-white/10 hover:text-white/80"
           (click)="pick('clear')"
         >
-          <lucide-icon name="eraser" [size]="16" class="shrink-0"></lucide-icon>
+          <lucide-icon name="x" [size]="16" class="shrink-0"></lucide-icon>
           <span class="font-medium">Clear Selection</span>
         </li>
       }
@@ -105,6 +112,14 @@ class SelectMenuPanelComponent {
       multi: true,
     },
   ],
+  styles: [
+    `
+      :host {
+        display: block;
+        width: 100%;
+      }
+    `,
+  ],
   template: `
     <button
       #trigger
@@ -116,28 +131,43 @@ class SelectMenuPanelComponent {
       (click)="toggle()"
       (keydown)="onTriggerKeydown($event)"
     >
-      <span class="flex min-w-0 flex-1 items-center gap-1">
+      <span class="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
         @if (selectedOption(); as selected) {
           @if (selected.imageUrl || selected.imageSeed) {
             <app-user-avatar
               [seed]="selected.imageSeed || selected.value"
               [imageUrl]="selected.imageUrl ?? null"
               [label]="selected.label"
-              [size]="24"
+              [size]="20"
               [alt]="''"
             ></app-user-avatar>
           } @else if (selected.icon) {
             <lucide-icon
               [name]="selected.icon"
-              [size]="16"
+              [size]="20"
               class="shrink-0 text-white/70"
             ></lucide-icon>
           }
-          <span class="min-w-0 truncate font-medium text-white">{{
-            selected.label
-          }}</span>
+          <span
+            class="min-w-0 flex-1 truncate whitespace-nowrap text-left text-sm font-normal leading-none"
+          >
+            <span class="text-white">{{ selected.label }}</span>
+            @if (selected.subtitle) {
+              <span class="text-white/50"> · {{ selected.subtitle }}</span>
+            }
+          </span>
         } @else {
-          <span class="truncate text-white/40">{{ placeholder }}</span>
+          @if (emptyIcon) {
+            <lucide-icon
+              [name]="emptyIcon"
+              [size]="20"
+              class="shrink-0 text-white/50"
+            ></lucide-icon>
+          }
+          <span
+            class="truncate whitespace-nowrap text-sm font-normal leading-none text-white/40"
+            >{{ placeholder }}</span
+          >
         }
       </span>
       <lucide-icon
@@ -159,6 +189,8 @@ export class SelectMenuComponent
 
   @Input() options: SelectMenuOption[] = [];
   @Input() placeholder = 'Select An Option';
+  /** Lucide icon on the left when empty (e.g. `users` on login). */
+  @Input() emptyIcon = '';
   @Input() disabled = false;
   /** When false, hide Clear Selection (filters / required fields). */
   @Input() clearable = true;

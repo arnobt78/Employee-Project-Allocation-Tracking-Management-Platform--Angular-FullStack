@@ -1,44 +1,42 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 3–4 delivery — page shell + list/dashboard redesign  
+**Phase / Stage:** Stage 3–4 delivery — login polish + SelectMenu stability  
 **Gate:** GATE-0015 **COMPLETE**; GATE-0001 formally still open in APPROVALS  
-**Status:** READY — next human action optional (push / GATE-0001)  
+**Status:** READY — next human action optional (push / GATE-0001 / per-page polish)  
 **Updated:** 2026-09-13
 
 ---
 
 ## Resume Point
 
-**Last completed (repo):** Page shell redesign — shared `list-page-shell` / `kpi-stat-card` / `list-toolbar`; Employees/Projects/Project Team KPIs + URL `?f=` filters; Projects route-only create/edit; Dashboard badge strip → KPI cards; chrome-first loading; list-query `f` length-capped; toolbar select sync via ngModel.
+**Last completed (repo):** Login page polish + SelectMenu height-stable account picker — feature cards (tones + Lucide + stagger); demo credential copy; shared `h-11` controls; single-line selected `label · subtitle`; avatar ring; panel check + Clear `x`.
 
-**Next exact action:** Optional `git push`. Formal GATE-0001 closure still open.
+**Next exact action:** Optional `git push`. Later: polish remaining private pages. Formal GATE-0001 closure still open.
 
 **Resume prompt:**
 
 ```text
-Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md. Continue from C1 after page shell redesign.
+Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md. Continue from C1 after login polish.
 ```
 
 ---
 
-## Validation Completed (page shell redesign 2026-09-13)
+## Validation Completed (login polish 2026-09-13)
 
 | Check | Result |
 |---|---|
-| `npm audit` | PASS (0) |
 | `npm run lint` | PASS |
 | `npm test` (ChromeHeadless) | PASS (23/23) |
-| `npm run build` | PASS (~1.08 MB initial) |
-| Browser smoke | PASS — login; dashboard KPIs; Employees/Projects/Project Team shell+Lucide search; Add Project → `/new-project`; Details → `/update-project/:id`; filter `?f=`; insights/calendar/api chrome-first |
-| API smoke | PASS — Login + lists + GetSchedule + GetApiDocumentation/Status 200; unauth GetAllEmployees 401 |
+| `npm run build` | PASS (~1.09 MB initial) |
 | verify-deep | PASS WITH WARNINGS |
-| review-security | PASS WITH WARNINGS (early chrome UX disclosure; remediated `f` length cap) |
+| review-security | PASS (no medium+) |
 
 ---
 
 ## Deferred
 
+- Per-page UI polish (remaining private routes)
 - Formal GATE-0001 approval record closure
 - Confirm Vercel dashboard Node 24 (RISK-0013)
 - Full remaining-app `*ngIf`/`*ngFor` → `@if`/`@for`

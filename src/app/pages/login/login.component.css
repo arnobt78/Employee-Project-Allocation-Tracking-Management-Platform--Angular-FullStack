@@ -24,3 +24,25 @@
 .feature-card:hover::before {
   opacity: 1;
 }
+
+@keyframes loginFeatureIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-feature-enter {
+  animation: loginFeatureIn 0.55s ease-out both;
+  animation-delay: calc(var(--login-stagger, 0) * 90ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-feature-enter {
+    animation: none;
+  }
+}

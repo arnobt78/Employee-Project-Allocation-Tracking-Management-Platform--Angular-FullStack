@@ -12,6 +12,16 @@ import { robohashUrl } from '@/app/lib/media/robohash';
   selector: 'app-user-avatar',
   standalone: true,
   imports: [CommonModule],
+  styles: [
+    `
+      :host {
+        display: inline-flex;
+        flex-shrink: 0;
+        line-height: 0;
+        vertical-align: middle;
+      }
+    `,
+  ],
   template: `
     @if (src()) {
       <img
@@ -19,7 +29,7 @@ import { robohashUrl } from '@/app/lib/media/robohash';
         [alt]="alt"
         [width]="size"
         [height]="size"
-        class="rounded-full object-cover bg-white/10"
+        class="block shrink-0 rounded-full border border-white/25 object-cover bg-white/10"
         [style.width.px]="size"
         [style.height.px]="size"
         referrerpolicy="no-referrer"
@@ -27,7 +37,7 @@ import { robohashUrl } from '@/app/lib/media/robohash';
       />
     } @else {
       <span
-        class="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 text-xs font-medium text-white/80"
+        class="inline-flex shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-xs font-medium text-white/80 leading-none"
         [style.width.px]="size"
         [style.height.px]="size"
         aria-hidden="true"

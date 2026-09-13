@@ -1,5 +1,35 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-13 — Login polish + SelectMenu stability (commit-ready)
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | Final gate |
+| `npm test` (ChromeHeadless) | **PASS (23/23)** | Includes login spec |
+| `npm run build` | **PASS** | ~1.09 MB initial |
+| verify-deep | **PASS WITH WARNINGS** | Independent verifier; Sign In not locked to `h-11` (acceptable) |
+| review-security | **PASS** | No medium+; demo credential copy is intentional existing exposure |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Login feature cards (tones + Lucide + stagger) | Done |
+| Demo credentials copy / copy-check | Done |
+| SelectMenu: `emptyIcon`, single-line selected label, fixed `h-11` | Done |
+| Avatar ring + size match empty icon (20) | Done |
+| Panel: gap-1, checkmark, Clear with `x` | Done |
+
+### eval_gate_status
+
+N/A (user-directed UX polish)
+
+---
+
 ## Session 2026-09-13 — Page shell + list/dashboard redesign (commit-ready)
 
 **Node:** v24.x

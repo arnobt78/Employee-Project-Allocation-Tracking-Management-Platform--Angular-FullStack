@@ -1,5 +1,12 @@
 # Changelog — Agile V project memory
 
+## 2026-09-13 — Login polish + SelectMenu height stability
+
+- Login: feature cards (tones + Lucide + stagger), demo credential copy, tighter field stacks
+- SelectMenu: `emptyIcon`, single-line selected `label · subtitle`, shared `h-11` with `.eh-control`
+- Avatar ring + size 20 matching empty icon; panel checkmark + Clear `x` with `gap-1`
+- verify-deep PASS WITH WARNINGS; review-security PASS; lint/test(23)/build PASS
+
 ## 2026-09-13 — Page shell + list/dashboard redesign
 
 - Shared `list-page-shell`, `kpi-stat-card`, `list-toolbar` (Lucide search); list-query `?f=` with length cap
