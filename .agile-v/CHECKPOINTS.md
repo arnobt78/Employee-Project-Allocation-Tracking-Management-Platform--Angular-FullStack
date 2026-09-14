@@ -7,6 +7,7 @@
 | CP-0013 | Human-Decision | GATE-0013 | `c1-gate13-ui-lockfile-2026-09-11` | **RESOLVED** | 2026-09-11 | UI polish + lockfile; verify-deep + security + commit-ready complete |
 | CP-0014 | Human-Decision | GATE-0014 | `c1-gate14-cleanup-budget-2026-09-11` | **RESOLVED** | 2026-09-11 | Dead-code + budget; verify-deep + security + commit-ready complete |
 | CP-0015 | Human-Decision | GATE-0015 | `c1-gate15-refresh-ux-2026-09-13` | **RESOLVED** | 2026-09-13 | Shell/nav FOUC + Phase A/B Zod/list-query; verify-deep + security + commit-ready |
+| CP-0016 | Human-Decision | GATE-0016 | `c1-gate16-ui-polish-2026-09-14` | **PENDING** | 2026-09-14 | Await screenshots + Option A/B/C; no coding until approved |
 
 ## Resume rules
 

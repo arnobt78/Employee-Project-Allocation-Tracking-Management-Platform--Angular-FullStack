@@ -86,6 +86,26 @@
 
 ---
 
+## Wave — Per-page UI polish (GATE-0016 — PENDING screenshots)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0032 | Intake screenshot batch; map issues → pages/components | REQ-0119 | BLOCKED | Human will share screenshots in next prompt |
+| TASK-0033 | Implement approved polish slices only (preserve shell/tokens/`h-11`) | REQ-0119 | BLOCKED | No coding until GATE-0016 approval |
+| TASK-0034 | verify-deep + commit-ready for approved slice(s) | REQ-0120 | BLOCKED | After implementation |
+
+---
+
+## Recommended approval options (GATE-0016)
+
+**Option A — Single-page slice:** Approve polish for only the pages shown in the next screenshot batch.  
+**Option B — Batch wave:** Approve all pages called out in that batch in one implement → verify → commit-ready cycle.  
+**Option C — Hold:** Keep planning only; no coding until further screenshots/instructions.
+
+Default recommendation: **Option A** after screenshots arrive (smallest blast radius).
+
+---
+
 ## Recommended approval options
 
 **Option A — Refresh FOUC + shell stability only:** Approve TASK-0020…0022 (REQ-0113–0114).  

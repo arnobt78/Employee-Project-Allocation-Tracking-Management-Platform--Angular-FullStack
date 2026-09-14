@@ -72,6 +72,15 @@ Legend: `BASELINE` = verified as-built behavior · `GAP` = docs/code mismatch or
 
 ---
 
+## UX — per-page UI polish (GATE-0016, screenshot-driven)
+
+| ID | Statement | Status | Notes |
+|---|---|---|---|
+| REQ-0119 | Private and guest pages MAY receive incremental visual polish (spacing, typography, controls, cards) driven by human screenshots; changes MUST preserve existing architecture (`MasterService`, shared UI tokens, shell/list patterns) and MUST NOT expand height of shared controls beyond documented tokens (e.g. `.eh-control` / `.eh-select-trigger` `h-11`). | PROPOSED | Awaiting screenshot batch; scope frozen per approval |
+| REQ-0120 | Each polish slice MUST keep layout shell stable (no full-page loader regressions) and MUST pass lint + relevant tests + production build before commit-ready. | PROPOSED | Same validation bar as GATE-0015 |
+
+---
+
 ## Explicit non-goals (unless human expands scope)
 
 - Replacing Angular SPA with Next.js/SSR

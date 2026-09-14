@@ -1,5 +1,11 @@
 # Changelog — Agile V project memory
 
+## 2026-09-14 — GATE-0016 planning (awaiting screenshots)
+
+- Formalized per-page UI polish as GATE-0016 / REQ-0119–0120 / TASK-0032–0034 / CP-0016
+- Halted at Human Gate; coding blocked until screenshots + Option A/B/C
+- Repo: `main` @ `555e5d5` (login polish); minor uncommitted login typography tweak noted
+
 ## 2026-09-13 — Login polish + SelectMenu height stability
 
 - Login: feature cards (tones + Lucide + stagger), demo credential copy, tighter field stacks
