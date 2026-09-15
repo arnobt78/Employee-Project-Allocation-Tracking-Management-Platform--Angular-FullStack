@@ -2,7 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { AppIconComponent } from './app-icon.component';
 
-export type KpiStatTone = 'sky' | 'emerald' | 'amber' | 'violet' | 'rose' | 'slate';
+export type KpiStatTone =
+  | 'sky'
+  | 'emerald'
+  | 'amber'
+  | 'violet'
+  | 'rose'
+  | 'slate';
 
 @Component({
   selector: 'app-kpi-stat-card',
@@ -10,8 +16,8 @@ export type KpiStatTone = 'sky' | 'emerald' | 'amber' | 'violet' | 'rose' | 'sla
   imports: [CommonModule, AppIconComponent],
   template: `
     <article
-      class="flex items-center justify-between gap-3 rounded-[24px] border bg-gradient-to-br p-3 sm:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.25)]"
-      [ngClass]="toneClasses"
+      class="flex items-center justify-between gap-3 rounded-[24px] border bg-gradient-to-br p-3 sm:p-4 transition hover:brightness-110"
+      [ngClass]="[toneClasses, glowClass]"
     >
       <div class="min-w-0">
         <p class="text-xs text-white/60 sm:text-sm">{{ label }}</p>
@@ -54,6 +60,23 @@ export class KpiStatCardComponent {
         return 'border-rose-400/30 from-rose-500/25 via-rose-500/10 to-rose-500/5';
       default:
         return 'border-white/10 from-white/10 via-white/5 to-transparent';
+    }
+  }
+
+  get glowClass(): string {
+    switch (this.tone) {
+      case 'sky':
+        return 'shadow-[0_30px_80px_rgba(2,132,199,0.35)]';
+      case 'emerald':
+        return 'shadow-[0_30px_80px_rgba(16,185,129,0.3)]';
+      case 'amber':
+        return 'shadow-[0_30px_80px_rgba(245,158,11,0.28)]';
+      case 'violet':
+        return 'shadow-[0_30px_80px_rgba(139,92,246,0.32)]';
+      case 'rose':
+        return 'shadow-[0_30px_80px_rgba(244,63,94,0.28)]';
+      default:
+        return 'shadow-[0_20px_50px_rgba(0,0,0,0.25)]';
     }
   }
 }

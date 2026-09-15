@@ -11,9 +11,9 @@ export interface PrivatePageMeta {
 /** Static page chrome for instant refresh paint (matches app-page-header copy). */
 export const PRIVATE_PAGE_META: Record<string, PrivatePageMeta> = {
   '/dashboard': {
-    title: 'Dashboard',
+    title: 'Operations Command Center',
     subtitle:
-      'Monitor workforce, projects, and assignment health in one place',
+      'Live workforce capacity, delivery health, and assignment coverage across EmpowerHub',
     icon: 'layout-dashboard',
     skeleton: 'dashboard',
   },

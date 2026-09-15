@@ -11,9 +11,9 @@ import { UbButtonDirective } from './button';
     <footer class="eh-shell-footer">
       <div class="eh-shell-inner">
         <div
-          class="flex w-full flex-col items-center justify-between gap-3 py-2 text-xs text-muted-foreground sm:flex-row sm:py-2"
+          class="flex min-h-16 w-full flex-col items-center justify-center gap-3 py-4 text-xs text-muted-foreground sm:min-h-[4.5rem] sm:flex-row sm:justify-between sm:py-5"
         >
-          <p>&copy; {{ currentYear }}. All rights reserved.</p>
+          <p class="leading-none">&copy; {{ currentYear }}. All rights reserved.</p>
           <a
             [href]="helpUrl"
             target="_blank"

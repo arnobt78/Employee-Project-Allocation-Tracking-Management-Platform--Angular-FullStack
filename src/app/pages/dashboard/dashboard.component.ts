@@ -1,12 +1,21 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, TitleCasePipe } from '@angular/common';
 import { MasterService } from '../../service/master.service';
-import { IParentDept, IProject, IProjectEmployee } from '../../model/interface/master';
+import {
+  IParentDept,
+  IProject,
+  IProjectEmployee,
+} from '../../model/interface/master';
 import { Employee } from '../../model/class/Employee';
-import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
 import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 import { KpiStatCardComponent } from '@/app/components/ui/kpi-stat-card.component';
+import {
+  DashboardChartComponent,
+  DashboardChartSlice,
+} from '@/app/components/ui/dashboard-chart.component';
+import { DashboardSkeletonComponent } from '@/app/components/ui/dashboard-skeleton.component';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 
 interface DashboardSnapshot {
@@ -21,11 +30,14 @@ interface DashboardSnapshot {
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    ListSkeletonComponent,
     DatePipe,
+    TitleCasePipe,
     UserAvatarComponent,
     PageHeaderComponent,
     KpiStatCardComponent,
+    DashboardChartComponent,
+    DashboardSkeletonComponent,
+    AppIconComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -53,10 +65,20 @@ export class DashboardComponent implements OnInit {
     inactiveAssignments: number;
   } | null = null;
 
+  projectStatusSlices: DashboardChartSlice[] = [];
+  assignmentSlices: DashboardChartSlice[] = [];
+
   constructor(private masterService: MasterService) {}
 
   ngOnInit(): void {
     this.loadPageData();
+  }
+
+  get opsSummary(): string {
+    const emp = this.dashboardData?.totalEmployee ?? 0;
+    const proj = this.dashboardData?.totalProject ?? 0;
+    const active = this.dashboardData?.activeProjectEmployees ?? 0;
+    return `${emp} people · ${proj} projects · ${active} actively assigned`;
   }
 
   private loadPageData(): void {
@@ -240,6 +262,7 @@ export class DashboardComponent implements OnInit {
         activeAssignments: 0,
         inactiveAssignments: 0,
       };
+      this.refreshChartSlices();
       return;
     }
 
@@ -250,12 +273,8 @@ export class DashboardComponent implements OnInit {
       (p) => !p.archivedAt || p.archivedAt === ''
     );
 
-    const activeProjectEmployees = this.projectEmployees.filter(
-      (pe) =>
-        pe.isActive === 'Y' ||
-        pe.isActive === 'y' ||
-        pe.isActive === 'true' ||
-        String(pe.isActive).toLowerCase() === 'true'
+    const activeProjectEmployees = this.projectEmployees.filter((pe) =>
+      this.isActive(pe.isActive)
     );
 
     const projectIdsWithActiveAssignments = new Set(
@@ -269,7 +288,9 @@ export class DashboardComponent implements OnInit {
     const nonAssignedProjects: IProject[] = [];
 
     nonArchivedProjects.forEach((p) => {
-      const hasActiveAssignments = projectIdsWithActiveAssignments.has(p.projectId);
+      const hasActiveAssignments = projectIdsWithActiveAssignments.has(
+        p.projectId
+      );
       const hasLead = p.leadByEmpId != null;
 
       if (hasActiveAssignments) {
@@ -305,6 +326,56 @@ export class DashboardComponent implements OnInit {
       activeAssignments: activeAssignmentsCount,
       inactiveAssignments: inactiveAssignmentsCount,
     };
+    this.refreshChartSlices();
+  }
+
+  private refreshChartSlices(): void {
+    const stats = this.projectStats;
+    if (!stats) {
+      this.projectStatusSlices = [];
+      this.assignmentSlices = [];
+      return;
+    }
+    this.projectStatusSlices = [
+      {
+        label: 'Assigned active',
+        value: stats.assigned,
+        color: 'rgba(16, 185, 129, 0.85)',
+      },
+      {
+        label: 'Planning',
+        value: stats.planning,
+        color: 'rgba(139, 92, 246, 0.85)',
+      },
+      {
+        label: 'Inactive',
+        value: stats.inactive,
+        color: 'rgba(148, 163, 184, 0.75)',
+      },
+      {
+        label: 'Archived',
+        value: stats.archived,
+        color: 'rgba(100, 116, 139, 0.7)',
+      },
+    ].filter((s) => s.value > 0);
+
+    this.assignmentSlices = [
+      {
+        label: 'Active',
+        value: stats.activeAssignments,
+        color: 'rgba(56, 189, 248, 0.85)',
+      },
+      {
+        label: 'Inactive',
+        value: stats.inactiveAssignments,
+        color: 'rgba(244, 63, 94, 0.75)',
+      },
+      {
+        label: 'Unassigned projects',
+        value: stats.nonAssigned,
+        color: 'rgba(245, 158, 11, 0.8)',
+      },
+    ].filter((s) => s.value > 0);
   }
 
   private isActive(value: string | boolean | null | undefined): boolean {
@@ -320,5 +391,85 @@ export class DashboardComponent implements OnInit {
       return '';
     }
     return logo.startsWith('/') ? logo : `/${logo}`;
+  }
+
+  /** Dark raster logos (e.g. Operations gear) stay unreadable — prefer Lucide. */
+  preferColoredDeptIcon(name: string): boolean {
+    const key = (name || '').toLowerCase();
+    return key.includes('operat');
+  }
+
+  departmentIcon(name: string): string {
+    const key = (name || '').toLowerCase();
+    if (key.includes('engineer') || key.includes('tech') || key.includes('it')) {
+      return 'zap';
+    }
+    if (key.includes('human') || key.includes('hr') || key.includes('people')) {
+      return 'users';
+    }
+    if (key.includes('operat') || key.includes('admin')) {
+      return 'settings';
+    }
+    if (key.includes('sales') || key.includes('market')) {
+      return 'chart-column';
+    }
+    if (key.includes('finance') || key.includes('account')) {
+      return 'activity';
+    }
+    return 'building-2';
+  }
+
+  departmentBlurb(dept: IParentDept): string {
+    if (dept.description?.trim()) {
+      return dept.description.trim();
+    }
+    const headcount = this.employees.filter(
+      (e) =>
+        (e.department || '').toLowerCase() ===
+        (dept.departmentName || '').toLowerCase()
+    ).length;
+    if (headcount > 0) {
+      return `${headcount} team member${headcount === 1 ? '' : 's'} in this division`;
+    }
+    if (dept.leadContact) {
+      return `Led by ${dept.leadContact}`;
+    }
+    return 'Parent division across the organization';
+  }
+
+  projectStatusIcon(status: string | undefined): string {
+    const key = (status || '').toLowerCase().replace(/[\s-]+/g, '_');
+    if (key.includes('active') || key === 'approved') return 'zap';
+    if (key.includes('review')) return 'git-pull-request';
+    if (key.includes('hold') || key.includes('pause')) return 'pause-circle';
+    if (key.includes('draft')) return 'pencil';
+    if (key.includes('archiv')) return 'archive';
+    if (key.includes('complete') || key.includes('done')) return 'check';
+    return 'circle-dot';
+  }
+
+  projectStatusTone(status: string | undefined): string {
+    const key = (status || '').toLowerCase().replace(/[\s-]+/g, '_');
+    if (key.includes('active') || key === 'approved') {
+      return 'border-emerald-400/40 bg-emerald-500/15 text-emerald-100 shadow-[0_8px_24px_rgba(16,185,129,0.25)]';
+    }
+    if (key.includes('review')) {
+      return 'border-amber-400/40 bg-amber-500/15 text-amber-100 shadow-[0_8px_24px_rgba(245,158,11,0.25)]';
+    }
+    if (key.includes('hold') || key.includes('pause')) {
+      return 'border-slate-400/40 bg-slate-500/20 text-slate-100 shadow-[0_8px_24px_rgba(100,116,139,0.3)]';
+    }
+    if (key.includes('draft')) {
+      return 'border-violet-400/40 bg-violet-500/15 text-violet-100 shadow-[0_8px_24px_rgba(139,92,246,0.25)]';
+    }
+    if (key.includes('archiv')) {
+      return 'border-white/20 bg-white/10 text-white/70 shadow-[0_8px_24px_rgba(0,0,0,0.25)]';
+    }
+    return 'border-sky-400/40 bg-sky-500/15 text-sky-100 shadow-[0_8px_24px_rgba(2,132,199,0.25)]';
+  }
+
+  formatStatusLabel(status: string | undefined): string {
+    const raw = (status || 'in_progress').replace(/_/g, ' ');
+    return raw;
   }
 }

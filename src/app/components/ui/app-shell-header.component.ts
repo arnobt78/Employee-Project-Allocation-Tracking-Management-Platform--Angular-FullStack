@@ -38,22 +38,21 @@ import { ProfileDropdownComponent } from './profile-dropdown.component';
       [class.eh-shell-header--scrolled]="scrolled()"
     >
       <div class="eh-shell-inner">
-        <div
-          class="flex w-full items-center justify-between gap-3 py-2"
-        >
+        <div class="flex w-full items-center justify-between gap-3 py-2">
           <a
             routerLink="/dashboard"
             class="group flex shrink-0 items-center gap-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             aria-label="Go to dashboard"
           >
             <span
-              class="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/15 bg-white/10 shadow-inner shadow-primary/30 backdrop-blur"
+              class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 shadow-inner shadow-primary/30 backdrop-blur"
             >
-              <img
-                src="/favicon.ico"
-                alt="EmpowerHub logo"
-                class="h-9 w-9 object-contain"
-              />
+              <lucide-icon
+                name="folder-git-2"
+                [size]="22"
+                class="text-sky-200"
+                data-testid="app-brand-icon"
+              ></lucide-icon>
             </span>
             <span
               class="text-base font-medium tracking-tight text-foreground"
@@ -115,7 +114,7 @@ import { ProfileDropdownComponent } from './profile-dropdown.component';
           class="absolute right-0 top-0 flex h-full w-[min(20rem,88vw)] flex-col border-l border-white/10 bg-slate-950/95 shadow-[0_30px_80px_rgba(0,0,0,0.55)] backdrop-blur-md"
         >
           <div
-            class="flex items-center justify-between border-b border-white/10 px-4 py-3"
+            class="flex items-center justify-between border-b border-white/10 px-2 sm:px-4 py-3"
           >
             <p class="text-sm font-medium text-white">Menu</p>
             <button
@@ -183,9 +182,9 @@ export class AppShellHeaderComponent implements OnInit {
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
       startWith(null),
-      map(() => this.resolvePath())
+      map(() => this.resolvePath()),
     ),
-    { initialValue: this.resolvePath() }
+    { initialValue: this.resolvePath() },
   );
 
   ngOnInit(): void {
@@ -193,7 +192,7 @@ export class AppShellHeaderComponent implements OnInit {
     this.router.events
       .pipe(
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-        takeUntilDestroyed(this.destroyRef)
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => this.closeMobileMenu());
   }
@@ -228,7 +227,7 @@ export class AppShellHeaderComponent implements OnInit {
 
   private syncScroll(): void {
     this.scrolled.set(
-      typeof window !== 'undefined' ? window.scrollY > 12 : false
+      typeof window !== 'undefined' ? window.scrollY > 12 : false,
     );
   }
 }

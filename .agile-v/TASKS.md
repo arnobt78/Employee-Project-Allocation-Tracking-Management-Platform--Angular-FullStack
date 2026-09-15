@@ -86,23 +86,23 @@
 
 ---
 
-## Wave — Per-page UI polish (GATE-0016 — PENDING screenshots)
+## Wave — Per-page UI polish (GATE-0016 — IN PROGRESS)
 
 | ID | Task | REQ | Status | Notes |
 |---|---|---|---|---|
-| TASK-0032 | Intake screenshot batch; map issues → pages/components | REQ-0119 | BLOCKED | Human will share screenshots in next prompt |
-| TASK-0033 | Implement approved polish slices only (preserve shell/tokens/`h-11`) | REQ-0119 | BLOCKED | No coding until GATE-0016 approval |
-| TASK-0034 | verify-deep + commit-ready for approved slice(s) | REQ-0120 | BLOCKED | After implementation |
+| TASK-0032 | Intake screenshot batch; map issues → pages/components | REQ-0119 | DONE | Dashboard batch + polish feedback |
+| TASK-0033 | Implement approved polish slices only (preserve shell/tokens/`h-11`) | REQ-0119 | PARTIAL | Dashboard Option A delivered; other pages deferred |
+| TASK-0034 | verify-deep + commit-ready for approved slice(s) | REQ-0120 | PARTIAL | Dashboard slice commit-ready; more pages later |
 
 ---
 
 ## Recommended approval options (GATE-0016)
 
-**Option A — Single-page slice:** Approve polish for only the pages shown in the next screenshot batch.  
+**Option A — Single-page slice:** Approve polish for only the pages shown in the next screenshot batch. **(active — dashboard done)**  
 **Option B — Batch wave:** Approve all pages called out in that batch in one implement → verify → commit-ready cycle.  
 **Option C — Hold:** Keep planning only; no coding until further screenshots/instructions.
 
-Default recommendation: **Option A** after screenshots arrive (smallest blast radius).
+Default recommendation: **Option A** (one page at a time).
 
 ---
 

@@ -1,5 +1,38 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-15 — GATE-0016 dashboard Option A (commit-ready)
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | Final gate |
+| `npm test` (ChromeHeadless) | **PASS (23/23)** | Known Karma API 404 noise |
+| `npm run build` | **PASS** | chart.js + chartjs-plugin-datalabels; budget warning raised earlier |
+| User visual confirm | **PASS** | Dashboard polish accepted |
+| Debug logs | **PASS** | No blocking mismatches; list skeletons deferred |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Unified KPI grid + ops banner + Chart.js (datalabels, HTML legend, mobile bar scroll) | Done |
+| Shared `app-dashboard-skeleton` + route placeholder rhythm | Done |
+| Brand `FolderGit2`; Operations Lucide `settings`; taller footer | Done |
+| Debug ingest removed before commit | Done |
+
+### Remaining
+
+- List/insights/calendar refresh skeleton enrich (next Option A pages)
+
+### eval_gate_status
+
+N/A (user-directed UX polish)
+
+---
+
 ## Session 2026-09-13 — Login polish + SelectMenu stability (commit-ready)
 
 **Node:** v24.x

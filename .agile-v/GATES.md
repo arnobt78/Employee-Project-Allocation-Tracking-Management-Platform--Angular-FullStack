@@ -8,7 +8,7 @@
 | GATE-0013 | UI SelectMenu/tokens + lockfile deploy fix | Human-Decision | User-directed polish + Vercel ERESOLVE | **APPROVED / COMPLETE** | verify-deep PASS WITH WARNINGS; security PASS; commit-ready 2026-09-11 |
 | GATE-0014 | Dead-code cleanup + initial bundle budget | Human-Decision | User-directed cleanup | **APPROVED / COMPLETE** | verify-deep PASS; security PASS; commit-ready 2026-09-11 |
 | GATE-0015 | Refresh / loading UX polish (no FOUC / flicker) + shell nav + Zod/list-query | Human-Decision | User-directed implement | **APPROVED / COMPLETE** | verify-deep PASS WITH WARNINGS; security PASS WITH WARNINGS; commit-ready 2026-09-13 |
-| GATE-0016 | Per-page UI polish (screenshot-driven) | Human-Decision | Stage 1–2 planning | **PENDING** | Screenshots + Option A/B/C; no coding until approved |
+| GATE-0016 | Per-page UI polish (screenshot-driven) | Human-Decision | Stage 3–4 implement | **IN PROGRESS** | Option A: dashboard slice complete; remaining pages one-at-a-time |
 
 ## GATE-0001 decision record (to be filled by human)
 

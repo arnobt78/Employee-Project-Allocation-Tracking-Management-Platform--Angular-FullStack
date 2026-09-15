@@ -23,7 +23,7 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
       class="w-56 overflow-hidden rounded-2xl border border-white/15 bg-slate-950/95 py-2 shadow-[0_25px_70px_rgba(9,14,33,0.75)] backdrop-blur-md sm:w-64"
       role="menu"
     >
-      <div class="px-4 py-3">
+      <div class="px-2 sm:px-4 py-3">
         <p class="truncate text-sm font-medium text-white">{{ displayName }}</p>
         <p class="truncate text-xs text-white/60">{{ subtitle }}</p>
       </div>

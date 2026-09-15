@@ -100,3 +100,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | Consistent loading contract (chrome first, data-region skeletons); remove dual Full Editor + inline project forms; align live pages with route placeholders |
 | Linked | Page shell redesign plan; GATE-0015 follow-on UX |
 | Status | APPROVED and executed |
+
+---
+
+## DEC-0016 — GATE-0016 Option A: dashboard-first polish
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-15 |
+| Decision | Polish one page at a time; deliver dashboard enrich (KPIs, charts, departments, mirror skeleton, brand FolderGit2, footer) before list/insights pages |
+| Rationale | Smallest blast radius; shared shell gaps already improved; list refresh skeletons remain a follow-on slice |
+| Linked | GATE-0016, TASK-0032–0034, REQ-0119–0120 |
+| Status | APPROVED and executed (dashboard slice) |

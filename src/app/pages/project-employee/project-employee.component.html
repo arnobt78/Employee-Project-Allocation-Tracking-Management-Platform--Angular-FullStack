@@ -137,7 +137,7 @@
           id="create-date"
           type="date"
           formControlName="assignedDate"
-          class="eh-native-date w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+          class="eh-native-date w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
         />
       </div>
       <div>
@@ -149,7 +149,7 @@
           type="text"
           formControlName="role"
           placeholder="Project Role"
-          class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+          class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
           [attr.aria-label]="
             'Enter the project role for ' + projectEmployeeForm.value.empId
           "
@@ -166,7 +166,7 @@
           max="200"
           formControlName="allocationPct"
           placeholder="0"
-          class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+          class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
         />
         <p
           *ngIf="
@@ -215,7 +215,7 @@
           formControlName="notes"
           rows="3"
           placeholder="Add any notes or context about this assignment..."
-          class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white resize-none"
+          class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white resize-none"
         ></textarea>
       </div>
       <div class="md:col-span-2 flex justify-end gap-3 pt-4">
@@ -347,7 +347,7 @@
                   [id]="'edit-date-' + item.empProjectId"
                   type="date"
                   formControlName="assignedDate"
-                  class="eh-native-date w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+                  class="eh-native-date w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
                 />
               </div>
               <div>
@@ -360,7 +360,7 @@
                   [id]="'edit-role-' + item.empProjectId"
                   type="text"
                   formControlName="role"
-                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
                 />
               </div>
               <div>
@@ -375,7 +375,7 @@
                   min="0"
                   max="200"
                   formControlName="allocationPct"
-                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
                 />
                 <p
                   *ngIf="
@@ -426,7 +426,7 @@
                   formControlName="notes"
                   rows="3"
                   placeholder="Add any notes or context about this assignment..."
-                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white resize-none"
+                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white resize-none"
                 ></textarea>
               </div>
               <div class="md:col-span-2 flex justify-end gap-3 pt-4">
@@ -458,7 +458,7 @@
           <ng-template #assignmentView>
             <div class="grid gap-4 sm:grid-cols-2">
               <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
                 <p class="text-xs text-white/45">Assigned Role</p>
                 <p class="text-base font-medium text-white">
@@ -466,7 +466,7 @@
                 </p>
               </div>
               <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
                 <p class="text-xs text-white/45">Assigned on</p>
                 <p class="text-base font-medium text-white">
@@ -474,7 +474,7 @@
                 </p>
               </div>
               <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
                 <p class="text-xs text-white/45">Employee ID</p>
                 <p class="text-base font-medium text-white">
@@ -482,7 +482,7 @@
                 </p>
               </div>
               <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
                 <p class="text-xs text-white/45">Project ID</p>
                 <p class="text-base font-medium text-white">
@@ -491,7 +491,7 @@
                 </p>
               </div>
               <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
                 <p class="text-xs text-white/45">Allocation</p>
                 <p class="text-base font-medium text-white">
@@ -499,7 +499,7 @@
                 </p>
               </div>
               <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
                 <p class="text-xs text-white/45">Unassigned</p>
                 <p class="text-base font-medium text-white">
@@ -507,7 +507,7 @@
                 </p>
               </div>
               <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
                 <p class="text-xs text-white/45">Created</p>
                 <p class="text-base font-medium text-white">
@@ -515,7 +515,7 @@
                 </p>
               </div>
               <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
                 <p class="text-xs text-white/45">Updated</p>
                 <p class="text-base font-medium text-white">
@@ -524,7 +524,7 @@
               </div>
               <div
                 *ngIf="item.notes && item.notes.trim()"
-                class="sm:col-span-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                class="sm:col-span-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
                 <p class="text-xs text-white/45">Notes</p>
                 <p

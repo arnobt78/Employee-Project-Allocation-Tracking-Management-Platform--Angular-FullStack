@@ -6,9 +6,11 @@ import { AppIconComponent } from './app-icon.component';
   selector: 'app-page-header',
   standalone: true,
   imports: [CommonModule, AppIconComponent],
+  host: { class: 'block' },
   template: `
     <div
       class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+      data-testid="page-header"
     >
       <div class="flex items-start gap-3">
         @if (icon) {

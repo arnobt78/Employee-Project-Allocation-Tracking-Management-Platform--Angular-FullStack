@@ -54,7 +54,7 @@
           type="date"
           formControlName="startDate"
           (change)="onFilterChange()"
-          class="eh-native-date w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          class="eh-native-date w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
         />
       </div>
       <div *ngIf="filterForm.get('dateRange')?.value === 'custom'">
@@ -63,7 +63,7 @@
           type="date"
           formControlName="endDate"
           (change)="onFilterChange()"
-          class="eh-native-date w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+          class="eh-native-date w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
         />
       </div>
       <div>
