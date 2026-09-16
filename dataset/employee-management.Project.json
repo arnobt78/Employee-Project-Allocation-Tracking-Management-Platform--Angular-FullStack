@@ -1,0 +1,2389 @@
+[
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9774"
+    },
+    "projectId": {
+      "$numberLong": "5001"
+    },
+    "projectName": "Aurora Web Revamp",
+    "clientName": "Northern Lights Inc.",
+    "clientIndustry": "Retail",
+    "startDate": {
+      "$date": "2025-01-08T00:00:00.000Z"
+    },
+    "endDate": {
+      "$date": "2025-06-30T00:00:00.000Z"
+    },
+    "leadByEmpId": {
+      "$numberLong": "1001"
+    },
+    "sponsorEmpId": {
+      "$numberLong": "1005"
+    },
+    "contactPerson": "Evelyn Carter",
+    "contactNo": "+15550001020",
+    "emailId": "ava.thompson@example.com",
+    "contactTitle": null,
+    "contactNotes": null,
+    "overview": {
+      "summary": "Modernize the Aurora web platform with responsive design, improved performance, and enhanced user experience.",
+      "objectives": [
+        "Redesign user interface for better accessibility",
+        "Improve page load times by 40%",
+        "Implement mobile-first responsive design"
+      ],
+      "successCriteria": [
+        "User satisfaction score above 4.5/5",
+        "Page load time under 2 seconds",
+        "Mobile traffic conversion rate increase of 25%"
+      ],
+      "stakeholderNotes": "Key stakeholders include product team, engineering, and client representatives."
+    },
+    "scope": null,
+    "successMetrics": null,
+    "status": "approved",
+    "statusReason": null,
+    "statusHistory": [
+      {
+        "status": "draft",
+        "previousStatus": null,
+        "changedAt": "2025-01-08T09:00:00Z",
+        "changedBy": 1001,
+        "comment": "Project drafted and initial requirements gathered"
+      },
+      {
+        "status": "draft",
+        "previousStatus": "draft",
+        "changedAt": "2025-01-20T14:30:00Z",
+        "changedBy": 1001,
+        "comment": "Design assets prepared and scope finalized"
+      },
+      {
+        "status": "in_review",
+        "previousStatus": "draft",
+        "changedAt": "2025-02-01T10:15:00Z",
+        "changedBy": 1001,
+        "comment": "Ready for review - all readiness items completed"
+      },
+      {
+        "status": "approved",
+        "previousStatus": "in_review",
+        "changedAt": "2025-02-05T11:00:00Z",
+        "changedBy": 1005,
+        "comment": "Project approved and ready to start"
+      }
+    ],
+    "timeline": [
+      {
+        "id": "init-5001",
+        "label": "Project initialized",
+        "description": "Project created and kickoff meeting scheduled",
+        "state": "completed",
+        "occurredAt": "2025-01-08T09:00:00Z",
+        "status": "in_review",
+        "actorId": 1001,
+        "actorName": "Ava Thompson"
+      },
+      {
+        "id": "kickoff-aurora",
+        "label": "Kick-off scheduled",
+        "description": "Stakeholder kick-off meeting confirmed on calendar",
+        "state": "completed",
+        "occurredAt": "2025-01-12T15:00:00Z",
+        "status": "in_review",
+        "actorId": 1001,
+        "actorName": "Ava Thompson"
+      },
+      {
+        "id": "assets-5001",
+        "label": "Design assets prepared",
+        "description": "Design kit updated and shared with team",
+        "state": "completed",
+        "occurredAt": "2025-01-20T18:00:00Z",
+        "status": "in_review",
+        "actorId": 1004,
+        "actorName": "Jackson Smith"
+      },
+      {
+        "id": "review-aurora",
+        "label": "Approval requested",
+        "description": "Project submitted for leadership review",
+        "state": "completed",
+        "occurredAt": "2025-02-01T10:15:00Z",
+        "status": "in_review",
+        "actorId": 1001,
+        "actorName": "Ava Thompson"
+      }
+    ],
+    "milestones": null,
+    "categories": [],
+    "tags": [
+      "delivery",
+      "active"
+    ],
+    "focusAreas": [],
+    "blockers": null,
+    "risks": [
+      {
+        "title": "Scope creep",
+        "severity": "medium",
+        "mitigation": "Weekly change control"
+      }
+    ],
+    "riskRegister": null,
+    "budget": {
+      "total": 150000,
+      "allocated": 120000,
+      "spent": 85000,
+      "currency": "USD",
+      "lastUpdated": "2025-11-10T10:00:00Z"
+    },
+    "financials": null,
+    "resourcesPlan": {
+      "stakeholders": [
+        {
+          "name": "Evelyn Carter",
+          "email": "ava.thompson@example.com",
+          "role": "Client Contact",
+          "department": "Product"
+        },
+        {
+          "name": "Ava Thompson",
+          "email": "ava.thompson@example.com",
+          "role": "Project Lead",
+          "department": "Engineering"
+        }
+      ],
+      "teamSize": 3,
+      "budgetAllocation": 150000
+    },
+    "readinessChecklist": {
+      "items": [
+        {
+          "id": "scopeDefined",
+          "title": "Scope confirmed",
+          "description": "Requirements baseline captured and shared.",
+          "category": "Scope",
+          "weight": 25,
+          "status": "done",
+          "ownerId": 1001,
+          "ownerName": "Ava Thompson",
+          "dueDate": "2025-01-15",
+          "notes": "Signed off by product",
+          "statusUpdatedAt": "2025-01-10T09:30:00Z"
+        },
+        {
+          "id": "budgetApproved",
+          "title": "Budget approved",
+          "description": "Finance sign-off received.",
+          "category": "Budget",
+          "weight": 20,
+          "status": "in_progress",
+          "ownerId": 1005,
+          "ownerName": "Mia Garcia",
+          "dueDate": "2025-02-10",
+          "notes": "Awaiting final CFO approval",
+          "statusUpdatedAt": "2025-02-02T08:45:00Z"
+        },
+        {
+          "id": "legalReviewed",
+          "title": "Contracts reviewed",
+          "description": "Legal agreements reviewed.",
+          "category": "Legal",
+          "weight": 20,
+          "status": "in_progress",
+          "ownerId": 1006,
+          "ownerName": "Ethan Chen",
+          "dueDate": "2025-02-18",
+          "notes": "Security appendix pending",
+          "statusUpdatedAt": "2025-02-04T12:10:00Z"
+        },
+        {
+          "id": "assetsPrepared",
+          "title": "Assets prepared",
+          "description": "Collateral ready to share.",
+          "category": "Assets",
+          "weight": 15,
+          "status": "done",
+          "ownerId": 1004,
+          "ownerName": "Jackson Smith",
+          "dueDate": "2025-01-25",
+          "notes": "Design kit updated",
+          "statusUpdatedAt": "2025-01-20T18:00:00Z"
+        },
+        {
+          "id": "kickoffScheduled",
+          "title": "Kickoff scheduled",
+          "description": "Kickoff with internal teams.",
+          "category": "Timeline",
+          "weight": 20,
+          "status": "in_progress",
+          "ownerId": 1001,
+          "ownerName": "Ava Thompson",
+          "dueDate": "2025-02-05",
+          "notes": "Waiting for client availability",
+          "statusUpdatedAt": "2025-02-03T10:00:00Z"
+        }
+      ],
+      "totalWeight": 100,
+      "completedWeight": 40,
+      "percent": 40,
+      "updatedAt": "2025-02-04T12:10:00Z",
+      "updatedBy": 1001
+    },
+    "readinessScore": null,
+    "approvalStatus": "in_review",
+    "approvalRequestedAt": {
+      "$date": "2025-02-01T10:15:00.000Z"
+    },
+    "approvalRequestedBy": {
+      "$numberLong": "1001"
+    },
+    "approvalResolvedAt": null,
+    "approvalResolvedBy": null,
+    "approvalReason": null,
+    "approvalNotes": null,
+    "reviewerComments": [
+      {
+        "id": "comment-5001-1",
+        "section": "overview",
+        "comment": "Add customer success metrics to success criteria. Consider including NPS score and customer retention rate.",
+        "reviewerId": 1003,
+        "reviewerName": "Sophia Nguyen",
+        "createdAt": "2025-02-03T11:00:00Z",
+        "severity": "info",
+        "resolved": false
+      },
+      {
+        "id": "comment-5001-2",
+        "section": "scope",
+        "comment": "The mobile-first approach is well-defined. Suggest adding specific breakpoints and device testing requirements.",
+        "reviewerId": 1005,
+        "reviewerName": "Mia Garcia",
+        "createdAt": "2025-02-04T09:30:00Z",
+        "severity": "info",
+        "resolved": false
+      }
+    ],
+    "progress": null,
+    "health": null,
+    "documents": null,
+    "externalLinks": null,
+    "aiGeneratedInsights": null,
+    "cmsContentRefs": [],
+    "lastSyncedAt": null,
+    "stageGate": null,
+    "governance": null,
+    "communicationPlan": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "archivedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9775"
+    },
+    "projectId": {
+      "$numberLong": "5002"
+    },
+    "projectName": "AI Platform",
+    "clientName": "Global Manson",
+    "clientIndustry": "Logistics",
+    "startDate": {
+      "$date": "2025-02-14T00:00:00.000Z"
+    },
+    "endDate": null,
+    "leadByEmpId": {
+      "$numberLong": "1003"
+    },
+    "sponsorEmpId": {
+      "$numberLong": "1006"
+    },
+    "contactPerson": "Carlos Angelo",
+    "contactNo": "+15550001024",
+    "emailId": "ops.contact@example.com",
+    "contactTitle": null,
+    "contactNotes": null,
+    "overview": {
+      "summary": "Build an AI-powered platform for logistics optimization and predictive analytics.",
+      "objectives": [
+        "Develop machine learning models for route optimization",
+        "Implement real-time tracking and analytics dashboard",
+        "Integrate with existing logistics systems"
+      ],
+      "successCriteria": [
+        "Reduce delivery time by 20%",
+        "Achieve 95% prediction accuracy",
+        "Process 10,000+ shipments daily"
+      ],
+      "stakeholderNotes": "Critical project requiring close collaboration with operations and data science teams."
+    },
+    "scope": null,
+    "successMetrics": null,
+    "status": "approved",
+    "statusReason": null,
+    "statusHistory": [
+      {
+        "status": "in_review",
+        "previousStatus": null,
+        "changedAt": "2025-02-14T09:00:00Z",
+        "changedBy": 1003,
+        "comment": "Project created and initial architecture design started"
+      },
+      {
+        "status": "in_review",
+        "previousStatus": "draft",
+        "changedAt": "2025-02-18T10:00:00Z",
+        "changedBy": 1006,
+        "comment": "Solution architecture workshop completed"
+      },
+      {
+        "status": "in_review",
+        "previousStatus": "draft",
+        "changedAt": "2025-02-20T13:00:00Z",
+        "changedBy": 1003,
+        "comment": "Ready for security review - architecture documentation complete"
+      },
+      {
+        "status": "approved",
+        "previousStatus": "in_review",
+        "changedAt": "2025-02-28T16:00:00Z",
+        "changedBy": 1006,
+        "comment": "Security and architecture approved - all review comments addressed",
+        "attachments": [
+          {
+            "id": "arch-approval",
+            "name": "Architecture approval",
+            "url": "https://example.com/docs/ai-platform-approval.pdf"
+          }
+        ]
+      }
+    ],
+    "timeline": [
+      {
+        "id": "init-5002",
+        "label": "Project initialized",
+        "description": "AI Platform project created and team assigned",
+        "state": "completed",
+        "occurredAt": "2025-02-14T09:00:00Z",
+        "status": "in_review",
+        "actorId": 1003,
+        "actorName": "Sophia Nguyen"
+      },
+      {
+        "id": "design-ai",
+        "label": "Solution architecture workshop",
+        "description": "Architecture design session completed with stakeholders",
+        "state": "completed",
+        "occurredAt": "2025-02-18T10:00:00Z",
+        "status": "in_review",
+        "actorId": 1006,
+        "actorName": "Ethan Chen"
+      },
+      {
+        "id": "review-5002",
+        "label": "Approval requested",
+        "description": "Project submitted for security and architecture review",
+        "state": "completed",
+        "occurredAt": "2025-02-20T13:00:00Z",
+        "status": "in_review",
+        "actorId": 1003,
+        "actorName": "Sophia Nguyen"
+      },
+      {
+        "id": "approval-ai",
+        "label": "Executive approval",
+        "description": "Project approved - security controls verified and architecture signed off",
+        "state": "completed",
+        "occurredAt": "2025-02-28T16:00:00Z",
+        "status": "in_progress",
+        "actorId": 1006,
+        "actorName": "Ethan Chen"
+      }
+    ],
+    "milestones": null,
+    "categories": [],
+    "tags": [
+      "delivery",
+      "active"
+    ],
+    "focusAreas": [],
+    "blockers": null,
+    "risks": [
+      {
+        "title": "Scope creep",
+        "severity": "medium",
+        "mitigation": "Weekly change control"
+      }
+    ],
+    "riskRegister": null,
+    "budget": {
+      "total": 200000,
+      "allocated": 180000,
+      "spent": 145000,
+      "currency": "USD",
+      "lastUpdated": "2025-11-10T10:00:00Z"
+    },
+    "financials": null,
+    "resourcesPlan": {
+      "stakeholders": [
+        {
+          "name": "Carlos Angelo",
+          "email": "ops.contact@example.com",
+          "role": "Client Contact",
+          "department": "Operations"
+        },
+        {
+          "name": "Sophia Nguyen",
+          "email": "ava.thompson@example.com",
+          "role": "Project Lead",
+          "department": "QA"
+        },
+        {
+          "name": "Ethan Chen",
+          "email": "ops.contact@example.com",
+          "role": "Sponsor",
+          "department": "Backend"
+        }
+      ],
+      "teamSize": 2,
+      "budgetAllocation": 200000
+    },
+    "readinessChecklist": {
+      "items": [
+        {
+          "id": "scopeDefined",
+          "title": "Scope confirmed",
+          "description": "Requirements baseline captured.",
+          "category": "Scope",
+          "weight": 25,
+          "status": "done",
+          "ownerId": 1003,
+          "ownerName": "Sophia Nguyen",
+          "dueDate": "2025-02-17",
+          "notes": "Baseline documented in Confluence",
+          "statusUpdatedAt": "2025-02-18T09:00:00Z"
+        },
+        {
+          "id": "budgetApproved",
+          "title": "Budget approved",
+          "category": "Budget",
+          "weight": 20,
+          "status": "done",
+          "ownerId": 1005,
+          "ownerName": "Mia Garcia",
+          "dueDate": "2025-02-22",
+          "notes": "Budget approved by finance",
+          "statusUpdatedAt": "2025-02-22T11:00:00Z"
+        },
+        {
+          "id": "legalReviewed",
+          "title": "Contracts reviewed",
+          "category": "Legal",
+          "weight": 20,
+          "status": "done",
+          "ownerId": 1006,
+          "ownerName": "Ethan Chen",
+          "dueDate": "2025-02-25",
+          "notes": "Security controls appended",
+          "statusUpdatedAt": "2025-02-25T10:30:00Z"
+        },
+        {
+          "id": "assetsPrepared",
+          "title": "Assets prepared",
+          "category": "Assets",
+          "weight": 15,
+          "status": "done",
+          "ownerId": 1004,
+          "ownerName": "Jackson Smith",
+          "dueDate": "2025-02-24",
+          "notes": "Design system updated for AI flows",
+          "statusUpdatedAt": "2025-02-24T15:00:00Z"
+        },
+        {
+          "id": "kickoffScheduled",
+          "title": "Kickoff scheduled",
+          "category": "Timeline",
+          "weight": 20,
+          "status": "done",
+          "ownerId": 1003,
+          "ownerName": "Sophia Nguyen",
+          "dueDate": "2025-03-01",
+          "notes": "Kickoff booked for March 2",
+          "statusUpdatedAt": "2025-02-27T09:30:00Z"
+        }
+      ],
+      "totalWeight": 100,
+      "completedWeight": 100,
+      "percent": 100,
+      "updatedAt": "2025-02-27T09:30:00Z",
+      "updatedBy": 1003
+    },
+    "readinessScore": null,
+    "approvalStatus": "approved",
+    "approvalRequestedAt": {
+      "$date": "2025-02-20T13:00:00.000Z"
+    },
+    "approvalRequestedBy": {
+      "$numberLong": "1003"
+    },
+    "approvalResolvedAt": {
+      "$date": "2025-02-28T16:00:00.000Z"
+    },
+    "approvalResolvedBy": {
+      "$numberLong": "1006"
+    },
+    "approvalReason": null,
+    "approvalNotes": null,
+    "reviewerComments": [
+      {
+        "id": "comment-5002-1",
+        "section": "team",
+        "comment": "Add an SRE as secondary reviewer for infrastructure components. This will help ensure scalability and reliability.",
+        "reviewerId": 1006,
+        "reviewerName": "Ethan Chen",
+        "createdAt": "2025-02-21T12:00:00Z",
+        "severity": "warning",
+        "resolved": true,
+        "resolvedAt": "2025-02-24T09:00:00Z",
+        "resolvedBy": 1003
+      },
+      {
+        "id": "comment-5002-2",
+        "section": "scope",
+        "comment": "The ML model training pipeline looks comprehensive. Consider adding monitoring and alerting for model drift.",
+        "reviewerId": 1003,
+        "reviewerName": "Sophia Nguyen",
+        "createdAt": "2025-02-22T14:00:00Z",
+        "severity": "info",
+        "resolved": false
+      }
+    ],
+    "progress": null,
+    "health": null,
+    "documents": null,
+    "externalLinks": null,
+    "aiGeneratedInsights": null,
+    "cmsContentRefs": [],
+    "lastSyncedAt": null,
+    "stageGate": null,
+    "governance": null,
+    "communicationPlan": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "archivedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9776"
+    },
+    "projectId": {
+      "$numberLong": "5030"
+    },
+    "projectName": "Model Automation",
+    "clientName": "John Doe",
+    "clientIndustry": "Healthcare",
+    "startDate": {
+      "$date": "2025-12-27T00:00:00.000Z"
+    },
+    "endDate": null,
+    "leadByEmpId": {
+      "$numberLong": "1001"
+    },
+    "sponsorEmpId": {
+      "$numberLong": "1003"
+    },
+    "contactPerson": "Arnob Mahmud",
+    "contactNo": "+15550001029",
+    "emailId": "ava.thompson@example.com",
+    "contactTitle": null,
+    "contactNotes": null,
+    "overview": {
+      "summary": "Automate model training and deployment workflows for healthcare data processing.",
+      "objectives": [
+        "Streamline model training pipeline",
+        "Automate deployment processes",
+        "Ensure compliance with healthcare regulations"
+      ],
+      "successCriteria": [
+        "Reduce model deployment time by 50%",
+        "Achieve 99.9% uptime",
+        "Pass all compliance audits"
+      ],
+      "stakeholderNotes": "High-priority project with strict regulatory requirements."
+    },
+    "scope": null,
+    "successMetrics": null,
+    "status": "draft",
+    "statusReason": null,
+    "statusHistory": [
+      {
+        "status": "draft",
+        "previousStatus": null,
+        "changedAt": "2025-11-01T09:00:00Z",
+        "changedBy": 1001,
+        "comment": "Project created and initial scope defined"
+      },
+      {
+        "status": "draft",
+        "previousStatus": "draft",
+        "changedAt": "2025-11-05T14:30:00Z",
+        "changedBy": 1001,
+        "comment": "Updated requirements based on client feedback"
+      }
+    ],
+    "timeline": [
+      {
+        "id": "init-5030",
+        "label": "Project initialized",
+        "description": "Project created and initial planning started",
+        "state": "completed",
+        "occurredAt": "2025-11-01T09:00:00Z",
+        "status": "in_review",
+        "actorId": 1001,
+        "actorName": "Ava Thompson"
+      },
+      {
+        "id": "scope-5030",
+        "label": "Scope refinement",
+        "description": "Requirements updated based on stakeholder feedback",
+        "state": "completed",
+        "occurredAt": "2025-11-05T14:30:00Z",
+        "status": "in_review",
+        "actorId": 1001,
+        "actorName": "Ava Thompson"
+      }
+    ],
+    "milestones": null,
+    "categories": [],
+    "tags": [
+      "delivery",
+      "active"
+    ],
+    "focusAreas": [],
+    "blockers": null,
+    "risks": [
+      {
+        "title": "Scope creep",
+        "severity": "medium",
+        "mitigation": "Weekly change control"
+      }
+    ],
+    "riskRegister": null,
+    "budget": {
+      "total": 120000,
+      "allocated": 80000,
+      "spent": 35000,
+      "currency": "USD",
+      "lastUpdated": "2025-11-10T10:00:00Z"
+    },
+    "financials": null,
+    "resourcesPlan": {
+      "stakeholders": [
+        {
+          "name": "Arnob Mahmud",
+          "email": "ava.thompson@example.com",
+          "role": "Client Contact",
+          "department": "Healthcare"
+        },
+        {
+          "name": "Ava Thompson",
+          "email": "ava.thompson@example.com",
+          "role": "Project Lead",
+          "department": "Frontend"
+        },
+        {
+          "name": "Sophia Nguyen",
+          "email": "ava.thompson@example.com",
+          "role": "Sponsor",
+          "department": "QA"
+        }
+      ],
+      "teamSize": 1,
+      "budgetAllocation": 120000
+    },
+    "readinessChecklist": {
+      "items": [
+        {
+          "id": "scopeDefined",
+          "title": "Scope confirmed",
+          "category": "Scope",
+          "description": "Requirements captured with client.",
+          "weight": 25,
+          "status": "in_progress",
+          "ownerId": 1002,
+          "ownerName": "Liam Jackson",
+          "dueDate": "2025-11-27",
+          "notes": "Need steering committee sign-off",
+          "statusUpdatedAt": "2025-11-10T12:28:23.571Z"
+        },
+        {
+          "id": "budgetApproved",
+          "title": "Budget approved",
+          "category": "Budget",
+          "weight": 20,
+          "status": "in_progress",
+          "ownerId": 1002,
+          "ownerName": "Liam Jackson",
+          "dueDate": "2025-11-24",
+          "notes": "Finance reviewing updated numbers",
+          "statusUpdatedAt": "2025-11-10T12:28:23.571Z"
+        },
+        {
+          "id": "legalReviewed",
+          "title": "Contracts reviewed",
+          "category": "Legal",
+          "weight": 20,
+          "status": "done",
+          "ownerId": 1002,
+          "ownerName": "Liam Jackson",
+          "dueDate": "2025-12-01",
+          "notes": "Client legal signed the DPA",
+          "statusUpdatedAt": "2025-11-10T21:51:49.249Z"
+        },
+        {
+          "id": "assetsPrepared",
+          "title": "Assets prepared",
+          "category": "Assets",
+          "weight": 15,
+          "status": "done",
+          "ownerId": 1003,
+          "ownerName": "Sophia Nguyen",
+          "dueDate": "2025-11-20",
+          "notes": "Model documentation drafted",
+          "statusUpdatedAt": "2025-11-10T12:28:23.571Z"
+        },
+        {
+          "id": "kickoffScheduled",
+          "title": "Kickoff scheduled",
+          "category": "Timeline",
+          "weight": 20,
+          "status": "in_progress",
+          "ownerId": 1005,
+          "ownerName": "Mia Garcia",
+          "dueDate": "2025-12-08",
+          "notes": "Waiting for client confirmation",
+          "statusUpdatedAt": "2025-11-10T21:51:49.249Z"
+        }
+      ],
+      "totalWeight": 100,
+      "completedWeight": 67.5,
+      "percent": 68,
+      "updatedAt": "2025-11-10T21:51:49.249Z"
+    },
+    "readinessScore": null,
+    "approvalStatus": "draft",
+    "approvalRequestedAt": null,
+    "approvalRequestedBy": null,
+    "approvalResolvedAt": null,
+    "approvalResolvedBy": null,
+    "approvalReason": null,
+    "approvalNotes": null,
+    "reviewerComments": [
+      {
+        "id": "comment-5030-1",
+        "section": "overview",
+        "comment": "Consider adding more details about the compliance requirements for healthcare data processing.",
+        "reviewerId": 1003,
+        "reviewerName": "Sophia Nguyen",
+        "createdAt": "2025-11-06T10:15:00Z",
+        "severity": "info",
+        "resolved": false
+      },
+      {
+        "id": "comment-5030-2",
+        "section": "scope",
+        "comment": "The deployment timeline seems aggressive. Suggest adding buffer time for testing phases.",
+        "reviewerId": 1002,
+        "reviewerName": "Liam Jackson",
+        "createdAt": "2025-11-07T11:20:00Z",
+        "severity": "warning",
+        "resolved": false
+      }
+    ],
+    "progress": null,
+    "health": null,
+    "documents": null,
+    "externalLinks": null,
+    "aiGeneratedInsights": null,
+    "cmsContentRefs": [],
+    "lastSyncedAt": null,
+    "stageGate": null,
+    "governance": null,
+    "communicationPlan": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "archivedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9777"
+    },
+    "projectId": {
+      "$numberLong": "5031"
+    },
+    "projectName": "IT Security Support",
+    "clientName": "Mad Max",
+    "clientIndustry": "Automotive",
+    "startDate": {
+      "$date": "2025-11-11T00:00:00.000Z"
+    },
+    "endDate": null,
+    "leadByEmpId": {
+      "$numberLong": "1003"
+    },
+    "sponsorEmpId": {
+      "$numberLong": "1006"
+    },
+    "contactPerson": "Arnob Mahmud",
+    "contactNo": "+15550001034",
+    "emailId": "ava.thompson@example.com",
+    "contactTitle": null,
+    "contactNotes": null,
+    "overview": {
+      "summary": "Provide comprehensive IT security support and transformation services for automotive client.",
+      "objectives": [
+        "Implement security best practices",
+        "Conduct security audits and assessments",
+        "Train team on security protocols"
+      ],
+      "successCriteria": [
+        "Zero security incidents during project",
+        "100% compliance with security standards",
+        "Complete security documentation"
+      ],
+      "stakeholderNotes": "Critical security project requiring expertise from multiple teams."
+    },
+    "scope": null,
+    "successMetrics": null,
+    "status": "on_hold",
+    "statusReason": null,
+    "statusHistory": [
+      {
+        "status": "draft",
+        "previousStatus": null,
+        "changedAt": "2025-11-08T09:30:00Z",
+        "changedBy": 1003,
+        "comment": "Project created and initial security assessment completed"
+      },
+      {
+        "status": "in_review",
+        "previousStatus": "draft",
+        "changedAt": "2025-11-10T15:56:19.238Z",
+        "changedBy": 1003,
+        "comment": "Sent for approval - all readiness checklist items completed"
+      },
+      {
+        "status": "approved",
+        "previousStatus": "in_review",
+        "changedAt": "2025-11-11T10:30:00Z",
+        "changedBy": 1006,
+        "comment": "Project approved and started"
+      },
+      {
+        "status": "on_hold",
+        "previousStatus": "approved",
+        "changedAt": "2025-11-12T14:00:00Z",
+        "changedBy": 1003,
+        "comment": "Project put on hold due to client budget constraints"
+      }
+    ],
+    "timeline": [
+      {
+        "id": "init-5031",
+        "label": "Project kickoff",
+        "description": "Initial project setup and security assessment started",
+        "state": "completed",
+        "occurredAt": "2025-11-08T09:30:00Z",
+        "status": "in_review",
+        "actorId": 1003,
+        "actorName": "Sophia Nguyen"
+      },
+      {
+        "id": "approval-5031",
+        "label": "Approval requested",
+        "description": "Project submitted for leadership review",
+        "state": "completed",
+        "occurredAt": "2025-11-10T15:56:19.238Z",
+        "status": "in_review",
+        "actorId": 1003,
+        "actorName": "Sophia Nguyen"
+      },
+      {
+        "id": "review-5031-1",
+        "label": "Reviewer comment (overview)",
+        "description": "KPIs for incident response times requested",
+        "state": "completed",
+        "occurredAt": "2025-11-10T15:58:16.503Z",
+        "status": "in_review",
+        "actorId": 1002,
+        "actorName": "Liam Jackson"
+      },
+      {
+        "id": "review-5031-2",
+        "label": "Reviewer comment (scope)",
+        "description": "Security audit methodology needs clarification",
+        "state": "completed",
+        "occurredAt": "2025-11-11T09:15:00Z",
+        "status": "in_review",
+        "actorId": 1006,
+        "actorName": "Ethan Chen"
+      }
+    ],
+    "milestones": null,
+    "categories": [],
+    "tags": [
+      "delivery",
+      "active"
+    ],
+    "focusAreas": [],
+    "blockers": null,
+    "risks": [
+      {
+        "title": "Scope creep",
+        "severity": "medium",
+        "mitigation": "Weekly change control"
+      }
+    ],
+    "riskRegister": null,
+    "budget": {
+      "total": 180000,
+      "allocated": 150000,
+      "spent": 95000,
+      "currency": "USD",
+      "lastUpdated": "2025-11-11T14:00:00Z"
+    },
+    "financials": null,
+    "resourcesPlan": {
+      "stakeholders": [
+        {
+          "name": "Arnob Mahmud",
+          "email": "ava.thompson@example.com",
+          "role": "Client Contact",
+          "department": "Automotive"
+        },
+        {
+          "name": "Sophia Nguyen",
+          "email": "ava.thompson@example.com",
+          "role": "Project Lead",
+          "department": "QA"
+        },
+        {
+          "name": "Ethan Chen",
+          "email": "ops.contact@example.com",
+          "role": "Sponsor",
+          "department": "Backend"
+        },
+        {
+          "name": "Liam Jackson",
+          "email": "ops.contact@example.com",
+          "role": "Backend Lead",
+          "department": "Backend"
+        },
+        {
+          "name": "Ava Thompson",
+          "email": "ava.thompson@example.com",
+          "role": "Frontend Support",
+          "department": "Frontend"
+        }
+      ],
+      "teamSize": 3,
+      "budgetAllocation": 180000
+    },
+    "readinessChecklist": {
+      "items": [
+        {
+          "id": "scopeDefined",
+          "title": "Scope confirmed",
+          "category": "Scope",
+          "weight": 25,
+          "status": "done",
+          "ownerId": 1003,
+          "ownerName": "Sophia Nguyen",
+          "dueDate": "2025-11-14",
+          "notes": "Baseline shared with stakeholders",
+          "statusUpdatedAt": "2025-11-10T15:00:46.173Z"
+        },
+        {
+          "id": "budgetApproved",
+          "title": "Budget approved",
+          "category": "Budget",
+          "weight": 20,
+          "status": "done",
+          "ownerId": 1001,
+          "ownerName": "Ava Thompson",
+          "dueDate": "2025-11-20",
+          "notes": "Signed contract in Drive",
+          "statusUpdatedAt": "2025-11-10T15:00:46.173Z"
+        },
+        {
+          "id": "legalReviewed",
+          "title": "Contracts reviewed",
+          "category": "Legal",
+          "weight": 20,
+          "status": "done",
+          "ownerId": 1002,
+          "ownerName": "Liam Jackson",
+          "dueDate": "2026-01-01",
+          "notes": "Vendor security annex approved",
+          "statusUpdatedAt": "2025-11-10T12:30:37.964Z"
+        },
+        {
+          "id": "assetsPrepared",
+          "title": "Assets prepared",
+          "category": "Assets",
+          "weight": 15,
+          "status": "in_progress",
+          "ownerId": 1003,
+          "ownerName": "Sophia Nguyen",
+          "dueDate": "2025-11-20",
+          "notes": "Playbooks under review",
+          "statusUpdatedAt": "2025-11-10T15:00:46.173Z"
+        },
+        {
+          "id": "kickoffScheduled",
+          "title": "Kickoff scheduled",
+          "category": "Timeline",
+          "weight": 20,
+          "status": "not_started",
+          "ownerId": 1001,
+          "ownerName": "Ava Thompson",
+          "dueDate": "2025-12-08",
+          "notes": "Awaiting client champions",
+          "statusUpdatedAt": "2025-11-10T12:28:51.572Z"
+        }
+      ],
+      "totalWeight": 100,
+      "completedWeight": 72.5,
+      "percent": 73,
+      "updatedAt": "2025-11-10T16:02:43.225Z"
+    },
+    "readinessScore": null,
+    "approvalStatus": "in_review",
+    "approvalRequestedAt": {
+      "$date": "2025-11-10T15:56:19.238Z"
+    },
+    "approvalRequestedBy": {
+      "$numberLong": "1003"
+    },
+    "approvalResolvedAt": null,
+    "approvalResolvedBy": null,
+    "approvalReason": null,
+    "approvalNotes": null,
+    "reviewerComments": [
+      {
+        "id": "comment-5031-1",
+        "section": "overview",
+        "comment": "Add KPIs for incident response times. Consider including metrics like mean time to detect (MTTD) and mean time to respond (MTTR).",
+        "reviewerId": 1002,
+        "reviewerName": "Liam Jackson",
+        "createdAt": "2025-11-10T15:58:16.503Z",
+        "severity": "info",
+        "resolved": false
+      },
+      {
+        "id": "comment-5031-2",
+        "section": "scope",
+        "comment": "The security audit methodology section needs more detail. Please specify which frameworks (ISO 27001, NIST, etc.) will be used.",
+        "reviewerId": 1006,
+        "reviewerName": "Ethan Chen",
+        "createdAt": "2025-11-11T09:15:00Z",
+        "severity": "warning",
+        "resolved": false
+      },
+      {
+        "id": "comment-5031-3",
+        "section": "team",
+        "comment": "Team composition looks good. Suggest adding a dedicated security architect if the scope expands.",
+        "reviewerId": 1003,
+        "reviewerName": "Sophia Nguyen",
+        "createdAt": "2025-11-11T14:20:00Z",
+        "severity": "info",
+        "resolved": true,
+        "resolvedAt": "2025-11-11T16:45:00Z",
+        "resolvedBy": 1003
+      }
+    ],
+    "progress": null,
+    "health": null,
+    "documents": null,
+    "externalLinks": null,
+    "aiGeneratedInsights": null,
+    "cmsContentRefs": [],
+    "lastSyncedAt": null,
+    "stageGate": null,
+    "governance": null,
+    "communicationPlan": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "archivedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9778"
+    },
+    "projectId": {
+      "$numberLong": "5032"
+    },
+    "projectName": "Legacy System Migration",
+    "clientName": "Tech Corp",
+    "clientIndustry": "Technology",
+    "startDate": {
+      "$date": "2024-06-01T00:00:00.000Z"
+    },
+    "endDate": {
+      "$date": "2024-12-31T00:00:00.000Z"
+    },
+    "leadByEmpId": {
+      "$numberLong": "1004"
+    },
+    "sponsorEmpId": {
+      "$numberLong": "1006"
+    },
+    "contactPerson": "John Smith",
+    "contactNo": "+15550001041",
+    "emailId": "john@techcorp.com",
+    "contactTitle": null,
+    "contactNotes": null,
+    "overview": {
+      "summary": "Completed legacy system migration project",
+      "objectives": [
+        "Migrate legacy systems",
+        "Ensure data integrity"
+      ],
+      "successCriteria": [
+        "Migration completed",
+        "Zero data loss"
+      ],
+      "stakeholderNotes": "Project completed successfully"
+    },
+    "scope": null,
+    "successMetrics": null,
+    "status": "approved",
+    "statusReason": null,
+    "statusHistory": [
+      {
+        "status": "draft",
+        "previousStatus": null,
+        "changedAt": "2024-06-01T09:00:00Z",
+        "changedBy": 1004,
+        "comment": "Project created"
+      },
+      {
+        "status": "approved",
+        "previousStatus": "draft",
+        "changedAt": "2024-06-15T10:00:00Z",
+        "changedBy": 1006,
+        "comment": "Project approved and completed"
+      }
+    ],
+    "timeline": [],
+    "milestones": null,
+    "categories": [],
+    "tags": [
+      "delivery",
+      "active"
+    ],
+    "focusAreas": [],
+    "blockers": null,
+    "risks": [
+      {
+        "title": "Scope creep",
+        "severity": "medium",
+        "mitigation": "Weekly change control"
+      }
+    ],
+    "riskRegister": null,
+    "budget": {
+      "total": 100000,
+      "allocated": 100000,
+      "spent": 100000,
+      "currency": "USD",
+      "lastUpdated": "2024-12-31T23:59:59Z"
+    },
+    "financials": null,
+    "resourcesPlan": {
+      "stakeholders": [],
+      "teamSize": 0,
+      "budgetAllocation": 100000
+    },
+    "readinessChecklist": {
+      "items": [],
+      "totalWeight": 100,
+      "completedWeight": 100,
+      "percent": 100,
+      "updatedAt": "2024-12-31T23:59:59Z"
+    },
+    "readinessScore": null,
+    "approvalStatus": "approved",
+    "approvalRequestedAt": null,
+    "approvalRequestedBy": null,
+    "approvalResolvedAt": null,
+    "approvalResolvedBy": null,
+    "approvalReason": null,
+    "approvalNotes": null,
+    "reviewerComments": [],
+    "progress": null,
+    "health": null,
+    "documents": null,
+    "externalLinks": null,
+    "aiGeneratedInsights": null,
+    "cmsContentRefs": [],
+    "lastSyncedAt": null,
+    "stageGate": null,
+    "governance": null,
+    "communicationPlan": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "archivedAt": {
+      "$date": "2024-12-31T23:59:59.000Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9779"
+    },
+    "projectId": {
+      "$numberLong": "5033"
+    },
+    "projectName": "Mobile App Redesign",
+    "clientName": "Startup Inc",
+    "clientIndustry": "Fintech",
+    "startDate": {
+      "$date": "2025-12-01T00:00:00.000Z"
+    },
+    "endDate": null,
+    "leadByEmpId": {
+      "$numberLong": "1001"
+    },
+    "sponsorEmpId": {
+      "$numberLong": "1005"
+    },
+    "contactPerson": "Jane Doe",
+    "contactNo": "+15550001043",
+    "emailId": "jane@startup.com",
+    "contactTitle": null,
+    "contactNotes": null,
+    "overview": {
+      "summary": "Redesign mobile application for better user experience",
+      "objectives": [
+        "Improve UX",
+        "Modernize design"
+      ],
+      "successCriteria": [
+        "User satisfaction increase",
+        "Faster load times"
+      ],
+      "stakeholderNotes": "In early planning phase"
+    },
+    "scope": null,
+    "successMetrics": null,
+    "status": "in_review",
+    "statusReason": null,
+    "statusHistory": [
+      {
+        "status": "in_review",
+        "previousStatus": null,
+        "changedAt": "2025-11-10T09:00:00Z",
+        "changedBy": 1001,
+        "comment": "Project initialized - planning phase"
+      }
+    ],
+    "timeline": [],
+    "milestones": null,
+    "categories": [],
+    "tags": [
+      "delivery",
+      "active"
+    ],
+    "focusAreas": [],
+    "blockers": null,
+    "risks": [
+      {
+        "title": "Scope creep",
+        "severity": "medium",
+        "mitigation": "Weekly change control"
+      }
+    ],
+    "riskRegister": null,
+    "budget": {
+      "total": 80000,
+      "allocated": 50000,
+      "spent": 15000,
+      "currency": "USD",
+      "lastUpdated": "2025-11-10T10:00:00Z"
+    },
+    "financials": null,
+    "resourcesPlan": {
+      "stakeholders": [],
+      "teamSize": 0,
+      "budgetAllocation": 80000
+    },
+    "readinessChecklist": {
+      "items": [],
+      "totalWeight": 100,
+      "completedWeight": 0,
+      "percent": 0,
+      "updatedAt": "2025-11-10T09:00:00Z"
+    },
+    "readinessScore": null,
+    "approvalStatus": "draft",
+    "approvalRequestedAt": null,
+    "approvalRequestedBy": null,
+    "approvalResolvedAt": null,
+    "approvalResolvedBy": null,
+    "approvalReason": null,
+    "approvalNotes": null,
+    "reviewerComments": [],
+    "progress": null,
+    "health": null,
+    "documents": null,
+    "externalLinks": null,
+    "aiGeneratedInsights": null,
+    "cmsContentRefs": [],
+    "lastSyncedAt": null,
+    "stageGate": null,
+    "governance": null,
+    "communicationPlan": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "archivedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb977a"
+    },
+    "projectId": {
+      "$numberLong": "5034"
+    },
+    "projectName": "Cloud Infrastructure Upgrade",
+    "clientName": "Enterprise Solutions",
+    "clientIndustry": "Technology",
+    "startDate": {
+      "$date": "2025-03-15T00:00:00.000Z"
+    },
+    "endDate": {
+      "$date": "2025-09-30T00:00:00.000Z"
+    },
+    "leadByEmpId": {
+      "$numberLong": "1006"
+    },
+    "sponsorEmpId": {
+      "$numberLong": "1001"
+    },
+    "contactPerson": "Robert Johnson",
+    "contactNo": "+15550001045",
+    "emailId": "robert@enterprise.com",
+    "contactTitle": null,
+    "contactNotes": null,
+    "overview": {
+      "summary": "Upgrade cloud infrastructure for better scalability",
+      "objectives": [
+        "Improve performance",
+        "Reduce costs"
+      ],
+      "successCriteria": [
+        "50% cost reduction",
+        "99.9% uptime"
+      ],
+      "stakeholderNotes": "Project rejected"
+    },
+    "scope": null,
+    "successMetrics": null,
+    "status": "rejected",
+    "statusReason": null,
+    "statusHistory": [
+      {
+        "status": "draft",
+        "previousStatus": null,
+        "changedAt": "2025-03-01T09:00:00Z",
+        "changedBy": 1006,
+        "comment": "Project proposal created"
+      },
+      {
+        "status": "in_review",
+        "previousStatus": "draft",
+        "changedAt": "2025-03-10T10:00:00Z",
+        "changedBy": 1006,
+        "comment": "Submitted for approval"
+      },
+      {
+        "status": "rejected",
+        "previousStatus": "in_review",
+        "changedAt": "2025-03-12T15:00:00Z",
+        "changedBy": 1001,
+        "comment": "Rejected due to budget constraints and timeline conflicts"
+      }
+    ],
+    "timeline": [],
+    "milestones": null,
+    "categories": [],
+    "tags": [
+      "delivery",
+      "active"
+    ],
+    "focusAreas": [],
+    "blockers": null,
+    "risks": [
+      {
+        "title": "Scope creep",
+        "severity": "medium",
+        "mitigation": "Weekly change control"
+      }
+    ],
+    "riskRegister": null,
+    "budget": {
+      "total": 250000,
+      "allocated": 200000,
+      "spent": 125000,
+      "currency": "USD",
+      "lastUpdated": "2025-03-12T15:00:00Z"
+    },
+    "financials": null,
+    "resourcesPlan": {
+      "stakeholders": [],
+      "teamSize": 0,
+      "budgetAllocation": 250000
+    },
+    "readinessChecklist": {
+      "items": [],
+      "totalWeight": 100,
+      "completedWeight": 60,
+      "percent": 60,
+      "updatedAt": "2025-03-12T15:00:00Z"
+    },
+    "readinessScore": null,
+    "approvalStatus": "rejected",
+    "approvalRequestedAt": null,
+    "approvalRequestedBy": null,
+    "approvalResolvedAt": null,
+    "approvalResolvedBy": null,
+    "approvalReason": null,
+    "approvalNotes": null,
+    "reviewerComments": [],
+    "progress": null,
+    "health": null,
+    "documents": null,
+    "externalLinks": null,
+    "aiGeneratedInsights": null,
+    "cmsContentRefs": [],
+    "lastSyncedAt": null,
+    "stageGate": null,
+    "governance": null,
+    "communicationPlan": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "archivedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb977b"
+    },
+    "projectId": {
+      "$numberLong": "5035"
+    },
+    "projectName": "Data Analytics Dashboard",
+    "clientName": "Retail Corp",
+    "clientIndustry": "Retail",
+    "startDate": {
+      "$date": "2025-04-01T00:00:00.000Z"
+    },
+    "endDate": {
+      "$date": "2025-08-31T00:00:00.000Z"
+    },
+    "leadByEmpId": {
+      "$numberLong": "1002"
+    },
+    "sponsorEmpId": {
+      "$numberLong": "1003"
+    },
+    "contactPerson": "Sarah Williams",
+    "contactNo": "+15550001047",
+    "emailId": "sarah@retailcorp.com",
+    "contactTitle": null,
+    "contactNotes": null,
+    "overview": {
+      "summary": "Build analytics dashboard for retail operations",
+      "objectives": [
+        "Real-time analytics",
+        "Better insights"
+      ],
+      "successCriteria": [
+        "Dashboard live",
+        "User adoption 80%"
+      ],
+      "stakeholderNotes": "Project cancelled"
+    },
+    "scope": null,
+    "successMetrics": null,
+    "status": "cancelled",
+    "statusReason": null,
+    "statusHistory": [
+      {
+        "status": "draft",
+        "previousStatus": null,
+        "changedAt": "2025-03-20T09:00:00Z",
+        "changedBy": 1002,
+        "comment": "Project initiated"
+      },
+      {
+        "status": "in_review",
+        "previousStatus": "draft",
+        "changedAt": "2025-03-25T10:00:00Z",
+        "changedBy": 1002,
+        "comment": "Submitted for review"
+      },
+      {
+        "status": "approved",
+        "previousStatus": "in_review",
+        "changedAt": "2025-03-28T14:00:00Z",
+        "changedBy": 1003,
+        "comment": "Project approved"
+      },
+      {
+        "status": "cancelled",
+        "previousStatus": "approved",
+        "changedAt": "2025-04-05T11:00:00Z",
+        "changedBy": 1002,
+        "comment": "Cancelled due to client changing priorities"
+      }
+    ],
+    "timeline": [],
+    "milestones": null,
+    "categories": [],
+    "tags": [
+      "delivery",
+      "active"
+    ],
+    "focusAreas": [],
+    "blockers": null,
+    "risks": [
+      {
+        "title": "Scope creep",
+        "severity": "medium",
+        "mitigation": "Weekly change control"
+      }
+    ],
+    "riskRegister": null,
+    "budget": {
+      "total": 90000,
+      "allocated": 75000,
+      "spent": 45000,
+      "currency": "USD",
+      "lastUpdated": "2025-04-05T11:00:00Z"
+    },
+    "financials": null,
+    "resourcesPlan": {
+      "stakeholders": [],
+      "teamSize": 0,
+      "budgetAllocation": 90000
+    },
+    "readinessChecklist": {
+      "items": [],
+      "totalWeight": 100,
+      "completedWeight": 45,
+      "percent": 45,
+      "updatedAt": "2025-04-05T11:00:00Z"
+    },
+    "readinessScore": null,
+    "approvalStatus": "rejected",
+    "approvalRequestedAt": null,
+    "approvalRequestedBy": null,
+    "approvalResolvedAt": null,
+    "approvalResolvedBy": null,
+    "approvalReason": null,
+    "approvalNotes": null,
+    "reviewerComments": [],
+    "progress": null,
+    "health": null,
+    "documents": null,
+    "externalLinks": null,
+    "aiGeneratedInsights": null,
+    "cmsContentRefs": [],
+    "lastSyncedAt": null,
+    "stageGate": null,
+    "governance": null,
+    "communicationPlan": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "archivedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb977c"
+    },
+    "projectId": {
+      "$numberLong": "5036"
+    },
+    "projectName": "API Gateway Modernization",
+    "clientName": "FinTech Global",
+    "clientIndustry": "Finance",
+    "startDate": {
+      "$date": "2025-05-10T00:00:00.000Z"
+    },
+    "endDate": null,
+    "leadByEmpId": {
+      "$numberLong": "1006"
+    },
+    "sponsorEmpId": {
+      "$numberLong": "1004"
+    },
+    "contactPerson": "Michael Brown",
+    "contactNo": "+15550001049",
+    "emailId": "michael@fintech.com",
+    "contactTitle": null,
+    "contactNotes": null,
+    "overview": {
+      "summary": "Modernize API gateway infrastructure",
+      "objectives": [
+        "Improve performance",
+        "Better security"
+      ],
+      "successCriteria": [
+        "50% faster response",
+        "Zero breaches"
+      ],
+      "stakeholderNotes": "Early planning stage"
+    },
+    "scope": null,
+    "successMetrics": null,
+    "status": "draft",
+    "statusReason": null,
+    "statusHistory": [
+      {
+        "status": "draft",
+        "previousStatus": null,
+        "changedAt": "2025-04-20T09:00:00Z",
+        "changedBy": 1006,
+        "comment": "Initial project setup"
+      }
+    ],
+    "timeline": [],
+    "milestones": null,
+    "categories": [],
+    "tags": [
+      "delivery",
+      "active"
+    ],
+    "focusAreas": [],
+    "blockers": null,
+    "risks": [
+      {
+        "title": "Scope creep",
+        "severity": "medium",
+        "mitigation": "Weekly change control"
+      }
+    ],
+    "riskRegister": null,
+    "budget": {
+      "total": 150000,
+      "allocated": 100000,
+      "spent": 35000,
+      "currency": "USD",
+      "lastUpdated": "2025-11-10T10:00:00Z"
+    },
+    "financials": null,
+    "resourcesPlan": {
+      "stakeholders": [],
+      "teamSize": 0,
+      "budgetAllocation": 150000
+    },
+    "readinessChecklist": {
+      "items": [],
+      "totalWeight": 100,
+      "completedWeight": 20,
+      "percent": 20,
+      "updatedAt": "2025-04-20T09:00:00Z"
+    },
+    "readinessScore": null,
+    "approvalStatus": "draft",
+    "approvalRequestedAt": null,
+    "approvalRequestedBy": null,
+    "approvalResolvedAt": null,
+    "approvalResolvedBy": null,
+    "approvalReason": null,
+    "approvalNotes": null,
+    "reviewerComments": [],
+    "progress": null,
+    "health": null,
+    "documents": null,
+    "externalLinks": null,
+    "aiGeneratedInsights": null,
+    "cmsContentRefs": [],
+    "lastSyncedAt": null,
+    "stageGate": null,
+    "governance": null,
+    "communicationPlan": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "archivedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb977d"
+    },
+    "projectId": {
+      "$numberLong": "5037"
+    },
+    "projectName": "Customer Portal Enhancement",
+    "clientName": "Service Pro",
+    "clientIndustry": "Services",
+    "startDate": {
+      "$date": "2024-09-01T00:00:00.000Z"
+    },
+    "endDate": {
+      "$date": "2024-11-30T00:00:00.000Z"
+    },
+    "leadByEmpId": {
+      "$numberLong": "1004"
+    },
+    "sponsorEmpId": {
+      "$numberLong": "1005"
+    },
+    "contactPerson": "Emily Davis",
+    "contactNo": "+15550001051",
+    "emailId": "emily@servicepro.com",
+    "contactTitle": null,
+    "contactNotes": null,
+    "overview": {
+      "summary": "Enhanced customer portal with new features",
+      "objectives": [
+        "Better UX",
+        "More features"
+      ],
+      "successCriteria": [
+        "Portal live",
+        "Customer satisfaction 90%"
+      ],
+      "stakeholderNotes": "Completed successfully"
+    },
+    "scope": null,
+    "successMetrics": null,
+    "status": "completed",
+    "statusReason": null,
+    "statusHistory": [
+      {
+        "status": "draft",
+        "previousStatus": null,
+        "changedAt": "2024-08-15T09:00:00Z",
+        "changedBy": 1004,
+        "comment": "Project created"
+      },
+      {
+        "status": "approved",
+        "previousStatus": "draft",
+        "changedAt": "2024-08-20T10:00:00Z",
+        "changedBy": 1005,
+        "comment": "Approved and started"
+      },
+      {
+        "status": "completed",
+        "previousStatus": "approved",
+        "changedAt": "2024-11-30T17:00:00Z",
+        "changedBy": 1004,
+        "comment": "Project completed successfully"
+      }
+    ],
+    "timeline": [],
+    "milestones": null,
+    "categories": [],
+    "tags": [
+      "delivery",
+      "active"
+    ],
+    "focusAreas": [],
+    "blockers": null,
+    "risks": [
+      {
+        "title": "Scope creep",
+        "severity": "medium",
+        "mitigation": "Weekly change control"
+      }
+    ],
+    "riskRegister": null,
+    "budget": {
+      "total": 75000,
+      "allocated": 75000,
+      "spent": 75000,
+      "currency": "USD",
+      "lastUpdated": "2024-11-30T17:00:00Z"
+    },
+    "financials": null,
+    "resourcesPlan": {
+      "stakeholders": [],
+      "teamSize": 0,
+      "budgetAllocation": 75000
+    },
+    "readinessChecklist": {
+      "items": [],
+      "totalWeight": 100,
+      "completedWeight": 100,
+      "percent": 100,
+      "updatedAt": "2024-11-30T17:00:00Z"
+    },
+    "readinessScore": null,
+    "approvalStatus": "approved",
+    "approvalRequestedAt": null,
+    "approvalRequestedBy": null,
+    "approvalResolvedAt": null,
+    "approvalResolvedBy": null,
+    "approvalReason": null,
+    "approvalNotes": null,
+    "reviewerComments": [],
+    "progress": null,
+    "health": null,
+    "documents": null,
+    "externalLinks": null,
+    "aiGeneratedInsights": null,
+    "cmsContentRefs": [],
+    "lastSyncedAt": null,
+    "stageGate": null,
+    "governance": null,
+    "communicationPlan": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.247Z"
+    },
+    "archivedAt": {
+      "$date": "2024-12-01T00:00:00.000Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691707b3f669025df5857b80"
+    },
+    "projectId": {
+      "$numberLong": "5038"
+    },
+    "projectName": "Test Testing",
+    "clientName": "Mr Test",
+    "clientIndustry": "",
+    "startDate": {
+      "$date": "2025-10-10T00:00:00.000Z"
+    },
+    "endDate": null,
+    "leadByEmpId": {
+      "$numberLong": "1002"
+    },
+    "sponsorEmpId": null,
+    "contactPerson": "Arnob",
+    "contactNo": "+15550001053",
+    "emailId": "ava.thompson@example.com",
+    "contactTitle": "",
+    "contactNotes": "",
+    "overview": {
+      "summary": "Rapidly stand up incident response coverage for Mad Max ahead of their Q4 audit by pairing our managed SOC with zero-trust guardrails and refreshed runbooks.",
+      "objectives": [
+        "1. Cut mean time to detect high-severity events below five minutes.",
+        "2. Deliver executive-ready SOC dashboards and weekly briefings.",
+        "3. Roll out zero-trust guardrails aligned to the updated compliance playbook."
+      ],
+      "successCriteria": [
+        "1. All Tier-1 incidents triaged within 15 minutes of alert.",
+        "2. \u226595\u202f% endpoint coverage with compliant posture scores.",
+        "3. Audit team signs off on revised access controls with zero critical findings."
+      ],
+      "stakeholderNotes": "Primary sponsor: Morgan Reeves (CIO). Legal and compliance join the Monday 9 AM CET review. Marketing needs talking points once launch dates are confirmed.",
+      "aiDraftSource": "contentful",
+      "aiDraftGeneratedAt": "2025-11-14T10:49:39.822Z",
+      "cmsEntryId": "4y4C2nYfinSWsdEGsQFCSR"
+    },
+    "scope": {},
+    "successMetrics": [],
+    "status": "approved",
+    "statusReason": "",
+    "statusHistory": [
+      {
+        "status": "in_review",
+        "previousStatus": "draft",
+        "changedAt": "2025-11-14T10:50:28.740Z",
+        "changedBy": 1005,
+        "changedByName": "Test",
+        "comment": "Please accept",
+        "attachments": [],
+        "metadata": {},
+        "id": "history-1763117428740"
+      },
+      {
+        "status": "approved",
+        "previousStatus": "in_review",
+        "changedAt": "2025-11-14T10:51:50.048Z",
+        "changedBy": 1005,
+        "changedByName": "Test",
+        "attachments": [],
+        "metadata": {},
+        "id": "history-1763117510048"
+      }
+    ],
+    "timeline": [
+      {
+        "id": "approval-1763117428740",
+        "label": "In Review status",
+        "description": "Please accept",
+        "state": "completed",
+        "occurredAt": "2025-11-14T10:50:28.740Z",
+        "assigneeIds": [],
+        "supportingDocs": [],
+        "status": "in_review",
+        "actorId": 1005,
+        "actorName": "Test"
+      },
+      {
+        "id": "review-1763117491982",
+        "label": "Reviewer comment (team)",
+        "description": "Good Luck Team",
+        "state": "completed",
+        "occurredAt": "2025-11-14T10:51:31.982Z",
+        "assigneeIds": [],
+        "supportingDocs": [],
+        "status": "in_review",
+        "actorId": 1003,
+        "actorName": "Test"
+      },
+      {
+        "id": "approval-1763117510048",
+        "label": "Approved status",
+        "state": "completed",
+        "occurredAt": "2025-11-14T10:51:50.048Z",
+        "assigneeIds": [],
+        "supportingDocs": [],
+        "status": "approved",
+        "actorId": 1005,
+        "actorName": "Test"
+      }
+    ],
+    "milestones": [],
+    "categories": [],
+    "tags": [
+      "delivery",
+      "active"
+    ],
+    "focusAreas": [],
+    "blockers": [],
+    "risks": [],
+    "riskRegister": {},
+    "budget": {},
+    "financials": {},
+    "resourcesPlan": {},
+    "readinessChecklist": {
+      "items": [
+        {
+          "id": "scopeDefined",
+          "title": "Scope confirmed",
+          "description": "Requirements baseline captured and shared with stakeholders.",
+          "category": "Scope",
+          "weight": 25,
+          "status": "in_progress",
+          "ownerId": 1003,
+          "ownerName": "Sophia Nguyen",
+          "dueDate": "2025-11-21",
+          "notes": "",
+          "statusUpdatedAt": "2025-11-14T10:45:30.903Z",
+          "lastUpdatedBy": null
+        },
+        {
+          "id": "budgetApproved",
+          "title": "Budget approved",
+          "description": "Finance sign-off received for the projected spend.",
+          "category": "Budget",
+          "weight": 20,
+          "status": "done",
+          "ownerId": 1001,
+          "ownerName": "Ava Thompson",
+          "dueDate": "2025-11-28",
+          "notes": "",
+          "statusUpdatedAt": "2025-11-14T10:45:30.903Z",
+          "lastUpdatedBy": null
+        },
+        {
+          "id": "legalReviewed",
+          "title": "Contracts reviewed",
+          "description": "Master services agreement and NDAs cleared with legal.",
+          "category": "Legal",
+          "weight": 20,
+          "status": "blocked",
+          "ownerId": 1002,
+          "ownerName": "Liam Jackson",
+          "dueDate": "2025-12-05",
+          "notes": "",
+          "statusUpdatedAt": "2025-11-14T10:45:30.903Z",
+          "lastUpdatedBy": null
+        },
+        {
+          "id": "assetsPrepared",
+          "title": "Assets prepared",
+          "description": "Brand assets, data rooms, and collateral ready to share.",
+          "category": "Assets",
+          "weight": 15,
+          "status": "done",
+          "ownerId": 1003,
+          "ownerName": "Sophia Nguyen",
+          "dueDate": "2025-11-24",
+          "notes": "",
+          "statusUpdatedAt": "2025-11-14T10:45:30.903Z",
+          "lastUpdatedBy": null
+        },
+        {
+          "id": "kickoffScheduled",
+          "title": "Kickoff scheduled",
+          "description": "Kickoff meeting on calendar with internal and client teams.",
+          "category": "Timeline",
+          "weight": 20,
+          "status": "in_progress",
+          "ownerId": 1002,
+          "ownerName": "Liam Jackson",
+          "dueDate": "2025-12-12",
+          "notes": "",
+          "statusUpdatedAt": "2025-11-14T10:45:30.903Z",
+          "lastUpdatedBy": null
+        }
+      ],
+      "totalWeight": 100,
+      "completedWeight": 57.5,
+      "percent": 57,
+      "updatedAt": "2025-11-14T11:00:16.537Z",
+      "updatedBy": null,
+      "summary": null
+    },
+    "readinessScore": 57,
+    "approvalStatus": "approved",
+    "approvalRequestedAt": {
+      "$date": "2025-11-14T10:50:28.740Z"
+    },
+    "approvalRequestedBy": {
+      "$numberLong": "1005"
+    },
+    "approvalResolvedAt": {
+      "$date": "2025-11-14T10:51:50.048Z"
+    },
+    "approvalResolvedBy": {
+      "$numberLong": "1005"
+    },
+    "approvalReason": "Please accept",
+    "approvalNotes": {
+      "lastAction": "approve",
+      "lastComment": "",
+      "lastActorId": 1005,
+      "lastActorName": "Test"
+    },
+    "reviewerComments": [
+      {
+        "id": "comment-1763117491982",
+        "section": "team",
+        "comment": "Good Luck Team",
+        "reviewerId": 1003,
+        "reviewerName": "Test",
+        "createdAt": "2025-11-14T10:51:31.982Z",
+        "severity": "warning",
+        "suggestions": [],
+        "resolved": false
+      }
+    ],
+    "progress": null,
+    "health": "",
+    "documents": [],
+    "externalLinks": [],
+    "aiGeneratedInsights": {},
+    "cmsContentRefs": [
+      {
+        "provider": "contentful",
+        "referenceId": "4y4C2nYfinSWsdEGsQFCSR",
+        "syncStatus": "idle",
+        "metadata": {
+          "appliedAt": "2025-11-14T10:49:39.822Z"
+        }
+      }
+    ],
+    "lastSyncedAt": null,
+    "stageGate": {},
+    "governance": {},
+    "communicationPlan": {},
+    "createdAt": {
+      "$date": "2025-11-14T10:42:59.915Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T11:00:16.710Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69171b97a0912180c9e557f6"
+    },
+    "projectId": {
+      "$numberLong": "5039"
+    },
+    "projectName": "Test 2",
+    "clientName": "Mr Test",
+    "clientIndustry": "",
+    "startDate": {
+      "$date": "2025-11-18T00:00:00.000Z"
+    },
+    "endDate": null,
+    "leadByEmpId": {
+      "$numberLong": "1008"
+    },
+    "sponsorEmpId": null,
+    "contactPerson": "Arnob Mahmud",
+    "contactNo": "+15550001055",
+    "emailId": "ava.thompson@example.com",
+    "contactTitle": "",
+    "contactNotes": "",
+    "overview": {
+      "summary": "The Test 2 project for Mr Test is underway, starting on 2025-11-18. Scope, budget, and contracts are approved. Asset preparation is in progress, and the kickoff meeting is currently blocked. Overall project readiness is at 73%. Contact person: Arnob Mahmud.",
+      "objectives": [
+        "Finalize asset preparation.",
+        "Schedule and execute the kickoff meeting.",
+        "Deliver the project within the defined scope and budget."
+      ],
+      "successCriteria": [
+        "Successful kickoff meeting with all stakeholders.",
+        "On-time delivery of project milestones.",
+        "Client satisfaction with project outcomes."
+      ],
+      "stakeholderNotes": "Please ensure timely completion of asset preparation to facilitate the kickoff meeting.",
+      "aiDraftSource": "gemini",
+      "aiDraftGeneratedAt": "2025-11-14T12:09:18.980Z"
+    },
+    "scope": {},
+    "successMetrics": [],
+    "status": "in_review",
+    "statusReason": "",
+    "statusHistory": [
+      {
+        "status": "draft",
+        "changedAt": "2025-11-14T12:07:51.504Z",
+        "changedBy": null,
+        "comment": "Project created",
+        "attachments": [],
+        "metadata": {},
+        "id": "history-1763122071504"
+      },
+      {
+        "status": "in_review",
+        "previousStatus": "draft",
+        "changedAt": "2025-11-14T12:10:47.604Z",
+        "changedBy": 1008,
+        "changedByName": "Mew",
+        "comment": "Thanks",
+        "attachments": [],
+        "metadata": {},
+        "id": "history-1763122247604"
+      }
+    ],
+    "timeline": [
+      {
+        "id": "approval-1763122071504",
+        "label": "Draft status",
+        "description": "Initial status recorded",
+        "state": "completed",
+        "occurredAt": "2025-11-14T12:07:51.504Z",
+        "assigneeIds": [],
+        "supportingDocs": [],
+        "status": "draft",
+        "actorId": null
+      },
+      {
+        "id": "approval-1763122247604",
+        "label": "In Review status",
+        "description": "Thanks",
+        "state": "completed",
+        "occurredAt": "2025-11-14T12:10:47.604Z",
+        "assigneeIds": [],
+        "supportingDocs": [],
+        "status": "in_review",
+        "actorId": 1008,
+        "actorName": "Mew"
+      },
+      {
+        "id": "review-1763122443047",
+        "label": "Reviewer comment (contact)",
+        "description": "whats going on??",
+        "state": "completed",
+        "occurredAt": "2025-11-14T12:14:03.047Z",
+        "assigneeIds": [],
+        "supportingDocs": [],
+        "status": "in_review",
+        "actorId": 1008,
+        "actorName": "Tester"
+      }
+    ],
+    "milestones": [],
+    "categories": [],
+    "tags": [
+      "delivery",
+      "active"
+    ],
+    "focusAreas": [],
+    "blockers": [],
+    "risks": [],
+    "riskRegister": {},
+    "budget": {},
+    "financials": {},
+    "resourcesPlan": {},
+    "readinessChecklist": {
+      "items": [
+        {
+          "id": "scopeDefined",
+          "title": "Scope confirmed",
+          "description": "Requirements baseline captured and shared with stakeholders.",
+          "category": "Scope",
+          "weight": 25,
+          "status": "done",
+          "ownerId": 1008,
+          "ownerName": "Test Man",
+          "dueDate": "2025-11-26",
+          "notes": "",
+          "statusUpdatedAt": "2025-11-14T12:09:33.368Z",
+          "lastUpdatedBy": null
+        },
+        {
+          "id": "budgetApproved",
+          "title": "Budget approved",
+          "description": "Finance sign-off received for the projected spend.",
+          "category": "Budget",
+          "weight": 20,
+          "status": "done",
+          "ownerId": 1008,
+          "ownerName": "Test Man",
+          "dueDate": "2025-11-27",
+          "notes": "",
+          "statusUpdatedAt": "2025-11-14T12:09:33.368Z",
+          "lastUpdatedBy": null
+        },
+        {
+          "id": "legalReviewed",
+          "title": "Contracts reviewed",
+          "description": "Master services agreement and NDAs cleared with legal.",
+          "category": "Legal",
+          "weight": 20,
+          "status": "done",
+          "ownerId": 1008,
+          "ownerName": "Test Man",
+          "dueDate": "2025-12-03",
+          "notes": "",
+          "statusUpdatedAt": "2025-11-14T12:09:33.368Z",
+          "lastUpdatedBy": null
+        },
+        {
+          "id": "assetsPrepared",
+          "title": "Assets prepared",
+          "description": "Brand assets, data rooms, and collateral ready to share.",
+          "category": "Assets",
+          "weight": 15,
+          "status": "in_progress",
+          "ownerId": 1008,
+          "ownerName": "Test Man",
+          "dueDate": "2025-12-02",
+          "notes": "",
+          "statusUpdatedAt": "2025-11-14T12:09:33.368Z",
+          "lastUpdatedBy": null
+        },
+        {
+          "id": "kickoffScheduled",
+          "title": "Kickoff scheduled",
+          "description": "Kickoff meeting on calendar with internal and client teams.",
+          "category": "Timeline",
+          "weight": 20,
+          "status": "blocked",
+          "ownerId": 1008,
+          "ownerName": "Test Man",
+          "dueDate": "2025-12-04",
+          "notes": "",
+          "statusUpdatedAt": "2025-11-14T12:09:33.368Z",
+          "lastUpdatedBy": null
+        }
+      ],
+      "totalWeight": 100,
+      "completedWeight": 72.5,
+      "percent": 73,
+      "updatedAt": "2025-11-14T12:15:13.689Z",
+      "updatedBy": null,
+      "summary": null
+    },
+    "readinessScore": 73,
+    "approvalStatus": "in_review",
+    "approvalRequestedAt": {
+      "$date": "2025-11-14T12:10:47.604Z"
+    },
+    "approvalRequestedBy": {
+      "$numberLong": "1008"
+    },
+    "approvalResolvedAt": null,
+    "approvalResolvedBy": null,
+    "approvalReason": "Thanks",
+    "approvalNotes": {
+      "lastAction": "request",
+      "lastComment": "Thanks",
+      "lastActorId": 1008,
+      "lastActorName": "Mew"
+    },
+    "reviewerComments": [
+      {
+        "id": "comment-1763122443047",
+        "section": "contact",
+        "comment": "whats going on??",
+        "reviewerId": 1008,
+        "reviewerName": "Tester",
+        "createdAt": "2025-11-14T12:14:03.047Z",
+        "severity": "critical",
+        "suggestions": [],
+        "resolved": false
+      }
+    ],
+    "progress": null,
+    "health": "",
+    "documents": [],
+    "externalLinks": [],
+    "aiGeneratedInsights": {},
+    "cmsContentRefs": [],
+    "lastSyncedAt": null,
+    "stageGate": {},
+    "governance": {},
+    "communicationPlan": {},
+    "createdAt": {
+      "$date": "2025-11-14T12:07:51.506Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T12:15:13.901Z"
+    }
+  }
+]

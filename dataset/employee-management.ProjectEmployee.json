@@ -1,0 +1,560 @@
+[
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb977e"
+    },
+    "empProjectId": {
+      "$numberLong": "7001"
+    },
+    "projectId": {
+      "$numberLong": "5001"
+    },
+    "empId": {
+      "$numberLong": "1001"
+    },
+    "assignedDate": {
+      "$date": "2025-01-10T00:00:00.000Z"
+    },
+    "role": "Project Lead",
+    "isActive": true,
+    "allocationPct": {
+      "$numberLong": "70"
+    },
+    "billable": true,
+    "billingRate": null,
+    "costRate": null,
+    "notes": "Leading the Aurora Web Revamp initiative. Focus on responsive design improvements and performance optimization. Weekly sync with client on Fridays.",
+    "responsibilities": [
+      "Delivery contribution",
+      "Status updates"
+    ],
+    "skillsApplied": [
+      "collaboration"
+    ],
+    "toolsUsed": [],
+    "schedule": null,
+    "contribution": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "unassignedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb977f"
+    },
+    "empProjectId": {
+      "$numberLong": "7002"
+    },
+    "projectId": {
+      "$numberLong": "5001"
+    },
+    "empId": {
+      "$numberLong": "1003"
+    },
+    "assignedDate": {
+      "$date": "2025-01-15T00:00:00.000Z"
+    },
+    "role": "Quality Lead",
+    "isActive": true,
+    "allocationPct": {
+      "$numberLong": "40"
+    },
+    "billable": true,
+    "billingRate": null,
+    "costRate": null,
+    "notes": "Responsible for QA strategy and test automation. Coordinating with frontend team on accessibility testing requirements.",
+    "responsibilities": [
+      "Delivery contribution",
+      "Status updates"
+    ],
+    "skillsApplied": [
+      "collaboration"
+    ],
+    "toolsUsed": [],
+    "schedule": null,
+    "contribution": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "unassignedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9780"
+    },
+    "empProjectId": {
+      "$numberLong": "7003"
+    },
+    "projectId": {
+      "$numberLong": "5001"
+    },
+    "empId": {
+      "$numberLong": "1004"
+    },
+    "assignedDate": {
+      "$date": "2025-01-18T00:00:00.000Z"
+    },
+    "role": "Product Designer",
+    "isActive": true,
+    "allocationPct": {
+      "$numberLong": "50"
+    },
+    "billable": false,
+    "billingRate": null,
+    "costRate": null,
+    "notes": "Design system updates and user experience improvements. Working closely with frontend team on component library.",
+    "responsibilities": [
+      "Delivery contribution",
+      "Status updates"
+    ],
+    "skillsApplied": [
+      "collaboration"
+    ],
+    "toolsUsed": [],
+    "schedule": null,
+    "contribution": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "unassignedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9781"
+    },
+    "empProjectId": {
+      "$numberLong": "7004"
+    },
+    "projectId": {
+      "$numberLong": "5002"
+    },
+    "empId": {
+      "$numberLong": "1003"
+    },
+    "assignedDate": {
+      "$date": "2025-02-14T00:00:00.000Z"
+    },
+    "role": "Program Lead",
+    "isActive": true,
+    "allocationPct": {
+      "$numberLong": "80"
+    },
+    "billable": true,
+    "billingRate": null,
+    "costRate": null,
+    "notes": "Leading AI Platform development. High allocation due to critical ML model training pipeline work. Daily standups with engineering team.",
+    "responsibilities": [
+      "Delivery contribution",
+      "Status updates"
+    ],
+    "skillsApplied": [
+      "collaboration"
+    ],
+    "toolsUsed": [],
+    "schedule": null,
+    "contribution": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "unassignedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9782"
+    },
+    "empProjectId": {
+      "$numberLong": "7005"
+    },
+    "projectId": {
+      "$numberLong": "5002"
+    },
+    "empId": {
+      "$numberLong": "1006"
+    },
+    "assignedDate": {
+      "$date": "2025-02-16T00:00:00.000Z"
+    },
+    "role": "SRE Advisor",
+    "isActive": true,
+    "allocationPct": {
+      "$numberLong": "40"
+    },
+    "billable": true,
+    "billingRate": null,
+    "costRate": null,
+    "notes": "Infrastructure and reliability consulting. Reviewing deployment architecture and monitoring setup for ML workloads.",
+    "responsibilities": [
+      "Delivery contribution",
+      "Status updates"
+    ],
+    "skillsApplied": [
+      "collaboration"
+    ],
+    "toolsUsed": [],
+    "schedule": null,
+    "contribution": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "unassignedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9783"
+    },
+    "empProjectId": {
+      "$numberLong": "7006"
+    },
+    "projectId": {
+      "$numberLong": "5002"
+    },
+    "empId": {
+      "$numberLong": "1001"
+    },
+    "assignedDate": {
+      "$date": "2025-02-18T00:00:00.000Z"
+    },
+    "role": "Frontend Advisor",
+    "isActive": false,
+    "allocationPct": {
+      "$numberLong": "20"
+    },
+    "billable": false,
+    "billingRate": null,
+    "costRate": null,
+    "notes": "Temporary advisory role. Unassigned after frontend architecture was finalized.",
+    "responsibilities": [
+      "Delivery contribution",
+      "Status updates"
+    ],
+    "skillsApplied": [
+      "collaboration"
+    ],
+    "toolsUsed": [],
+    "schedule": null,
+    "contribution": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "unassignedAt": {
+      "$date": "2025-03-10T00:00:00.000Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9784"
+    },
+    "empProjectId": {
+      "$numberLong": "7007"
+    },
+    "projectId": {
+      "$numberLong": "5030"
+    },
+    "empId": {
+      "$numberLong": "1005"
+    },
+    "assignedDate": {
+      "$date": "2025-11-29T00:00:00.000Z"
+    },
+    "role": "Automation",
+    "isActive": true,
+    "allocationPct": {
+      "$numberLong": "30"
+    },
+    "billable": true,
+    "billingRate": null,
+    "costRate": null,
+    "notes": "Building automation workflows for model training and deployment. Focus on CI/CD pipeline integration.",
+    "responsibilities": [
+      "Delivery contribution",
+      "Status updates"
+    ],
+    "skillsApplied": [
+      "collaboration"
+    ],
+    "toolsUsed": [],
+    "schedule": null,
+    "contribution": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "unassignedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9785"
+    },
+    "empProjectId": {
+      "$numberLong": "7008"
+    },
+    "projectId": {
+      "$numberLong": "5031"
+    },
+    "empId": {
+      "$numberLong": "1002"
+    },
+    "assignedDate": {
+      "$date": "2025-11-08T00:00:00.000Z"
+    },
+    "role": "Backend Lead",
+    "isActive": true,
+    "allocationPct": {
+      "$numberLong": "60"
+    },
+    "billable": true,
+    "billingRate": null,
+    "costRate": null,
+    "notes": "Leading backend development for security platform. Implementing authentication and authorization systems. Critical path item.",
+    "responsibilities": [
+      "Delivery contribution",
+      "Status updates"
+    ],
+    "skillsApplied": [
+      "collaboration"
+    ],
+    "toolsUsed": [],
+    "schedule": null,
+    "contribution": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "unassignedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9786"
+    },
+    "empProjectId": {
+      "$numberLong": "7009"
+    },
+    "projectId": {
+      "$numberLong": "5031"
+    },
+    "empId": {
+      "$numberLong": "1001"
+    },
+    "assignedDate": {
+      "$date": "2025-11-08T00:00:00.000Z"
+    },
+    "role": "Frontend Support",
+    "isActive": true,
+    "allocationPct": {
+      "$numberLong": "40"
+    },
+    "billable": true,
+    "billingRate": null,
+    "costRate": null,
+    "notes": "Supporting frontend development for security dashboard. Working on real-time monitoring UI components.",
+    "responsibilities": [
+      "Delivery contribution",
+      "Status updates"
+    ],
+    "skillsApplied": [
+      "collaboration"
+    ],
+    "toolsUsed": [],
+    "schedule": null,
+    "contribution": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "unassignedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9787"
+    },
+    "empProjectId": {
+      "$numberLong": "7010"
+    },
+    "projectId": {
+      "$numberLong": "5031"
+    },
+    "empId": {
+      "$numberLong": "1003"
+    },
+    "assignedDate": {
+      "$date": "2025-11-09T00:00:00.000Z"
+    },
+    "role": "Transformation Coach",
+    "isActive": true,
+    "allocationPct": {
+      "$numberLong": "50"
+    },
+    "billable": true,
+    "billingRate": null,
+    "costRate": null,
+    "notes": "Coaching team on security best practices and transformation methodology. Conducting weekly security training sessions.",
+    "responsibilities": [
+      "Delivery contribution",
+      "Status updates"
+    ],
+    "skillsApplied": [
+      "collaboration"
+    ],
+    "toolsUsed": [],
+    "schedule": null,
+    "contribution": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.343Z"
+    },
+    "unassignedAt": null
+  },
+  {
+    "_id": {
+      "$oid": "691707fbcaca7abf48fb6a0a"
+    },
+    "empProjectId": {
+      "$numberLong": "7011"
+    },
+    "projectId": {
+      "$numberLong": "5038"
+    },
+    "empId": {
+      "$numberLong": "1006"
+    },
+    "assignedDate": {
+      "$date": "2025-11-05T00:00:00.000Z"
+    },
+    "role": "Tester",
+    "isActive": true,
+    "allocationPct": {
+      "$numberLong": "50"
+    },
+    "billable": false,
+    "billingRate": null,
+    "costRate": null,
+    "notes": "Good Luck",
+    "responsibilities": [
+      "Delivery contribution",
+      "Status updates"
+    ],
+    "skillsApplied": [
+      "collaboration"
+    ],
+    "toolsUsed": [],
+    "schedule": null,
+    "contribution": null,
+    "createdAt": {
+      "$date": "2025-11-14T10:44:11.806Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T10:44:11.806Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "691708ebf669025df5857b81"
+    },
+    "empProjectId": {
+      "$numberLong": "7012"
+    },
+    "projectId": {
+      "$numberLong": "5038"
+    },
+    "empId": {
+      "$numberLong": "1004"
+    },
+    "assignedDate": {
+      "$date": "2025-11-06T00:00:00.000Z"
+    },
+    "role": "Product Designer",
+    "isActive": true,
+    "allocationPct": {
+      "$numberLong": "30"
+    },
+    "billable": false,
+    "billingRate": null,
+    "costRate": null,
+    "notes": null,
+    "responsibilities": [
+      "Delivery contribution",
+      "Status updates"
+    ],
+    "skillsApplied": [
+      "collaboration"
+    ],
+    "toolsUsed": [],
+    "schedule": null,
+    "contribution": null,
+    "createdAt": {
+      "$date": "2025-11-14T10:48:11.504Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T10:48:11.504Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69171c2bb8af72bc998c70d5"
+    },
+    "empProjectId": {
+      "$numberLong": "7013"
+    },
+    "projectId": {
+      "$numberLong": "5039"
+    },
+    "empId": {
+      "$numberLong": "1004"
+    },
+    "assignedDate": {
+      "$date": "2025-11-17T00:00:00.000Z"
+    },
+    "role": "Product Designer",
+    "isActive": true,
+    "allocationPct": {
+      "$numberLong": "40"
+    },
+    "billable": false,
+    "billingRate": null,
+    "costRate": null,
+    "notes": null,
+    "responsibilities": [
+      "Delivery contribution",
+      "Status updates"
+    ],
+    "skillsApplied": [
+      "collaboration"
+    ],
+    "toolsUsed": [],
+    "schedule": null,
+    "contribution": null,
+    "createdAt": {
+      "$date": "2025-11-14T12:10:19.852Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T12:10:19.852Z"
+    }
+  }
+]

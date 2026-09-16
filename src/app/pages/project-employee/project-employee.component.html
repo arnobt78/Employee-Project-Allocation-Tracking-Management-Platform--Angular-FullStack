@@ -33,23 +33,42 @@
   <app-kpi-stat-card
     listShellKpis
     label="Total assignments"
-    [value]="isLoading() ? '—' : metrics().total"
+    [value]="totalAssignmentsKpi()"
+    hint="All records"
     icon="contact"
     tone="sky"
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
     label="Active"
-    [value]="isLoading() ? '—' : metrics().active"
+    [value]="activeAssignmentsKpi()"
+    hint="Currently active"
     icon="check-circle"
     tone="emerald"
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
     label="Inactive"
-    [value]="isLoading() ? '—' : metrics().inactive"
+    [value]="inactiveAssignmentsKpi()"
+    hint="Paused or ended"
     icon="pause-circle"
     tone="slate"
+  ></app-kpi-stat-card>
+  <app-kpi-stat-card
+    listShellKpis
+    label="Projects"
+    [value]="uniqueProjectsKpi()"
+    hint="Unique projects"
+    icon="folder-kanban"
+    tone="violet"
+  ></app-kpi-stat-card>
+  <app-kpi-stat-card
+    listShellKpis
+    label="Roles"
+    [value]="uniqueRolesKpi()"
+    hint="Unique roles"
+    icon="briefcase"
+    tone="amber"
   ></app-kpi-stat-card>
 
   <app-list-toolbar
@@ -58,14 +77,10 @@
     searchLabel="Search assignments"
     searchPlaceholder="Search project, employee, role or date…"
     [searchValue]="searchTerm()"
-    filterId="assignment-status-filter"
-    filterLabel="Status"
-    filterIcon="circle-dot"
-    [filterValue]="filterValue()"
-    [filterOptions]="statusFilterOptions"
+    [menuFilters]="menuFilters()"
     [hasActiveFilters]="hasActiveFilters()"
     (searchChange)="updateSearch($event)"
-    (filterChange)="setStatusFilter($event)"
+    (menuFilterChange)="onMenuFilterChange($event)"
     (clearFilters)="clearListFilters()"
   >
     @if (!isLoading()) {
@@ -82,16 +97,24 @@
     class="mb-6 rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
   >
     <header class="mb-6 flex items-center justify-between gap-3">
-      <div>
-        <h2 class="text-base sm:text-xl font-medium text-white">
-          Add Project Assignment
-        </h2>
-        <p class="text-xs text-white/55">Connect employees to projects</p>
+      <div class="flex min-w-0 items-start gap-3">
+        <span
+          class="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-sky-200"
+          aria-hidden="true"
+        >
+          <lucide-icon name="users" [size]="18"></lucide-icon>
+        </span>
+        <div class="min-w-0">
+          <h2 class="text-base sm:text-xl font-medium text-white">
+            Add Project Assignment
+          </h2>
+          <p class="text-xs text-white/55">Connect employees to projects</p>
+        </div>
       </div>
       <button
         type="button"
         [disabled]="isSaving"
-        class="text-xs text-white/60 transition hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        class="shrink-0 text-xs text-white/60 transition hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
         (click)="closeCreatePanel()"
       >
         Cancel
@@ -104,9 +127,12 @@
       [class.opacity-50]="isSaving"
     >
       <div>
-        <label for="create-project" class="mb-2 block text-xs text-white/60"
-          >Project</label
-        >
+        <app-field-label
+          text="Project"
+          icon="folder-kanban"
+          forId="create-project"
+          [required]="true"
+        ></app-field-label>
         <app-select-menu
           id="create-project"
           formControlName="projectId"
@@ -117,9 +143,12 @@
         ></app-select-menu>
       </div>
       <div>
-        <label for="create-employee" class="mb-2 block text-xs text-white/60"
-          >Team Member</label
-        >
+        <app-field-label
+          text="Team Member"
+          icon="users"
+          forId="create-employee"
+          [required]="true"
+        ></app-field-label>
         <app-select-menu
           id="create-employee"
           formControlName="empId"
@@ -130,9 +159,12 @@
         ></app-select-menu>
       </div>
       <div>
-        <label for="create-date" class="mb-2 block text-xs text-white/60"
-          >Assigned Date</label
-        >
+        <app-field-label
+          text="Assigned Date"
+          icon="calendar"
+          forId="create-date"
+          [required]="true"
+        ></app-field-label>
         <input
           id="create-date"
           type="date"
@@ -141,9 +173,12 @@
         />
       </div>
       <div>
-        <label for="create-role" class="mb-2 block text-xs text-white/60"
-          >Project Role</label
-        >
+        <app-field-label
+          text="Project Role"
+          icon="briefcase"
+          forId="create-role"
+          [required]="true"
+        ></app-field-label>
         <input
           id="create-role"
           type="text"
@@ -156,9 +191,12 @@
         />
       </div>
       <div>
-        <label for="create-allocation" class="mb-2 block text-xs text-white/60"
-          >Allocation (%)</label
-        >
+        <app-field-label
+          text="Allocation (%)"
+          icon="hash"
+          forId="create-allocation"
+          [required]="true"
+        ></app-field-label>
         <input
           id="create-allocation"
           type="number"
@@ -180,7 +218,7 @@
         </p>
       </div>
       <div class="flex items-center gap-3 pt-2">
-        <span class="text-xs text-white/60">Active</span>
+        <app-field-label text="Active" icon="circle-check"></app-field-label>
         <button
           type="button"
           class="relative inline-flex h-9 w-16 items-center rounded-full border border-white/15 bg-white/10 px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -207,9 +245,11 @@
         </span>
       </div>
       <div class="md:col-span-2">
-        <label for="create-notes" class="mb-2 block text-xs text-white/60"
-          >Notes (Optional)</label
-        >
+        <app-field-label
+          text="Notes (Optional)"
+          icon="file-text"
+          forId="create-notes"
+        ></app-field-label>
         <textarea
           id="create-notes"
           formControlName="notes"
@@ -250,12 +290,18 @@
           class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
           (click)="toggleExpand(item.empProjectId)"
         >
-          <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
-            <span class="text-base font-medium text-white">
+          <div
+            class="flex flex-1 flex-col gap-2 md:flex-row md:flex-wrap md:items-center"
+          >
+            <span
+              *ngIf="item.projectName"
+              class="inline-flex items-center gap-1.5 rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1 text-xs text-violet-100"
+            >
+              <lucide-icon name="folder-kanban" [size]="12"></lucide-icon>
               {{ item.projectName }}
             </span>
             <span
-              class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
+              class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70"
             >
               <app-user-avatar
                 [seed]="employeeAvatarSeed(item)"
@@ -268,27 +314,34 @@
             </span>
             <span
               *ngIf="item.role"
-              class="inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 md:ml-3 md:mt-0"
+              class="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200"
             >
+              <lucide-icon name="briefcase" [size]="12"></lucide-icon>
               {{ item.role }}
             </span>
-          </div>
-          <div class="flex items-center gap-4">
-            <span [class]="statusBadge(item.isActive)" class="transition">
+            <span [class]="statusBadge(item.isActive)">
+              <lucide-icon
+                [name]="isActive(item.isActive) ? 'check-circle' : 'pause-circle'"
+                [size]="12"
+              ></lucide-icon>
               {{ isActive(item.isActive) ? "Active" : "Inactive" }}
             </span>
-            <span class="text-xs text-white/60">
-              {{ formattedDate(item.assignedDate) }}
-            </span>
             <span
-              class="text-xs text-white/40 transition"
-              [class.text-white]="expandedAssignmentId === item.empProjectId"
+              *ngIf="item.assignedDate"
+              class="inline-flex items-center gap-1.5 text-xs text-white/45"
             >
-              {{
-                expandedAssignmentId === item.empProjectId ? "Hide" : "Details"
-              }}
+              <lucide-icon name="calendar" [size]="12"></lucide-icon>
+              Assigned {{ formattedDate(item.assignedDate) }}
             </span>
           </div>
+          <span
+            class="shrink-0 text-xs text-white/40 transition"
+            [class.text-white]="expandedAssignmentId === item.empProjectId"
+          >
+            {{
+              expandedAssignmentId === item.empProjectId ? "Hide" : "Details"
+            }}
+          </span>
         </button>
 
         <div
@@ -308,11 +361,12 @@
               [class.opacity-50]="isSaving"
             >
               <div>
-                <label
-                  [for]="'edit-project-' + item.empProjectId"
-                  class="mb-2 block text-xs text-white/55"
-                  >Project</label
-                >
+                <app-field-label
+                  text="Project"
+                  icon="folder-kanban"
+                  [forId]="'edit-project-' + item.empProjectId"
+                  [required]="true"
+                ></app-field-label>
                 <app-select-menu
                   [id]="'edit-project-' + item.empProjectId"
                   formControlName="projectId"
@@ -323,11 +377,12 @@
                 ></app-select-menu>
               </div>
               <div>
-                <label
-                  [for]="'edit-employee-' + item.empProjectId"
-                  class="mb-2 block text-xs text-white/55"
-                  >Team Member</label
-                >
+                <app-field-label
+                  text="Team Member"
+                  icon="users"
+                  [forId]="'edit-employee-' + item.empProjectId"
+                  [required]="true"
+                ></app-field-label>
                 <app-select-menu
                   [id]="'edit-employee-' + item.empProjectId"
                   formControlName="empId"
@@ -338,11 +393,12 @@
                 ></app-select-menu>
               </div>
               <div>
-                <label
-                  [for]="'edit-date-' + item.empProjectId"
-                  class="mb-2 block text-xs text-white/55"
-                  >Assigned Date</label
-                >
+                <app-field-label
+                  text="Assigned Date"
+                  icon="calendar"
+                  [forId]="'edit-date-' + item.empProjectId"
+                  [required]="true"
+                ></app-field-label>
                 <input
                   [id]="'edit-date-' + item.empProjectId"
                   type="date"
@@ -351,11 +407,12 @@
                 />
               </div>
               <div>
-                <label
-                  [for]="'edit-role-' + item.empProjectId"
-                  class="mb-2 block text-xs text-white/55"
-                  >Role</label
-                >
+                <app-field-label
+                  text="Role"
+                  icon="briefcase"
+                  [forId]="'edit-role-' + item.empProjectId"
+                  [required]="true"
+                ></app-field-label>
                 <input
                   [id]="'edit-role-' + item.empProjectId"
                   type="text"
@@ -364,11 +421,12 @@
                 />
               </div>
               <div>
-                <label
-                  [for]="'edit-allocation-' + item.empProjectId"
-                  class="mb-2 block text-xs text-white/55"
-                  >Allocation (%)</label
-                >
+                <app-field-label
+                  text="Allocation (%)"
+                  icon="hash"
+                  [forId]="'edit-allocation-' + item.empProjectId"
+                  [required]="true"
+                ></app-field-label>
                 <input
                   [id]="'edit-allocation-' + item.empProjectId"
                   type="number"
@@ -389,7 +447,10 @@
                 </p>
               </div>
               <div class="flex items-center gap-3 pt-2">
-                <span class="text-xs text-white/55">Active</span>
+                <app-field-label
+                  text="Active"
+                  icon="circle-check"
+                ></app-field-label>
                 <button
                   type="button"
                   class="relative inline-flex h-9 w-16 items-center rounded-full border border-white/15 bg-white/10 px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -416,11 +477,11 @@
                 </span>
               </div>
               <div class="md:col-span-2">
-                <label
-                  [for]="'edit-notes-' + item.empProjectId"
-                  class="mb-2 block text-xs text-white/55"
-                  >Notes (Optional)</label
-                >
+                <app-field-label
+                  text="Notes (Optional)"
+                  icon="file-text"
+                  [forId]="'edit-notes-' + item.empProjectId"
+                ></app-field-label>
                 <textarea
                   [id]="'edit-notes-' + item.empProjectId"
                   formControlName="notes"

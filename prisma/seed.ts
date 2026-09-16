@@ -28,8 +28,17 @@ if (!DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is not set");
 }
 
-// JSON file paths (update these to match your actual paths)
-const JSON_DIR = "/Users/arnob_t78/Papers/Project Doc/db-migration/employee-management";
+// Repo dataset/ (Atlas-style exports use employee-management.* prefix)
+const JSON_DIR = path.join(process.cwd(), "dataset");
+
+function datasetPath(baseName: string): string {
+  const prefixed = path.join(JSON_DIR, `employee-management.${baseName}`);
+  if (fs.existsSync(prefixed)) {
+    return prefixed;
+  }
+  return path.join(JSON_DIR, baseName);
+}
+
 
 // MongoDB Extended JSON helpers
 function parseMongoDBExtendedJSON(value: any): any {
@@ -91,7 +100,7 @@ async function parseJSON(filePath: string): Promise<any[]> {
 // Seed functions using MongoDB native driver
 async function seedCounter(db: any) {
   console.log("🌱 Seeding Counter...");
-  const counters = await parseJSON(path.join(JSON_DIR, "Counter.json"));
+  const counters = await parseJSON(datasetPath("Counter.json"));
 
   if (counters.length === 0) {
     console.log("⚠️  No counters to seed");
@@ -126,7 +135,7 @@ async function seedCounter(db: any) {
 
 async function seedDepartmentParent(db: any) {
   console.log("🌱 Seeding DepartmentParent...");
-  const departments = await parseJSON(path.join(JSON_DIR, "DepartmentParent.json"));
+  const departments = await parseJSON(datasetPath("DepartmentParent.json"));
 
   if (departments.length === 0) {
     console.log("⚠️  No department parents to seed");
@@ -166,7 +175,7 @@ async function seedDepartmentParent(db: any) {
 
 async function seedDepartmentChild(db: any) {
   console.log("🌱 Seeding DepartmentChild...");
-  const departments = await parseJSON(path.join(JSON_DIR, "DepartmentChild.json"));
+  const departments = await parseJSON(datasetPath("DepartmentChild.json"));
 
   if (departments.length === 0) {
     console.log("⚠️  No department children to seed");
@@ -203,7 +212,7 @@ async function seedDepartmentChild(db: any) {
 
 async function seedEmployee(db: any) {
   console.log("🌱 Seeding Employee...");
-  const employees = await parseJSON(path.join(JSON_DIR, "Employee.json"));
+  const employees = await parseJSON(datasetPath("Employee.json"));
 
   if (employees.length === 0) {
     console.log("⚠️  No employees to seed");
@@ -226,7 +235,7 @@ async function seedEmployee(db: any) {
             emailId: emp.emailId || null,
             deptId: emp.deptId || null,
             department: emp.department || null,
-            password: emp.password || null,
+            password: null,
             gender: emp.gender || null,
             role: emp.role || null,
             title: emp.title || null,
@@ -269,7 +278,7 @@ async function seedEmployee(db: any) {
 
 async function seedProject(db: any) {
   console.log("🌱 Seeding Project...");
-  const projects = await parseJSON(path.join(JSON_DIR, "Project.json"));
+  const projects = await parseJSON(datasetPath("Project.json"));
 
   if (projects.length === 0) {
     console.log("⚠️  No projects to seed");
@@ -353,7 +362,7 @@ async function seedProject(db: any) {
 
 async function seedProjectEmployee(db: any) {
   console.log("🌱 Seeding ProjectEmployee...");
-  const projectEmployees = await parseJSON(path.join(JSON_DIR, "ProjectEmployee.json"));
+  const projectEmployees = await parseJSON(datasetPath("ProjectEmployee.json"));
 
   if (projectEmployees.length === 0) {
     console.log("⚠️  No project employees to seed");

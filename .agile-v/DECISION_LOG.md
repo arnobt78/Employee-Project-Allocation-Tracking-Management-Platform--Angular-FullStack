@@ -112,3 +112,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | Smallest blast radius; shared shell gaps already improved; list refresh skeletons remain a follow-on slice |
 | Linked | GATE-0016, TASK-0032–0034, REQ-0119–0120 |
 | Status | APPROVED and executed (dashboard slice) |
+
+---
+
+## DEC-0017 — GATE-0016 list pages + local-only reseed
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-16 |
+| Decision | Polish Employees/Projects/Project Team together; standardize list filters on `app-select-menu`; wipe+reseed only local `DATABASE_URL` with `ALLOW_DB_WIPE=1`; enrich existing schema fields in `dataset/` (prefer zero new models) |
+| Rationale | User approved plan; schema already rich; seed path was broken; production wipe out of scope |
+| Linked | GATE-0016, TASK-0035–0036, REQ-0121–0122 |
+| Status | APPROVED — implemented; dataset synthetic-only; wipe localhost-gated |

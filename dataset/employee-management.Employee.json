@@ -1,0 +1,474 @@
+[
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb976e"
+    },
+    "employeeId": {
+      "$numberLong": "1001"
+    },
+    "employeeName": "Ava Thompson",
+    "contactNo": "+15550001006",
+    "emailId": "ava.thompson@example.com",
+    "deptId": {
+      "$numberLong": "101"
+    },
+    "department": "Frontend",
+    "password": null,
+    "gender": "female",
+    "role": "Frontend Engineer",
+    "title": "Principal Frontend Engineer",
+    "avatarUrl": null,
+    "location": "Berlin",
+    "timezone": "Europe/Berlin",
+    "employmentType": "Full-time",
+    "managerId": null,
+    "hireDate": {
+      "$date": "2024-11-01T00:00:00.000Z"
+    },
+    "bio": "Leads frontend architecture and design systems across EmpowerHub.",
+    "about": "Leads frontend architecture and design systems across EmpowerHub.",
+    "notes": "Seeded professional profile for demos.",
+    "tags": [
+      "mentor",
+      "web"
+    ],
+    "skills": [
+      "Angular",
+      "TypeScript",
+      "UX"
+    ],
+    "certifications": [
+      "AWS Cloud Practitioner"
+    ],
+    "interests": [
+      "craft",
+      "mentorship"
+    ],
+    "languages": [
+      "English"
+    ],
+    "socialLinks": null,
+    "workPreferences": null,
+    "availability": null,
+    "preferences": null,
+    "performanceSnapshot": null,
+    "documents": null,
+    "customFields": null,
+    "createdAt": {
+      "$date": "2024-11-01T00:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.186Z"
+    },
+    "isActive": true,
+    "lastActiveAt": {
+      "$date": "2026-09-16T21:30:46.953Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb976f"
+    },
+    "employeeId": {
+      "$numberLong": "1002"
+    },
+    "employeeName": "Liam Jackson",
+    "contactNo": "+15550001008",
+    "emailId": "ops.contact@example.com",
+    "deptId": {
+      "$numberLong": "102"
+    },
+    "department": "Backend",
+    "password": null,
+    "gender": "male",
+    "role": "Backend Engineer",
+    "title": "Staff Backend Engineer",
+    "avatarUrl": null,
+    "location": "London",
+    "timezone": "Europe/London",
+    "employmentType": "Full-time",
+    "managerId": {
+      "$numberLong": "1001"
+    },
+    "hireDate": {
+      "$date": "2024-12-12T00:00:00.000Z"
+    },
+    "bio": "Builds resilient APIs and data pipelines for delivery teams.",
+    "about": "Builds resilient APIs and data pipelines for delivery teams.",
+    "notes": "Seeded professional profile for demos.",
+    "tags": [
+      "api",
+      "mentor"
+    ],
+    "skills": [
+      "Node.js",
+      "Prisma",
+      "MongoDB"
+    ],
+    "certifications": [
+      "Kubernetes Application Developer"
+    ],
+    "interests": [
+      "craft",
+      "mentorship"
+    ],
+    "languages": [
+      "English"
+    ],
+    "socialLinks": null,
+    "workPreferences": null,
+    "availability": null,
+    "preferences": null,
+    "performanceSnapshot": null,
+    "documents": null,
+    "customFields": null,
+    "createdAt": {
+      "$date": "2024-12-12T00:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.186Z"
+    },
+    "isActive": true,
+    "lastActiveAt": {
+      "$date": "2026-09-16T21:30:46.955Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9770"
+    },
+    "employeeId": {
+      "$numberLong": "1003"
+    },
+    "employeeName": "Sophia Nguyen",
+    "contactNo": "+15550001010",
+    "emailId": "ava.thompson@example.com",
+    "deptId": {
+      "$numberLong": "103"
+    },
+    "department": "QA",
+    "password": null,
+    "gender": "female",
+    "role": "QA Analyst",
+    "title": "Lead QA Analyst",
+    "avatarUrl": null,
+    "location": "Toronto",
+    "timezone": "America/Toronto",
+    "employmentType": "Full-time",
+    "managerId": {
+      "$numberLong": "1001"
+    },
+    "hireDate": {
+      "$date": "2025-01-06T00:00:00.000Z"
+    },
+    "bio": "Owns quality strategy, automation, and release readiness.",
+    "about": "Owns quality strategy, automation, and release readiness.",
+    "notes": "Seeded professional profile for demos.",
+    "tags": [
+      "qa",
+      "automation"
+    ],
+    "skills": [
+      "Automation",
+      "Playwright",
+      "Accessibility"
+    ],
+    "certifications": [
+      "ISTQB Advanced"
+    ],
+    "interests": [
+      "craft",
+      "mentorship"
+    ],
+    "languages": [
+      "English"
+    ],
+    "socialLinks": null,
+    "workPreferences": null,
+    "availability": null,
+    "preferences": null,
+    "performanceSnapshot": null,
+    "documents": null,
+    "customFields": null,
+    "createdAt": {
+      "$date": "2025-01-06T00:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.186Z"
+    },
+    "isActive": true,
+    "lastActiveAt": {
+      "$date": "2026-09-16T21:30:46.955Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9771"
+    },
+    "employeeId": {
+      "$numberLong": "1004"
+    },
+    "employeeName": "Jackson Smith",
+    "contactNo": "+15550001012",
+    "emailId": "ops.contact@example.com",
+    "deptId": {
+      "$numberLong": "101"
+    },
+    "department": "Frontend",
+    "password": null,
+    "gender": "male",
+    "role": "Product Designer",
+    "title": "Senior Product Designer",
+    "avatarUrl": null,
+    "location": "Austin",
+    "timezone": "America/Chicago",
+    "employmentType": "Contract",
+    "managerId": {
+      "$numberLong": "1001"
+    },
+    "hireDate": {
+      "$date": "2024-10-20T00:00:00.000Z"
+    },
+    "bio": "Shapes product experiences with research-backed UI craft.",
+    "about": "Shapes product experiences with research-backed UI craft.",
+    "notes": "Seeded professional profile for demos.",
+    "tags": [
+      "design",
+      "ux"
+    ],
+    "skills": [
+      "Figma",
+      "Design systems",
+      "Illustration"
+    ],
+    "certifications": [
+      "Google UX Design"
+    ],
+    "interests": [
+      "craft",
+      "mentorship"
+    ],
+    "languages": [
+      "English"
+    ],
+    "socialLinks": null,
+    "workPreferences": null,
+    "availability": null,
+    "preferences": null,
+    "performanceSnapshot": null,
+    "documents": null,
+    "customFields": null,
+    "createdAt": {
+      "$date": "2024-10-20T00:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.186Z"
+    },
+    "isActive": true,
+    "lastActiveAt": {
+      "$date": "2026-09-16T21:30:46.955Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9772"
+    },
+    "employeeId": {
+      "$numberLong": "1005"
+    },
+    "employeeName": "Mia Garcia",
+    "contactNo": "+15550001014",
+    "emailId": "ava.thompson@example.com",
+    "deptId": {
+      "$numberLong": "301"
+    },
+    "department": "Recruitment",
+    "password": null,
+    "gender": "female",
+    "role": "Recruiter",
+    "title": "Senior Talent Partner",
+    "avatarUrl": null,
+    "location": "Madrid",
+    "timezone": "Europe/Madrid",
+    "employmentType": "Part-time",
+    "managerId": {
+      "$numberLong": "1001"
+    },
+    "hireDate": {
+      "$date": "2024-09-18T00:00:00.000Z"
+    },
+    "bio": "Coordinates recruiting pipelines and people operations.",
+    "about": "Coordinates recruiting pipelines and people operations.",
+    "notes": "Seeded professional profile for demos.",
+    "tags": [
+      "people",
+      "ops"
+    ],
+    "skills": [
+      "Talent sourcing",
+      "Negotiation"
+    ],
+    "certifications": [
+      "SHRM-CP"
+    ],
+    "interests": [
+      "craft",
+      "mentorship"
+    ],
+    "languages": [
+      "English"
+    ],
+    "socialLinks": null,
+    "workPreferences": null,
+    "availability": null,
+    "preferences": null,
+    "performanceSnapshot": null,
+    "documents": null,
+    "customFields": null,
+    "createdAt": {
+      "$date": "2024-09-18T00:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.186Z"
+    },
+    "isActive": true,
+    "lastActiveAt": {
+      "$date": "2026-09-16T21:30:46.955Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9773"
+    },
+    "employeeId": {
+      "$numberLong": "1006"
+    },
+    "employeeName": "Ethan Chen",
+    "contactNo": "+15550001016",
+    "emailId": "ops.contact@example.com",
+    "deptId": {
+      "$numberLong": "102"
+    },
+    "department": "Backend",
+    "password": null,
+    "gender": "male",
+    "role": "Site Reliability Engineer",
+    "title": "SRE",
+    "avatarUrl": null,
+    "location": "Singapore",
+    "timezone": "Asia/Singapore",
+    "employmentType": "Full-time",
+    "managerId": {
+      "$numberLong": "1001"
+    },
+    "hireDate": {
+      "$date": "2024-08-01T00:00:00.000Z"
+    },
+    "bio": "Secures platforms with pragmatic threat modeling.",
+    "about": "Secures platforms with pragmatic threat modeling.",
+    "notes": "Seeded professional profile for demos.",
+    "tags": [
+      "sre",
+      "infra"
+    ],
+    "skills": [
+      "Kubernetes",
+      "Monitoring",
+      "Terraform"
+    ],
+    "certifications": [
+      "CompTIA Security+"
+    ],
+    "interests": [
+      "craft",
+      "mentorship"
+    ],
+    "languages": [
+      "English"
+    ],
+    "socialLinks": null,
+    "workPreferences": null,
+    "availability": null,
+    "preferences": null,
+    "performanceSnapshot": null,
+    "documents": null,
+    "customFields": null,
+    "createdAt": {
+      "$date": "2024-08-01T00:00:00.000Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.186Z"
+    },
+    "isActive": true,
+    "lastActiveAt": {
+      "$date": "2026-09-16T21:30:46.955Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69170c26caca7abf48fb6a0b"
+    },
+    "employeeId": {
+      "$numberLong": "1008"
+    },
+    "employeeName": "Test Man",
+    "contactNo": "+15550001018",
+    "emailId": "ava.thompson@example.com",
+    "deptId": {
+      "$numberLong": "120"
+    },
+    "department": "Developer",
+    "password": null,
+    "gender": "male",
+    "role": "Tester",
+    "title": "QA Contractor",
+    "avatarUrl": null,
+    "location": "Frankfurt",
+    "timezone": "Berlin",
+    "employmentType": "Contract",
+    "managerId": {
+      "$numberLong": "1001"
+    },
+    "hireDate": {
+      "$date": "2025-07-09T00:00:00.000Z"
+    },
+    "bio": "Team member contributing to EmpowerHub delivery.",
+    "about": "Team member contributing to EmpowerHub delivery.",
+    "notes": "Seeded professional profile for demos.",
+    "tags": [
+      "Leader",
+      "Manger"
+    ],
+    "skills": [
+      "React",
+      "Next"
+    ],
+    "certifications": [
+      "Internal onboarding"
+    ],
+    "interests": [
+      "craft",
+      "mentorship"
+    ],
+    "languages": [
+      "English"
+    ],
+    "socialLinks": null,
+    "workPreferences": null,
+    "availability": null,
+    "preferences": null,
+    "performanceSnapshot": null,
+    "documents": null,
+    "customFields": null,
+    "createdAt": {
+      "$date": "2025-11-14T11:01:58.461Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T11:01:58.461Z"
+    },
+    "isActive": true,
+    "lastActiveAt": {
+      "$date": "2026-09-16T21:30:46.955Z"
+    }
+  }
+]

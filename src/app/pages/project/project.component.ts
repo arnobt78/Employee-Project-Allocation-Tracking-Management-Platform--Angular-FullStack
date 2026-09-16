@@ -20,14 +20,28 @@ import { ListPageShellComponent } from '@/app/components/ui/list-page-shell.comp
 import { KpiStatCardComponent } from '@/app/components/ui/kpi-stat-card.component';
 import {
   ListToolbarComponent,
-  ListToolbarFilterOption,
+  ListToolbarMenuFilter,
+  ListToolbarMenuFilterChange,
 } from '@/app/components/ui/list-toolbar.component';
+import { SelectMenuOption } from '@/app/components/ui/select-menu.component';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 import {
   bindListQuery,
   ListQueryController,
   paginateList,
 } from '@/app/lib/list-query';
+
+const IN_FLIGHT_STATUSES = new Set([
+  'approved',
+  'active',
+  'in_review',
+  'in progress',
+  'in_progress',
+]);
+
+const PLANNING_STATUSES = new Set(['draft', 'planning', 'proposed']);
+
+const ON_HOLD_STATUSES = new Set(['on_hold', 'on hold', 'paused', 'hold']);
 
 @Component({
   selector: 'app-project',
@@ -59,37 +73,37 @@ export class ProjectComponent implements OnInit {
 
   readonly pageMeta = PRIVATE_PAGE_META['/projects'];
 
-  private readonly projectsSignal = signal<IProject[]>([]);
+  private readonly initialPeek = this.masterSrv.peekProjects();
+  private readonly projectsSignal = signal<IProject[]>(this.initialPeek ?? []);
   readonly projects = this.projectsSignal.asReadonly();
   readonly searchTerm = signal('');
   readonly filterValue = signal('');
+  readonly clientFilter = signal('');
   readonly listPage = signal(1);
-  readonly isLoading = signal(true);
-  readonly hasLoaded = signal(false);
-
-  readonly statusFilterOptions = computed<ListToolbarFilterOption[]>(() => {
-    const statuses = new Set<string>();
-    for (const p of this.projects()) {
-      const s = (p.status ?? '').trim();
-      if (s) statuses.add(s);
-    }
-    return [...statuses].sort().map((value) => ({ value, label: value }));
-  });
+  readonly isLoading = signal(this.initialPeek === null);
+  readonly hasLoaded = signal(this.initialPeek !== null);
 
   readonly filteredProjects = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     const status = this.filterValue().trim().toLowerCase();
+    const client = this.clientFilter().trim().toLowerCase();
     return this.projects().filter((project) => {
-      const matchesStatus =
-        !status || (project.status ?? '').trim().toLowerCase() === status;
-      if (!matchesStatus) return false;
-      if (!term) return true;
+      if (status && this.normalizedStatus(project) !== status) {
+        return false;
+      }
+      if (client && (project.clientName ?? '').trim().toLowerCase() !== client) {
+        return false;
+      }
+      if (!term) {
+        return true;
+      }
       return (
         project.projectName?.toLowerCase().includes(term) ||
         project.clientName?.toLowerCase().includes(term) ||
         project.contactPerson?.toLowerCase().includes(term) ||
         project.startDate?.toLowerCase().includes(term) ||
-        project.status?.toLowerCase().includes(term)
+        project.status?.toLowerCase().includes(term) ||
+        project.approvalStatus?.toLowerCase().includes(term)
       );
     });
   });
@@ -98,17 +112,76 @@ export class ProjectComponent implements OnInit {
     paginateList(this.filteredProjects(), this.listPage())
   );
 
-  readonly kpiTotal = computed(() => this.projects().length);
-  readonly kpiFiltered = computed(() => this.filteredProjects().length);
-  readonly kpiActiveStatuses = computed(() => {
-    const activeLike = ['approved', 'active', 'in_review', 'in progress'];
-    return this.projects().filter((p) =>
-      activeLike.includes((p.status ?? '').trim().toLowerCase())
-    ).length;
-  });
+  readonly menuFilters = computed((): ListToolbarMenuFilter[] => [
+    {
+      id: 'status',
+      label: 'Status',
+      emptyIcon: 'circle-dot',
+      value: this.filterValue(),
+      options: this.uniqueStatusOptions(this.projects()),
+    },
+    {
+      id: 'client',
+      label: 'Client',
+      emptyIcon: 'building-2',
+      value: this.clientFilter(),
+      options: this.uniqueOptions(
+        this.projects(),
+        (p) => p.clientName,
+        'building-2'
+      ),
+    },
+  ]);
+
+  private readonly kpiDash = computed(() =>
+    this.isLoading() && this.projects().length === 0 ? '—' : null
+  );
+
+  readonly kpiTotal = computed(() => this.kpiDash() ?? this.projects().length);
+
+  readonly kpiInFlight = computed(
+    () =>
+      this.kpiDash() ??
+      this.projects().filter((p) =>
+        IN_FLIGHT_STATUSES.has(this.normalizedStatus(p))
+      ).length
+  );
+
+  readonly kpiPlanning = computed(
+    () =>
+      this.kpiDash() ??
+      this.projects().filter((p) =>
+        PLANNING_STATUSES.has(this.normalizedStatus(p))
+      ).length
+  );
+
+  readonly kpiOnHold = computed(
+    () =>
+      this.kpiDash() ??
+      this.projects().filter((p) =>
+        ON_HOLD_STATUSES.has(this.normalizedStatus(p))
+      ).length
+  );
+
+  readonly kpiArchived = computed(
+    () =>
+      this.kpiDash() ??
+      this.projects().filter(
+        (p) => p.archivedAt != null && p.archivedAt !== ''
+      ).length
+  );
+
+  readonly kpiClients = computed(
+    () =>
+      this.kpiDash() ??
+      this.uniqueCount(this.projects(), (p) => p.clientName)
+  );
 
   readonly hasActiveFilters = computed(
-    () => !!this.searchTerm().trim() || !!this.filterValue().trim()
+    () =>
+      !!this.searchTerm().trim() ||
+      !!this.filterValue().trim() ||
+      !!this.clientFilter().trim()
   );
 
   pendingDelete: IProject | null = null;
@@ -121,7 +194,10 @@ export class ProjectComponent implements OnInit {
       this.destroyRef,
       this.searchTerm,
       this.listPage,
-      this.filterValue
+      this.filterValue,
+      {
+        client: this.clientFilter,
+      }
     );
     this.getProjects();
   }
@@ -205,8 +281,17 @@ export class ProjectComponent implements OnInit {
     this.listQuery.setSearch(term);
   }
 
-  setStatusFilter(value: string) {
-    this.listQuery.setFilter(value);
+  onMenuFilterChange(change: ListToolbarMenuFilterChange) {
+    switch (change.id) {
+      case 'status':
+        this.listQuery.setFilter(change.value);
+        break;
+      case 'client':
+        this.listQuery.setExtra('client', change.value);
+        break;
+      default:
+        break;
+    }
   }
 
   clearListFilters() {
@@ -222,5 +307,122 @@ export class ProjectComponent implements OnInit {
       return '—';
     }
     return this.datePipe.transform(date, 'MMM d, y') ?? date;
+  }
+
+  dateRangeLabel(project: IProject): string {
+    const start = this.formattedDate(project.startDate);
+    if (!project.endDate) {
+      return start;
+    }
+    return `${start} – ${this.formattedDate(project.endDate)}`;
+  }
+
+  displayStatus(project: IProject): string {
+    const raw = (project.status || project.approvalStatus || '').trim();
+    if (!raw) {
+      return 'Unknown';
+    }
+    return raw.replace(/_/g, ' ');
+  }
+
+  statusIcon(status: string | undefined): string {
+    const key = (status || '').toLowerCase().replace(/[\s-]+/g, '_');
+    if (key.includes('active') || key === 'approved') return 'zap';
+    if (key.includes('review')) return 'git-pull-request';
+    if (key.includes('hold') || key.includes('pause')) return 'pause-circle';
+    if (key.includes('draft') || key.includes('plan')) return 'pencil';
+    if (key.includes('archiv')) return 'archive';
+    if (key.includes('complete') || key.includes('done')) return 'check';
+    if (key.includes('reject') || key.includes('cancel')) return 'x';
+    return 'circle-dot';
+  }
+
+  statusBadgeClasses(status: string | undefined): string {
+    const key = (status || '').toLowerCase().replace(/[\s-]+/g, '_');
+    if (key.includes('active') || key === 'approved') {
+      return 'border-emerald-400/30 bg-emerald-500/10 text-emerald-200';
+    }
+    if (key.includes('review')) {
+      return 'border-amber-400/30 bg-amber-500/10 text-amber-100';
+    }
+    if (key.includes('hold') || key.includes('pause')) {
+      return 'border-slate-400/30 bg-slate-500/15 text-slate-100';
+    }
+    if (key.includes('draft') || key.includes('plan')) {
+      return 'border-violet-400/30 bg-violet-500/10 text-violet-100';
+    }
+    if (key.includes('archiv')) {
+      return 'border-white/20 bg-white/10 text-white/70';
+    }
+    if (key.includes('complete') || key.includes('done')) {
+      return 'border-sky-400/30 bg-sky-500/10 text-sky-200';
+    }
+    if (key.includes('reject') || key.includes('cancel')) {
+      return 'border-rose-400/30 bg-rose-500/10 text-rose-200';
+    }
+    return 'border-sky-400/30 bg-sky-500/10 text-sky-200';
+  }
+
+  private normalizedStatus(project: IProject): string {
+    return (project.status || project.approvalStatus || '').trim().toLowerCase();
+  }
+
+  private uniqueStatusOptions(projects: readonly IProject[]): SelectMenuOption[] {
+    const seen = new Set<string>();
+    const options: SelectMenuOption[] = [];
+    for (const project of projects) {
+      const raw = (project.status || project.approvalStatus || '').trim();
+      if (!raw) {
+        continue;
+      }
+      const key = raw.toLowerCase();
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      options.push({
+        value: raw,
+        label: raw.replace(/_/g, ' '),
+        icon: this.statusIcon(raw),
+      });
+    }
+    return options.sort((a, b) => a.label.localeCompare(b.label));
+  }
+
+  private uniqueOptions(
+    projects: readonly IProject[],
+    pick: (p: IProject) => string | null | undefined,
+    icon: string
+  ): SelectMenuOption[] {
+    const seen = new Set<string>();
+    const options: SelectMenuOption[] = [];
+    for (const project of projects) {
+      const raw = pick(project)?.trim();
+      if (!raw) {
+        continue;
+      }
+      const key = raw.toLowerCase();
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      options.push({ value: raw, label: raw, icon });
+    }
+    return options.sort((a, b) => a.label.localeCompare(b.label));
+  }
+
+  private uniqueCount(
+    projects: readonly IProject[],
+    pick: (p: IProject) => string | null | undefined
+  ): number {
+    const seen = new Set<string>();
+    for (const project of projects) {
+      const raw = pick(project)?.trim();
+      if (!raw) {
+        continue;
+      }
+      seen.add(raw.toLowerCase());
+    }
+    return seen.size;
   }
 }

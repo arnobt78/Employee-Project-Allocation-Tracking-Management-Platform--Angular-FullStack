@@ -26,6 +26,8 @@ You should receive an acknowledgement within a few business days. Please allow r
 
 This project is a **portfolio and learning demo**. It uses a seeded demo admin account for sign-in. Treat demo credentials and any sample data as **non-production**. Do not store real personal data or production secrets in a public fork without rotating keys and hardening auth.
 
+Tracked seed files under `dataset/` must use **synthetic** emails, phones, and names only (`@example.com` preferred). Domain wipe/reseed scripts (`db:wipe:local`, `db:reseed:local`) require `ALLOW_DB_WIPE=1` and refuse non-localhost `DATABASE_URL` unless an explicit override is set—never enable those overrides against production.
+
 Optional integrations (AI keys, CMS tokens, email SMTP/Resend, Sentry auth tokens) must stay **server-side** (see `.env.example`). Never commit real `.env` files or put secrets under `NG_APP_*` prefixes.
 
 ## Contact

@@ -31,9 +31,11 @@ import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
 import { ListPaginationComponent } from '@/app/components/ui/list-pagination.component';
 import { ListPageShellComponent } from '@/app/components/ui/list-page-shell.component';
 import { KpiStatCardComponent } from '@/app/components/ui/kpi-stat-card.component';
+import { FieldLabelComponent } from '@/app/components/ui/field-label.component';
 import {
   ListToolbarComponent,
-  ListToolbarFilterOption,
+  ListToolbarMenuFilter,
+  ListToolbarMenuFilterChange,
 } from '@/app/components/ui/list-toolbar.component';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 import {
@@ -58,6 +60,7 @@ import {
     ListPaginationComponent,
     ListPageShellComponent,
     KpiStatCardComponent,
+    FieldLabelComponent,
     ListToolbarComponent,
   ],
   providers: [DatePipe],
@@ -104,28 +107,77 @@ export class ProjectEmployeeComponent implements OnInit {
 
   readonly searchTerm = signal<string>('');
   readonly filterValue = signal<string>('');
+  readonly roleFilter = signal<string>('');
+  readonly activeFilter = signal<string>('');
   readonly listPage = signal(1);
   readonly isLoading = signal(true);
   readonly hasLoaded = signal(false);
 
-  readonly statusFilterOptions: ListToolbarFilterOption[] = [
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' },
-  ];
+  readonly menuFilters = computed((): ListToolbarMenuFilter[] => [
+    {
+      id: 'project',
+      label: 'Project',
+      emptyIcon: 'folder-kanban',
+      value: this.filterValue(),
+      options: this.uniqueOptions(
+        this.assignments(),
+        (item) => item.projectName,
+        'folder-kanban'
+      ),
+    },
+    {
+      id: 'role',
+      label: 'Role',
+      emptyIcon: 'briefcase',
+      value: this.roleFilter(),
+      options: this.uniqueOptions(
+        this.assignments(),
+        (item) => item.role,
+        'briefcase'
+      ),
+    },
+    {
+      id: 'active',
+      label: 'Status',
+      emptyIcon: 'circle-dot',
+      value: this.activeFilter(),
+      options: [
+        { value: 'yes', label: 'Active', icon: 'check-circle' },
+        { value: 'no', label: 'Inactive', icon: 'pause-circle' },
+      ],
+    },
+  ]);
 
   readonly hasActiveFilters = computed(
-    () => this.searchTerm().trim().length > 0 || this.filterValue().trim().length > 0
+    () =>
+      this.searchTerm().trim().length > 0 ||
+      this.filterValue().trim().length > 0 ||
+      this.roleFilter().trim().length > 0 ||
+      this.activeFilter().trim().length > 0
   );
 
   readonly filteredAssignments = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
-    const filter = this.filterValue().trim().toLowerCase();
+    const projectFilter = this.filterValue().trim().toLowerCase();
+    const role = this.roleFilter().trim().toLowerCase();
+    const activeFilter = this.activeFilter().trim().toLowerCase();
+
     return this.assignments().filter((item) => {
       const active = this.isActive(item.isActive);
-      if (filter === 'active' && !active) {
+
+      if (
+        projectFilter &&
+        (item.projectName?.toLowerCase() ?? '') !== projectFilter
+      ) {
         return false;
       }
-      if (filter === 'inactive' && active) {
+      if (role && (item.role?.toLowerCase() ?? '') !== role) {
+        return false;
+      }
+      if (activeFilter === 'yes' && !active) {
+        return false;
+      }
+      if (activeFilter === 'no' && active) {
         return false;
       }
       if (!term) {
@@ -143,15 +195,36 @@ export class ProjectEmployeeComponent implements OnInit {
     paginateList(this.filteredAssignments(), this.listPage())
   );
 
-  readonly metrics = computed(() => {
+  private readonly kpiDash = computed(() =>
+    this.isLoading() && this.assignments().length === 0 ? '—' : null
+  );
+
+  readonly totalAssignmentsKpi = computed(
+    () => this.kpiDash() ?? this.assignments().length
+  );
+  readonly activeAssignmentsKpi = computed(
+    () =>
+      this.kpiDash() ??
+      this.assignments().filter((item) => this.isActive(item.isActive)).length
+  );
+  readonly inactiveAssignmentsKpi = computed(() => {
+    const dash = this.kpiDash();
+    if (dash !== null) {
+      return dash;
+    }
     const data = this.assignments();
-    const active = data.filter((item) => this.isActive(item.isActive)).length;
-    return {
-      total: data.length,
-      active,
-      inactive: data.length - active,
-    };
+    return data.length - data.filter((item) => this.isActive(item.isActive)).length;
   });
+  readonly uniqueProjectsKpi = computed(
+    () =>
+      this.kpiDash() ??
+      this.uniqueCount(this.assignments(), (item) => item.projectName)
+  );
+  readonly uniqueRolesKpi = computed(
+    () =>
+      this.kpiDash() ??
+      this.uniqueCount(this.assignments(), (item) => item.role)
+  );
 
   projectEmployeeForm: FormGroup = this.fb.group({
     empProjectId: [null],
@@ -161,9 +234,11 @@ export class ProjectEmployeeComponent implements OnInit {
     role: ['', Validators.required],
     allocationPct: [
       0,
-      [Validators.required, Validators.min(0), Validators.max(200)]],
+      [Validators.required, Validators.min(0), Validators.max(200)],
+    ],
     isActive: [true],
-    notes: [''] });
+    notes: [''],
+  });
 
   expandedAssignmentId: number | null = null;
   editingAssignmentId: number | null = null;
@@ -180,7 +255,11 @@ export class ProjectEmployeeComponent implements OnInit {
       this.destroyRef,
       this.searchTerm,
       this.listPage,
-      this.filterValue
+      this.filterValue,
+      {
+        role: this.roleFilter,
+        active: this.activeFilter,
+      }
     );
     const projectsSnap = this.masterService.peekProjects();
     const employeesSnap = this.masterService.peekEmployees();
@@ -228,7 +307,8 @@ export class ProjectEmployeeComponent implements OnInit {
         }
         projectsLoaded = true;
         markComplete();
-      } });
+      },
+    });
     this.masterService.getAllEmp().subscribe({
       next: (employees) => {
         this.employeesSignal.set(employees ?? []);
@@ -241,7 +321,8 @@ export class ProjectEmployeeComponent implements OnInit {
         }
         employeesLoaded = true;
         markComplete();
-      } });
+      },
+    });
     this.getProjectEmployees(() => {
       assignmentsLoaded = true;
       markComplete();
@@ -259,7 +340,8 @@ export class ProjectEmployeeComponent implements OnInit {
           this.assignmentsSignal.set([]);
         }
         onComplete?.();
-      } });
+      },
+    });
   }
 
   onEdit(projectEmployee: IProjectEmployee) {
@@ -280,7 +362,8 @@ export class ProjectEmployeeComponent implements OnInit {
           ? projectEmployee.allocationPct
           : 0,
       isActive: this.isActive(projectEmployee.isActive),
-      notes: projectEmployee.notes || '' });
+      notes: projectEmployee.notes || '',
+    });
   }
 
   onDelete(id: number) {
@@ -458,8 +541,20 @@ export class ProjectEmployeeComponent implements OnInit {
     this.listQuery.setSearch(term);
   }
 
-  setStatusFilter(value: string) {
-    this.listQuery.setFilter(value);
+  onMenuFilterChange(change: ListToolbarMenuFilterChange) {
+    switch (change.id) {
+      case 'project':
+        this.listQuery.setFilter(change.value);
+        break;
+      case 'role':
+        this.listQuery.setExtra('role', change.value);
+        break;
+      case 'active':
+        this.listQuery.setExtra('active', change.value);
+        break;
+      default:
+        break;
+    }
   }
 
   clearListFilters() {
@@ -523,8 +618,8 @@ export class ProjectEmployeeComponent implements OnInit {
 
   statusBadge(isActive: string | boolean | null | undefined) {
     return this.isActive(isActive)
-      ? 'inline-flex items-center rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.25)]'
-      : 'inline-flex items-center rounded-full border border-slate-400/40 bg-slate-500/15 px-3 py-1 text-xs font-medium text-slate-200';
+      ? 'inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.25)]'
+      : 'inline-flex items-center gap-1.5 rounded-full border border-slate-400/40 bg-slate-500/15 px-3 py-1 text-xs font-medium text-slate-200';
   }
 
   isActive(value: string | boolean | null | undefined): boolean {
@@ -533,6 +628,43 @@ export class ProjectEmployeeComponent implements OnInit {
       return ['y', 'yes', 'true', '1'].includes(value.toLowerCase());
     }
     return false;
+  }
+
+  private uniqueOptions(
+    items: readonly IProjectEmployee[],
+    pick: (item: IProjectEmployee) => string | null | undefined,
+    icon: string
+  ): SelectMenuOption[] {
+    const seen = new Set<string>();
+    const options: SelectMenuOption[] = [];
+    for (const item of items) {
+      const raw = pick(item)?.trim();
+      if (!raw) {
+        continue;
+      }
+      const key = raw.toLowerCase();
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+      options.push({ value: raw, label: raw, icon });
+    }
+    return options.sort((a, b) => a.label.localeCompare(b.label));
+  }
+
+  private uniqueCount(
+    items: readonly IProjectEmployee[],
+    pick: (item: IProjectEmployee) => string | null | undefined
+  ): number {
+    const seen = new Set<string>();
+    for (const item of items) {
+      const raw = pick(item)?.trim();
+      if (!raw) {
+        continue;
+      }
+      seen.add(raw.toLowerCase());
+    }
+    return seen.size;
   }
 
   private todayString() {

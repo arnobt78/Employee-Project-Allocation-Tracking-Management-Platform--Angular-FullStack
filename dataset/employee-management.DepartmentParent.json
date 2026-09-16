@@ -1,0 +1,62 @@
+[
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9764"
+    },
+    "departmentId": {
+      "$numberLong": "1"
+    },
+    "departmentName": "Engineering",
+    "departmentLogo": "engineering.svg",
+    "description": "Product engineering and platform delivery.",
+    "leadContact": "Ava Thompson",
+    "leadEmail": "ava.thompson@example.com",
+    "leadPhone": "+15550001001",
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.059Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.059Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9765"
+    },
+    "departmentId": {
+      "$numberLong": "2"
+    },
+    "departmentName": "Operations",
+    "departmentLogo": "operations.svg",
+    "description": "Parent division across the organization.",
+    "leadContact": "Ops Desk",
+    "leadEmail": "ops@example.com",
+    "leadPhone": "+15550001003",
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.059Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.059Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9766"
+    },
+    "departmentId": {
+      "$numberLong": "3"
+    },
+    "departmentName": "Human Resources",
+    "departmentLogo": "hr.svg",
+    "description": "People operations, recruiting, and culture.",
+    "leadContact": "Mia Garcia",
+    "leadEmail": "mia.garcia@example.com",
+    "leadPhone": "+15550001005",
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.059Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.059Z"
+    }
+  }
+]

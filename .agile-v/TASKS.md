@@ -90,9 +90,11 @@
 
 | ID | Task | REQ | Status | Notes |
 |---|---|---|---|---|
-| TASK-0032 | Intake screenshot batch; map issues → pages/components | REQ-0119 | DONE | Dashboard batch + polish feedback |
-| TASK-0033 | Implement approved polish slices only (preserve shell/tokens/`h-11`) | REQ-0119 | PARTIAL | Dashboard Option A delivered; other pages deferred |
-| TASK-0034 | verify-deep + commit-ready for approved slice(s) | REQ-0120 | PARTIAL | Dashboard slice commit-ready; more pages later |
+| TASK-0032 | Intake screenshot batch; map issues → pages/components | REQ-0119 | DONE | Dashboard + list screenshots |
+| TASK-0033 | Implement approved polish slices only (preserve shell/tokens/`h-11`) | REQ-0119 | DONE | List pages wave coded |
+| TASK-0034 | verify-deep + commit-ready for approved slice(s) | REQ-0120 | DONE | List wave committed |
+| TASK-0035 | List toolbar v2: SelectMenu multi-filter + Clear + soft skeleton | REQ-0121 | DONE | Shared foundation |
+| TASK-0036 | Fix seed path to `dataset/`; local wipe+reseed; enrich sample JSON | REQ-0122 | DONE | Wipe localhost-only; dataset tracked |
 
 ---
 

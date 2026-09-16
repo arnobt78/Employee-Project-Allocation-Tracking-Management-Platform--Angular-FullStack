@@ -11,7 +11,7 @@
     class="eh-btn-icon bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
     (click)="startCreate()"
   >
-    <lucide-icon name="plus" [size]="16"></lucide-icon>
+    <lucide-icon name="user-round-plus" [size]="16"></lucide-icon>
     <span>Add Employee</span>
   </button>
 
@@ -25,18 +25,42 @@
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
-    label="Matching filters"
-    [value]="matchingEmployeesKpi()"
-    hint="Search + department"
-    icon="filter"
-    tone="violet"
-  ></app-kpi-stat-card>
-  <app-kpi-stat-card
-    listShellKpis
     label="Departments"
     [value]="departmentsKpi()"
     hint="Unique teams"
     icon="building-2"
+    tone="emerald"
+  ></app-kpi-stat-card>
+  <app-kpi-stat-card
+    listShellKpis
+    label="Roles"
+    [value]="rolesKpi()"
+    hint="Unique roles"
+    icon="briefcase"
+    tone="violet"
+  ></app-kpi-stat-card>
+  <app-kpi-stat-card
+    listShellKpis
+    label="Active"
+    [value]="activeEmployeesKpi()"
+    hint="Currently active"
+    icon="circle-check"
+    tone="sky"
+  ></app-kpi-stat-card>
+  <app-kpi-stat-card
+    listShellKpis
+    label="Employment types"
+    [value]="employmentTypesKpi()"
+    hint="Unique types"
+    icon="clock"
+    tone="amber"
+  ></app-kpi-stat-card>
+  <app-kpi-stat-card
+    listShellKpis
+    label="Full-time"
+    [value]="fullTimeKpi()"
+    hint="Full-time count"
+    icon="id-card"
     tone="emerald"
   ></app-kpi-stat-card>
 
@@ -44,16 +68,12 @@
     listShellToolbar
     searchId="employee-search"
     searchLabel="Search employees"
-    searchPlaceholder="Search employees, departments, IDs…"
+    searchPlaceholder="Search name, dept, ID, role, title, email…"
     [searchValue]="searchTerm()"
-    filterId="employee-dept-filter"
-    filterLabel="Department"
-    filterIcon="building-2"
-    [filterValue]="filterValue()"
-    [filterOptions]="departmentFilterOptions()"
+    [menuFilters]="menuFilters()"
     [hasActiveFilters]="hasActiveFilters()"
     (searchChange)="updateSearch($event)"
-    (filterChange)="setDepartmentFilter($event)"
+    (menuFilterChange)="onMenuFilterChange($event)"
     (clearFilters)="clearListFilters()"
   >
     @if (!isLoading()) {
@@ -69,17 +89,25 @@
     *ngIf="showCreatePanel"
     class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
   >
-    <header class="mb-4 flex items-center justify-between">
-      <div>
-        <h2 class="text-base sm:text-xl font-medium text-white">
-          Create New Employee
-        </h2>
-        <p class="text-xs text-white/50">Quick Onboarding Form</p>
+    <header class="mb-4 flex items-center justify-between gap-3">
+      <div class="flex min-w-0 items-start gap-3">
+        <span
+          class="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-sky-200"
+          aria-hidden="true"
+        >
+          <lucide-icon name="id-card-lanyard" [size]="18"></lucide-icon>
+        </span>
+        <div class="min-w-0">
+          <h2 class="text-base sm:text-xl font-medium text-white">
+            Create New Employee
+          </h2>
+          <p class="text-xs sm:text-sm text-white/50">Quick Onboarding Form</p>
+        </div>
       </div>
       <button
         type="button"
         [disabled]="isSaving"
-        class="text-xs text-white/60 transition hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        class="shrink-0 text-xs sm:text-sm text-white/60 transition hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
         (click)="closeCreatePanel()"
       >
         Cancel
@@ -92,9 +120,12 @@
       [class.opacity-50]="isSaving"
     >
       <div class="sm:col-span-1">
-        <label for="create-name" class="mb-2 block text-xs text-white/60"
-          >Employee Name</label
-        >
+        <app-field-label
+          text="Employee Name"
+          icon="users"
+          forId="create-name"
+          [required]="true"
+        ></app-field-label>
         <input
           id="create-name"
           type="text"
@@ -104,9 +135,12 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label for="create-dept" class="mb-2 block text-xs text-white/60"
-          >Department</label
-        >
+        <app-field-label
+          text="Department"
+          icon="building-2"
+          forId="create-dept"
+          [required]="true"
+        ></app-field-label>
         <input
           id="create-dept"
           type="text"
@@ -116,9 +150,11 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label for="create-deptid" class="mb-2 block text-xs text-white/60"
-          >Department ID</label
-        >
+        <app-field-label
+          text="Department ID"
+          icon="hash"
+          forId="create-deptid"
+        ></app-field-label>
         <input
           id="create-deptid"
           type="number"
@@ -128,9 +164,11 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label for="create-role" class="mb-2 block text-xs text-white/60"
-          >Role</label
-        >
+        <app-field-label
+          text="Role"
+          icon="briefcase"
+          forId="create-role"
+        ></app-field-label>
         <input
           id="create-role"
           type="text"
@@ -140,9 +178,11 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label for="create-title" class="mb-2 block text-xs text-white/60"
-          >Title</label
-        >
+        <app-field-label
+          text="Title"
+          icon="id-card"
+          forId="create-title"
+        ></app-field-label>
         <input
           id="create-title"
           type="text"
@@ -152,9 +192,11 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label for="create-employment" class="mb-2 block text-xs text-white/60"
-          >Employment Type</label
-        >
+        <app-field-label
+          text="Employment Type"
+          icon="clock"
+          forId="create-employment"
+        ></app-field-label>
         <input
           id="create-employment"
           type="text"
@@ -164,9 +206,11 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label for="create-phone" class="mb-2 block text-xs text-white/60"
-          >Contact Number</label
-        >
+        <app-field-label
+          text="Contact Number"
+          icon="phone"
+          forId="create-phone"
+        ></app-field-label>
         <input
           id="create-phone"
           type="tel"
@@ -176,9 +220,11 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label for="create-email" class="mb-2 block text-xs text-white/60"
-          >Email</label
-        >
+        <app-field-label
+          text="Email"
+          icon="mail"
+          forId="create-email"
+        ></app-field-label>
         <input
           id="create-email"
           type="email"
@@ -188,9 +234,11 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label for="create-location" class="mb-2 block text-xs text-white/60"
-          >Location</label
-        >
+        <app-field-label
+          text="Location"
+          icon="map-pin"
+          forId="create-location"
+        ></app-field-label>
         <input
           id="create-location"
           type="text"
@@ -200,9 +248,11 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label for="create-timezone" class="mb-2 block text-xs text-white/60"
-          >Timezone</label
-        >
+        <app-field-label
+          text="Timezone"
+          icon="clock"
+          forId="create-timezone"
+        ></app-field-label>
         <input
           id="create-timezone"
           type="text"
@@ -212,9 +262,11 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label for="create-hireDate" class="mb-2 block text-xs text-white/60"
-          >Hire Date</label
-        >
+        <app-field-label
+          text="Hire Date"
+          icon="calendar"
+          forId="create-hireDate"
+        ></app-field-label>
         <input
           id="create-hireDate"
           type="date"
@@ -223,9 +275,11 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label for="create-skills" class="mb-2 block text-xs text-white/60"
-          >Skills (comma separated)</label
-        >
+        <app-field-label
+          text="Skills (comma separated)"
+          icon="tag"
+          forId="create-skills"
+        ></app-field-label>
         <input
           id="create-skills"
           type="text"
@@ -235,9 +289,11 @@
         />
       </div>
       <div class="sm:col-span-1">
-        <label for="create-tags" class="mb-2 block text-xs text-white/60"
-          >Tags (comma separated)</label
-        >
+        <app-field-label
+          text="Tags (comma separated)"
+          icon="tag"
+          forId="create-tags"
+        ></app-field-label>
         <input
           id="create-tags"
           type="text"
@@ -278,7 +334,7 @@
           class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
           (click)="toggleExpand(employee.employeeId)"
         >
-          <div class="flex flex-1 flex-col gap-1 md:flex-row md:items-center">
+          <div class="flex flex-1 flex-col gap-2 md:flex-row md:flex-wrap md:items-center">
             <app-user-avatar
               class="shrink-0"
               [seed]="employee.emailId || employee.employeeName"
@@ -292,24 +348,49 @@
             >
               {{ employee.employeeId }}
             </span>
-            <span class="font-medium text-white md:ml-4 md:text-base">
+            <span class="font-medium text-white md:ml-2 md:text-base">
               {{ employee.employeeName }}
             </span>
             <span
-              class="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-4 md:mt-0"
+              *ngIf="employee.department"
+              class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-2"
             >
+              <lucide-icon name="building-2" [size]="12"></lucide-icon>
               {{ employee.department }}
             </span>
             <span
               *ngIf="employee.role"
-              class="inline-flex rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 md:ml-3 md:mt-0"
+              class="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 md:ml-1"
             >
+              <lucide-icon name="briefcase" [size]="12"></lucide-icon>
               {{ employee.role }}
             </span>
             <span
-              *ngIf="employee.hireDate || employee.createdAt"
-              class="text-xs text-white/45 md:ml-3 md:mt-0"
+              *ngIf="employee.title"
+              class="inline-flex items-center gap-1.5 rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-xs text-sky-200 md:ml-1"
             >
+              <lucide-icon name="id-card" [size]="12"></lucide-icon>
+              {{ employee.title }}
+            </span>
+            <span
+              *ngIf="employee.employmentType"
+              class="inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-500/10 px-3 py-1 text-xs text-amber-100 md:ml-1"
+            >
+              <lucide-icon name="clock" [size]="12"></lucide-icon>
+              {{ employee.employmentType }}
+            </span>
+            <span
+              *ngIf="employee.location"
+              class="inline-flex items-center gap-1.5 rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1 text-xs text-violet-100 md:ml-1"
+            >
+              <lucide-icon name="map-pin" [size]="12"></lucide-icon>
+              {{ employee.location }}
+            </span>
+            <span
+              *ngIf="employee.hireDate || employee.createdAt"
+              class="inline-flex items-center gap-1.5 text-xs text-white/45 md:ml-2"
+            >
+              <lucide-icon name="calendar" [size]="12"></lucide-icon>
               Joined
               {{
                 (employee.hireDate || employee.createdAt)! | date: "mediumDate"
@@ -317,7 +398,7 @@
             </span>
           </div>
           <span
-            class="text-xs text-white/40 transition"
+            class="shrink-0 text-xs text-white/40 transition"
             [class.text-white]="expandedEmployeeId === employee.employeeId"
           >
             {{
@@ -340,11 +421,12 @@
               [class.opacity-50]="isSaving"
             >
               <div class="md:col-span-1">
-                <label
-                  for="edit-name-{{ employee.employeeId }}"
-                  class="mb-2 block text-xs text-white/50"
-                  >Employee Name</label
-                >
+                <app-field-label
+                  text="Employee Name"
+                  icon="users"
+                  [forId]="'edit-name-' + employee.employeeId"
+                  [required]="true"
+                ></app-field-label>
                 <input
                   [id]="'edit-name-' + employee.employeeId"
                   type="text"
@@ -353,11 +435,12 @@
                 />
               </div>
               <div class="md:col-span-1">
-                <label
-                  for="edit-dept-{{ employee.employeeId }}"
-                  class="mb-2 block text-xs text-white/50"
-                  >Department</label
-                >
+                <app-field-label
+                  text="Department"
+                  icon="building-2"
+                  [forId]="'edit-dept-' + employee.employeeId"
+                  [required]="true"
+                ></app-field-label>
                 <input
                   [id]="'edit-dept-' + employee.employeeId"
                   type="text"
@@ -366,11 +449,11 @@
                 />
               </div>
               <div class="md:col-span-1">
-                <label
-                  for="edit-deptid-{{ employee.employeeId }}"
-                  class="mb-2 block text-xs text-white/50"
-                  >Department ID</label
-                >
+                <app-field-label
+                  text="Department ID"
+                  icon="hash"
+                  [forId]="'edit-deptid-' + employee.employeeId"
+                ></app-field-label>
                 <input
                   [id]="'edit-deptid-' + employee.employeeId"
                   type="number"
@@ -379,11 +462,11 @@
                 />
               </div>
               <div class="md:col-span-1">
-                <label
-                  for="edit-role-{{ employee.employeeId }}"
-                  class="mb-2 block text-xs text-white/50"
-                  >Role</label
-                >
+                <app-field-label
+                  text="Role"
+                  icon="briefcase"
+                  [forId]="'edit-role-' + employee.employeeId"
+                ></app-field-label>
                 <input
                   [id]="'edit-role-' + employee.employeeId"
                   type="text"
@@ -392,11 +475,11 @@
                 />
               </div>
               <div class="md:col-span-1">
-                <label
-                  for="edit-title-{{ employee.employeeId }}"
-                  class="mb-2 block text-xs text-white/50"
-                  >Title</label
-                >
+                <app-field-label
+                  text="Title"
+                  icon="id-card"
+                  [forId]="'edit-title-' + employee.employeeId"
+                ></app-field-label>
                 <input
                   [id]="'edit-title-' + employee.employeeId"
                   type="text"
@@ -405,11 +488,11 @@
                 />
               </div>
               <div class="md:col-span-1">
-                <label
-                  for="edit-employment-{{ employee.employeeId }}"
-                  class="mb-2 block text-xs text-white/50"
-                  >Employment Type</label
-                >
+                <app-field-label
+                  text="Employment Type"
+                  icon="clock"
+                  [forId]="'edit-employment-' + employee.employeeId"
+                ></app-field-label>
                 <input
                   [id]="'edit-employment-' + employee.employeeId"
                   type="text"
@@ -418,11 +501,11 @@
                 />
               </div>
               <div class="md:col-span-1">
-                <label
-                  for="edit-phone-{{ employee.employeeId }}"
-                  class="mb-2 block text-xs text-white/50"
-                  >Contact Number</label
-                >
+                <app-field-label
+                  text="Contact Number"
+                  icon="phone"
+                  [forId]="'edit-phone-' + employee.employeeId"
+                ></app-field-label>
                 <input
                   [id]="'edit-phone-' + employee.employeeId"
                   type="tel"
@@ -431,11 +514,11 @@
                 />
               </div>
               <div class="md:col-span-1">
-                <label
-                  for="edit-email-{{ employee.employeeId }}"
-                  class="mb-2 block text-xs text-white/50"
-                  >Email</label
-                >
+                <app-field-label
+                  text="Email"
+                  icon="mail"
+                  [forId]="'edit-email-' + employee.employeeId"
+                ></app-field-label>
                 <input
                   [id]="'edit-email-' + employee.employeeId"
                   type="email"
@@ -444,11 +527,11 @@
                 />
               </div>
               <div class="md:col-span-1">
-                <label
-                  for="edit-location-{{ employee.employeeId }}"
-                  class="mb-2 block text-xs text-white/50"
-                  >Location</label
-                >
+                <app-field-label
+                  text="Location"
+                  icon="map-pin"
+                  [forId]="'edit-location-' + employee.employeeId"
+                ></app-field-label>
                 <input
                   [id]="'edit-location-' + employee.employeeId"
                   type="text"
@@ -457,11 +540,11 @@
                 />
               </div>
               <div class="md:col-span-1">
-                <label
-                  for="edit-timezone-{{ employee.employeeId }}"
-                  class="mb-2 block text-xs text-white/50"
-                  >Timezone</label
-                >
+                <app-field-label
+                  text="Timezone"
+                  icon="clock"
+                  [forId]="'edit-timezone-' + employee.employeeId"
+                ></app-field-label>
                 <input
                   [id]="'edit-timezone-' + employee.employeeId"
                   type="text"
@@ -470,11 +553,11 @@
                 />
               </div>
               <div class="md:col-span-1">
-                <label
-                  for="edit-hireDate-{{ employee.employeeId }}"
-                  class="mb-2 block text-xs text-white/50"
-                  >Hire Date</label
-                >
+                <app-field-label
+                  text="Hire Date"
+                  icon="calendar"
+                  [forId]="'edit-hireDate-' + employee.employeeId"
+                ></app-field-label>
                 <input
                   [id]="'edit-hireDate-' + employee.employeeId"
                   type="date"
@@ -483,11 +566,11 @@
                 />
               </div>
               <div class="md:col-span-1">
-                <label
-                  for="edit-skills-{{ employee.employeeId }}"
-                  class="mb-2 block text-xs text-white/50"
-                  >Skills</label
-                >
+                <app-field-label
+                  text="Skills"
+                  icon="tag"
+                  [forId]="'edit-skills-' + employee.employeeId"
+                ></app-field-label>
                 <input
                   [id]="'edit-skills-' + employee.employeeId"
                   type="text"
@@ -496,11 +579,11 @@
                 />
               </div>
               <div class="md:col-span-1">
-                <label
-                  for="edit-tags-{{ employee.employeeId }}"
-                  class="mb-2 block text-xs text-white/50"
-                  >Tags</label
-                >
+                <app-field-label
+                  text="Tags"
+                  icon="tag"
+                  [forId]="'edit-tags-' + employee.employeeId"
+                ></app-field-label>
                 <input
                   [id]="'edit-tags-' + employee.employeeId"
                   type="text"
@@ -512,7 +595,7 @@
                 <button
                   type="button"
                   [disabled]="isSaving"
-                  class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   (click)="cancelEdit()"
                 >
                   Cancel
@@ -669,7 +752,7 @@
                 ></app-card-close-button>
                 <button
                   type="button"
-                  class="eh-btn-icon rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                  class="eh-btn-icon rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white"
                   (click)="onEdit(employee)"
                 >
                   <lucide-icon name="pencil" [size]="14"></lucide-icon>
@@ -677,7 +760,7 @@
                 </button>
                 <button
                   type="button"
-                  class="eh-btn-icon rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
+                  class="eh-btn-icon rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs sm:text-sm text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
                   (click)="promptDelete(employee)"
                 >
                   <lucide-icon name="trash-2" [size]="14"></lucide-icon>

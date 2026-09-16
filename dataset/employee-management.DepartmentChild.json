@@ -1,0 +1,135 @@
+[
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9767"
+    },
+    "childDeptId": {
+      "$numberLong": "101"
+    },
+    "departmentName": "Frontend",
+    "parentDeptId": {
+      "$numberLong": "1"
+    },
+    "description": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9768"
+    },
+    "childDeptId": {
+      "$numberLong": "102"
+    },
+    "departmentName": "Backend",
+    "parentDeptId": {
+      "$numberLong": "1"
+    },
+    "description": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb9769"
+    },
+    "childDeptId": {
+      "$numberLong": "103"
+    },
+    "departmentName": "QA",
+    "parentDeptId": {
+      "$numberLong": "1"
+    },
+    "description": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb976a"
+    },
+    "childDeptId": {
+      "$numberLong": "201"
+    },
+    "departmentName": "Logistics",
+    "parentDeptId": {
+      "$numberLong": "2"
+    },
+    "description": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb976b"
+    },
+    "childDeptId": {
+      "$numberLong": "202"
+    },
+    "departmentName": "Customer Support",
+    "parentDeptId": {
+      "$numberLong": "2"
+    },
+    "description": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb976c"
+    },
+    "childDeptId": {
+      "$numberLong": "301"
+    },
+    "departmentName": "Recruitment",
+    "parentDeptId": {
+      "$numberLong": "3"
+    },
+    "description": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb976d"
+    },
+    "childDeptId": {
+      "$numberLong": "302"
+    },
+    "departmentName": "Employee Success",
+    "parentDeptId": {
+      "$numberLong": "3"
+    },
+    "description": null,
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-13T00:34:23.128Z"
+    }
+  }
+]

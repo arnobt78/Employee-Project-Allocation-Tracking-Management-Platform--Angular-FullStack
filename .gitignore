@@ -77,7 +77,5 @@ lerna-debug.log*
 # Cache
 .eslintcache
 .cache
-dataset
-dataset/
 
 HETZNER_VPS_MIGRATION_GUIDE.md

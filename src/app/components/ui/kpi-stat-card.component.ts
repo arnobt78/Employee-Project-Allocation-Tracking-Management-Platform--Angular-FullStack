@@ -25,7 +25,7 @@ export type KpiStatTone =
           {{ value }}
         </p>
         @if (hint) {
-          <p class="mt-2 text-[11px] text-white/55 sm:text-xs">{{ hint }}</p>
+          <p class="mt-2 text-xs text-white/55 sm:text-sm">{{ hint }}</p>
         }
       </div>
       @if (icon) {

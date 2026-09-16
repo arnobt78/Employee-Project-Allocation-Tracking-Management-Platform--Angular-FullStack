@@ -1,0 +1,47 @@
+[
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb978a"
+    },
+    "key": "employee",
+    "value": {
+      "$numberLong": "1008"
+    },
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.404Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T11:01:57.973Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb978b"
+    },
+    "key": "project",
+    "value": {
+      "$numberLong": "5039"
+    },
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.404Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T12:07:51.114Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6915278f2ea0c14829bb978c"
+    },
+    "key": "projectEmployee",
+    "value": {
+      "$numberLong": "7013"
+    },
+    "createdAt": {
+      "$date": "2025-11-13T00:34:23.404Z"
+    },
+    "updatedAt": {
+      "$date": "2025-11-14T12:10:19.452Z"
+    }
+  }
+]

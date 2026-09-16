@@ -1,5 +1,48 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-16 — GATE-0016 list pages + local reseed
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | Post-verifier follow-up |
+| `npm test` (ChromeHeadless) | **PASS (25/25)** | Includes new list-query extras specs |
+| `npm run build` | **PASS** | Prod bundle OK |
+| `ALLOW_DB_WIPE=1 npm run db:wipe:local` | **REFUSED** | DATABASE_URL not localhost (safe) |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Shared KPI hint typography; list-toolbar SelectMenu multi-filter + Clear; list-skeleton; field-label | Done |
+| Employees: KPIs, filters, row/form icons, required `*`, Add/Create icons | Done |
+| Projects + Project Team: soft-load peeks, menuFilters, KPIs, row enrich, form labels | Done |
+| Projects client filter → `?client=` (not `title`) | Done |
+| `prisma/seed.ts` → `dataset/`; wipe/reseed scripts; enriched JSON; `.gitignore` allows dataset | Done (dataset untracked until commit) |
+
+### Remaining
+
+- Insights/calendar polish (deferred)
+- Optional localhost wipe+reseed when `DATABASE_URL` is local
+
+### Security (commit-ready)
+
+- Review: PASS WITH WARNINGS → dataset PII sanitized to `@example.com` / synthetic phones before commit; seed forces `password: null`
+- Wipe gates unchanged (localhost + `ALLOW_DB_WIPE=1`)
+
+### eval_gate_status
+
+N/A (user-directed UX polish)
+
+### Verifier
+
+[implementation-verifier](32b308cc-d742-4a83-93ca-49e35ab6fb78) PARTIAL → follow-ups; [re-verify](064579df-b6c0-48f5-80dc-bc68c08a467c) PASS WITH WARNINGS (process); browser A–Z PASS.
+
+---
+
 ## Session 2026-09-15 — GATE-0016 dashboard Option A (commit-ready)
 
 **Node:** v24.x

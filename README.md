@@ -227,8 +227,10 @@ cp .env.example .env
 **Minimum for a useful local demo:**
 
 1. Set `DATABASE_URL` to your MongoDB URI
-2. Seed the demo auth user: `npm run db:seed:auth`
-3. Optionally seed domain data: `npm run db:seed`
+2. Seed domain data from `dataset/`: `npm run db:seed`
+3. Seed the demo auth user: `npm run db:seed:auth`
+
+To wipe and reseed a **local** Mongo only: `ALLOW_DB_WIPE=1 npm run db:reseed:local` (refuses non-localhost unless `EH_ALLOW_REMOTE_WIPE=1` / `EH_ALLOW_ATLAS_WIPE=1`).
 
 You **do not** need AI, CMS, email, or Sentry keys to explore CRUD UI. Leave those blank; features that need them simply stay disabled or no-op.
 
@@ -598,8 +600,10 @@ const completion = await completeChatWithFallback(prompt);
 | `npm run build`             | Generate prod env → `ng build` → quiet Sentry map upload |
 | `npm run lint` / `lint:fix` | ESLint via Angular                                       |
 | `npm test`                  | Karma / Jasmine                                          |
-| `npm run db:seed`           | Domain seed data                                         |
+| `npm run db:seed`           | Domain seed from repo `dataset/`                         |
 | `npm run db:seed:auth`      | Demo `admin` user                                        |
+| `npm run db:wipe:local`     | Clear domain collections (requires `ALLOW_DB_WIPE=1`; localhost only unless override) |
+| `npm run db:reseed:local`   | Wipe → `db:seed` → `db:seed:auth` (local gate as above)  |
 
 ---
 

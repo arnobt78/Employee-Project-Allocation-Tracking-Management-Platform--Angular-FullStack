@@ -17,7 +17,9 @@
     "vercel-dev": "node -e \"console.log('Vercel dev ready'); setInterval(() => {}, 1 << 30);\"",
     "postinstall": "node tools/generate-env-prod.cjs",
     "db:seed": "tsx prisma/seed.ts",
-    "db:seed:auth": "node tools/seed-demo-user.mjs"
+    "db:seed:auth": "node tools/seed-demo-user.mjs",
+    "db:wipe:local": "node tools/wipe-local-domain.mjs",
+    "db:reseed:local": "ALLOW_DB_WIPE=1 npm run db:wipe:local && npm run db:seed && npm run db:seed:auth"
   },
   "private": true,
   "dependencies": {

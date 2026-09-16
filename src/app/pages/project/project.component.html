@@ -11,32 +11,56 @@
     class="eh-btn-icon bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
     (click)="startCreate()"
   >
-    <lucide-icon name="plus" [size]="16"></lucide-icon>
+    <lucide-icon name="folder-kanban" [size]="16"></lucide-icon>
     <span>Add Project</span>
   </button>
 
   <app-kpi-stat-card
     listShellKpis
     label="Total projects"
-    [value]="isLoading() ? '—' : kpiTotal()"
+    [value]="kpiTotal()"
     hint="All projects in the workspace"
     icon="folder-kanban"
     tone="sky"
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
-    label="Matching filters"
-    [value]="isLoading() ? '—' : kpiFiltered()"
-    hint="Visible after search and status filter"
-    icon="filter"
+    label="In flight"
+    [value]="kpiInFlight()"
+    hint="Approved, active, or in review"
+    icon="zap"
+    tone="emerald"
+  ></app-kpi-stat-card>
+  <app-kpi-stat-card
+    listShellKpis
+    label="Planning"
+    [value]="kpiPlanning()"
+    hint="Draft or planning"
+    icon="pencil"
     tone="violet"
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
-    label="In flight"
-    [value]="isLoading() ? '—' : kpiActiveStatuses()"
-    hint="Approved, active, or in review"
-    icon="activity"
+    label="On hold"
+    [value]="kpiOnHold()"
+    hint="Paused projects"
+    icon="pause-circle"
+    tone="amber"
+  ></app-kpi-stat-card>
+  <app-kpi-stat-card
+    listShellKpis
+    label="Archived"
+    [value]="kpiArchived()"
+    hint="Archived via archive date"
+    icon="archive"
+    tone="sky"
+  ></app-kpi-stat-card>
+  <app-kpi-stat-card
+    listShellKpis
+    label="Clients"
+    [value]="kpiClients()"
+    hint="Unique client names"
+    icon="building-2"
     tone="emerald"
   ></app-kpi-stat-card>
 
@@ -46,14 +70,10 @@
     searchLabel="Search projects"
     searchPlaceholder="Search projects, clients, contact…"
     [searchValue]="searchTerm()"
-    filterId="project-status-filter"
-    filterLabel="Status"
-    filterIcon="circle-dot"
-    [filterValue]="filterValue()"
-    [filterOptions]="statusFilterOptions()"
+    [menuFilters]="menuFilters()"
     [hasActiveFilters]="hasActiveFilters()"
     (searchChange)="updateSearch($event)"
-    (filterChange)="setStatusFilter($event)"
+    (menuFilterChange)="onMenuFilterChange($event)"
     (clearFilters)="clearListFilters()"
   >
     @if (!isLoading()) {
@@ -66,64 +86,72 @@
   </app-list-toolbar>
 
   <section class="space-y-4">
-    <app-list-skeleton *ngIf="isLoading()" [rows]="6"></app-list-skeleton>
-
-    <div
-      *ngFor="let project of pagedProjects().items"
-      class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5/75 px-3 py-3 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition hover:border-white/20 sm:flex-row sm:items-center sm:justify-between sm:px-4"
-    >
-      <div class="min-w-0 flex-1">
-        <p class="text-base font-medium text-white">
-          {{ project.projectName }}
-        </p>
-        <div class="mt-2 flex flex-wrap items-center gap-2">
-          <span
-            class="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70"
+    @if (isLoading()) {
+      <app-list-skeleton [rows]="6"></app-list-skeleton>
+    } @else {
+      <div
+        *ngFor="let project of pagedProjects().items"
+        class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5/75 px-3 py-3 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition hover:border-white/20 sm:flex-row sm:items-center sm:justify-between sm:px-4"
+      >
+        <div class="min-w-0 flex-1">
+          <p class="text-base font-medium text-white">
+            {{ project.projectName }}
+          </p>
+          <div class="mt-2 flex flex-wrap items-center gap-2">
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs"
+              [ngClass]="statusBadgeClasses(project.status || project.approvalStatus)"
+            >
+              <lucide-icon
+                [name]="statusIcon(project.status || project.approvalStatus)"
+                [size]="12"
+              ></lucide-icon>
+              {{ displayStatus(project) }}
+            </span>
+            <span
+              *ngIf="project.clientName"
+              class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70"
+            >
+              <lucide-icon name="building-2" [size]="12"></lucide-icon>
+              {{ project.clientName }}
+            </span>
+            <span
+              class="inline-flex items-center gap-1.5 text-xs text-white/50"
+            >
+              <lucide-icon name="calendar" [size]="12"></lucide-icon>
+              {{ dateRangeLabel(project) }}
+            </span>
+          </div>
+        </div>
+        <div class="flex shrink-0 items-center gap-2">
+          <a
+            ubButton
+            size="sm"
+            variant="outline"
+            class="eh-btn-icon border-white/20 bg-white/5 text-white/80 hover:border-white/40 hover:text-white"
+            [routerLink]="['/update-project', project.projectId || 0]"
           >
-            {{ project.clientName }}
-          </span>
-          <span
-            *ngIf="project.status"
-            class="inline-flex rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-xs text-sky-200"
+            <lucide-icon name="panel-right" [size]="14"></lucide-icon>
+            <span>Details</span>
+          </a>
+          <button
+            type="button"
+            class="eh-btn-icon inline-flex items-center gap-1 rounded-xl border border-rose-400/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20"
+            (click)="onDelete(project.projectId)"
           >
-            {{ project.status }}
-          </span>
-          <span class="text-xs text-white/50">
-            {{ formattedDate(project.startDate)
-            }}{{
-              project.endDate ? " – " + formattedDate(project.endDate) : ""
-            }}
-          </span>
+            <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+            <span>Delete</span>
+          </button>
         </div>
       </div>
-      <div class="flex shrink-0 items-center gap-2">
-        <a
-          ubButton
-          size="sm"
-          variant="outline"
-          class="eh-btn-icon border-white/20 bg-white/5 text-white/80 hover:border-white/40 hover:text-white"
-          [routerLink]="['/update-project', project.projectId || 0]"
-        >
-          <lucide-icon name="panel-right" [size]="14"></lucide-icon>
-          <span>Details</span>
-        </a>
-        <button
-          type="button"
-          class="eh-btn-icon inline-flex items-center gap-1 rounded-xl border border-rose-400/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20"
-          (click)="onDelete(project.projectId)"
-        >
-          <lucide-icon name="trash-2" [size]="14"></lucide-icon>
-          <span>Delete</span>
-        </button>
-      </div>
-    </div>
 
-    <div
-      *ngIf="!isLoading() && hasLoaded() && !filteredProjects().length"
-      class="rounded-[28px] border border-dashed border-white/15 bg-white/5/60 px-2 py-12 text-center text-sm text-white/60 sm:px-4"
-    >
-      No projects match your filters.
-    </div>
+      <div
+        *ngIf="hasLoaded() && !filteredProjects().length"
+        class="rounded-[28px] border border-dashed border-white/15 bg-white/5/60 px-2 py-12 text-center text-sm text-white/60 sm:px-4"
+      >
+        No projects match your filters.
+      </div>
+    }
   </section>
 </app-list-page-shell>
 
