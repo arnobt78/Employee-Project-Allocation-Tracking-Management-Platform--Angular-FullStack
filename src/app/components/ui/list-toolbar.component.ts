@@ -75,7 +75,6 @@ export interface ListToolbarMenuFilterChange {
               [clearable]="false"
               [ngModel]="matchedMenuValue(filter)"
               (ngModelChange)="onMenuFilter(filter.id, $event)"
-              (selectionChange)="onMenuFilter(filter.id, $event)"
             ></app-select-menu>
           </div>
         }
@@ -166,6 +165,11 @@ export class ListToolbarComponent {
       value === null || value === undefined || value === 'clear'
         ? ''
         : String(value);
+    const current =
+      this.menuFilters.find((filter) => filter.id === id)?.value?.trim() ?? '';
+    if (next === current) {
+      return;
+    }
     this.menuFilterChange.emit({ id, value: next });
   }
 }

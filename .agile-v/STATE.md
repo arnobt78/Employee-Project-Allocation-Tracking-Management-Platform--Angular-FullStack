@@ -11,9 +11,9 @@
 
 ## Resume Point
 
-**Last completed:** GATE-0016 list-page polish + local reseed tooling (see latest `git log -1`).
+**Last completed:** GATE-0016 list polish `025abbb` + demo DB reseed; list-toolbar single-emit filter fix.
 
-**Next exact action:** User Option A for Insights or calendar polish, or close GATE-0016 when accepted.
+**Next exact action:** Insights/calendar polish or close GATE-0016 when accepted.
 
 **Resume prompt:**
 
