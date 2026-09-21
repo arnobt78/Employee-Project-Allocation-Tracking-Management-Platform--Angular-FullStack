@@ -2,6 +2,7 @@
   [title]="pageMeta.title"
   [subtitle]="pageMeta.subtitle"
   [icon]="pageMeta.icon"
+  [contentLoading]="isLoading()"
 >
   <button
     listShellActions
@@ -76,19 +77,14 @@
     (menuFilterChange)="onMenuFilterChange($event)"
     (clearFilters)="clearListFilters()"
   >
-    @if (!isLoading()) {
-      <app-list-pagination
-        [page]="pagedProjects().page"
-        [totalPages]="pagedProjects().totalPages"
-        (pageChange)="goToPage($event)"
-      ></app-list-pagination>
-    }
+    <app-list-pagination
+      [page]="pagedProjects().page"
+      [totalPages]="pagedProjects().totalPages"
+      (pageChange)="goToPage($event)"
+    ></app-list-pagination>
   </app-list-toolbar>
 
   <section class="space-y-4">
-    @if (isLoading()) {
-      <app-list-skeleton [rows]="6"></app-list-skeleton>
-    } @else {
       <div
         *ngFor="let project of pagedProjects().items"
         class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5/75 px-3 py-3 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition hover:border-white/20 sm:flex-row sm:items-center sm:justify-between sm:px-4"
@@ -151,7 +147,6 @@
       >
         No projects match your filters.
       </div>
-    }
   </section>
 </app-list-page-shell>
 

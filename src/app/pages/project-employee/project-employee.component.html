@@ -2,6 +2,8 @@
   [title]="pageMeta.title"
   [subtitle]="pageMeta.subtitle"
   [icon]="pageMeta.icon"
+  [contentLoading]="isLoading()"
+  [skeletonKpiCount]="5"
 >
   @if (showCreatePanel) {
     <button
@@ -83,13 +85,11 @@
     (menuFilterChange)="onMenuFilterChange($event)"
     (clearFilters)="clearListFilters()"
   >
-    @if (!isLoading()) {
-      <app-list-pagination
-        [page]="pagedAssignments().page"
-        [totalPages]="pagedAssignments().totalPages"
-        (pageChange)="goToPage($event)"
-      ></app-list-pagination>
-    }
+    <app-list-pagination
+      [page]="pagedAssignments().page"
+      [totalPages]="pagedAssignments().totalPages"
+      (pageChange)="goToPage($event)"
+    ></app-list-pagination>
   </app-list-toolbar>
 
   <section
@@ -278,9 +278,6 @@
   </section>
 
   <section class="space-y-4">
-    <app-list-skeleton *ngIf="isLoading()" [rows]="4"></app-list-skeleton>
-
-    <ng-container *ngIf="!isLoading()">
       <div
         *ngFor="let item of pagedAssignments().items"
         class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition duration-200 hover:border-white/20"
@@ -626,7 +623,6 @@
       >
         No assignments match your filters.
       </div>
-    </ng-container>
   </section>
 </app-list-page-shell>
 

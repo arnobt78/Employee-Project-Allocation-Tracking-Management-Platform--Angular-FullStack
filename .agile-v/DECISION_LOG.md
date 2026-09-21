@@ -124,3 +124,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | User approved plan; schema already rich; seed path was broken; production wipe out of scope |
 | Linked | GATE-0016, TASK-0035–0036, REQ-0121–0122 |
 | Status | APPROVED — implemented; dataset synthetic-only; wipe localhost-gated |
+
+---
+
+## DEC-0018 — List cold-load skeleton (no KPI emdash)
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-22 |
+| Decision | On cold load, list pages mirror dashboard: stable header + list-shaped content skeleton until peek/data warm; never show live KPI cards with `—`. Align list-page-shell spacing with dashboard/placeholder. |
+| Rationale | Production hard-refresh screenshots showed KPI dash flash and gap mismatch; Cmd+Shift+R and Reload share one cold path (peeks cleared). |
+| Linked | GATE-0016, TASK-0037, REQ-0123–0124 |
+| Status | APPROVED — implemented (uncommitted); awaiting commit-ready |

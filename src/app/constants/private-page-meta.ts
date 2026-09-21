@@ -6,6 +6,8 @@ export interface PrivatePageMeta {
   icon: string;
   /** Shape of the shared refresh placeholder (not the page’s own data skeleton). */
   skeleton: PrivateSkeletonKind;
+  /** KPI tile count for `list` skeleton (default 6). */
+  listKpiCount?: number;
 }
 
 /** Static page chrome for instant refresh paint (matches app-page-header copy). */
@@ -48,6 +50,7 @@ export const PRIVATE_PAGE_META: Record<string, PrivatePageMeta> = {
     subtitle: 'Assign teammates to projects and track allocation',
     icon: 'contact',
     skeleton: 'list',
+    listKpiCount: 5,
   },
   '/business-insights': {
     title: 'Business Insights',

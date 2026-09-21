@@ -12,7 +12,6 @@ import { IProject } from '../../model/interface/master';
 import { MasterService } from '../../service/master.service';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { UbButtonDirective } from '@/app/components/ui/button';
-import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
 import { ListPaginationComponent } from '@/app/components/ui/list-pagination.component';
@@ -51,7 +50,6 @@ const ON_HOLD_STATUSES = new Set(['on_hold', 'on hold', 'paused', 'hold']);
     CommonModule,
     UbButtonDirective,
     RouterLink,
-    ListSkeletonComponent,
     AlertDialogComponent,
     ListPaginationComponent,
     ListPageShellComponent,
@@ -133,15 +131,10 @@ export class ProjectComponent implements OnInit {
     },
   ]);
 
-  private readonly kpiDash = computed(() =>
-    this.isLoading() && this.projects().length === 0 ? '—' : null
-  );
-
-  readonly kpiTotal = computed(() => this.kpiDash() ?? this.projects().length);
+  readonly kpiTotal = computed(() => this.projects().length);
 
   readonly kpiInFlight = computed(
     () =>
-      this.kpiDash() ??
       this.projects().filter((p) =>
         IN_FLIGHT_STATUSES.has(this.normalizedStatus(p))
       ).length
@@ -149,7 +142,6 @@ export class ProjectComponent implements OnInit {
 
   readonly kpiPlanning = computed(
     () =>
-      this.kpiDash() ??
       this.projects().filter((p) =>
         PLANNING_STATUSES.has(this.normalizedStatus(p))
       ).length
@@ -157,7 +149,6 @@ export class ProjectComponent implements OnInit {
 
   readonly kpiOnHold = computed(
     () =>
-      this.kpiDash() ??
       this.projects().filter((p) =>
         ON_HOLD_STATUSES.has(this.normalizedStatus(p))
       ).length
@@ -165,16 +156,13 @@ export class ProjectComponent implements OnInit {
 
   readonly kpiArchived = computed(
     () =>
-      this.kpiDash() ??
       this.projects().filter(
         (p) => p.archivedAt != null && p.archivedAt !== ''
       ).length
   );
 
-  readonly kpiClients = computed(
-    () =>
-      this.kpiDash() ??
-      this.uniqueCount(this.projects(), (p) => p.clientName)
+  readonly kpiClients = computed(() =>
+    this.uniqueCount(this.projects(), (p) => p.clientName)
   );
 
   readonly hasActiveFilters = computed(

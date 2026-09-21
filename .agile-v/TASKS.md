@@ -86,7 +86,7 @@
 
 ---
 
-## Wave — Per-page UI polish (GATE-0016 — IN PROGRESS)
+## Wave — Per-page UI polish (GATE-0016 — COMPLETE)
 
 | ID | Task | REQ | Status | Notes |
 |---|---|---|---|---|
@@ -95,6 +95,7 @@
 | TASK-0034 | verify-deep + commit-ready for approved slice(s) | REQ-0120 | DONE | List wave committed |
 | TASK-0035 | List toolbar v2: SelectMenu multi-filter + Clear + soft skeleton | REQ-0121 | DONE | Shared foundation |
 | TASK-0036 | Fix seed path to `dataset/`; local wipe+reseed; enrich sample JSON | REQ-0122 | DONE | Wipe localhost-only; dataset tracked |
+| TASK-0037 | List cold-load skeleton; remove KPI emdash flash; shell gap parity | REQ-0123–0124 | DONE | Verified + committed |
 
 ---
 

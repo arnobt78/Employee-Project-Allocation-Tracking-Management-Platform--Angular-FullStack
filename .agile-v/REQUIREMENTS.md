@@ -78,8 +78,10 @@ Legend: `BASELINE` = verified as-built behavior · `GAP` = docs/code mismatch or
 |---|---|---|---|
 | REQ-0119 | Private and guest pages MAY receive incremental visual polish (spacing, typography, controls, cards) driven by human screenshots; changes MUST preserve existing architecture (`MasterService`, shared UI tokens, shell/list patterns) and MUST NOT expand height of shared controls beyond documented tokens (e.g. `.eh-control` / `.eh-select-trigger` `h-11`). | IN_PROGRESS | Dashboard done; list pages wave approved 2026-09-16 |
 | REQ-0120 | Each polish slice MUST keep layout shell stable (no full-page loader regressions) and MUST pass lint + relevant tests + production build before commit-ready. | IN_PROGRESS | Soft placeholder→page handoff; no multi-layer KPI dash flash |
-| REQ-0121 | List toolbars SHOULD use shared `app-select-menu` filters with per-option icons; multi-filter + Clear; section gaps match list-page-shell rhythm. | APPROVED | GATE-0016 list wave |
-| REQ-0122 | Local domain seed MUST read repo `dataset/`; wipe+reseed scripts MUST require `ALLOW_DB_WIPE=1` and MUST NOT target production by default. | APPROVED | GATE-0016 Wave D |
+| REQ-0121 | List toolbars SHOULD use shared `app-select-menu` filters with per-option icons; multi-filter + Clear; section gaps match list-page-shell rhythm. | DONE | GATE-0016 list wave |
+| REQ-0122 | Local domain seed MUST read repo `dataset/`; wipe+reseed scripts MUST require `ALLOW_DB_WIPE=1` and MUST NOT target production by default. | DONE | GATE-0016 Wave D |
+| REQ-0123 | On cold load (no peek), list pages MUST show a list-shaped content skeleton under a stable header (no live KPI values as `—`); soft nav with warm peek MUST skip that skeleton. | APPROVED | GATE-0016 cold-load |
+| REQ-0124 | List page shell header→content spacing MUST match dashboard/placeholder (`mt-2 sm:mt-8` then `space-y-6 sm:space-y-8`). | APPROVED | GATE-0016 cold-load |
 
 ---
 

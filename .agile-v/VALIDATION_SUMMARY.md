@@ -1,5 +1,42 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-22 — GATE-0016 list cold-load (no KPI dash)
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | Post kpiCount follow-up |
+| `npx tsc -p tsconfig.app.json --noEmit` | **PASS** | |
+| `npm test` (ChromeHeadless) | **PASS (25/25)** | |
+| `npm run build` | **PASS** | Sentry maps uploaded |
+| Browser cold-load `/employee` `/projects` `/project-employee` | **PASS** | Skeleton then numeric KPIs; no KPI `—` |
+| Soft-nav warm peeks (list trio) | **PASS** | No skeleton flash |
+| Route crawl (dashboard→new-project + api-doc/status) | **PASS** | APIs HTTP 200 |
+| Independent verifier | **PASS** | kpiCount 5/6 aligned |
+| Security review (uncommitted cold-load slice) | **PASS** | UI-only; no auth/API changes |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| `app-list-page-skeleton` shared with route placeholder | Done |
+| `list-page-shell` `contentLoading` + `mt-2 sm:mt-8` gap parity | Done |
+| Employees / Projects / Project Team: no `kpiDash` emdash on cold load | Done |
+| `skeletonKpiCount` / `listKpiCount` (Project Team = 5) | Done |
+
+### Remaining
+
+- Insights/calendar polish (deferred)
+
+### eval_gate_status
+
+N/A (UX polish)
+
+---
+
 ## Session 2026-09-16 — GATE-0016 list pages + local reseed
 
 **Node:** v24.x

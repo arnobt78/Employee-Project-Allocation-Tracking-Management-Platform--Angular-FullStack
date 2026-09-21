@@ -19,7 +19,6 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Employee } from '../../model/class/Employee';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { UbButtonDirective } from '@/app/components/ui/button';
-import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import {
   SelectMenuComponent,
@@ -52,7 +51,6 @@ import {
     CommonModule,
     ReactiveFormsModule,
     UbButtonDirective,
-    ListSkeletonComponent,
     SelectMenuComponent,
     AlertDialogComponent,
     CardCloseButtonComponent,
@@ -195,35 +193,22 @@ export class ProjectEmployeeComponent implements OnInit {
     paginateList(this.filteredAssignments(), this.listPage())
   );
 
-  private readonly kpiDash = computed(() =>
-    this.isLoading() && this.assignments().length === 0 ? '—' : null
-  );
-
-  readonly totalAssignmentsKpi = computed(
-    () => this.kpiDash() ?? this.assignments().length
-  );
+  readonly totalAssignmentsKpi = computed(() => this.assignments().length);
   readonly activeAssignmentsKpi = computed(
     () =>
-      this.kpiDash() ??
       this.assignments().filter((item) => this.isActive(item.isActive)).length
   );
   readonly inactiveAssignmentsKpi = computed(() => {
-    const dash = this.kpiDash();
-    if (dash !== null) {
-      return dash;
-    }
     const data = this.assignments();
-    return data.length - data.filter((item) => this.isActive(item.isActive)).length;
+    return (
+      data.length - data.filter((item) => this.isActive(item.isActive)).length
+    );
   });
-  readonly uniqueProjectsKpi = computed(
-    () =>
-      this.kpiDash() ??
-      this.uniqueCount(this.assignments(), (item) => item.projectName)
+  readonly uniqueProjectsKpi = computed(() =>
+    this.uniqueCount(this.assignments(), (item) => item.projectName)
   );
-  readonly uniqueRolesKpi = computed(
-    () =>
-      this.kpiDash() ??
-      this.uniqueCount(this.assignments(), (item) => item.role)
+  readonly uniqueRolesKpi = computed(() =>
+    this.uniqueCount(this.assignments(), (item) => item.role)
   );
 
   projectEmployeeForm: FormGroup = this.fb.group({

@@ -11,7 +11,6 @@ import { Employee } from '../../model/class/Employee';
 import { CommonModule } from '@angular/common';
 import { UbButtonDirective } from '@/app/components/ui/button';
 import { ToastService } from '@/app/components/ui/toast.service';
-import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
 import { CardCloseButtonComponent } from '@/app/components/ui/card-close-button.component';
@@ -41,7 +40,6 @@ import {
     CommonModule,
     ReactiveFormsModule,
     UbButtonDirective,
-    ListSkeletonComponent,
     AlertDialogComponent,
     CardCloseButtonComponent,
     UserAvatarComponent,
@@ -156,34 +154,21 @@ export class EmployeeComponent implements OnInit {
     },
   ]);
 
-  private readonly kpiDash = computed(() =>
-    this.isLoading() && this.employees().length === 0 ? '—' : null
+  readonly totalEmployeesKpi = computed(() => this.employees().length);
+  readonly departmentsKpi = computed(() =>
+    this.uniqueCount(this.employees(), (e) => e.department)
   );
-
-  readonly totalEmployeesKpi = computed(
-    () => this.kpiDash() ?? this.employees().length
-  );
-  readonly departmentsKpi = computed(
-    () =>
-      this.kpiDash() ??
-      this.uniqueCount(this.employees(), (e) => e.department)
-  );
-  readonly rolesKpi = computed(
-    () => this.kpiDash() ?? this.uniqueCount(this.employees(), (e) => e.role)
+  readonly rolesKpi = computed(() =>
+    this.uniqueCount(this.employees(), (e) => e.role)
   );
   readonly activeEmployeesKpi = computed(
-    () =>
-      this.kpiDash() ??
-      this.employees().filter((e) => e.isActive !== false).length
+    () => this.employees().filter((e) => e.isActive !== false).length
   );
-  readonly employmentTypesKpi = computed(
-    () =>
-      this.kpiDash() ??
-      this.uniqueCount(this.employees(), (e) => e.employmentType)
+  readonly employmentTypesKpi = computed(() =>
+    this.uniqueCount(this.employees(), (e) => e.employmentType)
   );
   readonly fullTimeKpi = computed(
     () =>
-      this.kpiDash() ??
       this.employees().filter(
         (e) => (e.employmentType ?? '').trim().toLowerCase() === 'full-time'
       ).length

@@ -2,6 +2,7 @@
   [title]="pageMeta.title"
   [subtitle]="pageMeta.subtitle"
   [icon]="pageMeta.icon"
+  [contentLoading]="isLoading()"
 >
   <button
     listShellActions
@@ -76,13 +77,11 @@
     (menuFilterChange)="onMenuFilterChange($event)"
     (clearFilters)="clearListFilters()"
   >
-    @if (!isLoading()) {
-      <app-list-pagination
-        [page]="pagedEmployees().page"
-        [totalPages]="pagedEmployees().totalPages"
-        (pageChange)="goToPage($event)"
-      ></app-list-pagination>
-    }
+    <app-list-pagination
+      [page]="pagedEmployees().page"
+      [totalPages]="pagedEmployees().totalPages"
+      (pageChange)="goToPage($event)"
+    ></app-list-pagination>
   </app-list-toolbar>
 
   <section
@@ -322,9 +321,6 @@
   </section>
 
   <section class="space-y-4">
-    @if (isLoading()) {
-      <app-list-skeleton [rows]="4"></app-list-skeleton>
-    } @else {
       <div
         *ngFor="let employee of pagedEmployees().items; let idx = index"
         class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition duration-200 hover:border-white/20"
@@ -778,7 +774,6 @@
       >
         No employees match your filters.
       </div>
-    }
   </section>
 </app-list-page-shell>
 
