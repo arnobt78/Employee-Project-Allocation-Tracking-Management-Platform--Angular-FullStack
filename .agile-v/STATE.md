@@ -1,19 +1,19 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 3 — GATE-0016 list cold-load UX committed  
-**Gate:** GATE-0016 **COMPLETE** (list polish + cold-load); GATE-0001 formal still open  
-**Status:** Cold-load verified (browser A–Z + network); lint/tsc/test/build PASS  
+**Phase / Stage:** Stage 3 — GATE-0016 list stack gap fix  
+**Gate:** GATE-0016 **COMPLETE**; GATE-0001 formal still open  
+**Status:** KPI→filter gap fixed via shared eh-content-stack; lint/tsc/test/build PASS  
 **Updated:** 2026-09-22  
-**resume_token:** `c1-gate16-cold-load-done-2026-09-22`
+**resume_token:** `c1-gate16-stack-gap-done-2026-09-22`
 
 ---
 
 ## Resume Point
 
-**Last completed:** GATE-0016 list cold-load — shared `app-list-page-skeleton`, shell `contentLoading`, no KPI emdash, gap parity, project-employee `skeletonKpiCount=5`.
+**Last completed:** Shared `.eh-content-stack` / `.eh-section-stack` (flex gap) on list shell, skeletons, placeholder, dashboard; list-toolbar `block w-full`.
 
-**Validation:** `lint` PASS; `tsc` PASS; `test` 25/25 PASS; `build` PASS; browser cold/warm/routes PASS; security PASS.
+**Validation:** `lint` PASS; `tsc` PASS; `test` 25/25 PASS; `build` PASS; browser gap 24px on three list routes; security PASS.
 
 **Next exact action:** Insights/calendar polish (deferred) or formal GATE-0001 closure when ready.
 
@@ -21,7 +21,7 @@
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
-Resume after GATE-0016 cold-load (resume_token c1-gate16-cold-load-done-2026-09-22).
+Resume after GATE-0016 stack gap (resume_token c1-gate16-stack-gap-done-2026-09-22).
 Pick deferred Insights/calendar polish or GATE-0001 formal closure.
 ```
 

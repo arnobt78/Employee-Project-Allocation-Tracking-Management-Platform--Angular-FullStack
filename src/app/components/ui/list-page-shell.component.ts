@@ -13,7 +13,7 @@ import { ListPageSkeletonComponent } from './list-page-skeleton.component';
         <ng-content select="[listShellActions]"></ng-content>
       </app-page-header>
 
-      <div class="mt-2 space-y-6 sm:mt-8 sm:space-y-8">
+      <div class="eh-content-stack">
         @if (contentLoading) {
           <app-list-page-skeleton
             [rows]="skeletonRows"

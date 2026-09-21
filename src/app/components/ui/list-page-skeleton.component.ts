@@ -13,7 +13,7 @@ import { ListSkeletonComponent } from './list-skeleton.component';
   host: { class: 'block' },
   template: `
     <div
-      class="space-y-6 sm:space-y-8"
+      class="eh-section-stack"
       data-testid="list-page-skeleton"
       aria-hidden="true"
     >

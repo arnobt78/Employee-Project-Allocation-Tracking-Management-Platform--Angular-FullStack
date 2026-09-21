@@ -1,5 +1,39 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-22 — GATE-0016 KPI→filter stack gap
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npx tsc -p tsconfig.app.json --noEmit` | **PASS** | |
+| `npm test` (ChromeHeadless) | **PASS (25/25)** | |
+| `npm run build` | **PASS** | Sentry maps uploaded |
+| Browser KPI→filter gap (employee/projects/project-employee) | **PASS** | 24px (`gap-6`) |
+| Independent verifier | **PASS WITH WARNINGS** | Exclude unrelated README |
+| Security review | **PASS** | CSS/layout only |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| `.eh-content-stack` / `.eh-section-stack` shared utilities | Done |
+| List shell, skeleton, placeholder, dashboard wired | Done |
+| `app-list-toolbar` host `block w-full` | Done |
+
+### Remaining
+
+- Insights/calendar polish (deferred)
+
+### eval_gate_status
+
+N/A (UX spacing)
+
+---
+
 ## Session 2026-09-22 — GATE-0016 list cold-load (no KPI dash)
 
 **Node:** v24.x

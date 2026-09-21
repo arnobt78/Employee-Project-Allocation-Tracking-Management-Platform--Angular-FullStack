@@ -43,7 +43,7 @@ import { ListPageSkeletonComponent } from './list-page-skeleton.component';
         }
       </app-page-header>
 
-      <div class="mt-2 space-y-6 sm:mt-8 sm:space-y-8">
+      <div class="eh-content-stack">
         @switch (meta().skeleton) {
           @case ('dashboard') {
             <app-dashboard-skeleton></app-dashboard-skeleton>

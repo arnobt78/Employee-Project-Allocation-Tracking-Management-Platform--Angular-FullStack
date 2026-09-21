@@ -30,6 +30,7 @@ export interface ListToolbarMenuFilterChange {
   selector: 'app-list-toolbar',
   standalone: true,
   imports: [CommonModule, FormsModule, AppIconComponent, SelectMenuComponent],
+  host: { class: 'block w-full' },
   template: `
     <section
       class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5/70 px-2 py-2 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-3"

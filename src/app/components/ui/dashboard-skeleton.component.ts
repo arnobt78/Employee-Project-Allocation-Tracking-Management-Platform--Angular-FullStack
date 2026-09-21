@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 /**
  * Pixel-aligned dashboard loading mirror — used by route placeholder and page isLoading.
  * Keep structure in sync with dashboard.component.html loaded layout.
- * Host is display:block so parent space-y-* gap under page-header applies.
+ * Host is display:block so parent eh-content-stack gap under page-header applies.
  */
 @Component({
   selector: 'app-dashboard-skeleton',
@@ -11,7 +11,7 @@ import { Component } from '@angular/core';
   host: { class: 'block' },
   template: `
     <div
-      class="space-y-6 sm:space-y-8"
+      class="eh-section-stack"
       data-testid="dashboard-skeleton"
       aria-hidden="true"
     >

@@ -1,4 +1,4 @@
-<!-- Header→content: tight on phone; solid sm+ gap. Sections use shared space-y. -->
+<!-- Header→content: tight on phone; solid sm+ gap. Sections use eh-content-stack. -->
 <div class="text-white/85">
   <app-page-header
     [title]="pageMeta.title"
@@ -6,7 +6,7 @@
     [icon]="pageMeta.icon"
   ></app-page-header>
 
-  <div class="mt-2 space-y-6 sm:mt-8 sm:space-y-8">
+  <div class="eh-content-stack">
   @if (isLoading()) {
     <app-dashboard-skeleton></app-dashboard-skeleton>
   } @else {
