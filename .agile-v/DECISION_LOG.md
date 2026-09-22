@@ -160,3 +160,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | User approved plan after GATE-0016 prod soak screenshots (blank boot, truncated filters, update-project Untitled flash, list skeleton mismatch, 5 vs 6 KPIs). |
 | Linked | GATE-0017, TASK-0039–0043, REQ-0125–0128, CP-0018 |
 | Status | DONE — local verify-deep + security PASS; commit-ready |
+
+---
+
+## DEC-0021 — GATE-0017 prod UI soak before next polish
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-23 |
+| Decision | Pause coding. Human tests production and shares UI/behavior findings. Next implement only after feedback + approval (CP-0019). |
+| Rationale | GATE-0017 verified locally; remaining risk is prod-perceived UX. |
+| Linked | GATE-0017, CP-0019 |
+| Status | ACTIVE |
