@@ -2,10 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AppIconComponent } from './app-icon.component';
-import {
-  SelectMenuComponent,
-  SelectMenuOption,
-} from './select-menu.component';
+import { SelectMenuComponent, SelectMenuOption } from './select-menu.component';
 
 /** @deprecated Prefer ListToolbarMenuFilter + SelectMenu options. */
 export interface ListToolbarFilterOption {
@@ -47,7 +44,7 @@ export interface ListToolbarMenuFilterChange {
           [id]="searchId"
           type="search"
           [placeholder]="searchPlaceholder"
-          class="w-full rounded-2xl border border-white/15 bg-white/5 py-2.5 pl-10 pr-3 text-sm text-white/80 shadow-inner shadow-slate-950/30 outline-none transition placeholder:text-white/40 focus:border-primary/60 focus:bg-white/10 focus:text-white focus:shadow-[0_10px_30px_rgba(59,130,246,0.25)]"
+          class="w-full rounded-2xl border border-white/15 bg-white/5 py-2.5 pl-8 pr-3 text-sm text-white/80 shadow-inner shadow-slate-950/30 outline-none transition placeholder:text-white/40 focus:border-primary/60 focus:bg-white/10 focus:text-white focus:shadow-[0_10px_30px_rgba(59,130,246,0.25)]"
           [ngModel]="searchValue"
           (ngModelChange)="searchChange.emit($event)"
         />
@@ -68,7 +65,7 @@ export interface ListToolbarMenuFilterChange {
         }
 
         @for (filter of menuFilters; track filter.id) {
-          <div class="w-full min-w-0 sm:w-44">
+          <div class="w-full min-w-0 sm:w-auto sm:min-w-[11rem] sm:max-w-[18rem]">
             <app-select-menu
               [options]="filter.options"
               [placeholder]="filter.label + ': All'"
@@ -82,7 +79,9 @@ export interface ListToolbarMenuFilterChange {
 
         @if (!menuFilters.length && filterOptions.length) {
           <div class="relative w-full sm:w-52">
-            <label [attr.for]="filterId" class="sr-only">{{ filterLabel }}</label>
+            <label [attr.for]="filterId" class="sr-only">{{
+              filterLabel
+            }}</label>
             <span
               class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/50"
               aria-hidden="true"
@@ -145,7 +144,7 @@ export class ListToolbarComponent {
       return '';
     }
     const hit = this.filterOptions.find(
-      (opt) => opt.value.toLowerCase() === raw.toLowerCase()
+      (opt) => opt.value.toLowerCase() === raw.toLowerCase(),
     );
     return hit?.value ?? raw;
   }
@@ -156,7 +155,7 @@ export class ListToolbarComponent {
       return '';
     }
     const hit = filter.options.find(
-      (opt) => opt.value.toLowerCase() === raw.toLowerCase()
+      (opt) => opt.value.toLowerCase() === raw.toLowerCase(),
     );
     return hit?.value ?? raw;
   }

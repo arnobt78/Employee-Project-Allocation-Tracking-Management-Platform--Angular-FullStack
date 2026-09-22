@@ -1,5 +1,41 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-23 — GATE-0017 leftover polish + Project Team 6th KPI
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npm test` (ChromeHeadless) | **PASS (25/25)** | |
+| `npm run build` | **PASS** | Sentry maps uploaded |
+| Prior verify-deep A–Z browser crawl | **PASS** | Routes + APIs 200; SelectMenu 16rem; form skeleton |
+| Independent verifier (GATE-0017) | **PASS WITH WARNINGS** | Non-blocking leftovers fixed this session |
+| Security review (GATE-0017) | **PASS** | UI-only |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Single `ListPageRowVariant` (meta → skeletons) | Done |
+| SelectMenu CSS `max-width` = measured pane var | Done |
+| Project-form / placeholder `checklistRows=5` | Done |
+| Project Team People KPI + `listKpiCount=6` | Done |
+| Pre-boot CSS, list skeleton params, SelectMenu clamp (prior uncommitted) | Done |
+
+### Remaining
+
+- Insights/calendar polish (deferred)
+- Formal GATE-0001
+
+### eval_gate_status
+
+N/A (UX polish)
+
+---
+
 ## Session 2026-09-22 — GATE-0016 KPI→filter stack gap
 
 **Node:** v24.x

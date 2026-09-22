@@ -3,7 +3,10 @@
   [subtitle]="pageMeta.subtitle"
   [icon]="pageMeta.icon"
   [contentLoading]="isLoading()"
-  [skeletonKpiCount]="5"
+  [skeletonKpiCount]="6"
+  [skeletonFilterCount]="3"
+  [skeletonShowPagination]="true"
+  skeletonRowVariant="assignment"
 >
   @if (showCreatePanel) {
     <button
@@ -63,6 +66,14 @@
     hint="Unique projects"
     icon="folder-kanban"
     tone="violet"
+  ></app-kpi-stat-card>
+  <app-kpi-stat-card
+    listShellKpis
+    label="People"
+    [value]="uniqueEmployeesKpi()"
+    hint="Unique assignees"
+    icon="users"
+    tone="sky"
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis

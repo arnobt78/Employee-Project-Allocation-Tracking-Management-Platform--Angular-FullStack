@@ -46,6 +46,7 @@ import {
   SelectMenuComponent,
   SelectMenuOption,
 } from '@/app/components/ui/select-menu.component';
+import { ProjectFormSkeletonComponent } from '@/app/components/ui/project-form-skeleton.component';
 
 const readinessTaskDefinitions = [
   {
@@ -150,6 +151,7 @@ const REVIEWER_SEVERITIES = [
     SelectMenuComponent,
     AlertDialogComponent,
     PageHeaderComponent,
+    ProjectFormSkeletonComponent,
   ],
   templateUrl: './project-form.component.html',
   styleUrl: './project-form.component.css' })
@@ -224,6 +226,9 @@ export class ProjectFormComponent implements OnInit {
 
   private readonly modeSignal = signal<'create' | 'edit'>('create');
   readonly mode = this.modeSignal.asReadonly();
+  /** True while GetProject hydrates an edit route (avoids Untitled/0% flash). */
+  private readonly isLoadingSignal = signal(false);
+  readonly isLoading = this.isLoadingSignal.asReadonly();
 
   readonly readinessTasks = readinessTaskDefinitions;
   readonly readinessTotal = this.readinessTasks.length;
@@ -421,9 +426,11 @@ export class ProjectFormComponent implements OnInit {
       if (id > 0) {
         this.modeSignal.set('edit');
         this.editingSection.set(null);
+        this.isLoadingSignal.set(true);
         this.fetchProject(id);
       } else {
         this.modeSignal.set('create');
+        this.isLoadingSignal.set(false);
         this.editingSection.set('overview');
         this.projectForm.patchValue({
           startDate: this.todayString() });
@@ -1295,6 +1302,7 @@ export class ProjectFormComponent implements OnInit {
     this.masterService.getProjectById(id).subscribe({
       next: (project) => this.hydrateProject(project),
       error: () => {
+        this.isLoadingSignal.set(false);
         this.toast.error({
           title: 'Load failed',
           description: 'Unable to load project details. Please retry.' });
@@ -1676,6 +1684,7 @@ export class ProjectFormComponent implements OnInit {
   private hydrateProject(project: IProject | null) {
     if (!project) {
       this.resourceInsightsSignal.set(null);
+      this.isLoadingSignal.set(false);
       return;
     }
     const snapshot = this.cloneProject(project);
@@ -1710,6 +1719,7 @@ export class ProjectFormComponent implements OnInit {
     } else {
       this.resourceInsightsSignal.set(null);
     }
+    this.isLoadingSignal.set(false);
   }
 
   private refreshProjectSnapshot(projectId: number | null | undefined) {

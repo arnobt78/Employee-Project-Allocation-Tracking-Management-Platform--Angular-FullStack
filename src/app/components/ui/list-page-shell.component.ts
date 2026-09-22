@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { ListPageRowVariant } from '@/app/constants/private-page-meta';
 import { PageHeaderComponent } from './page-header.component';
 import { ListPageSkeletonComponent } from './list-page-skeleton.component';
 
@@ -18,6 +19,9 @@ import { ListPageSkeletonComponent } from './list-page-skeleton.component';
           <app-list-page-skeleton
             [rows]="skeletonRows"
             [kpiCount]="skeletonKpiCount"
+            [filterCount]="skeletonFilterCount"
+            [showPagination]="skeletonShowPagination"
+            [rowVariant]="skeletonRowVariant"
           ></app-list-page-skeleton>
         } @else {
           <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -42,4 +46,7 @@ export class ListPageShellComponent {
   @Input() contentLoading = false;
   @Input() skeletonRows = 6;
   @Input() skeletonKpiCount = 6;
+  @Input() skeletonFilterCount = 3;
+  @Input() skeletonShowPagination = false;
+  @Input() skeletonRowVariant: ListPageRowVariant = 'default';
 }

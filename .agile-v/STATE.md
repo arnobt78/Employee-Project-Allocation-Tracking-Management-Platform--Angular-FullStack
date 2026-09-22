@@ -1,28 +1,26 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 3 — GATE-0016 list stack gap fix  
-**Gate:** GATE-0016 **COMPLETE**; GATE-0001 formal still open  
-**Status:** KPI→filter gap fixed via shared eh-content-stack; lint/tsc/test/build PASS  
-**Updated:** 2026-09-22  
-**resume_token:** `c1-gate16-stack-gap-done-2026-09-22`
+**Phase / Stage:** Stage 4 — GATE-0017 coded + verified locally  
+**Gate:** GATE-0017 implement **COMPLETE**; GATE-0016 soak absorbed via GATE-0017 feedback; GATE-0001 formal still open  
+**Status:** Ready for commit-ready / push when human requests. Local verify PASS.  
+**Updated:** 2026-09-23  
+**resume_token:** `c1-gate17-complete-2026-09-23`
 
 ---
 
 ## Resume Point
 
-**Last completed:** Shared `.eh-content-stack` / `.eh-section-stack` (flex gap) on list shell, skeletons, placeholder, dashboard; list-toolbar `block w-full`.
+**Last completed (code):** GATE-0017 — pre-boot ambient CSS; parametrized list skeletons; SelectMenu 16–24rem pane; project-form skeleton (5 readiness rows); Project Team 6th KPI (People); type/CSS polish.
 
-**Validation:** `lint` PASS; `tsc` PASS; `test` 25/25 PASS; `build` PASS; browser gap 24px on three list routes; security PASS.
-
-**Next exact action:** Insights/calendar polish (deferred) or formal GATE-0001 closure when ready.
+**Next exact action:** Optional human prod UI soak of GATE-0017; otherwise idle / next approved slice. Formal GATE-0001 still open.
 
 **Resume prompt:**
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
-Resume after GATE-0016 stack gap (resume_token c1-gate16-stack-gap-done-2026-09-22).
-Pick deferred Insights/calendar polish or GATE-0001 formal closure.
+Resume after GATE-0017 (resume_token c1-gate17-complete-2026-09-23).
+Optional: prod soak GATE-0017; otherwise await next approved task.
 ```
 
 ---

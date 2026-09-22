@@ -207,6 +207,13 @@ export class ProjectEmployeeComponent implements OnInit {
   readonly uniqueProjectsKpi = computed(() =>
     this.uniqueCount(this.assignments(), (item) => item.projectName)
   );
+  readonly uniqueEmployeesKpi = computed(() =>
+    this.uniqueCount(this.assignments(), (item) =>
+      item.empId != null && item.empId !== 0
+        ? String(item.empId)
+        : item.employeeName
+    )
+  );
   readonly uniqueRolesKpi = computed(() =>
     this.uniqueCount(this.assignments(), (item) => item.role)
   );

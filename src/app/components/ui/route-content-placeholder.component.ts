@@ -12,6 +12,7 @@ import {
 } from './list-skeleton.component';
 import { DashboardSkeletonComponent } from './dashboard-skeleton.component';
 import { ListPageSkeletonComponent } from './list-page-skeleton.component';
+import { ProjectFormSkeletonComponent } from './project-form-skeleton.component';
 
 @Component({
   selector: 'app-route-content-placeholder',
@@ -23,6 +24,7 @@ import { ListPageSkeletonComponent } from './list-page-skeleton.component';
     StatPillSkeletonComponent,
     DashboardSkeletonComponent,
     ListPageSkeletonComponent,
+    ProjectFormSkeletonComponent,
   ],
   template: `
     <div
@@ -52,7 +54,15 @@ import { ListPageSkeletonComponent } from './list-page-skeleton.component';
             <app-list-page-skeleton
               [rows]="6"
               [kpiCount]="meta().listKpiCount ?? 6"
+              [filterCount]="meta().listFilterCount ?? 3"
+              [showPagination]="meta().listShowPagination ?? false"
+              [rowVariant]="meta().listRowVariant ?? 'default'"
             ></app-list-page-skeleton>
+          }
+          @case ('project-form') {
+            <app-project-form-skeleton
+              [checklistRows]="5"
+            ></app-project-form-skeleton>
           }
           @case ('insights') {
             <div class="flex flex-wrap gap-3">

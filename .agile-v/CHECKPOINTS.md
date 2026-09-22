@@ -7,7 +7,9 @@
 | CP-0013 | Human-Decision | GATE-0013 | `c1-gate13-ui-lockfile-2026-09-11` | **RESOLVED** | 2026-09-11 | UI polish + lockfile; verify-deep + security + commit-ready complete |
 | CP-0014 | Human-Decision | GATE-0014 | `c1-gate14-cleanup-budget-2026-09-11` | **RESOLVED** | 2026-09-11 | Dead-code + budget; verify-deep + security + commit-ready complete |
 | CP-0015 | Human-Decision | GATE-0015 | `c1-gate15-refresh-ux-2026-09-13` | **RESOLVED** | 2026-09-13 | Shell/nav FOUC + Phase A/B Zod/list-query; verify-deep + security + commit-ready |
-| CP-0016 | Human-Decision | GATE-0016 | `c1-gate16-ui-polish-2026-09-14` | **PENDING** | 2026-09-14 | Await screenshots + Option A/B/C; no coding until approved |
+| CP-0016 | Human-Decision | GATE-0016 | `c1-gate16-ui-polish-2026-09-14` | **RESOLVED** | 2026-09-14 | Screenshot waves + cold-load + stack gap shipped through `416a7c5` |
+| CP-0017 | Human-Action | GATE-0016 | `c1-gate16-prod-ui-soak-2026-09-22` | **RESOLVED** | 2026-09-22 | Soak findings (blank boot, list mirrors, SelectMenu, form skeleton) implemented as GATE-0017 |
+| CP-0018 | Human-Decision | GATE-0017 | `c1-gate17-complete-2026-09-23` | **RESOLVED** | 2026-09-23 | Boot CSS, skeleton params, SelectMenu clamp, form checklist=5, Project Team People KPI |
 
 ## Resume rules
 

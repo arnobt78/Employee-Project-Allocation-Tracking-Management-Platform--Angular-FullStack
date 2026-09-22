@@ -1,3 +1,28 @@
+@if (isLoading()) {
+  <div class="space-y-10 text-white/85">
+    <app-page-header
+      title="Project setup"
+      subtitle="Configure the essentials before rolling the project out to your teams. Organize the information into focused sections, edit inline, and save when you are ready."
+      icon="pencil"
+    >
+      <a
+        routerLink="/projects"
+        class="eh-btn-icon text-xs font-medium text-white/60 transition hover:text-white"
+      >
+        ← Back To Projects
+      </a>
+      <span
+        class="h-7 w-20 animate-pulse rounded-full border border-white/10 bg-white/10"
+        aria-hidden="true"
+      ></span>
+      <div
+        class="h-10 w-40 animate-pulse rounded-2xl border border-white/10 bg-white/5"
+        aria-hidden="true"
+      ></div>
+    </app-page-header>
+    <app-project-form-skeleton [checklistRows]="5"></app-project-form-skeleton>
+  </div>
+} @else {
 <div class="space-y-10 text-white/85" [formGroup]="projectForm">
   <app-page-header
     [title]="projectTitle()"
@@ -1916,6 +1941,7 @@
     </div>
   </footer>
 </div>
+}
 
 <app-alert-dialog
   [open]="pendingDelete()"

@@ -1,4 +1,11 @@
-export type PrivateSkeletonKind = 'dashboard' | 'list' | 'insights' | 'simple';
+export type PrivateSkeletonKind =
+  | 'dashboard'
+  | 'list'
+  | 'insights'
+  | 'simple'
+  | 'project-form';
+
+export type ListPageRowVariant = 'default' | 'employee' | 'project' | 'assignment';
 
 export interface PrivatePageMeta {
   title: string;
@@ -8,6 +15,12 @@ export interface PrivatePageMeta {
   skeleton: PrivateSkeletonKind;
   /** KPI tile count for `list` skeleton (default 6). */
   listKpiCount?: number;
+  /** Toolbar filter pill count for `list` skeleton (default 3). */
+  listFilterCount?: number;
+  /** Show pagination stub in list toolbar skeleton. */
+  listShowPagination?: boolean;
+  /** List row chip density for skeleton mirror. */
+  listRowVariant?: ListPageRowVariant;
 }
 
 /** Static page chrome for instant refresh paint (matches app-page-header copy). */
@@ -24,33 +37,44 @@ export const PRIVATE_PAGE_META: Record<string, PrivatePageMeta> = {
     subtitle: 'Search, add, and manage your organisation workforce',
     icon: 'users',
     skeleton: 'list',
+    listKpiCount: 6,
+    listFilterCount: 4,
+    listShowPagination: true,
+    listRowVariant: 'employee',
   },
   '/projects': {
     title: 'Projects',
     subtitle: 'Create, track, and update project delivery status',
     icon: 'folder-kanban',
     skeleton: 'list',
+    listKpiCount: 6,
+    listFilterCount: 2,
+    listShowPagination: true,
+    listRowVariant: 'project',
   },
   '/new-project': {
     title: 'Untitled project',
     subtitle:
       'Configure the essentials before rolling the project out to your teams. Organize the information into focused sections, edit inline, and save when you are ready.',
     icon: 'folder-kanban',
-    skeleton: 'simple',
+    skeleton: 'project-form',
   },
   '/update-project': {
     title: 'Project setup',
     subtitle:
       'Configure the essentials before rolling the project out to your teams. Organize the information into focused sections, edit inline, and save when you are ready.',
     icon: 'pencil',
-    skeleton: 'simple',
+    skeleton: 'project-form',
   },
   '/project-employee': {
     title: 'Project Team',
     subtitle: 'Assign teammates to projects and track allocation',
     icon: 'contact',
     skeleton: 'list',
-    listKpiCount: 5,
+    listKpiCount: 6,
+    listFilterCount: 3,
+    listShowPagination: true,
+    listRowVariant: 'assignment',
   },
   '/business-insights': {
     title: 'Business Insights',

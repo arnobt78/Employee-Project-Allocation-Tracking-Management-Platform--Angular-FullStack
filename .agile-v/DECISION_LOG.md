@@ -135,4 +135,28 @@ Append-only. Do not rewrite prior entries.
 | Decision | On cold load, list pages mirror dashboard: stable header + list-shaped content skeleton until peek/data warm; never show live KPI cards with `—`. Align list-page-shell spacing with dashboard/placeholder. |
 | Rationale | Production hard-refresh screenshots showed KPI dash flash and gap mismatch; Cmd+Shift+R and Reload share one cold path (peeks cleared). |
 | Linked | GATE-0016, TASK-0037, REQ-0123–0124 |
-| Status | APPROVED — implemented (uncommitted); awaiting commit-ready |
+| Status | DONE — `44bd5e3` + stack follow-up `416a7c5` |
+
+---
+
+## DEC-0019 — GATE-0016 prod UI soak before next polish
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-22 |
+| Decision | Pause GATE-0016 coding. Human tests production (hard refresh, soft nav, list trio + dashboard) and shares UI findings. Next implement only after feedback + Option A/B/C approval (CP-0017). |
+| Rationale | Code is on `origin/main`; remaining risk is prod-perceived UX, not unfinished planned tasks. |
+| Linked | GATE-0016, TASK-0038, CP-0017 |
+| Status | ACTIVE — superseded by GATE-0017 after soak feedback |
+
+---
+
+## DEC-0020 — GATE-0017 boot paint + skeleton mirrors + Team KPI parity
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-23 |
+| Decision | Implement soak findings as GATE-0017: pre-boot radials; parametrized list/form skeletons; SelectMenu 16–24rem; Project Team sixth KPI (People); unify `ListPageRowVariant`; align SelectMenu CSS max-width to measured pane var. |
+| Rationale | User approved plan after GATE-0016 prod soak screenshots (blank boot, truncated filters, update-project Untitled flash, list skeleton mismatch, 5 vs 6 KPIs). |
+| Linked | GATE-0017, TASK-0039–0043, REQ-0125–0128, CP-0018 |
+| Status | DONE — local verify-deep + security PASS; commit-ready |

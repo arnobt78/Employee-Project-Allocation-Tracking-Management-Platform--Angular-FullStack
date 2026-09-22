@@ -96,16 +96,25 @@
 | TASK-0035 | List toolbar v2: SelectMenu multi-filter + Clear + soft skeleton | REQ-0121 | DONE | Shared foundation |
 | TASK-0036 | Fix seed path to `dataset/`; local wipe+reseed; enrich sample JSON | REQ-0122 | DONE | Wipe localhost-only; dataset tracked |
 | TASK-0037 | List cold-load skeleton; remove KPI emdash flash; shell gap parity | REQ-0123–0124 | DONE | Verified + committed |
+| TASK-0038 | Intake prod UI soak findings; map → REQ/TASK; propose Option A/B/C | REQ-0119 | DONE | Findings → GATE-0017 |
 
 ---
 
-## Recommended approval options (GATE-0016)
+## Wave — GATE-0017 boot / skeleton / SelectMenu / Team KPIs (COMPLETE)
 
-**Option A — Single-page slice:** Approve polish for only the pages shown in the next screenshot batch. **(active — dashboard done)**  
-**Option B — Batch wave:** Approve all pages called out in that batch in one implement → verify → commit-ready cycle.  
-**Option C — Hold:** Keep planning only; no coding until further screenshots/instructions.
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0039 | Pre-boot ambient radials in `index.html` | REQ-0125 | DONE | Match shell before Angular mounts |
+| TASK-0040 | Parametrize list skeletons + project-form skeleton | REQ-0126 | DONE | Meta + shell + form checklist=5 |
+| TASK-0041 | SelectMenu pane width clamp 16–24rem + CSS align | REQ-0127 | DONE | measurePaneWidth + styles.css |
+| TASK-0042 | Project Team 6th KPI (People) + listKpiCount=6 | REQ-0128 | DONE | Parity with employee/projects |
+| TASK-0043 | verify-deep + security + commit-ready | REQ-0120 | DONE | Local A–Z crawl; docs synced |
 
-Default recommendation: **Option A** (one page at a time).
+---
+
+## Recommended approval options (GATE-0016 prod soak)
+
+**Closed:** Soak findings implemented under GATE-0017. Optional further prod soak of GATE-0017 only.
 
 ---
 

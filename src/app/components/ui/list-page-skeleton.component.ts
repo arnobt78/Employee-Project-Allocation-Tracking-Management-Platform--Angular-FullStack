@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { ListPageRowVariant } from '@/app/constants/private-page-meta';
 import { ListSkeletonComponent } from './list-skeleton.component';
 
 /**
@@ -37,29 +38,42 @@ import { ListSkeletonComponent } from './list-skeleton.component';
         <div
           class="h-11 w-full animate-pulse rounded-2xl border border-white/10 bg-white/5 sm:max-w-sm"
         ></div>
-        <div class="flex flex-wrap gap-2">
-          <div
-            class="h-11 w-36 animate-pulse rounded-2xl border border-white/10 bg-white/5"
-          ></div>
-          <div
-            class="h-11 w-36 animate-pulse rounded-2xl border border-white/10 bg-white/5"
-          ></div>
-          <div
-            class="h-11 w-36 animate-pulse rounded-2xl border border-white/10 bg-white/5"
-          ></div>
+        <div class="flex flex-wrap items-center gap-2">
+          @for (pill of filterPills; track pill) {
+            <div
+              class="h-11 w-36 animate-pulse rounded-2xl border border-white/10 bg-white/5"
+            ></div>
+          }
+          @if (showPagination) {
+            <div
+              class="h-11 w-28 animate-pulse rounded-2xl border border-white/10 bg-white/5"
+            ></div>
+          }
         </div>
       </section>
-      <app-list-skeleton [rows]="rows"></app-list-skeleton>
+      <app-list-skeleton
+        [rows]="rows"
+        [rowVariant]="rowVariant"
+      ></app-list-skeleton>
     </div>
   `,
 })
 export class ListPageSkeletonComponent {
   @Input() rows = 6;
-  /** Match live KPI tile count (project-employee uses 5; others 6). */
+  @Input() showPagination = false;
+  @Input() rowVariant: ListPageRowVariant = 'default';
+
+  /** Match live KPI tile count (list pages use 6). */
   @Input() set kpiCount(value: number) {
     const n = Number.isFinite(value) && value > 0 ? Math.floor(value) : 6;
     this.kpiCards = Array.from({ length: n }, (_, i) => i + 1);
   }
 
+  @Input() set filterCount(value: number) {
+    const n = Number.isFinite(value) && value > 0 ? Math.floor(value) : 3;
+    this.filterPills = Array.from({ length: n }, (_, i) => i + 1);
+  }
+
   kpiCards = [1, 2, 3, 4, 5, 6];
+  filterPills = [1, 2, 3];
 }

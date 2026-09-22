@@ -256,7 +256,7 @@ export class SelectMenuComponent
     }
 
     const triggerEl = this.trigger.nativeElement;
-    const triggerWidth = this.measureTriggerWidth();
+    const paneWidth = this.measurePaneWidth();
 
     const positionStrategy = this.overlay
       .position()
@@ -287,12 +287,12 @@ export class SelectMenuComponent
       hasBackdrop: true,
       backdropClass: 'cdk-overlay-transparent-backdrop',
       panelClass: 'eh-select-menu-pane',
-      width: triggerWidth,
-      minWidth: triggerWidth,
-      maxWidth: 'none',
+      width: paneWidth,
+      minWidth: paneWidth,
+      maxWidth: paneWidth,
     });
 
-    this.applyPaneWidth(triggerWidth);
+    this.applyPaneWidth(paneWidth);
 
     const portal = new ComponentPortal(SelectMenuPanelComponent);
     const componentRef = this.overlayRef.attach(portal);
@@ -353,6 +353,28 @@ export class SelectMenuComponent
     this.selectedOption.set(match ?? null);
   }
 
+  /** Pane at least 16rem and at least trigger width; cap at 24rem / viewport. */
+  private measurePaneWidth(): number {
+    const triggerWidth = this.measureTriggerWidth();
+    const minRem = 16 * this.rootFontSize();
+    const maxRem = 24 * this.rootFontSize();
+    const viewportCap =
+      typeof window !== 'undefined'
+        ? Math.max(minRem, window.innerWidth - 32)
+        : maxRem;
+    const maxWidth = Math.min(maxRem, viewportCap);
+    return Math.ceil(Math.min(maxWidth, Math.max(triggerWidth, minRem)));
+  }
+
+  private rootFontSize(): number {
+    if (typeof window === 'undefined' || !document.documentElement) {
+      return 16;
+    }
+    const raw = getComputedStyle(document.documentElement).fontSize;
+    const n = Number.parseFloat(raw);
+    return Number.isFinite(n) && n > 0 ? n : 16;
+  }
+
   /** Match overlay pane to the live trigger width (responsive screens). */
   private measureTriggerWidth(): number {
     return Math.ceil(this.trigger.nativeElement.getBoundingClientRect().width);
@@ -364,7 +386,11 @@ export class SelectMenuComponent
     }
     const pane = this.overlayRef.overlayElement;
     pane.style.setProperty('--eh-select-trigger-width', `${width}px`);
-    this.overlayRef.updateSize({ width, minWidth: width, maxWidth: 'none' });
+    this.overlayRef.updateSize({
+      width,
+      minWidth: width,
+      maxWidth: width,
+    });
   }
 
   private setupResizeSync(triggerEl: HTMLElement): void {
@@ -376,7 +402,7 @@ export class SelectMenuComponent
       if (!this.overlayRef) {
         return;
       }
-      this.applyPaneWidth(this.measureTriggerWidth());
+      this.applyPaneWidth(this.measurePaneWidth());
     });
     this.resizeObserver.observe(triggerEl);
   }
