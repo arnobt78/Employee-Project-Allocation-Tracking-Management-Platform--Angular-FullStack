@@ -1,7 +1,7 @@
 # Tasks — Cycle C1 (prioritized plan)
 
-**Status:** Proposed — awaiting GATE-0001 approval  
-**Rule:** No implementation until approved. Waves are sequential; tasks within a wave may parallelize if independent.
+**Status:** Active — Waves 1+ delivered under user direction (GATE-0001 retroactively closed 2026-09-23)  
+**Rule:** Implementation proceeds under approved gates / user chat approval. Waves are sequential; tasks within a wave may parallelize if independent.
 
 ---
 

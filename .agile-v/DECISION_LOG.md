@@ -172,3 +172,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | GATE-0017 verified locally; remaining risk is prod-perceived UX. |
 | Linked | GATE-0017, CP-0019 |
 | Status | ACTIVE |
+
+---
+
+## DEC-0022 — Close GATE-0001 formal paper trail
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-23 |
+| Decision | Retroactively record GATE-0001 APPROVED as Option A (security-first) as-built; resolve CP-0001. |
+| Rationale | User asked to close formal paper trail; Waves 1+ and later gates already shipped under chat approval (DEC-0004 onward). |
+| Linked | GATE-0001, CP-0001, APPROVALS.md |
+| Status | DONE |
