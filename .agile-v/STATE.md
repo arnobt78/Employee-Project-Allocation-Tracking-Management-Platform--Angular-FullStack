@@ -3,7 +3,7 @@
 **Cycle:** C1  
 **Phase / Stage:** Stage 4 — GATE-0017 coded + verified locally  
 **Gate:** GATE-0017 implement **COMPLETE**; GATE-0016 soak absorbed via GATE-0017 feedback; GATE-0001 formal still open  
-**Status:** Local commit `ee55041` on `main` (ahead of origin by 1).  
+**Status:** Local commits `ee55041` + `7f99eac` on `main` (ahead of origin by 2).  
 **Updated:** 2026-09-23  
 **resume_token:** `c1-gate17-complete-2026-09-23`
 
