@@ -1,5 +1,11 @@
 # Changelog — Agile V project memory
 
+## 2026-09-24 — GATE-0017 soak: login + Employees UI polish
+
+- Login: grid `mx-auto`, drop form `sm:max-w-xl`, label `space-y-2`; SelectMenu `gap-2` + pane = trigger (≥16rem, viewport-capped, no 24rem max) — `3445214`
+- Employees: skeleton mirrors live ID→avatar row; KPI stub spacing; `.eh-action-btn*` (Close/Add/Save/Cancel/Edit/Delete); view-mode field-label icons; list ID before avatar
+- verify-deep PASS WITH WARNINGS (excluded out-of-scope project-employee / project-form); lint/build PASS
+
 ## 2026-09-14 — GATE-0016 planning (awaiting screenshots)
 
 - Formalized per-page UI polish as GATE-0016 / REQ-0119–0120 / TASK-0032–0034 / CP-0016

@@ -7,16 +7,18 @@ import { ListPageRowVariant } from '@/app/constants/private-page-meta';
   template: `
     <div class="animate-pulse space-y-6" [attr.aria-hidden]="true">
       @for (row of rowsArray; track row) {
-        <div
-          class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-4"
-        >
-          <div class="flex min-w-0 flex-1 items-center gap-3">
-            <div class="h-10 w-10 shrink-0 rounded-full bg-white/10"></div>
-            <div class="min-w-0 flex-1 space-y-2">
-              <div class="flex items-center gap-2">
-                <div class="h-3 w-10 rounded-full bg-white/10"></div>
-                <div class="h-4 w-36 max-w-[50%] rounded-full bg-white/10"></div>
-              </div>
+        @if (rowVariant === 'employee') {
+          <div
+            class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5 px-2 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-4"
+          >
+            <div
+              class="flex min-w-0 flex-1 flex-col gap-2 md:flex-row md:flex-wrap md:items-center"
+            >
+              <div
+                class="h-8 w-8 shrink-0 rounded-2xl border border-white/15 bg-white/10"
+              ></div>
+              <div class="h-8 w-8 shrink-0 rounded-full bg-white/10"></div>
+              <div class="h-4 w-36 max-w-[50%] rounded-full bg-white/10"></div>
               <div class="flex flex-wrap gap-2">
                 @for (chip of chipWidths; track $index) {
                   <div
@@ -25,13 +27,39 @@ import { ListPageRowVariant } from '@/app/constants/private-page-meta';
                   ></div>
                 }
               </div>
+              <div class="h-4 w-28 rounded-full bg-white/10"></div>
+            </div>
+            <div class="h-4 w-14 shrink-0 rounded-full bg-white/10"></div>
+          </div>
+        } @else {
+          <div
+            class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-4"
+          >
+            <div class="flex min-w-0 flex-1 items-center gap-3">
+              <div class="h-10 w-10 shrink-0 rounded-full bg-white/10"></div>
+              <div class="min-w-0 flex-1 space-y-2">
+                <div class="flex items-center gap-2">
+                  <div class="h-3 w-10 rounded-full bg-white/10"></div>
+                  <div
+                    class="h-4 w-36 max-w-[50%] rounded-full bg-white/10"
+                  ></div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  @for (chip of chipWidths; track $index) {
+                    <div
+                      class="h-6 rounded-full bg-white/10"
+                      [style.width.px]="chip"
+                    ></div>
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="flex shrink-0 items-center gap-2">
+              <div class="h-6 w-28 rounded-full bg-white/10"></div>
+              <div class="h-8 w-20 rounded-full bg-white/10"></div>
             </div>
           </div>
-          <div class="flex shrink-0 items-center gap-2">
-            <div class="h-6 w-28 rounded-full bg-white/10"></div>
-            <div class="h-8 w-20 rounded-full bg-white/10"></div>
-          </div>
-        </div>
+        }
       }
     </div>
   `,

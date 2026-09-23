@@ -88,8 +88,8 @@ Legend: `BASELINE` = verified as-built behavior · `GAP` = docs/code mismatch or
 | ID | Requirement | Status | Notes |
 |---|---|---|---|
 | REQ-0125 | Document/html MUST paint dark ambient radials before Angular mounts (hard refresh must not show blank flat black). | DONE | `index.html` critical CSS |
-| REQ-0126 | List and project-form loading skeletons MUST mirror live chrome (KPI/filter counts, row variants, readiness checklist rows). | DONE | Meta + `project-form-skeleton` checklist=5 |
-| REQ-0127 | SelectMenu overlay pane width MUST be clamped (≥16rem, ≤24rem, viewport-aware). | DONE | TS measure + CSS var |
+| REQ-0126 | List and project-form loading skeletons MUST mirror live chrome (KPI/filter counts, row variants, readiness checklist rows). | DONE | Meta + `project-form-skeleton` checklist=5; employee row ID→avatar order |
+| REQ-0127 | SelectMenu overlay pane width MUST match at least the trigger and ≥16rem, capped only by viewport (no fixed 24rem max). | DONE | TS measure + CSS var; soak follow-up dropped 24rem cap |
 | REQ-0128 | Project Team list page MUST show six KPI cards (parity with Employees/Projects), including unique assignees. | DONE | People KPI |
 
 ---

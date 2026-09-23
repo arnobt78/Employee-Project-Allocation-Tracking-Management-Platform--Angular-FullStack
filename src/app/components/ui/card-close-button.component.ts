@@ -9,11 +9,11 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
   template: `
     <button
       type="button"
-      class="eh-btn-icon rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+      class="eh-action-btn eh-action-btn-outline"
       aria-label="Close Details"
       (click)="closed.emit()"
     >
-      <lucide-icon name="x" [size]="16"></lucide-icon>
+      <lucide-icon name="x" [size]="14"></lucide-icon>
       <span>Close</span>
     </button>
   `,

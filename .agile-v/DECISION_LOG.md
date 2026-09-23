@@ -184,3 +184,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | User asked to close formal paper trail; Waves 1+ and later gates already shipped under chat approval (DEC-0004 onward). |
 | Linked | GATE-0001, CP-0001, APPROVALS.md |
 | Status | DONE |
+
+---
+
+## DEC-0023 — GATE-0017 soak slices: login then Employees (one page at a time)
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-24 |
+| Decision | Implement approved soak findings page-by-page (login, then Employees). SelectMenu pane tracks trigger width (drop 24rem max). Shared `.eh-action-btn*` for list/card action height. Exclude unrelated project-employee / project-form typography from Employees commit. |
+| Rationale | User screenshots + approved plans; keep CP-0019 open for further prod feedback. |
+| Linked | GATE-0017, CP-0019, TASK-0044–0045, REQ-0119–0120, REQ-0126–0127 |
+| Status | DONE — login `3445214`; Employees polish this commit |

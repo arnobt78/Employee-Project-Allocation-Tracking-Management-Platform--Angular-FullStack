@@ -11,12 +11,10 @@
   <button
     listShellActions
     type="button"
-    ubButton
-    size="sm"
-    class="eh-btn-icon bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+    class="eh-action-btn eh-action-btn-primary"
     (click)="startCreate()"
   >
-    <lucide-icon name="user-round-plus" [size]="16"></lucide-icon>
+    <lucide-icon name="user-round-plus" [size]="14"></lucide-icon>
     <span>Add Employee</span>
   </button>
 
@@ -308,13 +306,11 @@
       <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
         <button
           type="submit"
-          ubButton
-          size="sm"
           [disabled]="isSaving"
-          class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+          class="eh-action-btn eh-action-btn-primary"
         >
           @if (!isSaving) {
-            <lucide-icon name="save" [size]="16"></lucide-icon>
+            <lucide-icon name="save" [size]="14"></lucide-icon>
             <span>Save Employee</span>
           } @else {
             <span>Saving Employee...</span>
@@ -337,6 +333,11 @@
         <div
           class="flex flex-1 flex-col gap-2 md:flex-row md:flex-wrap md:items-center"
         >
+          <span
+            class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-xs font-medium text-white/80 shadow-inner shadow-slate-950/25"
+          >
+            {{ employee.employeeId }}
+          </span>
           <app-user-avatar
             class="shrink-0"
             [seed]="employee.emailId || employee.employeeName"
@@ -345,17 +346,12 @@
             [size]="32"
             [alt]="employee.employeeName"
           ></app-user-avatar>
-          <span
-            class="inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-xs font-medium text-white/80 shadow-inner shadow-slate-950/25"
-          >
-            {{ employee.employeeId }}
-          </span>
-          <span class="font-medium text-white md:ml-2 md:text-base">
+          <span class="font-medium text-white md:text-base">
             {{ employee.employeeName }}
           </span>
           <span
             *ngIf="employee.department"
-            class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-2"
+            class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70"
           >
             <lucide-icon name="building-2" [size]="12"></lucide-icon>
             {{ employee.department }}
@@ -390,7 +386,7 @@
           </span>
           <span
             *ngIf="employee.hireDate || employee.createdAt"
-            class="inline-flex items-center gap-1.5 text-xs text-white/45 md:ml-2"
+            class="inline-flex items-center gap-1.5 text-xs text-white/45"
           >
             <lucide-icon name="calendar" [size]="12"></lucide-icon>
             Joined
@@ -400,7 +396,7 @@
           </span>
         </div>
         <span
-          class="shrink-0 text-xs text-white/40 transition"
+          class="shrink-0 text-xs sm:text-sm text-white/40 transition"
           [class.text-white]="expandedEmployeeId === employee.employeeId"
         >
           {{ expandedEmployeeId === employee.employeeId ? "Hide" : "Details" }}
@@ -595,20 +591,18 @@
               <button
                 type="button"
                 [disabled]="isSaving"
-                class="rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                class="eh-action-btn eh-action-btn-outline"
                 (click)="cancelEdit()"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                ubButton
-                size="sm"
                 [disabled]="isSaving"
-                class="eh-btn-icon bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+                class="eh-action-btn eh-action-btn-primary"
               >
                 @if (!isSaving) {
-                  <lucide-icon name="save" [size]="16"></lucide-icon>
+                  <lucide-icon name="save" [size]="14"></lucide-icon>
                   <span>Save Changes</span>
                 } @else {
                   <span>Updating...</span>
@@ -622,7 +616,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Employee ID</p>
+              <app-field-label text="Employee ID" icon="hash"></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ employee.employeeId }}
               </p>
@@ -630,7 +624,10 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Department</p>
+              <app-field-label
+                text="Department"
+                icon="building-2"
+              ></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ employee.department }}
               </p>
@@ -638,7 +635,10 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Department ID</p>
+              <app-field-label
+                text="Department ID"
+                icon="hash"
+              ></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ employee.deptId || "—" }}
               </p>
@@ -646,18 +646,24 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Role & Title</p>
+              <app-field-label
+                text="Role & Title"
+                icon="briefcase"
+              ></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ employee.role || "—" }}
               </p>
-              <p class="text-xs text-white/55">
+              <p class="text-xs text-white/55 sm:text-sm">
                 {{ employee.title || "—" }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Employment Type</p>
+              <app-field-label
+                text="Employment Type"
+                icon="clock"
+              ></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ employee.employmentType || "—" }}
               </p>
@@ -665,29 +671,35 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Contact</p>
+              <app-field-label text="Contact" icon="phone"></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ employee.contactNo || "—" }}
               </p>
-              <p class="text-xs text-white/55">
+              <p class="text-xs text-white/55 sm:text-sm">
                 {{ employee.emailId || "—" }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Location</p>
+              <app-field-label
+                text="Location"
+                icon="map-pin"
+              ></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ employee.location || "—" }}
               </p>
-              <p class="text-xs text-white/55">
+              <p class="text-xs text-white/55 sm:text-sm">
                 {{ employee.timezone || "—" }}
               </p>
             </div>
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Hire Date</p>
+              <app-field-label
+                text="Hire Date"
+                icon="calendar"
+              ></app-field-label>
               <p class="text-base font-medium text-white">
                 {{
                   employee.hireDate
@@ -701,7 +713,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Updated</p>
+              <app-field-label text="Updated" icon="calendar"></app-field-label>
               <p class="text-base font-medium text-white">
                 {{
                   employee.updatedAt
@@ -713,7 +725,10 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Last Active</p>
+              <app-field-label
+                text="Last Active"
+                icon="clock"
+              ></app-field-label>
               <p class="text-base font-medium text-white">
                 {{
                   employee.lastActiveAt
@@ -725,7 +740,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 sm:col-span-2"
             >
-              <p class="text-xs text-white/45">Skills</p>
+              <app-field-label text="Skills" icon="tag"></app-field-label>
               <p class="text-base font-medium text-white">
                 {{
                   employee.skills && employee.skills.length
@@ -737,7 +752,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 sm:col-span-2"
             >
-              <p class="text-xs text-white/45">Tags</p>
+              <app-field-label text="Tags" icon="tag"></app-field-label>
               <p class="text-base font-medium text-white">
                 {{
                   employee.tags && employee.tags.length
@@ -752,7 +767,7 @@
               ></app-card-close-button>
               <button
                 type="button"
-                class="eh-btn-icon rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white"
+                class="eh-action-btn eh-action-btn-outline"
                 (click)="onEdit(employee)"
               >
                 <lucide-icon name="pencil" [size]="14"></lucide-icon>
@@ -760,7 +775,7 @@
               </button>
               <button
                 type="button"
-                class="eh-btn-icon rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs sm:text-sm text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
+                class="eh-action-btn eh-action-btn-danger"
                 (click)="promptDelete(employee)"
               >
                 <lucide-icon name="trash-2" [size]="14"></lucide-icon>

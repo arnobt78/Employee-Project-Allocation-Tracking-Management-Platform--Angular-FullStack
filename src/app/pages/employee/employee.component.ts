@@ -1,4 +1,11 @@
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -9,7 +16,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MasterService } from '../../service/master.service';
 import { Employee } from '../../model/class/Employee';
 import { CommonModule } from '@angular/common';
-import { UbButtonDirective } from '@/app/components/ui/button';
 import { ToastService } from '@/app/components/ui/toast.service';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
@@ -39,7 +45,6 @@ import {
     AppIconComponent,
     CommonModule,
     ReactiveFormsModule,
-    UbButtonDirective,
     AlertDialogComponent,
     CardCloseButtonComponent,
     UserAvatarComponent,
@@ -88,10 +93,7 @@ export class EmployeeComponent implements OnInit {
       if (role && (employee.role?.toLowerCase() ?? '') !== role) {
         return false;
       }
-      if (
-        etype &&
-        (employee.employmentType?.toLowerCase() ?? '') !== etype
-      ) {
+      if (etype && (employee.employmentType?.toLowerCase() ?? '') !== etype) {
         return false;
       }
       if (title && (employee.title?.toLowerCase() ?? '') !== title) {
@@ -112,7 +114,7 @@ export class EmployeeComponent implements OnInit {
   });
 
   readonly pagedEmployees = computed(() =>
-    paginateList(this.filteredEmployees(), this.listPage())
+    paginateList(this.filteredEmployees(), this.listPage()),
   );
 
   readonly menuFilters = computed((): ListToolbarMenuFilter[] => [
@@ -124,7 +126,7 @@ export class EmployeeComponent implements OnInit {
       options: this.uniqueOptions(
         this.employees(),
         (e) => e.department,
-        'building-2'
+        'building-2',
       ),
     },
     {
@@ -142,7 +144,7 @@ export class EmployeeComponent implements OnInit {
       options: this.uniqueOptions(
         this.employees(),
         (e) => e.employmentType,
-        'clock'
+        'clock',
       ),
     },
     {
@@ -156,22 +158,22 @@ export class EmployeeComponent implements OnInit {
 
   readonly totalEmployeesKpi = computed(() => this.employees().length);
   readonly departmentsKpi = computed(() =>
-    this.uniqueCount(this.employees(), (e) => e.department)
+    this.uniqueCount(this.employees(), (e) => e.department),
   );
   readonly rolesKpi = computed(() =>
-    this.uniqueCount(this.employees(), (e) => e.role)
+    this.uniqueCount(this.employees(), (e) => e.role),
   );
   readonly activeEmployeesKpi = computed(
-    () => this.employees().filter((e) => e.isActive !== false).length
+    () => this.employees().filter((e) => e.isActive !== false).length,
   );
   readonly employmentTypesKpi = computed(() =>
-    this.uniqueCount(this.employees(), (e) => e.employmentType)
+    this.uniqueCount(this.employees(), (e) => e.employmentType),
   );
   readonly fullTimeKpi = computed(
     () =>
       this.employees().filter(
-        (e) => (e.employmentType ?? '').trim().toLowerCase() === 'full-time'
-      ).length
+        (e) => (e.employmentType ?? '').trim().toLowerCase() === 'full-time',
+      ).length,
   );
 
   readonly hasActiveFilters = computed(
@@ -180,7 +182,7 @@ export class EmployeeComponent implements OnInit {
       this.filterValue().trim().length > 0 ||
       this.roleFilter().trim().length > 0 ||
       this.etypeFilter().trim().length > 0 ||
-      this.titleFilter().trim().length > 0
+      this.titleFilter().trim().length > 0,
   );
 
   expandedEmployeeId: number | null = null;
@@ -228,7 +230,7 @@ export class EmployeeComponent implements OnInit {
         role: this.roleFilter,
         etype: this.etypeFilter,
         title: this.titleFilter,
-      }
+      },
     );
     this.getEmployees();
   }
@@ -364,7 +366,7 @@ export class EmployeeComponent implements OnInit {
     this.masterService.deleteEmpById(employeeId).subscribe({
       next: () => {
         this.employeesSignal.update((list) =>
-          list.filter((emp) => emp.employeeId !== employeeId)
+          list.filter((emp) => emp.employeeId !== employeeId),
         );
         this.isDeleting = false;
         this.pendingDelete = null;
@@ -524,7 +526,7 @@ export class EmployeeComponent implements OnInit {
   private uniqueOptions(
     employees: readonly Employee[],
     pick: (e: Employee) => string | null | undefined,
-    icon: string
+    icon: string,
   ): SelectMenuOption[] {
     const seen = new Set<string>();
     const options: SelectMenuOption[] = [];
@@ -545,7 +547,7 @@ export class EmployeeComponent implements OnInit {
 
   private uniqueCount(
     employees: readonly Employee[],
-    pick: (e: Employee) => string | null | undefined
+    pick: (e: Employee) => string | null | undefined,
   ): number {
     const seen = new Set<string>();
     for (const employee of employees) {
@@ -570,7 +572,7 @@ export class EmployeeComponent implements OnInit {
     };
 
     const normalizeDate = (
-      dateValue: string | null | undefined
+      dateValue: string | null | undefined,
     ): string | null => {
       if (!dateValue || typeof dateValue !== 'string') return null;
       try {

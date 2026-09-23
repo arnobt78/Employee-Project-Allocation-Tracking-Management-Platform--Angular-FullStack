@@ -106,15 +106,17 @@
 |---|---|---|---|---|
 | TASK-0039 | Pre-boot ambient radials in `index.html` | REQ-0125 | DONE | Match shell before Angular mounts |
 | TASK-0040 | Parametrize list skeletons + project-form skeleton | REQ-0126 | DONE | Meta + shell + form checklist=5 |
-| TASK-0041 | SelectMenu pane width clamp 16–24rem + CSS align | REQ-0127 | DONE | measurePaneWidth + styles.css |
+| TASK-0041 | SelectMenu pane width (≥16rem, viewport-capped; later drop 24rem max) | REQ-0127 | DONE | measurePaneWidth + styles.css; soak follow-up |
 | TASK-0042 | Project Team 6th KPI (People) + listKpiCount=6 | REQ-0128 | DONE | Parity with employee/projects |
 | TASK-0043 | verify-deep + security + commit-ready | REQ-0120 | DONE | Local A–Z crawl; docs synced |
+| TASK-0044 | Login soak polish: center pair, SelectMenu gap/width, label spacing | REQ-0119 | DONE | `3445214` |
+| TASK-0045 | Employees soak polish: skeleton mirror, eh-action-btn*, view labels, ID→avatar | REQ-0119–0120, REQ-0126 | DONE | This commit |
 
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)
 
-**Closed:** Soak findings implemented under GATE-0017. Optional further prod soak of GATE-0017 only.
+**Closed:** Soak findings implemented under GATE-0017. Further soak slices (login + Employees) shipped 2026-09-24; CP-0019 remains for more prod feedback.
 
 ---
 

@@ -1,5 +1,41 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-24 — GATE-0017 soak: Employees UI polish (+ login already at `3445214`)
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npm run build` | **PASS** | Bundle budget warning (~1.40 kB over); Sentry maps uploaded |
+| Independent verifier (Employees polish) | **PASS WITH WARNINGS** | Exclude out-of-scope `project-employee` / `project-form` HTML |
+| Browser smoke `/employee` | **PASS** | ID→avatar order; view `app-field-label` icons; action btns height 38px |
+| Security review | **not required** | UI tokens / templates only |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Employee list-skeleton ID→avatar→chips→Details stub | Done |
+| List-page-skeleton KPI stubs (`mt-1`/`mt-2`, `h-10` icon) | Done |
+| Shared `.eh-action-btn*` (+ Close icon 14) | Done |
+| Employee Add/Save/Cancel/Edit/Delete height unify | Done |
+| View-mode `app-field-label` + icons; list ID before avatar | Done |
+| Login polish (prior commit `3445214`) | Done |
+
+### Remaining
+
+- CP-0019 further prod soak feedback
+- Do not commit unrelated project-employee / project-form typography unless approved
+
+### eval_gate_status
+
+N/A (UX polish)
+
+---
+
 ## Session 2026-09-23 — GATE-0017 leftover polish + Project Team 6th KPI
 
 **Node:** v24.x

@@ -23,12 +23,14 @@ import { ListSkeletonComponent } from './list-skeleton.component';
           <article
             class="animate-pulse flex items-center justify-between gap-3 rounded-[24px] border border-white/10 bg-white/5 p-3 sm:p-4"
           >
-            <div class="min-w-0 flex-1 space-y-3">
-              <div class="h-3 w-24 rounded-full bg-white/10"></div>
-              <div class="h-8 w-14 rounded-full bg-white/10"></div>
-              <div class="h-3 w-28 rounded-full bg-white/10"></div>
+            <div class="min-w-0 flex-1">
+              <div class="h-3 w-24 rounded-full bg-white/10 sm:h-3.5 sm:w-28"></div>
+              <div class="mt-1 h-7 w-12 rounded-full bg-white/10 sm:h-8 sm:w-14"></div>
+              <div class="mt-2 h-3 w-28 rounded-full bg-white/10"></div>
             </div>
-            <div class="h-10 w-10 shrink-0 rounded-2xl bg-white/10"></div>
+            <div
+              class="h-10 w-10 shrink-0 rounded-2xl border border-white/15 bg-white/10"
+            ></div>
           </article>
         }
       </section>
