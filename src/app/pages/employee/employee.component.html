@@ -303,7 +303,7 @@
           placeholder="mentor, remote"
         />
       </div>
-      <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
+      <div class="sm:col-span-2 flex justify-end gap-3">
         <button
           type="submit"
           [disabled]="isSaving"
@@ -587,14 +587,15 @@
                 class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
               />
             </div>
-            <div class="md:col-span-2 flex justify-end gap-3 pt-2">
+            <div class="md:col-span-2 flex justify-end gap-3">
               <button
                 type="button"
                 [disabled]="isSaving"
                 class="eh-action-btn eh-action-btn-outline"
                 (click)="cancelEdit()"
               >
-                Cancel
+                <lucide-icon name="x" [size]="14"></lucide-icon>
+                <span>Cancel</span>
               </button>
               <button
                 type="submit"
@@ -682,10 +683,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <app-field-label
-                text="Location"
-                icon="map-pin"
-              ></app-field-label>
+              <app-field-label text="Location" icon="map-pin"></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ employee.location || "—" }}
               </p>
@@ -761,7 +759,7 @@
                 }}
               </p>
             </div>
-            <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
+            <div class="sm:col-span-2 flex justify-end gap-3">
               <app-card-close-button
                 (closed)="closeExpanded()"
               ></app-card-close-button>

@@ -193,7 +193,7 @@
 
   /* Icon + label buttons: single gap token */
   .eh-btn-icon {
-    @apply inline-flex items-center justify-center gap-2;
+    @apply inline-flex items-center justify-center gap-1.5;
   }
 
   /* Shared list/card action height — Edit/Delete are the source of truth */

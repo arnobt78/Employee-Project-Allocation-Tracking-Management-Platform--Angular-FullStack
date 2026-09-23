@@ -1,5 +1,11 @@
 # Changelog — Agile V project memory
 
+## 2026-09-24 — Employees Cancel icon + action button gap
+
+- Edit Cancel: Lucide `x` (14) + label on `eh-action-btn-outline`
+- `.eh-btn-icon` icon↔label gap `gap-2` → `gap-1.5` (6px); SelectMenu unchanged
+- verify-deep PASS WITH WARNINGS (scoped commit); lint/build PASS
+
 ## 2026-09-24 — GATE-0017 soak: login + Employees UI polish
 
 - Login: grid `mx-auto`, drop form `sm:max-w-xl`, label `space-y-2`; SelectMenu `gap-2` + pane = trigger (≥16rem, viewport-capped, no 24rem max) — `3445214`

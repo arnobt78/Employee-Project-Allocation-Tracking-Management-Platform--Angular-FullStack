@@ -1,5 +1,37 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-24 — Employees Cancel icon + eh-btn-icon gap-1.5
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npm run build` | **PASS** | Bundle budget warning; Sentry maps |
+| Independent verifier | **PASS WITH WARNINGS** | Exclude README / field-label / project-* HTML |
+| Browser smoke | **PASS** | Cancel has `x`; Add/Cancel/Save `gap: 6px` |
+| Security review | **not required** | CSS/template only |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Edit-footer Cancel Lucide `x` + label | Done |
+| `.eh-btn-icon` `gap-2` → `gap-1.5` | Done |
+
+### Remaining
+
+- CP-0019 further prod soak
+- Unrelated local dirty files not staged
+
+### eval_gate_status
+
+N/A (UX polish)
+
+---
+
 ## Session 2026-09-24 — GATE-0017 soak: Employees UI polish (+ login already at `3445214`)
 
 **Node:** v24.x

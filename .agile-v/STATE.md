@@ -11,16 +11,16 @@
 
 ## Resume Point
 
-**Last completed (code):** GATE-0017 soak follow-up — login centering/SelectMenu trigger-width/`space-y-2` (`3445214`); Employees skeleton ID→avatar mirror, `eh-action-btn*` height tokens, view-mode `app-field-label` icons, list ID before avatar.
+**Last completed (code):** GATE-0017 soak follow-ups — login (`3445214`); Employees list polish (`4502209`); edit Cancel `x` icon + `.eh-btn-icon` gap `1.5` (6px).
 
-**Next exact action:** Human continues **production** soak (hard refresh, soft nav, remaining pages). Share new screenshots / notes. Agent triages — **no coding until feedback + approval**. Leave unrelated dirty `project-employee` / `project-form` typography local unless approved.
+**Next exact action:** Human continues **production** soak. Share new screenshots / notes. Agent triages — **no coding until feedback + approval**. Leave unrelated dirty README / field-label / `project-employee` / `project-form` local unless approved.
 
 **Resume prompt:**
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
 Resume GATE-0017 prod soak (resume_token c1-gate17-prod-ui-soak-2026-09-23).
-Login + Employees polish shipped; await further prod UI findings before next implement.
+Login + Employees polish (incl. Cancel icon / btn gap) shipped; await further prod UI findings.
 ```
 
 ---
