@@ -325,459 +325,459 @@
   </section>
 
   <section class="space-y-4">
-      <div
-        *ngFor="let employee of pagedEmployees().items; let idx = index"
-        class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition duration-200 hover:border-white/20"
+    <div
+      *ngFor="let employee of pagedEmployees().items; let idx = index"
+      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition duration-200 hover:border-white/20"
+    >
+      <button
+        type="button"
+        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
+        (click)="toggleExpand(employee.employeeId)"
       >
-        <button
-          type="button"
-          class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
-          (click)="toggleExpand(employee.employeeId)"
+        <div
+          class="flex flex-1 flex-col gap-2 md:flex-row md:flex-wrap md:items-center"
         >
-          <div class="flex flex-1 flex-col gap-2 md:flex-row md:flex-wrap md:items-center">
-            <app-user-avatar
-              class="shrink-0"
-              [seed]="employee.emailId || employee.employeeName"
-              [imageUrl]="employee.avatarUrl ?? null"
-              [label]="employee.employeeName"
-              [size]="32"
-              [alt]="employee.employeeName"
-            ></app-user-avatar>
-            <span
-              class="inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-xs font-medium text-white/80 shadow-inner shadow-slate-950/25"
-            >
-              {{ employee.employeeId }}
-            </span>
-            <span class="font-medium text-white md:ml-2 md:text-base">
-              {{ employee.employeeName }}
-            </span>
-            <span
-              *ngIf="employee.department"
-              class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-2"
-            >
-              <lucide-icon name="building-2" [size]="12"></lucide-icon>
-              {{ employee.department }}
-            </span>
-            <span
-              *ngIf="employee.role"
-              class="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 md:ml-1"
-            >
-              <lucide-icon name="briefcase" [size]="12"></lucide-icon>
-              {{ employee.role }}
-            </span>
-            <span
-              *ngIf="employee.title"
-              class="inline-flex items-center gap-1.5 rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-xs text-sky-200 md:ml-1"
-            >
-              <lucide-icon name="id-card" [size]="12"></lucide-icon>
-              {{ employee.title }}
-            </span>
-            <span
-              *ngIf="employee.employmentType"
-              class="inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-500/10 px-3 py-1 text-xs text-amber-100 md:ml-1"
-            >
-              <lucide-icon name="clock" [size]="12"></lucide-icon>
-              {{ employee.employmentType }}
-            </span>
-            <span
-              *ngIf="employee.location"
-              class="inline-flex items-center gap-1.5 rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1 text-xs text-violet-100 md:ml-1"
-            >
-              <lucide-icon name="map-pin" [size]="12"></lucide-icon>
-              {{ employee.location }}
-            </span>
-            <span
-              *ngIf="employee.hireDate || employee.createdAt"
-              class="inline-flex items-center gap-1.5 text-xs text-white/45 md:ml-2"
-            >
-              <lucide-icon name="calendar" [size]="12"></lucide-icon>
-              Joined
-              {{
-                (employee.hireDate || employee.createdAt)! | date: "mediumDate"
-              }}
-            </span>
-          </div>
+          <app-user-avatar
+            class="shrink-0"
+            [seed]="employee.emailId || employee.employeeName"
+            [imageUrl]="employee.avatarUrl ?? null"
+            [label]="employee.employeeName"
+            [size]="32"
+            [alt]="employee.employeeName"
+          ></app-user-avatar>
           <span
-            class="shrink-0 text-xs text-white/40 transition"
-            [class.text-white]="expandedEmployeeId === employee.employeeId"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-xs font-medium text-white/80 shadow-inner shadow-slate-950/25"
           >
+            {{ employee.employeeId }}
+          </span>
+          <span class="font-medium text-white md:ml-2 md:text-base">
+            {{ employee.employeeName }}
+          </span>
+          <span
+            *ngIf="employee.department"
+            class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70 md:ml-2"
+          >
+            <lucide-icon name="building-2" [size]="12"></lucide-icon>
+            {{ employee.department }}
+          </span>
+          <span
+            *ngIf="employee.role"
+            class="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200"
+          >
+            <lucide-icon name="briefcase" [size]="12"></lucide-icon>
+            {{ employee.role }}
+          </span>
+          <span
+            *ngIf="employee.title"
+            class="inline-flex items-center gap-1.5 rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-xs text-sky-200"
+          >
+            <lucide-icon name="id-card" [size]="12"></lucide-icon>
+            {{ employee.title }}
+          </span>
+          <span
+            *ngIf="employee.employmentType"
+            class="inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-500/10 px-3 py-1 text-xs text-amber-100"
+          >
+            <lucide-icon name="clock" [size]="12"></lucide-icon>
+            {{ employee.employmentType }}
+          </span>
+          <span
+            *ngIf="employee.location"
+            class="inline-flex items-center gap-1.5 rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1 text-xs text-violet-100"
+          >
+            <lucide-icon name="map-pin" [size]="12"></lucide-icon>
+            {{ employee.location }}
+          </span>
+          <span
+            *ngIf="employee.hireDate || employee.createdAt"
+            class="inline-flex items-center gap-1.5 text-xs text-white/45 md:ml-2"
+          >
+            <lucide-icon name="calendar" [size]="12"></lucide-icon>
+            Joined
             {{
-              expandedEmployeeId === employee.employeeId ? "Hide" : "Details"
+              (employee.hireDate || employee.createdAt)! | date: "mediumDate"
             }}
           </span>
-        </button>
-
-        <div
-          *ngIf="expandedEmployeeId === employee.employeeId"
-          class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75"
-        >
-          <ng-container
-            *ngIf="editingEmployeeId === employee.employeeId; else viewMode"
-          >
-            <form
-              [formGroup]="employeeForm"
-              class="grid gap-4 md:grid-cols-2"
-              (ngSubmit)="onSave()"
-              [class.opacity-50]="isSaving"
-            >
-              <div class="md:col-span-1">
-                <app-field-label
-                  text="Employee Name"
-                  icon="users"
-                  [forId]="'edit-name-' + employee.employeeId"
-                  [required]="true"
-                ></app-field-label>
-                <input
-                  [id]="'edit-name-' + employee.employeeId"
-                  type="text"
-                  formControlName="employeeName"
-                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="md:col-span-1">
-                <app-field-label
-                  text="Department"
-                  icon="building-2"
-                  [forId]="'edit-dept-' + employee.employeeId"
-                  [required]="true"
-                ></app-field-label>
-                <input
-                  [id]="'edit-dept-' + employee.employeeId"
-                  type="text"
-                  formControlName="department"
-                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="md:col-span-1">
-                <app-field-label
-                  text="Department ID"
-                  icon="hash"
-                  [forId]="'edit-deptid-' + employee.employeeId"
-                ></app-field-label>
-                <input
-                  [id]="'edit-deptid-' + employee.employeeId"
-                  type="number"
-                  formControlName="deptId"
-                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="md:col-span-1">
-                <app-field-label
-                  text="Role"
-                  icon="briefcase"
-                  [forId]="'edit-role-' + employee.employeeId"
-                ></app-field-label>
-                <input
-                  [id]="'edit-role-' + employee.employeeId"
-                  type="text"
-                  formControlName="role"
-                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="md:col-span-1">
-                <app-field-label
-                  text="Title"
-                  icon="id-card"
-                  [forId]="'edit-title-' + employee.employeeId"
-                ></app-field-label>
-                <input
-                  [id]="'edit-title-' + employee.employeeId"
-                  type="text"
-                  formControlName="title"
-                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="md:col-span-1">
-                <app-field-label
-                  text="Employment Type"
-                  icon="clock"
-                  [forId]="'edit-employment-' + employee.employeeId"
-                ></app-field-label>
-                <input
-                  [id]="'edit-employment-' + employee.employeeId"
-                  type="text"
-                  formControlName="employmentType"
-                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="md:col-span-1">
-                <app-field-label
-                  text="Contact Number"
-                  icon="phone"
-                  [forId]="'edit-phone-' + employee.employeeId"
-                ></app-field-label>
-                <input
-                  [id]="'edit-phone-' + employee.employeeId"
-                  type="tel"
-                  formControlName="contactNo"
-                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="md:col-span-1">
-                <app-field-label
-                  text="Email"
-                  icon="mail"
-                  [forId]="'edit-email-' + employee.employeeId"
-                ></app-field-label>
-                <input
-                  [id]="'edit-email-' + employee.employeeId"
-                  type="email"
-                  formControlName="emailId"
-                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="md:col-span-1">
-                <app-field-label
-                  text="Location"
-                  icon="map-pin"
-                  [forId]="'edit-location-' + employee.employeeId"
-                ></app-field-label>
-                <input
-                  [id]="'edit-location-' + employee.employeeId"
-                  type="text"
-                  formControlName="location"
-                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="md:col-span-1">
-                <app-field-label
-                  text="Timezone"
-                  icon="clock"
-                  [forId]="'edit-timezone-' + employee.employeeId"
-                ></app-field-label>
-                <input
-                  [id]="'edit-timezone-' + employee.employeeId"
-                  type="text"
-                  formControlName="timezone"
-                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="md:col-span-1">
-                <app-field-label
-                  text="Hire Date"
-                  icon="calendar"
-                  [forId]="'edit-hireDate-' + employee.employeeId"
-                ></app-field-label>
-                <input
-                  [id]="'edit-hireDate-' + employee.employeeId"
-                  type="date"
-                  formControlName="hireDate"
-                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="md:col-span-1">
-                <app-field-label
-                  text="Skills"
-                  icon="tag"
-                  [forId]="'edit-skills-' + employee.employeeId"
-                ></app-field-label>
-                <input
-                  [id]="'edit-skills-' + employee.employeeId"
-                  type="text"
-                  formControlName="skills"
-                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="md:col-span-1">
-                <app-field-label
-                  text="Tags"
-                  icon="tag"
-                  [forId]="'edit-tags-' + employee.employeeId"
-                ></app-field-label>
-                <input
-                  [id]="'edit-tags-' + employee.employeeId"
-                  type="text"
-                  formControlName="tags"
-                  class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="md:col-span-2 flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  [disabled]="isSaving"
-                  class="rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                  (click)="cancelEdit()"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  ubButton
-                  size="sm"
-                  [disabled]="isSaving"
-                  class="eh-btn-icon bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  @if (!isSaving) {
-                    <lucide-icon name="save" [size]="16"></lucide-icon>
-                    <span>Save Changes</span>
-                  } @else {
-                    <span>Updating...</span>
-                  }
-                </button>
-              </div>
-            </form>
-          </ng-container>
-          <ng-template #viewMode>
-            <div class="grid gap-4 sm:grid-cols-2">
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Employee ID</p>
-                <p class="text-base font-medium text-white">
-                  {{ employee.employeeId }}
-                </p>
-              </div>
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Department</p>
-                <p class="text-base font-medium text-white">
-                  {{ employee.department }}
-                </p>
-              </div>
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Department ID</p>
-                <p class="text-base font-medium text-white">
-                  {{ employee.deptId || "—" }}
-                </p>
-              </div>
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Role & Title</p>
-                <p class="text-base font-medium text-white">
-                  {{ employee.role || "—" }}
-                </p>
-                <p class="text-xs text-white/55">
-                  {{ employee.title || "—" }}
-                </p>
-              </div>
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Employment Type</p>
-                <p class="text-base font-medium text-white">
-                  {{ employee.employmentType || "—" }}
-                </p>
-              </div>
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Contact</p>
-                <p class="text-base font-medium text-white">
-                  {{ employee.contactNo || "—" }}
-                </p>
-                <p class="text-xs text-white/55">
-                  {{ employee.emailId || "—" }}
-                </p>
-              </div>
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Location</p>
-                <p class="text-base font-medium text-white">
-                  {{ employee.location || "—" }}
-                </p>
-                <p class="text-xs text-white/55">
-                  {{ employee.timezone || "—" }}
-                </p>
-              </div>
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Hire Date</p>
-                <p class="text-base font-medium text-white">
-                  {{
-                    employee.hireDate
-                      ? (employee.hireDate | date: "mediumDate")
-                      : employee.createdAt
-                        ? (employee.createdAt | date: "mediumDate")
-                        : "—"
-                  }}
-                </p>
-              </div>
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Updated</p>
-                <p class="text-base font-medium text-white">
-                  {{
-                    employee.updatedAt
-                      ? (employee.updatedAt | date: "mediumDate")
-                      : "—"
-                  }}
-                </p>
-              </div>
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Last Active</p>
-                <p class="text-base font-medium text-white">
-                  {{
-                    employee.lastActiveAt
-                      ? (employee.lastActiveAt | date: "mediumDate")
-                      : "—"
-                  }}
-                </p>
-              </div>
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 sm:col-span-2"
-              >
-                <p class="text-xs text-white/45">Skills</p>
-                <p class="text-base font-medium text-white">
-                  {{
-                    employee.skills && employee.skills.length
-                      ? employee.skills.join(", ")
-                      : "—"
-                  }}
-                </p>
-              </div>
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 sm:col-span-2"
-              >
-                <p class="text-xs text-white/45">Tags</p>
-                <p class="text-base font-medium text-white">
-                  {{
-                    employee.tags && employee.tags.length
-                      ? employee.tags.join(", ")
-                      : "—"
-                  }}
-                </p>
-              </div>
-              <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
-                <app-card-close-button
-                  (closed)="closeExpanded()"
-                ></app-card-close-button>
-                <button
-                  type="button"
-                  class="eh-btn-icon rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white"
-                  (click)="onEdit(employee)"
-                >
-                  <lucide-icon name="pencil" [size]="14"></lucide-icon>
-                  <span>Edit</span>
-                </button>
-                <button
-                  type="button"
-                  class="eh-btn-icon rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs sm:text-sm text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
-                  (click)="promptDelete(employee)"
-                >
-                  <lucide-icon name="trash-2" [size]="14"></lucide-icon>
-                  <span>Delete</span>
-                </button>
-              </div>
-            </div>
-          </ng-template>
         </div>
-      </div>
+        <span
+          class="shrink-0 text-xs text-white/40 transition"
+          [class.text-white]="expandedEmployeeId === employee.employeeId"
+        >
+          {{ expandedEmployeeId === employee.employeeId ? "Hide" : "Details" }}
+        </span>
+      </button>
 
       <div
-        *ngIf="hasLoaded() && !filteredEmployees().length"
-        class="rounded-[28px] border border-dashed border-white/15 bg-white/5/60 px-2 sm:px-4 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
+        *ngIf="expandedEmployeeId === employee.employeeId"
+        class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75"
       >
-        No employees match your filters.
+        <ng-container
+          *ngIf="editingEmployeeId === employee.employeeId; else viewMode"
+        >
+          <form
+            [formGroup]="employeeForm"
+            class="grid gap-4 md:grid-cols-2"
+            (ngSubmit)="onSave()"
+            [class.opacity-50]="isSaving"
+          >
+            <div class="md:col-span-1">
+              <app-field-label
+                text="Employee Name"
+                icon="users"
+                [forId]="'edit-name-' + employee.employeeId"
+                [required]="true"
+              ></app-field-label>
+              <input
+                [id]="'edit-name-' + employee.employeeId"
+                type="text"
+                formControlName="employeeName"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <app-field-label
+                text="Department"
+                icon="building-2"
+                [forId]="'edit-dept-' + employee.employeeId"
+                [required]="true"
+              ></app-field-label>
+              <input
+                [id]="'edit-dept-' + employee.employeeId"
+                type="text"
+                formControlName="department"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <app-field-label
+                text="Department ID"
+                icon="hash"
+                [forId]="'edit-deptid-' + employee.employeeId"
+              ></app-field-label>
+              <input
+                [id]="'edit-deptid-' + employee.employeeId"
+                type="number"
+                formControlName="deptId"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <app-field-label
+                text="Role"
+                icon="briefcase"
+                [forId]="'edit-role-' + employee.employeeId"
+              ></app-field-label>
+              <input
+                [id]="'edit-role-' + employee.employeeId"
+                type="text"
+                formControlName="role"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <app-field-label
+                text="Title"
+                icon="id-card"
+                [forId]="'edit-title-' + employee.employeeId"
+              ></app-field-label>
+              <input
+                [id]="'edit-title-' + employee.employeeId"
+                type="text"
+                formControlName="title"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <app-field-label
+                text="Employment Type"
+                icon="clock"
+                [forId]="'edit-employment-' + employee.employeeId"
+              ></app-field-label>
+              <input
+                [id]="'edit-employment-' + employee.employeeId"
+                type="text"
+                formControlName="employmentType"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <app-field-label
+                text="Contact Number"
+                icon="phone"
+                [forId]="'edit-phone-' + employee.employeeId"
+              ></app-field-label>
+              <input
+                [id]="'edit-phone-' + employee.employeeId"
+                type="tel"
+                formControlName="contactNo"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <app-field-label
+                text="Email"
+                icon="mail"
+                [forId]="'edit-email-' + employee.employeeId"
+              ></app-field-label>
+              <input
+                [id]="'edit-email-' + employee.employeeId"
+                type="email"
+                formControlName="emailId"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <app-field-label
+                text="Location"
+                icon="map-pin"
+                [forId]="'edit-location-' + employee.employeeId"
+              ></app-field-label>
+              <input
+                [id]="'edit-location-' + employee.employeeId"
+                type="text"
+                formControlName="location"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <app-field-label
+                text="Timezone"
+                icon="clock"
+                [forId]="'edit-timezone-' + employee.employeeId"
+              ></app-field-label>
+              <input
+                [id]="'edit-timezone-' + employee.employeeId"
+                type="text"
+                formControlName="timezone"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <app-field-label
+                text="Hire Date"
+                icon="calendar"
+                [forId]="'edit-hireDate-' + employee.employeeId"
+              ></app-field-label>
+              <input
+                [id]="'edit-hireDate-' + employee.employeeId"
+                type="date"
+                formControlName="hireDate"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <app-field-label
+                text="Skills"
+                icon="tag"
+                [forId]="'edit-skills-' + employee.employeeId"
+              ></app-field-label>
+              <input
+                [id]="'edit-skills-' + employee.employeeId"
+                type="text"
+                formControlName="skills"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-1">
+              <app-field-label
+                text="Tags"
+                icon="tag"
+                [forId]="'edit-tags-' + employee.employeeId"
+              ></app-field-label>
+              <input
+                [id]="'edit-tags-' + employee.employeeId"
+                type="text"
+                formControlName="tags"
+                class="w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
+            <div class="md:col-span-2 flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                [disabled]="isSaving"
+                class="rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                (click)="cancelEdit()"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                ubButton
+                size="sm"
+                [disabled]="isSaving"
+                class="eh-btn-icon bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                @if (!isSaving) {
+                  <lucide-icon name="save" [size]="16"></lucide-icon>
+                  <span>Save Changes</span>
+                } @else {
+                  <span>Updating...</span>
+                }
+              </button>
+            </div>
+          </form>
+        </ng-container>
+        <ng-template #viewMode>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Employee ID</p>
+              <p class="text-base font-medium text-white">
+                {{ employee.employeeId }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Department</p>
+              <p class="text-base font-medium text-white">
+                {{ employee.department }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Department ID</p>
+              <p class="text-base font-medium text-white">
+                {{ employee.deptId || "—" }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Role & Title</p>
+              <p class="text-base font-medium text-white">
+                {{ employee.role || "—" }}
+              </p>
+              <p class="text-xs text-white/55">
+                {{ employee.title || "—" }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Employment Type</p>
+              <p class="text-base font-medium text-white">
+                {{ employee.employmentType || "—" }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Contact</p>
+              <p class="text-base font-medium text-white">
+                {{ employee.contactNo || "—" }}
+              </p>
+              <p class="text-xs text-white/55">
+                {{ employee.emailId || "—" }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Location</p>
+              <p class="text-base font-medium text-white">
+                {{ employee.location || "—" }}
+              </p>
+              <p class="text-xs text-white/55">
+                {{ employee.timezone || "—" }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Hire Date</p>
+              <p class="text-base font-medium text-white">
+                {{
+                  employee.hireDate
+                    ? (employee.hireDate | date: "mediumDate")
+                    : employee.createdAt
+                      ? (employee.createdAt | date: "mediumDate")
+                      : "—"
+                }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Updated</p>
+              <p class="text-base font-medium text-white">
+                {{
+                  employee.updatedAt
+                    ? (employee.updatedAt | date: "mediumDate")
+                    : "—"
+                }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Last Active</p>
+              <p class="text-base font-medium text-white">
+                {{
+                  employee.lastActiveAt
+                    ? (employee.lastActiveAt | date: "mediumDate")
+                    : "—"
+                }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 sm:col-span-2"
+            >
+              <p class="text-xs text-white/45">Skills</p>
+              <p class="text-base font-medium text-white">
+                {{
+                  employee.skills && employee.skills.length
+                    ? employee.skills.join(", ")
+                    : "—"
+                }}
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 sm:col-span-2"
+            >
+              <p class="text-xs text-white/45">Tags</p>
+              <p class="text-base font-medium text-white">
+                {{
+                  employee.tags && employee.tags.length
+                    ? employee.tags.join(", ")
+                    : "—"
+                }}
+              </p>
+            </div>
+            <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
+              <app-card-close-button
+                (closed)="closeExpanded()"
+              ></app-card-close-button>
+              <button
+                type="button"
+                class="eh-btn-icon rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white"
+                (click)="onEdit(employee)"
+              >
+                <lucide-icon name="pencil" [size]="14"></lucide-icon>
+                <span>Edit</span>
+              </button>
+              <button
+                type="button"
+                class="eh-btn-icon rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs sm:text-sm text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
+                (click)="promptDelete(employee)"
+              >
+                <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+                <span>Delete</span>
+              </button>
+            </div>
+          </div>
+        </ng-template>
       </div>
+    </div>
+
+    <div
+      *ngIf="hasLoaded() && !filteredEmployees().length"
+      class="rounded-[28px] border border-dashed border-white/15 bg-white/5/60 px-2 sm:px-4 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
+    >
+      No employees match your filters.
+    </div>
   </section>
 </app-list-page-shell>
 

@@ -42,7 +42,7 @@ export interface SelectMenuOption {
         <li
           role="option"
           [attr.aria-selected]="option.value === selectedValue"
-          class="flex cursor-pointer items-center gap-1 rounded-xl px-3 py-1.5 text-sm transition"
+          class="flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm transition"
           [class.bg-white/10]="option.value === selectedValue"
           [class.text-white]="option.value === selectedValue"
           [class.text-white/80]="option.value !== selectedValue"
@@ -68,7 +68,9 @@ export interface SelectMenuOption {
           <div class="min-w-0 flex-1 leading-tight">
             <p class="truncate text-sm font-medium">{{ option.label }}</p>
             @if (option.subtitle) {
-              <p class="truncate text-xs text-white/50">{{ option.subtitle }}</p>
+              <p class="truncate text-xs text-white/50">
+                {{ option.subtitle }}
+              </p>
             }
           </div>
           @if (option.value === selectedValue) {
@@ -83,7 +85,7 @@ export interface SelectMenuOption {
       @if (showClear) {
         <li
           role="option"
-          class="flex cursor-pointer items-center gap-1 rounded-xl border-t border-white/10 px-3 py-1.5 text-sm text-white/60 transition hover:bg-white/10 hover:text-white/80"
+          class="flex cursor-pointer items-center gap-1.5 rounded-xl border-t border-white/10 px-3 py-1.5 text-sm text-white/60 transition hover:bg-white/10 hover:text-white/80"
           (click)="pick('clear')"
         >
           <lucide-icon name="x" [size]="16" class="shrink-0"></lucide-icon>
@@ -131,7 +133,7 @@ class SelectMenuPanelComponent {
       (click)="toggle()"
       (keydown)="onTriggerKeydown($event)"
     >
-      <span class="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
+      <span class="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden">
         @if (selectedOption(); as selected) {
           @if (selected.imageUrl || selected.imageSeed) {
             <app-user-avatar
@@ -353,17 +355,15 @@ export class SelectMenuComponent
     this.selectedOption.set(match ?? null);
   }
 
-  /** Pane at least 16rem and at least trigger width; cap at 24rem / viewport. */
+  /** Pane at least trigger width and at least 16rem; cap only by viewport. */
   private measurePaneWidth(): number {
     const triggerWidth = this.measureTriggerWidth();
     const minRem = 16 * this.rootFontSize();
-    const maxRem = 24 * this.rootFontSize();
     const viewportCap =
       typeof window !== 'undefined'
         ? Math.max(minRem, window.innerWidth - 32)
-        : maxRem;
-    const maxWidth = Math.min(maxRem, viewportCap);
-    return Math.ceil(Math.min(maxWidth, Math.max(triggerWidth, minRem)));
+        : triggerWidth;
+    return Math.ceil(Math.min(viewportCap, Math.max(triggerWidth, minRem)));
   }
 
   private rootFontSize(): number {

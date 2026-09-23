@@ -329,7 +329,7 @@
   pointer-events: auto;
 }
 
-/* SelectMenu pane: --eh-select-trigger-width is the measured/clamped pane size (16–24rem), not raw trigger width */
+/* SelectMenu pane: --eh-select-trigger-width is measured pane width (≥16rem, matches trigger, viewport-capped) */
 .eh-select-menu-pane.cdk-overlay-pane {
   width: var(--eh-select-trigger-width) !important;
   min-width: var(--eh-select-trigger-width) !important;
