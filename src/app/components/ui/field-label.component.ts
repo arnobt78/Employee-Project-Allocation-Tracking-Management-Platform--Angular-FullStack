@@ -9,7 +9,7 @@ import { AppIconComponent } from './app-icon.component';
   imports: [CommonModule, AppIconComponent],
   template: `
     <label
-      class="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-white/70 sm:text-sm"
+      class="flex items-center gap-1.5 text-xs font-medium text-white/70 sm:text-sm"
       [attr.for]="forId || null"
     >
       @if (icon) {

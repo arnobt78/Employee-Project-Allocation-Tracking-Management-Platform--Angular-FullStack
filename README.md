@@ -210,19 +210,19 @@ employee-management/
 
 ### 1. Clone and install
 
-```bash
+   ```bash
 git clone https://github.com/arnobt78/Employee-Management--Angular-FullStack-Fundamental-Project-1.git
 cd Employee-Management--Angular-FullStack-Fundamental-Project-1
 npm install
-```
+   ```
 
 `postinstall` generates `src/environments/environment.prod.ts` (gitignored).
 
 ### 2. Environment file (optional but recommended)
 
-```bash
+   ```bash
 cp .env.example .env
-```
+   ```
 
 **Minimum for a useful local demo:**
 
@@ -236,9 +236,9 @@ You **do not** need AI, CMS, email, or Sentry keys to explore CRUD UI. Leave tho
 
 ### 3. Run frontend + API together
 
-```bash
-npm start
-```
+   ```bash
+   npm start
+   ```
 
 This runs:
 

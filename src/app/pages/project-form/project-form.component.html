@@ -188,7 +188,7 @@
             </span>
           </div>
           <span
-            class="text-xs text-white/40 transition"
+            class="text-xs sm:text-sm text-white/40 transition"
             [class.text-white]="expandedSection() === 'overview'"
           >
             {{ expandedSection() === "overview" ? "Hide" : "Expand" }}
@@ -792,7 +792,7 @@
             </span>
           </div>
           <span
-            class="text-xs text-white/40 transition"
+            class="text-xs sm:text-sm text-white/40 transition"
             [class.text-white]="expandedSection() === 'team'"
           >
             {{ expandedSection() === "team" ? "Hide" : "Expand" }}
@@ -1380,7 +1380,7 @@
                             />
                           </div>
                         </div>
-                        <div class="flex justify-end gap-3 pt-2">
+                        <div class="flex justify-end gap-3">
                           <button
                             type="button"
                             class="rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white"
@@ -1433,7 +1433,7 @@
             </span>
           </div>
           <span
-            class="text-xs text-white/40 transition"
+            class="text-xs sm:text-sm text-white/40 transition"
             [class.text-white]="expandedSection() === 'contact'"
           >
             {{ expandedSection() === "contact" ? "Hide" : "Expand" }}
@@ -1587,7 +1587,7 @@
             </span>
           </div>
           <span
-            class="text-xs text-white/40 transition"
+            class="text-xs sm:text-sm text-white/40 transition"
             [class.text-white]="expandedSection() === 'approval'"
           >
             {{ expandedSection() === "approval" ? "Hide" : "Expand" }}
@@ -1622,7 +1622,7 @@
                   {{ formatDateTime(currentProject()?.approvalResolvedAt) }}
                 </p>
               </div>
-              <div class="flex flex-wrap gap-2 pt-2">
+              <div class="flex flex-wrap gap-2">
                 <button
                   *ngIf="canRequestApproval()"
                   type="button"
