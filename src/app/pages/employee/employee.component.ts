@@ -1,7 +1,11 @@
 import {
+  afterNextRender,
   Component,
   DestroyRef,
+  ElementRef,
+  Injector,
   OnInit,
+  ViewChild,
   computed,
   inject,
   signal,
@@ -60,9 +64,12 @@ import {
 export class EmployeeComponent implements OnInit {
   readonly pageMeta = PRIVATE_PAGE_META['/employee'];
 
+  @ViewChild('createPanel') createPanel?: ElementRef<HTMLElement>;
+
   employeeForm: FormGroup;
 
   private readonly masterService = inject(MasterService);
+  private readonly injector = inject(Injector);
   private readonly initialPeek = this.masterService.peekEmployees();
   private readonly employeesSignal = signal<Employee[]>(this.initialPeek ?? []);
   readonly employees = this.employeesSignal.asReadonly();
@@ -300,6 +307,7 @@ export class EmployeeComponent implements OnInit {
       skills: '',
       tags: '',
     });
+    this.scheduleScrollTo(() => this.createPanel?.nativeElement ?? null);
   }
 
   closeCreatePanel() {
@@ -338,6 +346,25 @@ export class EmployeeComponent implements OnInit {
       skills: Array.isArray(employee.skills) ? employee.skills.join(', ') : '',
       tags: Array.isArray(employee.tags) ? employee.tags.join(', ') : '',
     });
+
+    const employeeId = employee.employeeId;
+    if (employeeId != null) {
+      this.scheduleScrollTo(() =>
+        document.getElementById(`employee-card-${employeeId}`),
+      );
+    }
+  }
+
+  /** Wait for *ngIf / form DOM, then smooth-scroll into view (sticky header via scroll-mt). */
+  private scheduleScrollTo(getEl: () => HTMLElement | null | undefined) {
+    afterNextRender(
+      () => {
+        requestAnimationFrame(() => {
+          getEl()?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      },
+      { injector: this.injector },
+    );
   }
 
   cancelEdit() {

@@ -1,5 +1,13 @@
 # Changelog — Agile V project memory
 
+## 2026-09-24 — Employees UX: labels, scroll, sticky nav, save spinner
+
+- `app-field-label` `aboveControl` → `mb-1.5` only above form controls (view mode flush)
+- Add Employee / Edit: smooth `scrollIntoView` with `scroll-mt-24` anchors
+- Sticky private nav: sticky on `app-shell-header` host; shell `overflow-x-clip`
+- Create/edit Save: `loader-circle` spinner + saving text while `isSaving`
+- verify-deep PASS WITH WARNINGS; lint/build PASS
+
 ## 2026-09-24 — Employees Cancel icon + action button gap
 
 - Edit Cancel: Lucide `x` (14) + label on `eh-action-btn-outline`

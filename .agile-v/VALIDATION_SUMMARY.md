@@ -1,5 +1,38 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-24 — Employees labels / scroll / sticky nav / save spinner
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npm run build` | **PASS** | Bundle budget warning; Sentry maps |
+| Independent verifier | **PASS WITH WARNINGS** | All 6 dirty app files in scope |
+| Browser smoke (prior) | **PASS** | Sticky host top=0; save spinner + text |
+| Security review | **not required** | UI shell / templates only |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| `aboveControl` label margin (create/edit) | Done |
+| Smooth scroll create panel + edit card | Done |
+| Sticky `app-shell-header` host | Done |
+| Employee save spinner | Done |
+
+### Remaining
+
+- CP-0019 further prod soak
+
+### eval_gate_status
+
+N/A (UX polish)
+
+---
+
 ## Session 2026-09-24 — Employees Cancel icon + eh-btn-icon gap-1.5
 
 **Node:** v24.x

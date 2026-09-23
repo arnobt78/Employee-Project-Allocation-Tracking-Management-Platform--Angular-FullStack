@@ -111,7 +111,8 @@
 | TASK-0043 | verify-deep + security + commit-ready | REQ-0120 | DONE | Local A–Z crawl; docs synced |
 | TASK-0044 | Login soak polish: center pair, SelectMenu gap/width, label spacing | REQ-0119 | DONE | `3445214` |
 | TASK-0045 | Employees soak polish: skeleton mirror, eh-action-btn*, view labels, ID→avatar | REQ-0119–0120, REQ-0126 | DONE | `4502209` |
-| TASK-0046 | Employees Cancel icon + `.eh-btn-icon` gap-1.5 | REQ-0119 | DONE | This commit |
+| TASK-0046 | Employees Cancel icon + `.eh-btn-icon` gap-1.5 | REQ-0119 | DONE | `6db459c` |
+| TASK-0047 | Field-label aboveControl; create/edit scroll; sticky nav host; save spinner | REQ-0119 | DONE | This commit |
 
 ---
 

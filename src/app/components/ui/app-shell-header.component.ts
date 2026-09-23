@@ -25,6 +25,11 @@ import { ProfileDropdownComponent } from './profile-dropdown.component';
 @Component({
   selector: 'app-shell-header',
   standalone: true,
+  host: {
+    class:
+      'eh-shell-header sticky top-0 z-30 block transition-[background-color,backdrop-filter,box-shadow] duration-200',
+    '[class.eh-shell-header--scrolled]': 'scrolled()',
+  },
   imports: [
     CommonModule,
     RouterLink,
@@ -33,10 +38,7 @@ import { ProfileDropdownComponent } from './profile-dropdown.component';
     ProfileDropdownComponent,
   ],
   template: `
-    <header
-      class="eh-shell-header sticky top-0 z-30 transition-[background-color,backdrop-filter,box-shadow] duration-200"
-      [class.eh-shell-header--scrolled]="scrolled()"
-    >
+    <header>
       <div class="eh-shell-inner">
         <div class="flex w-full items-center justify-between gap-3 py-2">
           <a

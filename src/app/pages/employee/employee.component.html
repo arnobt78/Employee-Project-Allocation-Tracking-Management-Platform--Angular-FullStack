@@ -87,8 +87,9 @@
   </app-list-toolbar>
 
   <section
+    #createPanel
     *ngIf="showCreatePanel"
-    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
+    class="scroll-mt-24 rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
   >
     <header class="mb-4 flex items-center justify-between gap-3">
       <div class="flex min-w-0 items-start gap-3">
@@ -122,6 +123,7 @@
     >
       <div class="sm:col-span-1">
         <app-field-label
+          [aboveControl]="true"
           text="Employee Name"
           icon="users"
           forId="create-name"
@@ -137,6 +139,7 @@
       </div>
       <div class="sm:col-span-1">
         <app-field-label
+          [aboveControl]="true"
           text="Department"
           icon="building-2"
           forId="create-dept"
@@ -152,6 +155,7 @@
       </div>
       <div class="sm:col-span-1">
         <app-field-label
+          [aboveControl]="true"
           text="Department ID"
           icon="hash"
           forId="create-deptid"
@@ -166,6 +170,7 @@
       </div>
       <div class="sm:col-span-1">
         <app-field-label
+          [aboveControl]="true"
           text="Role"
           icon="briefcase"
           forId="create-role"
@@ -180,6 +185,7 @@
       </div>
       <div class="sm:col-span-1">
         <app-field-label
+          [aboveControl]="true"
           text="Title"
           icon="id-card"
           forId="create-title"
@@ -194,6 +200,7 @@
       </div>
       <div class="sm:col-span-1">
         <app-field-label
+          [aboveControl]="true"
           text="Employment Type"
           icon="clock"
           forId="create-employment"
@@ -208,6 +215,7 @@
       </div>
       <div class="sm:col-span-1">
         <app-field-label
+          [aboveControl]="true"
           text="Contact Number"
           icon="phone"
           forId="create-phone"
@@ -222,6 +230,7 @@
       </div>
       <div class="sm:col-span-1">
         <app-field-label
+          [aboveControl]="true"
           text="Email"
           icon="mail"
           forId="create-email"
@@ -236,6 +245,7 @@
       </div>
       <div class="sm:col-span-1">
         <app-field-label
+          [aboveControl]="true"
           text="Location"
           icon="map-pin"
           forId="create-location"
@@ -250,6 +260,7 @@
       </div>
       <div class="sm:col-span-1">
         <app-field-label
+          [aboveControl]="true"
           text="Timezone"
           icon="clock"
           forId="create-timezone"
@@ -264,6 +275,7 @@
       </div>
       <div class="sm:col-span-1">
         <app-field-label
+          [aboveControl]="true"
           text="Hire Date"
           icon="calendar"
           forId="create-hireDate"
@@ -277,6 +289,7 @@
       </div>
       <div class="sm:col-span-1">
         <app-field-label
+          [aboveControl]="true"
           text="Skills (comma separated)"
           icon="tag"
           forId="create-skills"
@@ -291,6 +304,7 @@
       </div>
       <div class="sm:col-span-1">
         <app-field-label
+          [aboveControl]="true"
           text="Tags (comma separated)"
           icon="tag"
           forId="create-tags"
@@ -313,6 +327,11 @@
             <lucide-icon name="save" [size]="14"></lucide-icon>
             <span>Save Employee</span>
           } @else {
+            <lucide-icon
+              name="loader-circle"
+              [size]="14"
+              class="animate-spin"
+            ></lucide-icon>
             <span>Saving Employee...</span>
           }
         </button>
@@ -323,7 +342,8 @@
   <section class="space-y-4">
     <div
       *ngFor="let employee of pagedEmployees().items; let idx = index"
-      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition duration-200 hover:border-white/20"
+      [attr.id]="'employee-card-' + employee.employeeId"
+      class="scroll-mt-24 overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition duration-200 hover:border-white/20"
     >
       <button
         type="button"
@@ -418,6 +438,7 @@
           >
             <div class="md:col-span-1">
               <app-field-label
+                [aboveControl]="true"
                 text="Employee Name"
                 icon="users"
                 [forId]="'edit-name-' + employee.employeeId"
@@ -432,6 +453,7 @@
             </div>
             <div class="md:col-span-1">
               <app-field-label
+                [aboveControl]="true"
                 text="Department"
                 icon="building-2"
                 [forId]="'edit-dept-' + employee.employeeId"
@@ -446,6 +468,7 @@
             </div>
             <div class="md:col-span-1">
               <app-field-label
+                [aboveControl]="true"
                 text="Department ID"
                 icon="hash"
                 [forId]="'edit-deptid-' + employee.employeeId"
@@ -459,6 +482,7 @@
             </div>
             <div class="md:col-span-1">
               <app-field-label
+                [aboveControl]="true"
                 text="Role"
                 icon="briefcase"
                 [forId]="'edit-role-' + employee.employeeId"
@@ -472,6 +496,7 @@
             </div>
             <div class="md:col-span-1">
               <app-field-label
+                [aboveControl]="true"
                 text="Title"
                 icon="id-card"
                 [forId]="'edit-title-' + employee.employeeId"
@@ -485,6 +510,7 @@
             </div>
             <div class="md:col-span-1">
               <app-field-label
+                [aboveControl]="true"
                 text="Employment Type"
                 icon="clock"
                 [forId]="'edit-employment-' + employee.employeeId"
@@ -498,6 +524,7 @@
             </div>
             <div class="md:col-span-1">
               <app-field-label
+                [aboveControl]="true"
                 text="Contact Number"
                 icon="phone"
                 [forId]="'edit-phone-' + employee.employeeId"
@@ -511,6 +538,7 @@
             </div>
             <div class="md:col-span-1">
               <app-field-label
+                [aboveControl]="true"
                 text="Email"
                 icon="mail"
                 [forId]="'edit-email-' + employee.employeeId"
@@ -524,6 +552,7 @@
             </div>
             <div class="md:col-span-1">
               <app-field-label
+                [aboveControl]="true"
                 text="Location"
                 icon="map-pin"
                 [forId]="'edit-location-' + employee.employeeId"
@@ -537,6 +566,7 @@
             </div>
             <div class="md:col-span-1">
               <app-field-label
+                [aboveControl]="true"
                 text="Timezone"
                 icon="clock"
                 [forId]="'edit-timezone-' + employee.employeeId"
@@ -550,6 +580,7 @@
             </div>
             <div class="md:col-span-1">
               <app-field-label
+                [aboveControl]="true"
                 text="Hire Date"
                 icon="calendar"
                 [forId]="'edit-hireDate-' + employee.employeeId"
@@ -563,6 +594,7 @@
             </div>
             <div class="md:col-span-1">
               <app-field-label
+                [aboveControl]="true"
                 text="Skills"
                 icon="tag"
                 [forId]="'edit-skills-' + employee.employeeId"
@@ -576,6 +608,7 @@
             </div>
             <div class="md:col-span-1">
               <app-field-label
+                [aboveControl]="true"
                 text="Tags"
                 icon="tag"
                 [forId]="'edit-tags-' + employee.employeeId"
@@ -606,7 +639,12 @@
                   <lucide-icon name="save" [size]="14"></lucide-icon>
                   <span>Save Changes</span>
                 } @else {
-                  <span>Updating...</span>
+                  <lucide-icon
+                    name="loader-circle"
+                    [size]="14"
+                    class="animate-spin"
+                  ></lucide-icon>
+                  <span>Saving...</span>
                 }
               </button>
             </div>

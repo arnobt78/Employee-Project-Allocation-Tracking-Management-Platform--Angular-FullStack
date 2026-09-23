@@ -10,6 +10,7 @@ import { AppIconComponent } from './app-icon.component';
   template: `
     <label
       class="flex items-center gap-1.5 text-xs font-medium text-white/70 sm:text-sm"
+      [ngClass]="{ 'mb-1.5': aboveControl }"
       [attr.for]="forId || null"
     >
       @if (icon) {
@@ -31,4 +32,6 @@ export class FieldLabelComponent {
   @Input() icon = '';
   @Input() forId = '';
   @Input() required = false;
+  /** Extra space below the label when stacked above an input/control (create/edit). */
+  @Input() aboveControl = false;
 }
