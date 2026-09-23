@@ -23,1924 +23,2003 @@
     <app-project-form-skeleton [checklistRows]="5"></app-project-form-skeleton>
   </div>
 } @else {
-<div class="space-y-10 text-white/85" [formGroup]="projectForm">
-  <app-page-header
-    [title]="projectTitle()"
-    subtitle="Configure the essentials before rolling the project out to your teams. Organize the information into focused sections, edit inline, and save when you are ready."
-    [icon]="isEditMode() ? 'pencil' : 'folder-kanban'"
-  >
-    <a
-      routerLink="/projects"
-      class="eh-btn-icon text-xs font-medium text-white/60 transition hover:text-white"
+  <div class="space-y-10 text-white/85" [formGroup]="projectForm">
+    <app-page-header
+      [title]="projectTitle()"
+      subtitle="Configure the essentials before rolling the project out to your teams. Organize the information into focused sections, edit inline, and save when you are ready."
+      [icon]="isEditMode() ? 'pencil' : 'folder-kanban'"
     >
-      ← Back To Projects
-    </a>
-    <span
-      class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] text-white/60"
-    >
-      {{ isEditMode() ? "Editing" : "Draft" }}
-    </span>
-    <div class="min-w-[10rem] space-y-2 text-sm text-white/70">
-      <div class="flex items-center justify-between gap-4">
-        <span>Readiness</span>
-        <span class="font-medium text-white">{{ progress() }}%</span>
-      </div>
-      <div class="h-2 w-full rounded-full bg-white/10">
-        <div
-          class="h-2 rounded-full bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 transition-all duration-300"
-          [style.width.%]="progress()"
-        ></div>
-      </div>
-    </div>
-  </app-page-header>
-
-  <section
-    class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
-    [formGroup]="readinessForm"
-  >
-    <header
-      class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
-    >
-      <div>
-        <h2 class="text-base sm:text-xl font-medium text-white">
-          Readiness Checklist
-        </h2>
-        <p class="text-xs text-white/55">
-          Confirm essentials before project kickoff
-        </p>
-      </div>
-      <div
-        class="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/65"
+      <a
+        routerLink="/projects"
+        class="eh-btn-icon text-xs font-medium text-white/60 transition hover:text-white"
       >
-        <span class="text-2xl font-medium text-white">
-          {{ readinessProgress() }}%
-        </span>
-        <span class="flex flex-col text-[11px]">
-          <span>Complete</span>
-          <span class="text-white/50">
-            {{ readinessCompleted() }} /
-            {{ readinessTotal }}
-          </span>
-        </span>
-      </div>
-    </header>
-    <div class="grid gap-4">
-      <div
-        *ngFor="let task of readinessTasks"
-        class="group space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5 text-left transition hover:border-primary/40 hover:bg-white/10"
-        [formGroupName]="task.id"
+        ← Back To Projects
+      </a>
+      <span
+        class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs sm:text-sm text-white/60"
       >
-        <div
-          class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
-        >
-          <div class="space-y-1">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="text-sm font-medium text-white">
-                {{ task.title }}
-              </span>
-              <span
-                class="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] text-white/50"
-              >
-                {{ task.category }}
-              </span>
-              <span
-                class="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] text-white/45"
-              >
-                {{ task.weight }} pts
-              </span>
-            </div>
-            <p class="text-xs text-white/65">
-              {{ task.description }}
-            </p>
-          </div>
-          <span
-            class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium"
-            [ngClass]="statusBadgeClass(task.id)"
-          >
-            {{ readinessStatusLabel(task.id) }}
-          </span>
+        {{ isEditMode() ? "Editing" : "Draft" }}
+      </span>
+      <div class="min-w-[10rem] space-y-2 text-sm text-white/70">
+        <div class="flex items-center justify-between gap-4">
+          <span>Readiness</span>
+          <span class="font-medium text-white">{{ progress() }}%</span>
         </div>
-
-        <div class="grid gap-3 md:grid-cols-3">
-          <div class="flex flex-col gap-1">
-            <label class="text-[11px] text-white/50">Project Status</label>
-            <app-select-menu
-              formControlName="status"
-              [options]="readinessStatusOptions"
-              [clearable]="false"
-              placeholder="Select Status"
-            ></app-select-menu>
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-[11px] text-white/50">Project Owner</label>
-            <app-select-menu
-              formControlName="ownerId"
-              [options]="employeeSelectOptions()"
-              [clearable]="false"
-              [numeric]="true"
-              placeholder="Unassigned"
-            ></app-select-menu>
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-[11px] text-white/50">Due Date</label>
-            <input
-              type="date"
-              formControlName="dueDate"
-              class="eh-native-date rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-            />
-          </div>
-        </div>
-        <div>
-          <label class="text-[11px] text-white/50">Notes (Optional)</label>
-          <textarea
-            rows="2"
-            formControlName="notes"
-            placeholder="Add context, blockers, or next steps"
-            class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-          ></textarea>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="space-y-4">
-    <!-- Overview -->
-    <div
-      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-md transition hover:border-white/20"
-    >
-      <button
-        type="button"
-        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
-        (click)="toggleSection('overview')"
-      >
-        <div class="flex flex-col gap-1">
-          <span class="text-sm font-medium text-white/55"
-            >Project Overview</span
-          >
-          <span class="text-base font-medium text-white">
-            {{ displayValue("projectName") }}
-          </span>
-        </div>
-        <span
-          class="text-xs text-white/40 transition"
-          [class.text-white]="expandedSection() === 'overview'"
-        >
-          {{ expandedSection() === "overview" ? "Hide" : "Expand" }}
-        </span>
-      </button>
-      <div
-        *ngIf="expandedSection() === 'overview'"
-        class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75"
-      >
-        <ng-container
-          *ngIf="editingSection() === 'overview'; else overviewView"
-        >
-          <div class="grid gap-4 md:grid-cols-2">
-            <div>
-              <label for="projectName" class="text-xs text-white/50"
-                >Project Name</label
-              >
-              <input
-                id="projectName"
-                type="text"
-                formControlName="projectName"
-                placeholder="Northern Lights Revamp"
-                class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-              />
-              <p
-                *ngIf="controlInvalid('projectName')"
-                class="text-xs text-rose-300"
-              >
-                Provide a project name of at least three characters.
-              </p>
-            </div>
-            <div>
-              <label for="clientName" class="text-xs text-white/50"
-                >Client Name</label
-              >
-              <input
-                id="clientName"
-                type="text"
-                formControlName="clientName"
-                placeholder="Northern Lights Inc."
-                class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-              />
-              <p
-                *ngIf="controlInvalid('clientName')"
-                class="text-xs text-rose-300"
-              >
-                Client Name is required.
-              </p>
-            </div>
-            <div>
-              <label for="startDate" class="text-xs text-white/50"
-                >Start Date</label
-              >
-              <input
-                id="startDate"
-                type="date"
-                formControlName="startDate"
-                class="eh-native-date input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-              />
-              <p
-                *ngIf="controlInvalid('startDate')"
-                class="text-xs text-rose-300"
-              >
-                Choose a start date for the initiative.
-              </p>
-            </div>
-          </div>
+        <div class="h-2 w-full rounded-full bg-white/10">
           <div
-            class="mt-6 grid gap-4 md:grid-cols-2"
-            [formGroup]="overviewDetailsForm"
-          >
-            <div class="md:col-span-2">
-              <label for="overview-summary" class="text-xs text-white/50"
-                >Project Summary</label
-              >
-              <textarea
-                id="overview-summary"
-                rows="4"
-                formControlName="summary"
-                placeholder="High-level narrative for stakeholders."
-                class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-              ></textarea>
-            </div>
-            <div>
-              <label for="overview-objectives" class="text-xs text-white/50"
-                >Project Objectives</label
-              >
-              <textarea
-                id="overview-objectives"
-                rows="4"
-                formControlName="objectives"
-                placeholder="One objective per line."
-                class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-              ></textarea>
-            </div>
-            <div>
-              <label for="overview-success" class="text-xs text-white/50"
-                >Success Criteria</label
-              >
-              <textarea
-                id="overview-success"
-                rows="4"
-                formControlName="successCriteria"
-                placeholder="Define how we will measure success."
-                class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-              ></textarea>
-            </div>
-            <div class="md:col-span-2">
-              <label for="overview-notes" class="text-xs text-white/50"
-                >Stakeholder Notes</label
-              >
-              <textarea
-                id="overview-notes"
-                rows="3"
-                formControlName="stakeholderNotes"
-                placeholder="Approvals, constraints, or reminders to keep the team aligned."
-                class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-              ></textarea>
-            </div>
-          </div>
-          <div class="mt-6 flex justify-end gap-3">
-            <button
-              type="button"
-              class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-              (click)="cancelEdit()"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              ubButton
-              size="sm"
-              class="gap-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
-              [disabled]="isSaving()"
-              (click)="saveSection('overview')"
-            >
-              @if (!isSaving()) {
-                <lucide-icon
-                  [name]="isEditMode() ? 'save' : 'plus'"
-                  [size]="16"
-                ></lucide-icon>
-                <span>{{
-                  isEditMode() ? "Save Changes" : "Create Project"
-                }}</span>
-              } @else {
-                <lucide-icon
-                  name="loader-circle"
-                  [size]="16"
-                  class="animate-spin"
-                ></lucide-icon>
-                <span>{{
-                  isEditMode() ? "Saving..." : "Creating Project..."
-                }}</span>
-              }
-            </button>
-          </div>
-        </ng-container>
-        <ng-template #overviewView>
-          <div class="grid gap-4 md:grid-cols-2">
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Client</p>
-              <p class="text-base font-medium text-white">
-                {{ displayValue("clientName") }}
-              </p>
-            </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Kick-Off</p>
-              <p class="text-base font-medium text-white">
-                {{ displayValue("startDate") }}
-              </p>
-            </div>
-          </div>
-          <ng-container *ngIf="currentProject()?.overview as overview">
-            <div
-              *ngIf="overview.summary"
-              class="mt-6 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
-            >
-              <p class="text-xs text-white/45">Summary</p>
-              <p class="mt-2 text-sm text-white/80">
-                {{ overview.summary }}
-              </p>
-            </div>
-            <div
-              *ngIf="overview.objectives.length"
-              class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
-            >
-              <p class="text-xs text-white/45">Objectives</p>
-              <ul
-                class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
-              >
-                <li *ngFor="let objective of overview.objectives">
-                  {{ objective }}
-                </li>
-              </ul>
-            </div>
-            <div
-              *ngIf="overview.successCriteria.length"
-              class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
-            >
-              <p class="text-xs text-white/45">Success Criteria</p>
-              <ul
-                class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
-              >
-                <li *ngFor="let criteria of overview.successCriteria">
-                  {{ criteria }}
-                </li>
-              </ul>
-            </div>
-            <div
-              *ngIf="
-                overview.stakeholderNotes &&
-                overview.stakeholderNotes.length > 0
-              "
-              class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
-            >
-              <p class="text-xs text-white/45">Stakeholder Notes</p>
-              <p class="mt-2 text-sm text-white/80">
-                {{ overview.stakeholderNotes }}
-              </p>
-            </div>
-            <div
-              *ngIf="overview.aiDraftSource || overview.cmsEntryId"
-              class="mt-4 flex flex-wrap items-center gap-3 text-xs text-white/45"
-            >
-              <span *ngIf="overview.aiDraftSource">
-                Source:
-                {{ overview.aiDraftSource | uppercase }}
-              </span>
-              <span *ngIf="overview.aiDraftGeneratedAt">
-                Updated
-                {{ overview.aiDraftGeneratedAt | date: "medium" }}
-              </span>
-              <span *ngIf="overview.cmsEntryTitle">
-                Contentful:
-                {{ overview.cmsEntryTitle }}
-              </span>
-            </div>
-          </ng-container>
-          <div class="mt-6 flex justify-end">
-            <button
-              type="button"
-              class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-              (click)="startEdit('overview')"
-            >
-              Edit Project Overview
-            </button>
-          </div>
-        </ng-template>
+            class="h-2 rounded-full bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 transition-all duration-300"
+            [style.width.%]="progress()"
+          ></div>
+        </div>
+      </div>
+    </app-page-header>
+
+    <section
+      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
+      [formGroup]="readinessForm"
+    >
+      <header
+        class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+      >
+        <div>
+          <h2 class="text-base font-medium text-white sm:text-xl">
+            Readiness Checklist
+          </h2>
+          <p class="text-xs sm:text-sm text-white/55">
+            Confirm essentials before project kickoff
+          </p>
+        </div>
         <div
-          class="mt-8 rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
+          class="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/65"
+        >
+          <span class="text-2xl font-medium text-white">
+            {{ readinessProgress() }}%
+          </span>
+          <span class="flex flex-col text-xs sm:text-sm">
+            <span>Complete</span>
+            <span class="text-white/50">
+              {{ readinessCompleted() }} /
+              {{ readinessTotal }}
+            </span>
+          </span>
+        </div>
+      </header>
+      <div class="grid gap-4">
+        <div
+          *ngFor="let task of readinessTasks"
+          class="group space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5 text-left transition hover:border-primary/40 hover:bg-white/10"
+          [formGroupName]="task.id"
         >
           <div
             class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
           >
-            <div>
-              <p class="text-xs text-white/45">Content Helper</p>
-              <p class="text-sm text-white/65">
-                Pull the latest brief from Contentful or let AI draft a first
-                pass for you.
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-sm font-medium text-white">
+                  {{ task.title }}
+                </span>
+                <span
+                  class="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-xs text-white/50"
+                >
+                  {{ task.category }}
+                </span>
+                <span
+                  class="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-xs text-white/45"
+                >
+                  {{ task.weight }} pts
+                </span>
+              </div>
+              <p class="text-xs text-white/65">
+                {{ task.description }}
               </p>
             </div>
-            <div class="flex flex-wrap gap-2">
-              <button
-                type="button"
-                class="rounded-xl border border-white/20 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-                (click)="toggleContentfulPanel()"
-              >
-                {{
-                  contentfulPanelOpen()
-                    ? "Hide Contentful form"
-                    : "Fetch from Contentful"
-                }}
-              </button>
-              <button
-                type="button"
-                ubButton
-                size="sm"
-                class="gap-1 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-[0_20px_45px_rgba(251,191,36,0.35)]"
-                [disabled]="aiProcessing()"
-                (click)="generateOverviewDraft()"
-              >
-                @if (aiProcessing()) {
-                  <lucide-icon
-                    name="loader-circle"
-                    [size]="16"
-                    class="animate-spin"
-                  ></lucide-icon>
-                  <span>Generating...</span>
-                } @else {
-                  <lucide-icon name="wand-sparkles" [size]="16"></lucide-icon>
-                  <span>Generate AI Draft</span>
-                }
-              </button>
-              <button
-                *ngIf="aiDraft()"
-                type="button"
-                class="rounded-xl border border-white/20 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-                (click)="toggleAiPanel()"
-              >
-                {{ aiPanelOpen() ? "Hide AI draft" : "Show AI draft" }}
-              </button>
-              <button
-                *ngIf="contentfulBrief()"
-                type="button"
-                class="rounded-xl border border-white/20 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-                (click)="clearContentfulBrief()"
-              >
-                Clear Contentful Result
-              </button>
-              <button
-                *ngIf="aiDraft()"
-                type="button"
-                class="rounded-xl border border-white/20 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-                (click)="clearAiDraft()"
-              >
-                Clear AI Draft
-              </button>
-            </div>
+            <span
+              class="inline-flex items-center rounded-full px-3 py-1 text-xs sm:text-sm font-medium"
+              [ngClass]="statusBadgeClass(task.id)"
+            >
+              {{ readinessStatusLabel(task.id) }}
+            </span>
           </div>
-          <form
-            *ngIf="contentfulPanelOpen()"
-            [formGroup]="contentfulForm"
-            (ngSubmit)="loadContentfulBrief()"
-            class="mt-5 space-y-4"
-          >
-            <div class="grid gap-4 lg:grid-cols-3">
-              <div class="lg:col-span-1">
-                <label for="contentful-entry" class="text-xs text-white/50"
-                  >Entry ID</label
-                >
-                <input
-                  id="contentful-entry"
-                  type="text"
-                  formControlName="entryId"
-                  placeholder="e.g. 3xDzG2wC5V4tC5uqr"
-                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="lg:col-span-1">
-                <label for="contentful-type" class="text-xs text-white/50"
-                  >Content Type</label
-                >
-                <input
-                  id="contentful-type"
-                  type="text"
-                  formControlName="contentType"
-                  placeholder="Optional Contentful type ID"
-                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-              <div class="lg:col-span-1">
-                <label for="contentful-slug" class="text-xs text-white/50"
-                  >Slug</label
-                >
-                <input
-                  id="contentful-slug"
-                  type="text"
-                  formControlName="slug"
-                  placeholder="Optional slug"
-                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-                />
-              </div>
-            </div>
-            <div
-              class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <label class="flex items-center gap-2 text-xs text-white/50">
-                <input
-                  type="checkbox"
-                  formControlName="preview"
-                  class="h-4 w-4 rounded border border-white/30 bg-transparent accent-sky-400"
-                />
-                Preview token
-              </label>
-              <button
-                type="submit"
-                ubButton
-                size="sm"
-                class="w-full gap-1 sm:w-auto bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
-                [disabled]="contentfulLoading()"
-              >
-                @if (contentfulLoading()) {
-                  <lucide-icon
-                    name="loader-circle"
-                    [size]="16"
-                    class="animate-spin"
-                  ></lucide-icon>
-                  <span>Fetching...</span>
-                } @else {
-                  <lucide-icon name="download" [size]="16"></lucide-icon>
-                  <span>Fetch Brief</span>
-                }
-              </button>
-            </div>
-          </form>
-          <p *ngIf="contentfulError()" class="mt-2 text-xs text-rose-300">
-            {{ contentfulError() }}
-          </p>
-          <div
-            *ngIf="contentfulBrief() as brief"
-            class="mt-5 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
-          >
-            <div
-              class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between"
-            >
-              <div>
-                <p class="text-sm font-medium text-white">
-                  {{ brief.title || "Contentful entry" }}
-                </p>
-                <p class="text-xs text-white/55" *ngIf="brief.entryId">
-                  Entry ID: {{ brief.entryId }}
-                </p>
-              </div>
-            </div>
-            <ng-container *ngIf="brief.overview as ov">
-              <div
-                *ngIf="ov.summary"
-                class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Summary</p>
-                <p class="mt-2 text-sm text-white/80">
-                  {{ ov.summary }}
-                </p>
-              </div>
-              <div
-                *ngIf="ov.objectives.length"
-                class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Objectives</p>
-                <ul
-                  class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
-                >
-                  <li *ngFor="let objective of ov.objectives">
-                    {{ objective }}
-                  </li>
-                </ul>
-              </div>
-              <div
-                *ngIf="ov.successCriteria.length"
-                class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Success Criteria</p>
-                <ul
-                  class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
-                >
-                  <li *ngFor="let criteria of ov.successCriteria">
-                    {{ criteria }}
-                  </li>
-                </ul>
-              </div>
-              <div
-                *ngIf="ov.stakeholderNotes"
-                class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <p class="text-xs text-white/45">Stakeholder Notes</p>
-                <p class="mt-2 text-sm text-white/80">
-                  {{ ov.stakeholderNotes }}
-                </p>
-              </div>
-            </ng-container>
-            <div class="mt-4 flex justify-end gap-3">
-              <button
-                type="button"
-                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-                (click)="clearContentfulBrief()"
-              >
-                Dismiss
-              </button>
-              <button
-                type="button"
-                ubButton
-                size="sm"
-                class="gap-1 bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)]"
-                (click)="applyContentfulOverview(brief)"
-              >
-                <lucide-icon name="check" [size]="16"></lucide-icon>
-                <span>Apply To Overview</span>
-              </button>
-            </div>
-          </div>
-          <div
-            *ngIf="aiPanelOpen() && aiDraft() as ai"
-            class="mt-6 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
-          >
-            <div
-              class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between"
-            >
-              <p class="text-sm font-medium text-white">
-                AI draft · {{ ai.source | uppercase }}
-              </p>
-              <span class="text-xs text-white/50" *ngIf="ai.prompt">
-                Prompt snapshot captured
-              </span>
-            </div>
-            <div
-              *ngIf="ai.overview.summary"
-              class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Summary</p>
-              <p class="mt-2 text-sm text-white/80">
-                {{ ai.overview.summary }}
-              </p>
-            </div>
-            <div
-              *ngIf="ai.overview.objectives.length"
-              class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Objectives</p>
-              <ul
-                class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
-              >
-                <li *ngFor="let objective of ai.overview.objectives">
-                  {{ objective }}
-                </li>
-              </ul>
-            </div>
-            <div
-              *ngIf="ai.overview.successCriteria.length"
-              class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Success Criteria</p>
-              <ul
-                class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
-              >
-                <li *ngFor="let criteria of ai.overview.successCriteria">
-                  {{ criteria }}
-                </li>
-              </ul>
-            </div>
-            <div
-              *ngIf="ai.overview.stakeholderNotes"
-              class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Stakeholder Notes</p>
-              <p class="mt-2 text-sm text-white/80">
-                {{ ai.overview.stakeholderNotes }}
-              </p>
-            </div>
-            <div class="mt-4 flex justify-end gap-3">
-              <button
-                type="button"
-                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-                (click)="clearAiDraft()"
-              >
-                Dismiss
-              </button>
-              <button
-                type="button"
-                ubButton
-                size="sm"
-                class="gap-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
-                (click)="applyAiDraft(ai)"
-              >
-                <lucide-icon name="check" [size]="16"></lucide-icon>
-                <span>Apply AI Draft</span>
-              </button>
-            </div>
-          </div>
-          <p *ngIf="aiError()" class="mt-2 text-xs text-rose-300">
-            {{ aiError() }}
-          </p>
-        </div>
-      </div>
-    </div>
 
-    <!-- Team -->
-    <div
-      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-md transition hover:border-white/20"
-    >
-      <button
-        type="button"
-        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
-        (click)="toggleSection('team')"
-      >
-        <div class="flex flex-col gap-1">
-          <span class="text-sm font-medium text-white/55">Leadership</span>
-          <span class="text-base font-medium text-white">
-            {{ displayValue("leadByEmpId") }}
-          </span>
-        </div>
-        <span
-          class="text-xs text-white/40 transition"
-          [class.text-white]="expandedSection() === 'team'"
-        >
-          {{ expandedSection() === "team" ? "Hide" : "Expand" }}
-        </span>
-      </button>
-      <div
-        *ngIf="expandedSection() === 'team'"
-        class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75"
-      >
-        <ng-container *ngIf="editingSection() === 'team'; else teamView">
-          <div class="grid gap-4 md:grid-cols-2">
-            <div class="md:col-span-2">
-              <label for="leadByEmpId" class="text-xs text-white/50"
-                >Project Lead</label
+          <div class="grid gap-3 md:grid-cols-3">
+            <div class="flex flex-col gap-1">
+              <label class="text-xs sm:text-sm text-white/50"
+                >Project Status</label
               >
               <app-select-menu
-                id="leadByEmpId"
-                formControlName="leadByEmpId"
-                class=""
+                formControlName="status"
+                [options]="readinessStatusOptions"
+                [clearable]="false"
+                placeholder="Select Status"
+              ></app-select-menu>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs sm:text-sm text-white/50"
+                >Project Owner</label
+              >
+              <app-select-menu
+                formControlName="ownerId"
                 [options]="employeeSelectOptions()"
                 [clearable]="false"
                 [numeric]="true"
                 placeholder="Unassigned"
               ></app-select-menu>
             </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs sm:text-sm text-white/50">Due Date</label>
+              <input
+                type="date"
+                formControlName="dueDate"
+                class="eh-native-date rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+              />
+            </div>
           </div>
-          <div class="mt-6 flex justify-end gap-3">
-            <button
-              type="button"
-              class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-              (click)="cancelEdit()"
+          <div>
+            <label class="text-xs sm:text-sm text-white/50"
+              >Notes (Optional)</label
             >
-              Cancel
-            </button>
-            <button
-              type="button"
-              ubButton
-              size="sm"
-              class="gap-1 bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
-              [disabled]="isSaving()"
-              (click)="saveSection('team')"
-            >
-              @if (!isSaving()) {
-                <lucide-icon name="save" [size]="16"></lucide-icon>
-                <span>Save Assignment</span>
-              } @else {
-                <lucide-icon
-                  name="loader-circle"
-                  [size]="16"
-                  class="animate-spin"
-                ></lucide-icon>
-                <span>Saving...</span>
-              }
-            </button>
+            <textarea
+              rows="2"
+              formControlName="notes"
+              placeholder="Add context, blockers, or next steps"
+              class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+            ></textarea>
           </div>
-        </ng-container>
-        <ng-template #teamView>
-          <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+        </div>
+      </div>
+    </section>
+
+    <section class="space-y-4">
+      <!-- Overview -->
+      <div
+        class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-md transition hover:border-white/20"
+      >
+        <button
+          type="button"
+          class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
+          (click)="toggleSection('overview')"
+        >
+          <div class="flex flex-col gap-1">
+            <span class="text-sm font-medium text-white/55"
+              >Project Overview</span
+            >
+            <span class="text-base font-medium text-white">
+              {{ displayValue("projectName") }}
+            </span>
+          </div>
+          <span
+            class="text-xs text-white/40 transition"
+            [class.text-white]="expandedSection() === 'overview'"
           >
-            <p class="text-xs text-white/45">Project Lead</p>
-            <p class="text-base font-medium text-white">
-              {{ displayValue("leadByEmpId") }}
-            </p>
-          </div>
-          <div class="mt-6 flex justify-end">
-            <button
-              type="button"
-              class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-              (click)="startEdit('team')"
-            >
-              Edit Lead
-            </button>
-          </div>
-        </ng-template>
-        <ng-container *ngIf="resourceInsights() as resources">
-          <div class="mt-8 space-y-6">
+            {{ expandedSection() === "overview" ? "Hide" : "Expand" }}
+          </span>
+        </button>
+        <div
+          *ngIf="expandedSection() === 'overview'"
+          class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75"
+        >
+          <ng-container
+            *ngIf="editingSection() === 'overview'; else overviewView"
+          >
+            <div class="grid gap-4 md:grid-cols-2">
+              <div>
+                <label
+                  for="projectName"
+                  class="text-xs sm:text-sm text-white/50"
+                  >Project Name</label
+                >
+                <input
+                  id="projectName"
+                  type="text"
+                  formControlName="projectName"
+                  placeholder="Northern Lights Revamp"
+                  class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                />
+                <p
+                  *ngIf="controlInvalid('projectName')"
+                  class="text-xs text-rose-300"
+                >
+                  Provide a project name of at least three characters.
+                </p>
+              </div>
+              <div>
+                <label for="clientName" class="text-xs sm:text-sm text-white/50"
+                  >Client Name</label
+                >
+                <input
+                  id="clientName"
+                  type="text"
+                  formControlName="clientName"
+                  placeholder="Northern Lights Inc."
+                  class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                />
+                <p
+                  *ngIf="controlInvalid('clientName')"
+                  class="text-xs text-rose-300"
+                >
+                  Client Name is required.
+                </p>
+              </div>
+              <div>
+                <label for="startDate" class="text-xs sm:text-sm text-white/50"
+                  >Start Date</label
+                >
+                <input
+                  id="startDate"
+                  type="date"
+                  formControlName="startDate"
+                  class="eh-native-date input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                />
+                <p
+                  *ngIf="controlInvalid('startDate')"
+                  class="text-xs text-rose-300"
+                >
+                  Choose a start date for the initiative.
+                </p>
+              </div>
+            </div>
             <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
+              class="mt-6 grid gap-4 md:grid-cols-2"
+              [formGroup]="overviewDetailsForm"
             >
-              <div
-                class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+              <div class="md:col-span-2">
+                <label
+                  for="overview-summary"
+                  class="text-xs sm:text-sm text-white/50"
+                  >Project Summary</label
+                >
+                <textarea
+                  id="overview-summary"
+                  rows="4"
+                  formControlName="summary"
+                  placeholder="High-level narrative for stakeholders."
+                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                ></textarea>
+              </div>
+              <div>
+                <label
+                  for="overview-objectives"
+                  class="text-xs sm:text-sm text-white/50"
+                  >Project Objectives</label
+                >
+                <textarea
+                  id="overview-objectives"
+                  rows="4"
+                  formControlName="objectives"
+                  placeholder="One objective per line."
+                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                ></textarea>
+              </div>
+              <div>
+                <label
+                  for="overview-success"
+                  class="text-xs sm:text-sm text-white/50"
+                  >Success Criteria</label
+                >
+                <textarea
+                  id="overview-success"
+                  rows="4"
+                  formControlName="successCriteria"
+                  placeholder="Define how we will measure success."
+                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                ></textarea>
+              </div>
+              <div class="md:col-span-2">
+                <label
+                  for="overview-notes"
+                  class="text-xs sm:text-sm text-white/50"
+                  >Stakeholder Notes</label
+                >
+                <textarea
+                  id="overview-notes"
+                  rows="3"
+                  formControlName="stakeholderNotes"
+                  placeholder="Approvals, constraints, or reminders to keep the team aligned."
+                  class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                ></textarea>
+              </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                (click)="cancelEdit()"
               >
-                <div>
-                  <p class="text-xs text-white/50">Resource Snapshot</p>
-                  <p class="text-sm text-white/65">
-                    Live allocation signals across the portfolio.
-                  </p>
-                </div>
-                <span class="text-[11px] text-white/40">
-                  Updated {{ formatDateTime(resources.retrievedAt) }}
+                Cancel
+              </button>
+              <button
+                type="button"
+                ubButton
+                size="sm"
+                class="gap-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+                [disabled]="isSaving()"
+                (click)="saveSection('overview')"
+              >
+                @if (!isSaving()) {
+                  <lucide-icon
+                    [name]="isEditMode() ? 'save' : 'plus'"
+                    [size]="16"
+                  ></lucide-icon>
+                  <span>{{
+                    isEditMode() ? "Save Changes" : "Create Project"
+                  }}</span>
+                } @else {
+                  <lucide-icon
+                    name="loader-circle"
+                    [size]="16"
+                    class="animate-spin"
+                  ></lucide-icon>
+                  <span>{{
+                    isEditMode() ? "Saving..." : "Creating Project..."
+                  }}</span>
+                }
+              </button>
+            </div>
+          </ng-container>
+          <ng-template #overviewView>
+            <div class="grid gap-4 md:grid-cols-2">
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Client</p>
+                <p class="text-base font-medium text-white">
+                  {{ displayValue("clientName") }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Kick-Off</p>
+                <p class="text-base font-medium text-white">
+                  {{ displayValue("startDate") }}
+                </p>
+              </div>
+            </div>
+            <ng-container *ngIf="currentProject()?.overview as overview">
+              <div
+                *ngIf="overview.summary"
+                class="mt-6 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
+              >
+                <p class="text-xs text-white/45">Summary</p>
+                <p class="mt-2 text-sm text-white/80">
+                  {{ overview.summary }}
+                </p>
+              </div>
+              <div
+                *ngIf="overview.objectives.length"
+                class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
+              >
+                <p class="text-xs text-white/45">Objectives</p>
+                <ul
+                  class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
+                >
+                  <li *ngFor="let objective of overview.objectives">
+                    {{ objective }}
+                  </li>
+                </ul>
+              </div>
+              <div
+                *ngIf="overview.successCriteria.length"
+                class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
+              >
+                <p class="text-xs text-white/45">Success Criteria</p>
+                <ul
+                  class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
+                >
+                  <li *ngFor="let criteria of overview.successCriteria">
+                    {{ criteria }}
+                  </li>
+                </ul>
+              </div>
+              <div
+                *ngIf="
+                  overview.stakeholderNotes &&
+                  overview.stakeholderNotes.length > 0
+                "
+                class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
+              >
+                <p class="text-xs text-white/45">Stakeholder Notes</p>
+                <p class="mt-2 text-sm text-white/80">
+                  {{ overview.stakeholderNotes }}
+                </p>
+              </div>
+              <div
+                *ngIf="overview.aiDraftSource || overview.cmsEntryId"
+                class="mt-4 flex flex-wrap items-center gap-3 text-xs text-white/45"
+              >
+                <span *ngIf="overview.aiDraftSource">
+                  Source:
+                  {{ overview.aiDraftSource | uppercase }}
+                </span>
+                <span *ngIf="overview.aiDraftGeneratedAt">
+                  Updated
+                  {{ overview.aiDraftGeneratedAt | date: "medium" }}
+                </span>
+                <span *ngIf="overview.cmsEntryTitle">
+                  Contentful:
+                  {{ overview.cmsEntryTitle }}
                 </span>
               </div>
-              <ng-container *ngIf="resources.metrics as metrics">
-                <div
-                  class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5"
-                >
-                  <div
-                    class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-                  >
-                    <p class="text-[11px] text-white/45">Team Size</p>
-                    <p class="mt-2 text-2xl font-medium text-white">
-                      {{ metrics.teamSize }}
-                    </p>
-                    <p class="text-xs text-white/55">
-                      Contributors currently attached to this project.
-                    </p>
-                  </div>
-                  <div
-                    class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-                  >
-                    <p class="text-[11px] text-white/45">Bench Ready</p>
-                    <p class="mt-2 text-2xl font-medium text-white">
-                      {{ metrics.benchCount }}
-                    </p>
-                    <p class="text-xs text-white/55">
-                      Active employees currently free for allocation.
-                    </p>
-                  </div>
-                  <div
-                    class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-                  >
-                    <p class="text-[11px] text-white/45">Overbooked</p>
-                    <p class="mt-2 text-2xl font-medium text-white">
-                      {{ metrics.overbookedCount }}
-                    </p>
-                    <p class="text-xs text-white/55">
-                      Teammates exceeding recommended capacity.
-                    </p>
-                  </div>
-                  <div
-                    class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-                  >
-                    <p class="text-[11px] text-white/45">Active Assignments</p>
-                    <p class="mt-2 text-2xl font-medium text-white">
-                      {{ metrics.activeAssignmentCount }}
-                    </p>
-                    <p class="text-xs text-white/55">
-                      Across all projects in flight.
-                    </p>
-                  </div>
-                  <div
-                    class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-                  >
-                    <p class="text-[11px] text-white/45">Avg Allocation</p>
-                    <p class="mt-2 text-2xl font-medium text-white">
-                      {{ formatPercent(metrics.averageAllocation) }}
-                    </p>
-                    <p class="text-xs text-white/55">
-                      Mean utilization across the active workforce.
-                    </p>
-                  </div>
-                </div>
-              </ng-container>
-            </div>
-
-            <div class="grid gap-4 lg:grid-cols-2">
-              <div
-                *ngIf="resources.lead as lead"
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
+            </ng-container>
+            <div class="mt-6 flex justify-end">
+              <button
+                type="button"
+                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                (click)="startEdit('overview')"
               >
-                <div class="flex items-start justify-between gap-4">
-                  <div>
-                    <p class="text-xs text-white/50">Current Lead</p>
-                    <p class="text-base sm:text-xl font-medium text-white">
-                      {{ lead.employeeName }}
-                    </p>
-                    <p class="text-sm text-white/60">
-                      {{ lead.role || "Lead" }}
-                      <span *ngIf="lead.department">
-                        • {{ lead.department }}
-                      </span>
-                    </p>
-                  </div>
-                  <span
-                    class="inline-flex items-center rounded-full px-3 py-1 text-[11px]"
-                    [ngClass]="allocationStatusClass(lead.allocation.status)"
-                  >
-                    {{ allocationStatusLabel(lead.allocation.status) }}
-                  </span>
-                </div>
-                <div class="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div
-                    class="rounded-xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-                  >
-                    <p class="text-[11px] text-white/45">Availability</p>
-                    <p class="text-sm text-white">
-                      {{ availabilitySummary(lead) }}
-                    </p>
-                  </div>
-                  <div
-                    class="rounded-xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-                  >
-                    <p class="text-[11px] text-white/45">Fit Score</p>
-                    <p class="text-sm text-white">
-                      {{ formatScore(lead.fitScore) }}
-                    </p>
-                    <p class="text-xs text-white/55">
-                      {{
-                        lead.fitNotes || "Derived from allocation and tenure."
-                      }}
-                    </p>
-                  </div>
-                </div>
-                <div *ngIf="lead.activeAssignments.length" class="mt-4">
-                  <p class="text-[11px] text-white/45">Active Projects</p>
-                  <ul class="mt-2 space-y-2 text-sm text-white/75">
-                    <li
-                      *ngFor="
-                        let assignment of lead.activeAssignments;
-                        trackBy: trackDigest
-                      "
-                      class="flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-2"
-                    >
-                      <div>
-                        <p class="font-medium text-white">
-                          {{
-                            assignment.projectName ||
-                              "Project #" + assignment.projectId
-                          }}
-                        </p>
-                        <p class="text-xs text-white/55">
-                          {{ assignment.role || "Contributor" }}
-                          <span
-                            *ngIf="assignment.isCurrentProject"
-                            class="text-emerald-300"
-                          >
-                            • this project
-                          </span>
-                        </p>
-                      </div>
-                      <span class="text-xs text-white/65">
-                        {{ formatPercent(assignment.allocationPct) }}
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
-              >
-                <div class="flex flex-col gap-2">
-                  <p class="text-xs text-white/50">Suggested Project Leads</p>
-                  <p class="text-sm text-white/65">
-                    People with leadership signals and room to step in.
-                  </p>
-                </div>
-                <div
-                  *ngIf="
-                    resources.recommendedLeads.length;
-                    else noLeadSuggestions
-                  "
-                  class="mt-4 space-y-3"
-                >
-                  <div
-                    *ngFor="
-                      let candidate of resources.recommendedLeads;
-                      trackBy: trackResourceByEmployee
-                    "
-                    class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-                  >
-                    <div class="flex items-start justify-between gap-3">
-                      <div>
-                        <p class="text-sm font-medium text-white">
-                          {{ candidate.employeeName }}
-                        </p>
-                        <p class="text-xs text-white/55">
-                          {{ candidate.role || "Lead" }}
-                          <span *ngIf="candidate.department">
-                            • {{ candidate.department }}
-                          </span>
-                        </p>
-                      </div>
-                      <span class="text-xs font-medium text-white/75">
-                        {{ formatScore(candidate.fitScore) }}
-                      </span>
-                    </div>
-                    <div
-                      class="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/60"
-                    >
-                      <span
-                        class="rounded-full px-3 py-1"
-                        [ngClass]="
-                          allocationStatusClass(candidate.allocation.status)
-                        "
-                      >
-                        {{ allocationStatusLabel(candidate.allocation.status) }}
-                      </span>
-                      <span>
-                        {{ availabilitySummary(candidate) }}
-                      </span>
-                    </div>
-                    <p
-                      *ngIf="candidate.fitNotes"
-                      class="mt-2 text-xs text-white/55"
-                    >
-                      {{ candidate.fitNotes }}
-                    </p>
-                    <div class="mt-2 flex justify-end">
-                      <button
-                        type="button"
-                        ubButton
-                        size="sm"
-                        class="bg-gradient-to-r from-indigo-500 via-sky-500 to-blue-500 text-white shadow-[0_15px_40px_rgba(56,189,248,0.35)]"
-                        (click)="applyRecommendedLead(candidate)"
-                      >
-                        <lucide-icon name="user-plus" [size]="16"></lucide-icon>
-                        <span>Assign As Lead</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <ng-template #noLeadSuggestions>
-                  <p class="mt-4 text-sm text-white/55">
-                    No alternative leads detected right now. As availability
-                    changes, new candidates will surface here.
-                  </p>
-                </ng-template>
-              </div>
+                Edit Project Overview
+              </button>
             </div>
-
-            <div class="grid gap-4 lg:grid-cols-2">
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
-              >
-                <div
-                  class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
-                >
-                  <div>
-                    <p class="text-xs text-white/50">
-                      Current Project Allocations
-                    </p>
-                    <p class="text-sm text-white/65">
-                      Who is attached to this initiative today.
-                    </p>
-                  </div>
-                  <span class="text-[11px] text-white/40">
-                    {{ resources.assignments.length }} members
-                  </span>
-                </div>
-                <div
-                  *ngIf="resources.assignments.length; else noAssignments"
-                  class="mt-4 space-y-3"
-                >
-                  <div
-                    *ngFor="
-                      let assignment of resources.assignments;
-                      trackBy: trackAssignmentById
-                    "
-                    class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-                  >
-                    <div class="flex items-start justify-between gap-3">
-                      <div>
-                        <p class="text-sm font-medium text-white">
-                          {{ assignment.employee.employeeName }}
-                        </p>
-                        <p class="text-xs text-white/55">
-                          {{
-                            assignment.role ||
-                              assignment.employee.role ||
-                              "Contributor"
-                          }}
-                          <span *ngIf="assignment.employee.department">
-                            • {{ assignment.employee.department }}
-                          </span>
-                        </p>
-                      </div>
-                      <span
-                        class="text-[11px] rounded-full border px-2 py-1"
-                        [ngClass]="
-                          assignment.isActive
-                            ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'
-                            : 'border-white/20 bg-white/10 text-white/55'
-                        "
-                      >
-                        {{ assignmentStatusLabel(assignment) }}
-                      </span>
-                    </div>
-                    <div
-                      class="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/60"
-                    >
-                      <span
-                        class="rounded-full px-3 py-1"
-                        [ngClass]="
-                          allocationStatusClass(assignment.allocationStatus)
-                        "
-                      >
-                        {{ allocationStatusLabel(assignment.allocationStatus) }}
-                      </span>
-                      <span>
-                        {{ formatPercent(assignment.allocationPct) }} load
-                      </span>
-                      <span *ngIf="assignment.assignedDate">
-                        Since {{ formatDateTime(assignment.assignedDate) }}
-                      </span>
-                    </div>
-                    <p class="mt-2 text-xs text-white/55">
-                      {{ availabilitySummary(assignment.employee) }}
-                    </p>
-                  </div>
-                </div>
-                <ng-template #noAssignments>
-                  <p class="mt-4 text-sm text-white/55">
-                    No team members have been assigned yet. Head to the project
-                    staffing workspace to add contributors.
-                  </p>
-                </ng-template>
-              </div>
-              <div
-                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
-              >
-                <div class="flex flex-col gap-2">
-                  <p class="text-xs text-white/50">
-                    Recommended Project Collaborators
-                  </p>
-                  <p class="text-sm text-white/65">
-                    People with availability and adjacent skills to accelerate
-                    delivery.
-                  </p>
-                </div>
-                <div
-                  *ngIf="
-                    resources.recommendedCollaborators.length;
-                    else noCollaborators
-                  "
-                  class="mt-4 space-y-3"
-                >
-                  <div
-                    *ngFor="
-                      let collaborator of resources.recommendedCollaborators;
-                      trackBy: trackResourceByEmployee
-                    "
-                    class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-                  >
-                    <div class="flex items-start justify-between gap-3">
-                      <div>
-                        <p class="text-sm font-medium text-white">
-                          {{ collaborator.employeeName }}
-                        </p>
-                        <p class="text-xs text-white/55">
-                          {{ collaborator.role || "Contributor" }}
-                          <span *ngIf="collaborator.department">
-                            • {{ collaborator.department }}
-                          </span>
-                        </p>
-                      </div>
-                      <span class="text-xs font-medium text-white/75">
-                        {{ formatScore(collaborator.fitScore) }}
-                      </span>
-                    </div>
-                    <div
-                      class="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/60"
-                    >
-                      <span
-                        class="rounded-full px-3 py-1"
-                        [ngClass]="
-                          allocationStatusClass(collaborator.allocation.status)
-                        "
-                      >
-                        {{
-                          allocationStatusLabel(collaborator.allocation.status)
-                        }}
-                      </span>
-                      <span>
-                        {{ availabilitySummary(collaborator) }}
-                      </span>
-                    </div>
-                    <p
-                      *ngIf="collaborator.fitNotes"
-                      class="mt-2 text-xs text-white/55"
-                    >
-                      {{ collaborator.fitNotes }}
-                    </p>
-                    <div class="mt-2 flex justify-end">
-                      <button
-                        type="button"
-                        class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-                        (click)="startCollaboratorAssignment(collaborator)"
-                      >
-                        {{
-                          collaboratorAssignmentProfile()?.employeeId ===
-                          collaborator.employeeId
-                            ? "Close panel"
-                            : "Add to team"
-                        }}
-                      </button>
-                    </div>
-                    <form
-                      *ngIf="
-                        collaboratorAssignmentProfile()?.employeeId ===
-                        collaborator.employeeId
-                      "
-                      [formGroup]="collaboratorAssignmentForm"
-                      (ngSubmit)="submitCollaboratorAssignment()"
-                      class="mt-4 space-y-3 rounded-2xl border border-dashed border-white/20 bg-white/5/70 p-4"
-                    >
-                      <div class="grid gap-3 sm:grid-cols-3">
-                        <div class="sm:col-span-1">
-                          <label
-                            for="collab-role"
-                            class="text-[11px] text-white/50"
-                            >Role</label
-                          >
-                          <input
-                            id="collab-role"
-                            type="text"
-                            formControlName="role"
-                            class="w-full rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
-                            placeholder="Contributor"
-                          />
-                        </div>
-                        <div>
-                          <label
-                            for="collab-allocation"
-                            class="text-[11px] text-white/50"
-                            >Allocation (%)</label
-                          >
-                          <input
-                            id="collab-allocation"
-                            type="number"
-                            min="1"
-                            max="200"
-                            formControlName="allocationPct"
-                            class="w-full rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
-                          />
-                          <p
-                            *ngIf="
-                              collaboratorAssignmentForm.controls[
-                                'allocationPct'
-                              ]?.invalid &&
-                              (collaboratorAssignmentForm.controls[
-                                'allocationPct'
-                              ]?.dirty ||
-                                collaboratorAssignmentForm.controls[
-                                  'allocationPct'
-                                ]?.touched)
-                            "
-                            class="text-xs text-rose-300"
-                          >
-                            Enter a value between 1 and 200.
-                          </p>
-                        </div>
-                        <div>
-                          <label
-                            for="collab-date"
-                            class="text-[11px] text-white/50"
-                            >Assigned Date</label
-                          >
-                          <input
-                            id="collab-date"
-                            type="date"
-                            formControlName="assignedDate"
-                            class="eh-native-date w-full rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
-                          />
-                        </div>
-                      </div>
-                      <div class="flex justify-end gap-3 pt-2">
-                        <button
-                          type="button"
-                          class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-                          (click)="cancelCollaboratorAssignment()"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          ubButton
-                          size="sm"
-                          class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)]"
-                          [disabled]="collaboratorAssignmentProcessing()"
-                        >
-                          <lucide-icon name="plus" [size]="16"></lucide-icon>
-                          <span>Add Assignment</span>
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-                <ng-template #noCollaborators>
-                  <p class="mt-4 text-sm text-white/55">
-                    Everybody looks fully booked right now. We’ll raise our hand
-                    when new availability opens up.
-                  </p>
-                </ng-template>
-              </div>
-            </div>
-          </div>
-        </ng-container>
-      </div>
-    </div>
-
-    <!-- Contact -->
-    <div
-      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-md transition hover:border-white/20"
-    >
-      <button
-        type="button"
-        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
-        (click)="toggleSection('contact')"
-      >
-        <div class="flex flex-col gap-1">
-          <span class="text-sm font-medium text-white/55">Client Contact</span>
-          <span class="text-base font-medium text-white">
-            {{ displayValue("contactPerson") }}
-          </span>
-        </div>
-        <span
-          class="text-xs text-white/40 transition"
-          [class.text-white]="expandedSection() === 'contact'"
-        >
-          {{ expandedSection() === "contact" ? "Hide" : "Expand" }}
-        </span>
-      </button>
-      <div
-        *ngIf="expandedSection() === 'contact'"
-        class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75"
-      >
-        <ng-container *ngIf="editingSection() === 'contact'; else contactView">
-          <div class="grid gap-4 md:grid-cols-2">
-            <div>
-              <label for="contactPerson" class="text-xs text-white/50"
-                >Primary Contact</label
-              >
-              <input
-                id="contactPerson"
-                type="text"
-                formControlName="contactPerson"
-                placeholder="Avery Chen"
-                class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-              />
-            </div>
-            <div>
-              <label for="contactNo" class="text-xs text-white/50"
-                >Contact Number</label
-              >
-              <input
-                id="contactNo"
-                type="text"
-                formControlName="contactNo"
-                placeholder="+1 (555) 123-7890"
-                class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-              />
-              <p
-                *ngIf="controlInvalid('contactNo')"
-                class="text-xs text-rose-300"
-              >
-                Use digits, parentheses, spaces, or dashes for the phone number.
-              </p>
-            </div>
-            <div class="md:col-span-2">
-              <label for="emailId" class="text-xs text-white/50"
-                >Contact Email</label
-              >
-              <input
-                id="emailId"
-                type="email"
-                formControlName="emailId"
-                placeholder="avery.chen@northernlights.com"
-                class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-              />
-              <p
-                *ngIf="controlInvalid('emailId')"
-                class="text-xs text-rose-300"
-              >
-                Provide a valid email address.
-              </p>
-            </div>
-          </div>
-          <div class="mt-6 flex justify-end gap-3">
-            <button
-              type="button"
-              class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-              (click)="cancelEdit()"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              ubButton
-              size="sm"
-              class="gap-1 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-[0_20px_45px_rgba(251,146,60,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
-              [disabled]="isSaving()"
-              (click)="saveSection('contact')"
-            >
-              @if (!isSaving()) {
-                <lucide-icon name="save" [size]="16"></lucide-icon>
-                <span>Save Contact</span>
-              } @else {
-                <lucide-icon
-                  name="loader-circle"
-                  [size]="16"
-                  class="animate-spin"
-                ></lucide-icon>
-                <span>Saving...</span>
-              }
-            </button>
-          </div>
-        </ng-container>
-        <ng-template #contactView>
-          <div class="grid gap-4 md:grid-cols-2">
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Primary Contact</p>
-              <p class="text-base font-medium text-white">
-                {{ displayValue("contactPerson") }}
-              </p>
-            </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-            >
-              <p class="text-xs text-white/45">Phone</p>
-              <p class="text-base font-medium text-white">
-                {{ displayValue("contactNo") }}
-              </p>
-            </div>
-            <div
-              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 md:col-span-2"
-            >
-              <p class="text-xs text-white/45">Email</p>
-              <p class="text-base font-medium text-white">
-                {{ displayValue("emailId") }}
-              </p>
-            </div>
-          </div>
-          <div class="mt-6 flex justify-end">
-            <button
-              type="button"
-              class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
-              (click)="startEdit('contact')"
-            >
-              Edit Contact
-            </button>
-          </div>
-        </ng-template>
-      </div>
-    </div>
-
-    <!-- Approval -->
-    <div
-      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-md transition hover:border-white/20"
-    >
-      <button
-        type="button"
-        class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
-        (click)="toggleSection('approval')"
-      >
-        <div class="flex flex-col gap-1">
-          <span class="text-sm font-medium text-white/55"
-            >Approval Process</span
-          >
-          <span class="text-base font-medium text-white">
-            {{ approvalStatusLabel(approvalStatus()) }}
-          </span>
-        </div>
-        <span
-          class="text-xs text-white/40 transition"
-          [class.text-white]="expandedSection() === 'approval'"
-        >
-          {{ expandedSection() === "approval" ? "Hide" : "Expand" }}
-        </span>
-      </button>
-      <div
-        *ngIf="expandedSection() === 'approval'"
-        class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75 space-y-6"
-      >
-        <div class="grid gap-4 md:grid-cols-2">
+          </ng-template>
           <div
-            class="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/80"
+            class="mt-8 rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
           >
-            <div class="flex items-center gap-3">
-              <span class="text-[11px] text-white/50">Current Status</span>
-              <span
-                class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-medium"
-                [ngClass]="approvalStatusBadgeClass(approvalStatus())"
-              >
-                {{ approvalStatusLabel(approvalStatus()) }}
-              </span>
+            <div
+              class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+            >
+              <div>
+                <p class="text-xs text-white/45">Content Helper</p>
+                <p class="text-sm text-white/65">
+                  Pull the latest brief from Contentful or let AI draft a first
+                  pass for you.
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="rounded-xl border border-white/20 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                  (click)="toggleContentfulPanel()"
+                >
+                  {{
+                    contentfulPanelOpen()
+                      ? "Hide Contentful form"
+                      : "Fetch from Contentful"
+                  }}
+                </button>
+                <button
+                  type="button"
+                  ubButton
+                  size="sm"
+                  class="gap-1 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-[0_20px_45px_rgba(251,191,36,0.35)]"
+                  [disabled]="aiProcessing()"
+                  (click)="generateOverviewDraft()"
+                >
+                  @if (aiProcessing()) {
+                    <lucide-icon
+                      name="loader-circle"
+                      [size]="16"
+                      class="animate-spin"
+                    ></lucide-icon>
+                    <span>Generating...</span>
+                  } @else {
+                    <lucide-icon name="wand-sparkles" [size]="16"></lucide-icon>
+                    <span>Generate AI Draft</span>
+                  }
+                </button>
+                <button
+                  *ngIf="aiDraft()"
+                  type="button"
+                  class="rounded-xl border border-white/20 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                  (click)="toggleAiPanel()"
+                >
+                  {{ aiPanelOpen() ? "Hide AI draft" : "Show AI draft" }}
+                </button>
+                <button
+                  *ngIf="contentfulBrief()"
+                  type="button"
+                  class="rounded-xl border border-white/20 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                  (click)="clearContentfulBrief()"
+                >
+                  Clear Contentful Result
+                </button>
+                <button
+                  *ngIf="aiDraft()"
+                  type="button"
+                  class="rounded-xl border border-white/20 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                  (click)="clearAiDraft()"
+                >
+                  Clear AI Draft
+                </button>
+              </div>
             </div>
-            <div class="space-y-1 text-xs text-white/55">
-              <p *ngIf="currentProject()?.approvalRequestedAt">
-                Requested
-                {{ formatDateTime(currentProject()?.approvalRequestedAt) }}
-              </p>
-              <p *ngIf="currentProject()?.approvalResolvedAt">
-                Resolved
-                {{ formatDateTime(currentProject()?.approvalResolvedAt) }}
-              </p>
-            </div>
-            <div class="flex flex-wrap gap-2 pt-2">
-              <button
-                *ngIf="canRequestApproval()"
-                type="button"
-                ubButton
-                size="sm"
-                class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
-                [disabled]="
-                  approvalProcessing() || !currentProject()?.projectId
-                "
-                (click)="requestApprovalAction()"
-              >
-                <lucide-icon name="sparkles" [size]="16"></lucide-icon>
-                <span>Request Approval</span>
-              </button>
-              <button
-                *ngIf="canApprove()"
-                type="button"
-                ubButton
-                size="sm"
-                class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)]"
-                [disabled]="approvalProcessing()"
-                (click)="approveProjectAction()"
-              >
-                <lucide-icon name="check" [size]="16"></lucide-icon>
-                <span>Approve</span>
-              </button>
-              <button
-                *ngIf="canReject()"
-                type="button"
-                ubButton
-                size="sm"
-                class="bg-gradient-to-r from-rose-500 via-red-500 to-orange-500 text-white shadow-[0_20px_45px_rgba(244,63,94,0.35)]"
-                [disabled]="approvalProcessing()"
-                (click)="rejectProjectAction()"
-              >
-                <lucide-icon name="x" [size]="16"></lucide-icon>
-                <span>Reject</span>
-              </button>
-              <button
-                *ngIf="canResetApproval()"
-                type="button"
-                ubButton
-                size="sm"
-                variant="outline"
-                class="border-white/20 bg-white/10 text-white/80 hover:border-white/40 hover:text-white"
-                [disabled]="approvalProcessing()"
-                (click)="resetProjectApprovalAction()"
-              >
-                <lucide-icon name="rotate-ccw" [size]="16"></lucide-icon>
-                <span>Reset To Draft</span>
-              </button>
-            </div>
-            <p class="text-[11px] text-white/50">
-              Comments are optional except for rejections. Choose an internal
-              reviewer or enter an external approver.
-            </p>
-          </div>
-          <div
-            class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/80"
-          >
             <form
-              [formGroup]="approvalForm"
-              class="space-y-3"
-              (submit)="$event.preventDefault()"
+              *ngIf="contentfulPanelOpen()"
+              [formGroup]="contentfulForm"
+              (ngSubmit)="loadContentfulBrief()"
+              class="mt-5 space-y-4"
             >
-              <div class="grid gap-3 md:grid-cols-2">
-                <div class="flex flex-col gap-1">
-                  <label class="text-[11px] text-white/50"
-                    >Actor (Employee)</label
-                  >
-                  <app-select-menu
-                    formControlName="actorId"
-                    [options]="employeeSelectOptions()"
-                    [clearable]="false"
-                    [numeric]="true"
-                    placeholder="Unassigned"
-                  ></app-select-menu>
-                </div>
-                <div class="flex flex-col gap-1">
-                  <label class="text-[11px] text-white/50"
-                    >External Approver</label
+              <div class="grid gap-4 lg:grid-cols-3">
+                <div class="lg:col-span-1">
+                  <label
+                    for="contentful-entry"
+                    class="text-xs sm:text-sm text-white/50"
+                    >Entry ID</label
                   >
                   <input
+                    id="contentful-entry"
                     type="text"
-                    formControlName="actorName"
-                    placeholder="Reviewer name"
-                    class="rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    formControlName="entryId"
+                    placeholder="e.g. 3xDzG2wC5V4tC5uqr"
+                    class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                  />
+                </div>
+                <div class="lg:col-span-1">
+                  <label
+                    for="contentful-type"
+                    class="text-xs sm:text-sm text-white/50"
+                    >Content Type</label
+                  >
+                  <input
+                    id="contentful-type"
+                    type="text"
+                    formControlName="contentType"
+                    placeholder="Optional Contentful type ID"
+                    class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                  />
+                </div>
+                <div class="lg:col-span-1">
+                  <label
+                    for="contentful-slug"
+                    class="text-xs sm:text-sm text-white/50"
+                    >Slug</label
+                  >
+                  <input
+                    id="contentful-slug"
+                    type="text"
+                    formControlName="slug"
+                    placeholder="Optional slug"
+                    class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
                   />
                 </div>
               </div>
+              <div
+                class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <label
+                  class="flex items-center gap-2 text-xs sm:text-sm text-white/50"
+                >
+                  <input
+                    type="checkbox"
+                    formControlName="preview"
+                    class="h-4 w-4 rounded border border-white/30 bg-transparent accent-sky-400"
+                  />
+                  Preview token
+                </label>
+                <button
+                  type="submit"
+                  ubButton
+                  size="sm"
+                  class="w-full gap-1 sm:w-auto bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+                  [disabled]="contentfulLoading()"
+                >
+                  @if (contentfulLoading()) {
+                    <lucide-icon
+                      name="loader-circle"
+                      [size]="16"
+                      class="animate-spin"
+                    ></lucide-icon>
+                    <span>Fetching...</span>
+                  } @else {
+                    <lucide-icon name="download" [size]="16"></lucide-icon>
+                    <span>Fetch Brief</span>
+                  }
+                </button>
+              </div>
+            </form>
+            <p *ngIf="contentfulError()" class="mt-2 text-xs text-rose-300">
+              {{ contentfulError() }}
+            </p>
+            <div
+              *ngIf="contentfulBrief() as brief"
+              class="mt-5 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
+            >
+              <div
+                class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between"
+              >
+                <div>
+                  <p class="text-sm font-medium text-white">
+                    {{ brief.title || "Contentful entry" }}
+                  </p>
+                  <p class="text-xs text-white/55" *ngIf="brief.entryId">
+                    Entry ID: {{ brief.entryId }}
+                  </p>
+                </div>
+              </div>
+              <ng-container *ngIf="brief.overview as ov">
+                <div
+                  *ngIf="ov.summary"
+                  class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                >
+                  <p class="text-xs text-white/45">Summary</p>
+                  <p class="mt-2 text-sm text-white/80">
+                    {{ ov.summary }}
+                  </p>
+                </div>
+                <div
+                  *ngIf="ov.objectives.length"
+                  class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                >
+                  <p class="text-xs text-white/45">Objectives</p>
+                  <ul
+                    class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
+                  >
+                    <li *ngFor="let objective of ov.objectives">
+                      {{ objective }}
+                    </li>
+                  </ul>
+                </div>
+                <div
+                  *ngIf="ov.successCriteria.length"
+                  class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                >
+                  <p class="text-xs text-white/45">Success Criteria</p>
+                  <ul
+                    class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
+                  >
+                    <li *ngFor="let criteria of ov.successCriteria">
+                      {{ criteria }}
+                    </li>
+                  </ul>
+                </div>
+                <div
+                  *ngIf="ov.stakeholderNotes"
+                  class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                >
+                  <p class="text-xs text-white/45">Stakeholder Notes</p>
+                  <p class="mt-2 text-sm text-white/80">
+                    {{ ov.stakeholderNotes }}
+                  </p>
+                </div>
+              </ng-container>
+              <div class="mt-4 flex justify-end gap-3">
+                <button
+                  type="button"
+                  class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                  (click)="clearContentfulBrief()"
+                >
+                  Dismiss
+                </button>
+                <button
+                  type="button"
+                  ubButton
+                  size="sm"
+                  class="gap-1 bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)]"
+                  (click)="applyContentfulOverview(brief)"
+                >
+                  <lucide-icon name="check" [size]="16"></lucide-icon>
+                  <span>Apply To Overview</span>
+                </button>
+              </div>
+            </div>
+            <div
+              *ngIf="aiPanelOpen() && aiDraft() as ai"
+              class="mt-6 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
+            >
+              <div
+                class="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between"
+              >
+                <p class="text-sm font-medium text-white">
+                  AI draft · {{ ai.source | uppercase }}
+                </p>
+                <span class="text-xs text-white/50" *ngIf="ai.prompt">
+                  Prompt snapshot captured
+                </span>
+              </div>
+              <div
+                *ngIf="ai.overview.summary"
+                class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Summary</p>
+                <p class="mt-2 text-sm text-white/80">
+                  {{ ai.overview.summary }}
+                </p>
+              </div>
+              <div
+                *ngIf="ai.overview.objectives.length"
+                class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Objectives</p>
+                <ul
+                  class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
+                >
+                  <li *ngFor="let objective of ai.overview.objectives">
+                    {{ objective }}
+                  </li>
+                </ul>
+              </div>
+              <div
+                *ngIf="ai.overview.successCriteria.length"
+                class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Success Criteria</p>
+                <ul
+                  class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
+                >
+                  <li *ngFor="let criteria of ai.overview.successCriteria">
+                    {{ criteria }}
+                  </li>
+                </ul>
+              </div>
+              <div
+                *ngIf="ai.overview.stakeholderNotes"
+                class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+              >
+                <p class="text-xs text-white/45">Stakeholder Notes</p>
+                <p class="mt-2 text-sm text-white/80">
+                  {{ ai.overview.stakeholderNotes }}
+                </p>
+              </div>
+              <div class="mt-4 flex justify-end gap-3">
+                <button
+                  type="button"
+                  class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                  (click)="clearAiDraft()"
+                >
+                  Dismiss
+                </button>
+                <button
+                  type="button"
+                  ubButton
+                  size="sm"
+                  class="gap-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+                  (click)="applyAiDraft(ai)"
+                >
+                  <lucide-icon name="check" [size]="16"></lucide-icon>
+                  <span>Apply AI Draft</span>
+                </button>
+              </div>
+            </div>
+            <p *ngIf="aiError()" class="mt-2 text-xs text-rose-300">
+              {{ aiError() }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team -->
+      <div
+        class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-md transition hover:border-white/20"
+      >
+        <button
+          type="button"
+          class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
+          (click)="toggleSection('team')"
+        >
+          <div class="flex flex-col gap-1">
+            <span class="text-sm font-medium text-white/55">Leadership</span>
+            <span class="text-base font-medium text-white">
+              {{ displayValue("leadByEmpId") }}
+            </span>
+          </div>
+          <span
+            class="text-xs text-white/40 transition"
+            [class.text-white]="expandedSection() === 'team'"
+          >
+            {{ expandedSection() === "team" ? "Hide" : "Expand" }}
+          </span>
+        </button>
+        <div
+          *ngIf="expandedSection() === 'team'"
+          class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75"
+        >
+          <ng-container *ngIf="editingSection() === 'team'; else teamView">
+            <div class="grid gap-4 md:grid-cols-2">
+              <div class="md:col-span-2">
+                <label
+                  for="leadByEmpId"
+                  class="text-xs sm:text-sm text-white/50"
+                  >Project Lead</label
+                >
+                <app-select-menu
+                  id="leadByEmpId"
+                  formControlName="leadByEmpId"
+                  class=""
+                  [options]="employeeSelectOptions()"
+                  [clearable]="false"
+                  [numeric]="true"
+                  placeholder="Unassigned"
+                ></app-select-menu>
+              </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                class="rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white"
+                (click)="cancelEdit()"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                ubButton
+                size="sm"
+                class="gap-1 bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+                [disabled]="isSaving()"
+                (click)="saveSection('team')"
+              >
+                @if (!isSaving()) {
+                  <lucide-icon name="save" [size]="16"></lucide-icon>
+                  <span>Save Assignment</span>
+                } @else {
+                  <lucide-icon
+                    name="loader-circle"
+                    [size]="16"
+                    class="animate-spin"
+                  ></lucide-icon>
+                  <span>Saving...</span>
+                }
+              </button>
+            </div>
+          </ng-container>
+          <ng-template #teamView>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+            >
+              <p class="text-xs text-white/45">Project Lead</p>
+              <p class="text-base font-medium text-white">
+                {{ displayValue("leadByEmpId") }}
+              </p>
+            </div>
+            <div class="mt-6 flex justify-end">
+              <button
+                type="button"
+                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                (click)="startEdit('team')"
+              >
+                Edit Lead
+              </button>
+            </div>
+          </ng-template>
+          <ng-container *ngIf="resourceInsights() as resources">
+            <div class="mt-8 space-y-6">
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
+              >
+                <div
+                  class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+                >
+                  <div>
+                    <p class="text-xs sm:text-sm text-white/50">
+                      Resource Snapshot
+                    </p>
+                    <p class="text-sm text-white/65">
+                      Live allocation signals across the portfolio.
+                    </p>
+                  </div>
+                  <span class="text-xs sm:text-sm text-white/40">
+                    Updated {{ formatDateTime(resources.retrievedAt) }}
+                  </span>
+                </div>
+                <ng-container *ngIf="resources.metrics as metrics">
+                  <div
+                    class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5"
+                  >
+                    <div
+                      class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                    >
+                      <p class="text-xs sm:text-sm text-white/45">Team Size</p>
+                      <p class="mt-2 text-2xl font-medium text-white">
+                        {{ metrics.teamSize }}
+                      </p>
+                      <p class="text-xs text-white/55">
+                        Contributors currently attached to this project.
+                      </p>
+                    </div>
+                    <div
+                      class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                    >
+                      <p class="text-xs sm:text-sm text-white/45">
+                        Bench Ready
+                      </p>
+                      <p class="mt-2 text-2xl font-medium text-white">
+                        {{ metrics.benchCount }}
+                      </p>
+                      <p class="text-xs text-white/55">
+                        Active employees currently free for allocation.
+                      </p>
+                    </div>
+                    <div
+                      class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                    >
+                      <p class="text-xs sm:text-sm text-white/45">Overbooked</p>
+                      <p class="mt-2 text-2xl font-medium text-white">
+                        {{ metrics.overbookedCount }}
+                      </p>
+                      <p class="text-xs text-white/55">
+                        Teammates exceeding recommended capacity.
+                      </p>
+                    </div>
+                    <div
+                      class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                    >
+                      <p class="text-xs sm:text-sm text-white/45">
+                        Active Assignments
+                      </p>
+                      <p class="mt-2 text-2xl font-medium text-white">
+                        {{ metrics.activeAssignmentCount }}
+                      </p>
+                      <p class="text-xs text-white/55">
+                        Across all projects in flight.
+                      </p>
+                    </div>
+                    <div
+                      class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                    >
+                      <p class="text-xs sm:text-sm text-white/45">
+                        Avg Allocation
+                      </p>
+                      <p class="mt-2 text-2xl font-medium text-white">
+                        {{ formatPercent(metrics.averageAllocation) }}
+                      </p>
+                      <p class="text-xs text-white/55">
+                        Mean utilization across the active workforce.
+                      </p>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+
+              <div class="grid gap-4 lg:grid-cols-2">
+                <div
+                  *ngIf="resources.lead as lead"
+                  class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
+                >
+                  <div class="flex items-start justify-between gap-4">
+                    <div>
+                      <p class="text-xs sm:text-sm text-white/50">
+                        Current Lead
+                      </p>
+                      <p class="text-base sm:text-xl font-medium text-white">
+                        {{ lead.employeeName }}
+                      </p>
+                      <p class="text-sm text-white/60">
+                        {{ lead.role || "Lead" }}
+                        <span *ngIf="lead.department">
+                          • {{ lead.department }}
+                        </span>
+                      </p>
+                    </div>
+                    <span
+                      class="inline-flex items-center rounded-full px-3 py-1 text-xs sm:text-sm"
+                      [ngClass]="allocationStatusClass(lead.allocation.status)"
+                    >
+                      {{ allocationStatusLabel(lead.allocation.status) }}
+                    </span>
+                  </div>
+                  <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div
+                      class="rounded-xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                    >
+                      <p class="text-xs sm:text-sm text-white/45">
+                        Availability
+                      </p>
+                      <p class="text-sm text-white">
+                        {{ availabilitySummary(lead) }}
+                      </p>
+                    </div>
+                    <div
+                      class="rounded-xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                    >
+                      <p class="text-xs sm:text-sm text-white/45">Fit Score</p>
+                      <p class="text-sm text-white">
+                        {{ formatScore(lead.fitScore) }}
+                      </p>
+                      <p class="text-xs text-white/55">
+                        {{
+                          lead.fitNotes || "Derived from allocation and tenure."
+                        }}
+                      </p>
+                    </div>
+                  </div>
+                  <div *ngIf="lead.activeAssignments.length" class="mt-4">
+                    <p class="text-xs sm:text-sm text-white/45">
+                      Active Projects
+                    </p>
+                    <ul class="mt-2 space-y-2 text-sm text-white/75">
+                      <li
+                        *ngFor="
+                          let assignment of lead.activeAssignments;
+                          trackBy: trackDigest
+                        "
+                        class="flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-2"
+                      >
+                        <div>
+                          <p class="font-medium text-white">
+                            {{
+                              assignment.projectName ||
+                                "Project #" + assignment.projectId
+                            }}
+                          </p>
+                          <p class="text-xs text-white/55">
+                            {{ assignment.role || "Contributor" }}
+                            <span
+                              *ngIf="assignment.isCurrentProject"
+                              class="text-emerald-300"
+                            >
+                              • this project
+                            </span>
+                          </p>
+                        </div>
+                        <span class="text-xs text-white/65">
+                          {{ formatPercent(assignment.allocationPct) }}
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div
+                  class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
+                >
+                  <div class="flex flex-col gap-2">
+                    <p class="text-xs sm:text-sm text-white/50">
+                      Suggested Project Leads
+                    </p>
+                    <p class="text-sm text-white/65">
+                      People with leadership signals and room to step in.
+                    </p>
+                  </div>
+                  <div
+                    *ngIf="
+                      resources.recommendedLeads.length;
+                      else noLeadSuggestions
+                    "
+                    class="mt-4 space-y-3"
+                  >
+                    <div
+                      *ngFor="
+                        let candidate of resources.recommendedLeads;
+                        trackBy: trackResourceByEmployee
+                      "
+                      class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                    >
+                      <div class="flex items-start justify-between gap-3">
+                        <div>
+                          <p class="text-sm font-medium text-white">
+                            {{ candidate.employeeName }}
+                          </p>
+                          <p class="text-xs text-white/55">
+                            {{ candidate.role || "Lead" }}
+                            <span *ngIf="candidate.department">
+                              • {{ candidate.department }}
+                            </span>
+                          </p>
+                        </div>
+                        <span
+                          class="text-xs sm:text-sm font-medium text-white/75"
+                        >
+                          {{ formatScore(candidate.fitScore) }}
+                        </span>
+                      </div>
+                      <div
+                        class="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-white/60"
+                      >
+                        <span
+                          class="rounded-full px-3 py-1"
+                          [ngClass]="
+                            allocationStatusClass(candidate.allocation.status)
+                          "
+                        >
+                          {{
+                            allocationStatusLabel(candidate.allocation.status)
+                          }}
+                        </span>
+                        <span>
+                          {{ availabilitySummary(candidate) }}
+                        </span>
+                      </div>
+                      <p
+                        *ngIf="candidate.fitNotes"
+                        class="mt-2 text-xs sm:text-sm text-white/55"
+                      >
+                        {{ candidate.fitNotes }}
+                      </p>
+                      <div class="mt-2 flex justify-end">
+                        <button
+                          type="button"
+                          ubButton
+                          size="sm"
+                          class="bg-gradient-to-r from-indigo-500 via-sky-500 to-blue-500 text-white shadow-[0_15px_40px_rgba(56,189,248,0.35)]"
+                          (click)="applyRecommendedLead(candidate)"
+                        >
+                          <lucide-icon
+                            name="user-plus"
+                            [size]="16"
+                          ></lucide-icon>
+                          <span>Assign As Lead</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #noLeadSuggestions>
+                    <p class="mt-4 text-sm text-white/55">
+                      No alternative leads detected right now. As availability
+                      changes, new candidates will surface here.
+                    </p>
+                  </ng-template>
+                </div>
+              </div>
+
+              <div class="grid gap-4 lg:grid-cols-2">
+                <div
+                  class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
+                >
+                  <div
+                    class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
+                  >
+                    <div>
+                      <p class="text-xs sm:text-sm text-white/50">
+                        Current Project Allocations
+                      </p>
+                      <p class="text-sm text-white/65">
+                        Who is attached to this initiative today.
+                      </p>
+                    </div>
+                    <span class="text-xs sm:text-sm text-white/40">
+                      {{ resources.assignments.length }} members
+                    </span>
+                  </div>
+                  <div
+                    *ngIf="resources.assignments.length; else noAssignments"
+                    class="mt-4 space-y-3"
+                  >
+                    <div
+                      *ngFor="
+                        let assignment of resources.assignments;
+                        trackBy: trackAssignmentById
+                      "
+                      class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                    >
+                      <div class="flex items-start justify-between gap-3">
+                        <div>
+                          <p class="text-sm font-medium text-white">
+                            {{ assignment.employee.employeeName }}
+                          </p>
+                          <p class="text-xs text-white/55">
+                            {{
+                              assignment.role ||
+                                assignment.employee.role ||
+                                "Contributor"
+                            }}
+                            <span *ngIf="assignment.employee.department">
+                              • {{ assignment.employee.department }}
+                            </span>
+                          </p>
+                        </div>
+                        <span
+                          class="text-xs sm:text-sm rounded-full border px-2 py-1"
+                          [ngClass]="
+                            assignment.isActive
+                              ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'
+                              : 'border-white/20 bg-white/10 text-white/55'
+                          "
+                        >
+                          {{ assignmentStatusLabel(assignment) }}
+                        </span>
+                      </div>
+                      <div
+                        class="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-white/60"
+                      >
+                        <span
+                          class="rounded-full px-3 py-1"
+                          [ngClass]="
+                            allocationStatusClass(assignment.allocationStatus)
+                          "
+                        >
+                          {{
+                            allocationStatusLabel(assignment.allocationStatus)
+                          }}
+                        </span>
+                        <span>
+                          {{ formatPercent(assignment.allocationPct) }} load
+                        </span>
+                        <span *ngIf="assignment.assignedDate">
+                          Since {{ formatDateTime(assignment.assignedDate) }}
+                        </span>
+                      </div>
+                      <p class="mt-2 text-xs sm:text-sm text-white/55">
+                        {{ availabilitySummary(assignment.employee) }}
+                      </p>
+                    </div>
+                  </div>
+                  <ng-template #noAssignments>
+                    <p class="mt-4 text-sm text-white/55">
+                      No team members have been assigned yet. Head to the
+                      project staffing workspace to add contributors.
+                    </p>
+                  </ng-template>
+                </div>
+                <div
+                  class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
+                >
+                  <div class="flex flex-col gap-2">
+                    <p class="text-xs sm:text-sm text-white/50">
+                      Recommended Project Collaborators
+                    </p>
+                    <p class="text-sm text-white/65">
+                      People with availability and adjacent skills to accelerate
+                      delivery.
+                    </p>
+                  </div>
+                  <div
+                    *ngIf="
+                      resources.recommendedCollaborators.length;
+                      else noCollaborators
+                    "
+                    class="mt-4 space-y-3"
+                  >
+                    <div
+                      *ngFor="
+                        let collaborator of resources.recommendedCollaborators;
+                        trackBy: trackResourceByEmployee
+                      "
+                      class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                    >
+                      <div class="flex items-start justify-between gap-3">
+                        <div>
+                          <p class="text-sm font-medium text-white">
+                            {{ collaborator.employeeName }}
+                          </p>
+                          <p class="text-xs text-white/55">
+                            {{ collaborator.role || "Contributor" }}
+                            <span *ngIf="collaborator.department">
+                              • {{ collaborator.department }}
+                            </span>
+                          </p>
+                        </div>
+                        <span class="text-xs font-medium text-white/75">
+                          {{ formatScore(collaborator.fitScore) }}
+                        </span>
+                      </div>
+                      <div
+                        class="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-white/60"
+                      >
+                        <span
+                          class="rounded-full px-3 py-1"
+                          [ngClass]="
+                            allocationStatusClass(
+                              collaborator.allocation.status
+                            )
+                          "
+                        >
+                          {{
+                            allocationStatusLabel(
+                              collaborator.allocation.status
+                            )
+                          }}
+                        </span>
+                        <span>
+                          {{ availabilitySummary(collaborator) }}
+                        </span>
+                      </div>
+                      <p
+                        *ngIf="collaborator.fitNotes"
+                        class="mt-2 text-xs sm:text-sm text-white/55"
+                      >
+                        {{ collaborator.fitNotes }}
+                      </p>
+                      <div class="mt-2 flex justify-end">
+                        <button
+                          type="button"
+                          class="rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white"
+                          (click)="startCollaboratorAssignment(collaborator)"
+                        >
+                          {{
+                            collaboratorAssignmentProfile()?.employeeId ===
+                            collaborator.employeeId
+                              ? "Close panel"
+                              : "Add to team"
+                          }}
+                        </button>
+                      </div>
+                      <form
+                        *ngIf="
+                          collaboratorAssignmentProfile()?.employeeId ===
+                          collaborator.employeeId
+                        "
+                        [formGroup]="collaboratorAssignmentForm"
+                        (ngSubmit)="submitCollaboratorAssignment()"
+                        class="mt-4 space-y-3 rounded-2xl border border-dashed border-white/20 bg-white/5/70 p-4"
+                      >
+                        <div class="grid gap-3 sm:grid-cols-3">
+                          <div class="sm:col-span-1">
+                            <label
+                              for="collab-role"
+                              class="text-xs sm:text-sm text-white/50"
+                              >Role</label
+                            >
+                            <input
+                              id="collab-role"
+                              type="text"
+                              formControlName="role"
+                              class="w-full rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+                              placeholder="Contributor"
+                            />
+                          </div>
+                          <div>
+                            <label
+                              for="collab-allocation"
+                              class="text-xs sm:text-sm text-white/50"
+                              >Allocation (%)</label
+                            >
+                            <input
+                              id="collab-allocation"
+                              type="number"
+                              min="1"
+                              max="200"
+                              formControlName="allocationPct"
+                              class="w-full rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+                            />
+                            <p
+                              *ngIf="
+                                collaboratorAssignmentForm.controls[
+                                  'allocationPct'
+                                ]?.invalid &&
+                                (collaboratorAssignmentForm.controls[
+                                  'allocationPct'
+                                ]?.dirty ||
+                                  collaboratorAssignmentForm.controls[
+                                    'allocationPct'
+                                  ]?.touched)
+                              "
+                              class="text-xs text-rose-300"
+                            >
+                              Enter a value between 1 and 200.
+                            </p>
+                          </div>
+                          <div>
+                            <label
+                              for="collab-date"
+                              class="text-xs sm:text-sm text-white/50"
+                              >Assigned Date</label
+                            >
+                            <input
+                              id="collab-date"
+                              type="date"
+                              formControlName="assignedDate"
+                              class="eh-native-date w-full rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+                            />
+                          </div>
+                        </div>
+                        <div class="flex justify-end gap-3 pt-2">
+                          <button
+                            type="button"
+                            class="rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white"
+                            (click)="cancelCollaboratorAssignment()"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            ubButton
+                            size="sm"
+                            class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)]"
+                            [disabled]="collaboratorAssignmentProcessing()"
+                          >
+                            <lucide-icon name="plus" [size]="16"></lucide-icon>
+                            <span>Add Assignment</span>
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                  <ng-template #noCollaborators>
+                    <p class="mt-4 text-sm text-white/55">
+                      Everybody looks fully booked right now. We’ll raise our
+                      hand when new availability opens up.
+                    </p>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div
+        class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-md transition hover:border-white/20"
+      >
+        <button
+          type="button"
+          class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
+          (click)="toggleSection('contact')"
+        >
+          <div class="flex flex-col gap-1">
+            <span class="text-sm font-medium text-white/55"
+              >Client Contact</span
+            >
+            <span class="text-base font-medium text-white">
+              {{ displayValue("contactPerson") }}
+            </span>
+          </div>
+          <span
+            class="text-xs text-white/40 transition"
+            [class.text-white]="expandedSection() === 'contact'"
+          >
+            {{ expandedSection() === "contact" ? "Hide" : "Expand" }}
+          </span>
+        </button>
+        <div
+          *ngIf="expandedSection() === 'contact'"
+          class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75"
+        >
+          <ng-container
+            *ngIf="editingSection() === 'contact'; else contactView"
+          >
+            <div class="grid gap-4 md:grid-cols-2">
+              <div>
+                <label
+                  for="contactPerson"
+                  class="text-xs sm:text-sm text-white/50"
+                  >Primary Contact</label
+                >
+                <input
+                  id="contactPerson"
+                  type="text"
+                  formControlName="contactPerson"
+                  placeholder="Avery Chen"
+                  class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                />
+              </div>
+              <div>
+                <label for="contactNo" class="text-xs sm:text-sm text-white/50"
+                  >Contact Number</label
+                >
+                <input
+                  id="contactNo"
+                  type="text"
+                  formControlName="contactNo"
+                  placeholder="+1 (555) 123-7890"
+                  class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                />
+                <p
+                  *ngIf="controlInvalid('contactNo')"
+                  class="text-xs sm:text-sm text-rose-300"
+                >
+                  Use digits, parentheses, spaces, or dashes for the phone
+                  number.
+                </p>
+              </div>
+              <div class="md:col-span-2">
+                <label for="emailId" class="text-xs sm:text-sm text-white/50"
+                  >Contact Email</label
+                >
+                <input
+                  id="emailId"
+                  type="email"
+                  formControlName="emailId"
+                  placeholder="avery.chen@northernlights.com"
+                  class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                />
+                <p
+                  *ngIf="controlInvalid('emailId')"
+                  class="text-xs sm:text-sm text-rose-300"
+                >
+                  Provide a valid email address.
+                </p>
+              </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                class="rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white"
+                (click)="cancelEdit()"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                ubButton
+                size="sm"
+                class="gap-1 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-[0_20px_45px_rgba(251,146,60,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+                [disabled]="isSaving()"
+                (click)="saveSection('contact')"
+              >
+                @if (!isSaving()) {
+                  <lucide-icon name="save" [size]="16"></lucide-icon>
+                  <span>Save Contact</span>
+                } @else {
+                  <lucide-icon
+                    name="loader-circle"
+                    [size]="16"
+                    class="animate-spin"
+                  ></lucide-icon>
+                  <span>Saving...</span>
+                }
+              </button>
+            </div>
+          </ng-container>
+          <ng-template #contactView>
+            <div class="grid gap-4 md:grid-cols-2">
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+              >
+                <p class="text-xs sm:text-sm text-white/45">Primary Contact</p>
+                <p class="text-base font-medium text-white">
+                  {{ displayValue("contactPerson") }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+              >
+                <p class="text-xs sm:text-sm text-white/45">Phone</p>
+                <p class="text-base font-medium text-white">
+                  {{ displayValue("contactNo") }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 md:col-span-2"
+              >
+                <p class="text-xs sm:text-sm text-white/45">Email</p>
+                <p class="text-base font-medium text-white">
+                  {{ displayValue("emailId") }}
+                </p>
+              </div>
+            </div>
+            <div class="mt-6 flex justify-end">
+              <button
+                type="button"
+                class="rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white"
+                (click)="startEdit('contact')"
+              >
+                Edit Contact
+              </button>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Approval -->
+      <div
+        class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_35px_90px_rgba(8,12,32,0.55)] backdrop-blur-md transition hover:border-white/20"
+      >
+        <button
+          type="button"
+          class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
+          (click)="toggleSection('approval')"
+        >
+          <div class="flex flex-col gap-1">
+            <span class="text-sm font-medium text-white/55"
+              >Approval Process</span
+            >
+            <span class="text-base font-medium text-white">
+              {{ approvalStatusLabel(approvalStatus()) }}
+            </span>
+          </div>
+          <span
+            class="text-xs text-white/40 transition"
+            [class.text-white]="expandedSection() === 'approval'"
+          >
+            {{ expandedSection() === "approval" ? "Hide" : "Expand" }}
+          </span>
+        </button>
+        <div
+          *ngIf="expandedSection() === 'approval'"
+          class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75 space-y-6"
+        >
+          <div class="grid gap-4 md:grid-cols-2">
+            <div
+              class="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/80"
+            >
+              <div class="flex items-center gap-3">
+                <span class="text-xs sm:text-sm text-white/50"
+                  >Current Status</span
+                >
+                <span
+                  class="inline-flex items-center rounded-full px-3 py-1 text-xs sm:text-sm font-medium"
+                  [ngClass]="approvalStatusBadgeClass(approvalStatus())"
+                >
+                  {{ approvalStatusLabel(approvalStatus()) }}
+                </span>
+              </div>
+              <div class="space-y-1 text-xs text-white/55">
+                <p *ngIf="currentProject()?.approvalRequestedAt">
+                  Requested
+                  {{ formatDateTime(currentProject()?.approvalRequestedAt) }}
+                </p>
+                <p *ngIf="currentProject()?.approvalResolvedAt">
+                  Resolved
+                  {{ formatDateTime(currentProject()?.approvalResolvedAt) }}
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-2 pt-2">
+                <button
+                  *ngIf="canRequestApproval()"
+                  type="button"
+                  ubButton
+                  size="sm"
+                  class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+                  [disabled]="
+                    approvalProcessing() || !currentProject()?.projectId
+                  "
+                  (click)="requestApprovalAction()"
+                >
+                  <lucide-icon name="sparkles" [size]="16"></lucide-icon>
+                  <span>Request Approval</span>
+                </button>
+                <button
+                  *ngIf="canApprove()"
+                  type="button"
+                  ubButton
+                  size="sm"
+                  class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)]"
+                  [disabled]="approvalProcessing()"
+                  (click)="approveProjectAction()"
+                >
+                  <lucide-icon name="check" [size]="16"></lucide-icon>
+                  <span>Approve</span>
+                </button>
+                <button
+                  *ngIf="canReject()"
+                  type="button"
+                  ubButton
+                  size="sm"
+                  class="bg-gradient-to-r from-rose-500 via-red-500 to-orange-500 text-white shadow-[0_20px_45px_rgba(244,63,94,0.35)]"
+                  [disabled]="approvalProcessing()"
+                  (click)="rejectProjectAction()"
+                >
+                  <lucide-icon name="x" [size]="16"></lucide-icon>
+                  <span>Reject</span>
+                </button>
+                <button
+                  *ngIf="canResetApproval()"
+                  type="button"
+                  ubButton
+                  size="sm"
+                  variant="outline"
+                  class="border-white/20 bg-white/10 text-white/80 hover:border-white/40 hover:text-white"
+                  [disabled]="approvalProcessing()"
+                  (click)="resetProjectApprovalAction()"
+                >
+                  <lucide-icon name="rotate-ccw" [size]="16"></lucide-icon>
+                  <span>Reset To Draft</span>
+                </button>
+              </div>
+              <p class="text-xs sm:text-sm text-white/50">
+                Comments are optional except for rejections. Choose an internal
+                reviewer or enter an external approver.
+              </p>
+            </div>
+            <div
+              class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/80"
+            >
+              <form
+                [formGroup]="approvalForm"
+                class="space-y-3"
+                (submit)="$event.preventDefault()"
+              >
+                <div class="grid gap-3 md:grid-cols-2">
+                  <div class="flex flex-col gap-1">
+                    <label class="text-xs sm:text-sm text-white/50"
+                      >Actor (Employee)</label
+                    >
+                    <app-select-menu
+                      formControlName="actorId"
+                      [options]="employeeSelectOptions()"
+                      [clearable]="false"
+                      [numeric]="true"
+                      placeholder="Unassigned"
+                    ></app-select-menu>
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <label class="text-xs sm:text-sm text-white/50"
+                      >External Approver</label
+                    >
+                    <input
+                      type="text"
+                      formControlName="actorName"
+                      placeholder="Reviewer name"
+                      class="rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    />
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-xs sm:text-sm text-white/50"
+                    >Comment / Rationale</label
+                  >
+                  <textarea
+                    rows="3"
+                    formControlName="comment"
+                    placeholder="Add a short note for the audit trail"
+                    class="rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                  ></textarea>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <div
+              class="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4"
+            >
+              <h3 class="text-sm font-medium text-white">Status History</h3>
+              <ng-container *ngIf="approvalHistory().length; else noHistory">
+                <div
+                  *ngFor="let entry of approvalHistory()"
+                  class="space-y-1 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                >
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-white">
+                      {{ approvalStatusLabel(entry.status) }}
+                    </span>
+                    <span class="text-xs text-white/60">
+                      {{ formatDateTime(entry.changedAt) }}
+                    </span>
+                  </div>
+                  <p class="text-xs text-white/60">
+                    {{
+                      actorDisplayName(
+                        entry.changedBy ?? null,
+                        entry.changedByName
+                      )
+                    }}
+                    <ng-container *ngIf="entry.previousStatus">
+                      • from {{ approvalStatusLabel(entry.previousStatus) }}
+                    </ng-container>
+                  </p>
+                  <p *ngIf="entry.comment" class="text-xs text-white/70">
+                    {{ entry.comment }}
+                  </p>
+                </div>
+              </ng-container>
+              <ng-template #noHistory>
+                <p class="text-xs text-white/50">
+                  No approval activity recorded yet.
+                </p>
+              </ng-template>
+            </div>
+            <div
+              class="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4"
+            >
+              <h3 class="text-sm font-medium text-white">Approval Timeline</h3>
+              <ng-container *ngIf="approvalTimeline().length; else noTimeline">
+                <div
+                  *ngFor="let entry of approvalTimeline() | slice: 0 : 6"
+                  class="space-y-1 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                >
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-white">
+                      {{ entry.label }}
+                    </span>
+                    <span class="text-xs text-white/60">
+                      {{ formatDateTime(entry.occurredAt) }}
+                    </span>
+                  </div>
+                  <p class="text-xs text-white/60">
+                    {{
+                      actorDisplayName(entry.actorId ?? null, entry.actorName)
+                    }}
+                  </p>
+                  <p *ngIf="entry.description" class="text-xs text-white/70">
+                    {{ entry.description }}
+                  </p>
+                </div>
+              </ng-container>
+              <ng-template #noTimeline>
+                <p class="text-xs text-white/50">
+                  No approval timeline entries yet.
+                </p>
+              </ng-template>
+            </div>
+          </div>
+
+          <div
+            class="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4"
+          >
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-medium text-white">Reviewer Comments</h3>
+              <span class="text-xs sm:text-sm text-white/50">
+                {{ reviewerComments().length }} total
+              </span>
+            </div>
+            <form
+              [formGroup]="reviewerCommentForm"
+              (ngSubmit)="submitReviewerComment()"
+              class="grid gap-3 md:grid-cols-2"
+            >
               <div class="flex flex-col gap-1">
-                <label class="text-[11px] text-white/50"
-                  >Comment / Rationale</label
+                <label class="text-xs sm:text-sm text-white/50"
+                  >Reviewer Section</label
+                >
+                <app-select-menu
+                  formControlName="section"
+                  [options]="reviewerSectionOptions"
+                  [clearable]="false"
+                  placeholder="Select Section"
+                ></app-select-menu>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-xs sm:text-sm text-white/50"
+                  >Reviewer Severity</label
+                >
+                <app-select-menu
+                  formControlName="severity"
+                  [options]="reviewerSeveritySelectOptions"
+                  [clearable]="false"
+                  placeholder="Select Severity"
+                ></app-select-menu>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-xs sm:text-sm text-white/50"
+                  >Reviewer (Employee)</label
+                >
+                <app-select-menu
+                  formControlName="reviewerId"
+                  [options]="employeeSelectOptions()"
+                  [clearable]="false"
+                  [numeric]="true"
+                  placeholder="External"
+                ></app-select-menu>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-xs sm:text-sm text-white/50"
+                  >Reviewer Name</label
+                >
+                <input
+                  type="text"
+                  formControlName="reviewerName"
+                  placeholder="External reviewer name"
+                  class="rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                />
+              </div>
+              <div class="md:col-span-2 flex flex-col gap-1">
+                <label class="text-xs sm:text-sm text-white/50"
+                  >Comment (Optional)</label
                 >
                 <textarea
                   rows="3"
                   formControlName="comment"
-                  placeholder="Add a short note for the audit trail"
+                  placeholder="Notes, outstanding tasks, or blockers"
                   class="rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
                 ></textarea>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        <div class="grid gap-4 md:grid-cols-2">
-          <div
-            class="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4"
-          >
-            <h3 class="text-sm font-medium text-white">Status History</h3>
-            <ng-container *ngIf="approvalHistory().length; else noHistory">
-              <div
-                *ngFor="let entry of approvalHistory()"
-                class="space-y-1 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-white">
-                    {{ approvalStatusLabel(entry.status) }}
-                  </span>
-                  <span class="text-xs text-white/60">
-                    {{ formatDateTime(entry.changedAt) }}
-                  </span>
-                </div>
-                <p class="text-xs text-white/60">
-                  {{
-                    actorDisplayName(
-                      entry.changedBy ?? null,
-                      entry.changedByName
-                    )
-                  }}
-                  <ng-container *ngIf="entry.previousStatus">
-                    • from {{ approvalStatusLabel(entry.previousStatus) }}
-                  </ng-container>
-                </p>
-                <p *ngIf="entry.comment" class="text-xs text-white/70">
-                  {{ entry.comment }}
-                </p>
-              </div>
-            </ng-container>
-            <ng-template #noHistory>
-              <p class="text-xs text-white/50">
-                No approval activity recorded yet.
-              </p>
-            </ng-template>
-          </div>
-          <div
-            class="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4"
-          >
-            <h3 class="text-sm font-medium text-white">Approval Timeline</h3>
-            <ng-container *ngIf="approvalTimeline().length; else noTimeline">
-              <div
-                *ngFor="let entry of approvalTimeline() | slice: 0 : 6"
-                class="space-y-1 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-white">
-                    {{ entry.label }}
-                  </span>
-                  <span class="text-xs text-white/60">
-                    {{ formatDateTime(entry.occurredAt) }}
-                  </span>
-                </div>
-                <p class="text-xs text-white/60">
-                  {{ actorDisplayName(entry.actorId ?? null, entry.actorName) }}
-                </p>
-                <p *ngIf="entry.description" class="text-xs text-white/70">
-                  {{ entry.description }}
-                </p>
-              </div>
-            </ng-container>
-            <ng-template #noTimeline>
-              <p class="text-xs text-white/50">
-                No approval timeline entries yet.
-              </p>
-            </ng-template>
-          </div>
-        </div>
-
-        <div
-          class="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4"
-        >
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-medium text-white">Reviewer Comments</h3>
-            <span class="text-[11px] text-white/50">
-              {{ reviewerComments().length }} total
-            </span>
-          </div>
-          <form
-            [formGroup]="reviewerCommentForm"
-            (ngSubmit)="submitReviewerComment()"
-            class="grid gap-3 md:grid-cols-2"
-          >
-            <div class="flex flex-col gap-1">
-              <label class="text-[11px] text-white/50">Reviewer Section</label>
-              <app-select-menu
-                formControlName="section"
-                [options]="reviewerSectionOptions"
-                [clearable]="false"
-                placeholder="Select Section"
-              ></app-select-menu>
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[11px] text-white/50">Reviewer Severity</label>
-              <app-select-menu
-                formControlName="severity"
-                [options]="reviewerSeveritySelectOptions"
-                [clearable]="false"
-                placeholder="Select Severity"
-              ></app-select-menu>
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[11px] text-white/50"
-                >Reviewer (Employee)</label
-              >
-              <app-select-menu
-                formControlName="reviewerId"
-                [options]="employeeSelectOptions()"
-                [clearable]="false"
-                [numeric]="true"
-                placeholder="External"
-              ></app-select-menu>
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[11px] text-white/50">Reviewer Name</label>
-              <input
-                type="text"
-                formControlName="reviewerName"
-                placeholder="External reviewer name"
-                class="rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-              />
-            </div>
-            <div class="md:col-span-2 flex flex-col gap-1">
-              <label class="text-[11px] text-white/50"
-                >Comment (Optional)</label
-              >
-              <textarea
-                rows="3"
-                formControlName="comment"
-                placeholder="Notes, outstanding tasks, or blockers"
-                class="rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
-              ></textarea>
-              <p
-                *ngIf="
-                  reviewerCommentForm.controls['comment'].invalid &&
-                  reviewerCommentForm.controls['comment'].touched
-                "
-                class="text-xs text-rose-300"
-              >
-                Please provide a comment (minimum three characters).
-              </p>
-            </div>
-            <div class="md:col-span-2 flex justify-end">
-              <button
-                type="submit"
-                ubButton
-                size="sm"
-                class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
-                [disabled]="
-                  reviewerCommentProcessing() || !currentProject()?.projectId
-                "
-              >
-                <lucide-icon
-                  name="message-square-plus"
-                  [size]="16"
-                ></lucide-icon>
-                <span>Add Comment</span>
-              </button>
-            </div>
-          </form>
-          <div class="space-y-3">
-            <ng-container *ngIf="reviewerComments().length; else noComments">
-              <div
-                *ngFor="let comment of reviewerComments()"
-                class="space-y-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
-              >
-                <div class="flex items-center justify-between gap-2">
-                  <span class="text-sm font-medium text-white">
-                    {{ comment.comment }}
-                  </span>
-                  <span
-                    class="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[11px] text-white/50"
-                  >
-                    {{ comment.section | titlecase }}
-                  </span>
-                </div>
-                <div
-                  class="flex flex-wrap items-center gap-2 text-xs text-white/60"
+                <p
+                  *ngIf="
+                    reviewerCommentForm.controls['comment'].invalid &&
+                    reviewerCommentForm.controls['comment'].touched
+                  "
+                  class="text-xs text-rose-300"
                 >
-                  <span>{{ formatDateTime(comment.createdAt) }}</span>
-                  <span>•</span>
-                  <span>
-                    {{
-                      actorDisplayName(comment.reviewerId, comment.reviewerName)
-                    }}
-                  </span>
-                  <span
-                    class="rounded-full px-2 py-0.5 text-[11px]"
-                    [ngClass]="commentSeverityClass(comment.severity)"
-                  >
-                    {{ comment.severity || "info" | titlecase }}
-                  </span>
-                  <span
-                    class="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[11px]"
-                    [class.text-emerald-200]="comment.resolved"
-                    [class.text-rose-200]="!comment.resolved"
-                  >
-                    {{ comment.resolved ? "Resolved" : "Open" }}
-                  </span>
-                </div>
+                  Please provide a comment (minimum three characters).
+                </p>
+              </div>
+              <div class="md:col-span-2 flex justify-end">
                 <button
-                  type="button"
-                  class="text-xs text-white/70 transition hover:text-white"
-                  (click)="toggleReviewerCommentResolved(comment)"
-                  [disabled]="reviewerCommentProcessing()"
+                  type="submit"
+                  ubButton
+                  size="sm"
+                  class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+                  [disabled]="
+                    reviewerCommentProcessing() || !currentProject()?.projectId
+                  "
                 >
-                  {{ comment.resolved ? "Reopen comment" : "Mark as resolved" }}
+                  <lucide-icon
+                    name="message-square-plus"
+                    [size]="16"
+                  ></lucide-icon>
+                  <span>Add Comment</span>
                 </button>
               </div>
-            </ng-container>
-            <ng-template #noComments>
-              <p class="text-xs text-white/50">
-                No reviewer feedback logged yet.
-              </p>
-            </ng-template>
+            </form>
+            <div class="space-y-3">
+              <ng-container *ngIf="reviewerComments().length; else noComments">
+                <div
+                  *ngFor="let comment of reviewerComments()"
+                  class="space-y-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                >
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-sm font-medium text-white">
+                      {{ comment.comment }}
+                    </span>
+                    <span
+                      class="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-xs sm:text-sm text-white/50"
+                    >
+                      {{ comment.section | titlecase }}
+                    </span>
+                  </div>
+                  <div
+                    class="flex flex-wrap items-center gap-2 text-xs text-white/60"
+                  >
+                    <span>{{ formatDateTime(comment.createdAt) }}</span>
+                    <span>•</span>
+                    <span>
+                      {{
+                        actorDisplayName(
+                          comment.reviewerId,
+                          comment.reviewerName
+                        )
+                      }}
+                    </span>
+                    <span
+                      class="rounded-full px-2 py-0.5 text-xs sm:text-sm"
+                      [ngClass]="commentSeverityClass(comment.severity)"
+                    >
+                      {{ comment.severity || "info" | titlecase }}
+                    </span>
+                    <span
+                      class="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-xs sm:text-sm"
+                      [class.text-emerald-200]="comment.resolved"
+                      [class.text-rose-200]="!comment.resolved"
+                    >
+                      {{ comment.resolved ? "Resolved" : "Open" }}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    class="text-xs text-white/70 transition hover:text-white"
+                    (click)="toggleReviewerCommentResolved(comment)"
+                    [disabled]="reviewerCommentProcessing()"
+                  >
+                    {{
+                      comment.resolved ? "Reopen comment" : "Mark as resolved"
+                    }}
+                  </button>
+                </div>
+              </ng-container>
+              <ng-template #noComments>
+                <p class="text-xs sm:text-sm text-white/50">
+                  No reviewer feedback logged yet.
+                </p>
+              </ng-template>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <footer
-    class="flex flex-col gap-4 rounded-[24px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between"
-  >
-    <div class="space-y-1 text-xs text-white/60">
-      <p>
-        Changes are auto-populated into the preview cards as you type. Remember
-        to save a section after editing.
-      </p>
-      <p *ngIf="isEditMode()" class="text-white/50">
-        Need to archive this project? You can remove it safely from the
-        workspace below.
-      </p>
-    </div>
-    <div class="flex flex-wrap items-center gap-3">
-      @if (isEditMode()) {
+    <footer
+      class="flex flex-col gap-4 rounded-[24px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div class="space-y-1 text-xs sm:text-sm text-white/60">
+        <p>
+          Changes are auto-populated into the preview cards as you type.
+          Remember to save a section after editing.
+        </p>
+        <p *ngIf="isEditMode()" class="text-white/50">
+          Need to archive this project? You can remove it safely from the
+          workspace below.
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        @if (isEditMode()) {
+          <button
+            type="button"
+            class="eh-btn-icon rounded-xl border border-rose-400/40 bg-rose-500/15 px-4 py-2 text-xs sm:text-sm text-rose-100 transition hover:border-rose-300/60 hover:bg-rose-500/25 hover:text-rose-50"
+            (click)="requestDelete()"
+          >
+            <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+            <span>Archive Project</span>
+          </button>
+        }
         <button
           type="button"
-          class="eh-btn-icon rounded-xl border border-rose-400/40 bg-rose-500/15 px-4 py-2 text-xs text-rose-100 transition hover:border-rose-300/60 hover:bg-rose-500/25 hover:text-rose-50"
-          (click)="requestDelete()"
+          ubButton
+          size="sm"
+          class="gap-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="isSaving()"
+          (click)="saveAllChanges()"
         >
-          <lucide-icon name="trash-2" [size]="16"></lucide-icon>
-          <span>Archive Project</span>
+          @if (!isSaving()) {
+            <lucide-icon
+              [name]="isEditMode() ? 'save' : 'plus'"
+              [size]="16"
+            ></lucide-icon>
+            <span>{{
+              isEditMode() ? "Save All Changes" : "Create Project"
+            }}</span>
+          } @else {
+            <lucide-icon
+              name="loader-circle"
+              [size]="16"
+              class="animate-spin"
+            ></lucide-icon>
+            <span>{{
+              isEditMode() ? "Saving..." : "Creating Project..."
+            }}</span>
+          }
         </button>
-      }
-      <button
-        type="button"
-        ubButton
-        size="sm"
-        class="gap-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
-        [disabled]="isSaving()"
-        (click)="saveAllChanges()"
-      >
-        @if (!isSaving()) {
-          <lucide-icon
-            [name]="isEditMode() ? 'save' : 'plus'"
-            [size]="16"
-          ></lucide-icon>
-          <span>{{
-            isEditMode() ? "Save All Changes" : "Create Project"
-          }}</span>
-        } @else {
-          <lucide-icon
-            name="loader-circle"
-            [size]="16"
-            class="animate-spin"
-          ></lucide-icon>
-          <span>{{ isEditMode() ? "Saving..." : "Creating Project..." }}</span>
-        }
-      </button>
-    </div>
-  </footer>
-</div>
+      </div>
+    </footer>
+  </div>
 }
 
 <app-alert-dialog

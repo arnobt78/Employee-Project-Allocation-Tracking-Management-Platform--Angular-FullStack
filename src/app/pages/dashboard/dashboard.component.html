@@ -7,449 +7,453 @@
   ></app-page-header>
 
   <div class="eh-content-stack">
-  @if (isLoading()) {
-    <app-dashboard-skeleton></app-dashboard-skeleton>
-  } @else {
-    <!-- Hero / ops banner -->
-    <section
-      class="relative overflow-hidden rounded-[28px] border border-indigo-400/30 bg-gradient-to-br from-indigo-500/25 via-violet-500/15 to-fuchsia-500/10 p-2 shadow-[0_35px_100px_rgba(99,102,241,0.35)] sm:p-4"
-    >
-      <p
-        class="text-[11px] font-medium uppercase tracking-[0.28em] text-indigo-100/80"
+    @if (isLoading()) {
+      <app-dashboard-skeleton></app-dashboard-skeleton>
+    } @else {
+      <!-- Hero / ops banner -->
+      <section
+        class="relative overflow-hidden rounded-[28px] border border-indigo-400/30 bg-gradient-to-br from-indigo-500/25 via-violet-500/15 to-fuchsia-500/10 p-2 shadow-[0_35px_100px_rgba(99,102,241,0.35)] sm:p-4"
       >
-        EmpowerHub
-      </p>
-      <h2 class="mt-2 text-xl font-medium text-white sm:text-2xl">
-        Align people, projects, and delivery in one operating view
-      </h2>
-      <p class="mt-2 max-w-2xl text-sm text-white/70">
-        Track capacity, surface delivery risk early, and keep every assignment
-        visible to leadership — without leaving this command center.
-      </p>
-      <div class="mt-4 flex flex-wrap gap-2 text-xs text-white/80">
-        <span
-          class="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm"
+        <p
+          class="text-xs sm:text-sm font-medium uppercase tracking-[0.28em] text-indigo-100/80"
         >
-          <lucide-icon name="users" [size]="14"></lucide-icon>
-          {{ dashboardData?.totalEmployee || 0 }} workforce
-        </span>
-        <span
-          class="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm"
-        >
-          <lucide-icon name="folder-kanban" [size]="14"></lucide-icon>
-          {{ dashboardData?.totalProject || 0 }} projects
-        </span>
-        <span
-          class="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm"
-        >
-          <lucide-icon name="activity" [size]="14"></lucide-icon>
-          {{ opsSummary }}
-        </span>
-      </div>
-    </section>
+          EmpowerHub
+        </p>
+        <h2 class="mt-2 text-xl font-medium text-white sm:text-2xl">
+          Align people, projects, and delivery in one operating view
+        </h2>
+        <p class="mt-2 max-w-2xl text-sm text-white/70">
+          Track capacity, surface delivery risk early, and keep every assignment
+          visible to leadership — without leaving this command center.
+        </p>
+        <div class="mt-4 flex flex-wrap gap-2 text-xs text-white/80">
+          <span
+            class="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm"
+          >
+            <lucide-icon name="users" [size]="14"></lucide-icon>
+            {{ dashboardData?.totalEmployee || 0 }} workforce
+          </span>
+          <span
+            class="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm"
+          >
+            <lucide-icon name="folder-kanban" [size]="14"></lucide-icon>
+            {{ dashboardData?.totalProject || 0 }} projects
+          </span>
+          <span
+            class="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm"
+          >
+            <lucide-icon name="activity" [size]="14"></lucide-icon>
+            {{ opsSummary }}
+          </span>
+        </div>
+      </section>
 
-    <!-- All KPIs share one grid so row gap matches card gap-3 (list-page-shell) -->
-    <section
-      class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
-      data-testid="dashboard-kpi-grid"
-    >
-      <app-kpi-stat-card
-        label="Total Employees"
-        [value]="dashboardData?.totalEmployee ?? 0"
-        hint="Track your entire organisation workforce across locations."
-        icon="users"
-        tone="sky"
-      ></app-kpi-stat-card>
-      <app-kpi-stat-card
-        label="Total Projects"
-        [value]="dashboardData?.totalProject ?? 0"
-        hint="Monitor project health and velocity with real-time status."
-        icon="folder-kanban"
-        tone="emerald"
-      ></app-kpi-stat-card>
-      <app-kpi-stat-card
-        label="Active Project Employees"
-        [value]="dashboardData?.activeProjectEmployees ?? 0"
-        hint="Know exactly who is booked and where the next gaps appear."
-        icon="user-plus"
-        tone="amber"
-      ></app-kpi-stat-card>
-      @if (projectStats) {
+      <!-- All KPIs share one grid so row gap matches card gap-3 (list-page-shell) -->
+      <section
+        class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+        data-testid="dashboard-kpi-grid"
+      >
         <app-kpi-stat-card
-          label="Non-archived"
-          [value]="projectStats.nonArchived"
-          hint="Included in delivery calculations"
-          icon="folder-open"
+          label="Total Employees"
+          [value]="dashboardData?.totalEmployee ?? 0"
+          hint="Track your entire organisation workforce across locations."
+          icon="users"
           tone="sky"
         ></app-kpi-stat-card>
         <app-kpi-stat-card
-          label="Active projects"
-          [value]="projectStats.active"
-          hint="With active assignments or leads"
-          icon="zap"
+          label="Total Projects"
+          [value]="dashboardData?.totalProject ?? 0"
+          hint="Monitor project health and velocity with real-time status."
+          icon="folder-kanban"
           tone="emerald"
         ></app-kpi-stat-card>
         <app-kpi-stat-card
-          label="Inactive projects"
-          [value]="projectStats.inactive"
-          hint="No active assignments and no lead"
-          icon="pause-circle"
-          tone="slate"
-        ></app-kpi-stat-card>
-        <app-kpi-stat-card
-          label="Planning"
-          [value]="projectStats.planning"
-          hint="Lead assigned, no active team yet"
-          icon="compass"
-          tone="violet"
-        ></app-kpi-stat-card>
-        <app-kpi-stat-card
-          label="Assigned"
-          [value]="projectStats.assigned"
-          hint="Projects with active employee assignments"
-          icon="users"
+          label="Active Project Employees"
+          [value]="dashboardData?.activeProjectEmployees ?? 0"
+          hint="Know exactly who is booked and where the next gaps appear."
+          icon="user-plus"
           tone="amber"
         ></app-kpi-stat-card>
-        <app-kpi-stat-card
-          label="Active assignments"
-          [value]="projectStats.activeAssignments"
-          hint="Live project–employee links"
-          icon="link"
-          tone="emerald"
-        ></app-kpi-stat-card>
-        @if (projectStats.archived > 0) {
+        @if (projectStats) {
           <app-kpi-stat-card
-            label="Archived"
-            [value]="projectStats.archived"
-            hint="Excluded from active calculations"
-            icon="archive"
+            label="Non-archived"
+            [value]="projectStats.nonArchived"
+            hint="Included in delivery calculations"
+            icon="folder-open"
+            tone="sky"
+          ></app-kpi-stat-card>
+          <app-kpi-stat-card
+            label="Active projects"
+            [value]="projectStats.active"
+            hint="With active assignments or leads"
+            icon="zap"
+            tone="emerald"
+          ></app-kpi-stat-card>
+          <app-kpi-stat-card
+            label="Inactive projects"
+            [value]="projectStats.inactive"
+            hint="No active assignments and no lead"
+            icon="pause-circle"
             tone="slate"
           ></app-kpi-stat-card>
-        }
-        @if (projectStats.nonAssigned > 0) {
           <app-kpi-stat-card
-            label="Unassigned"
-            [value]="projectStats.nonAssigned"
-            hint="No active employee assignments"
-            icon="user-x"
-            tone="rose"
+            label="Planning"
+            [value]="projectStats.planning"
+            hint="Lead assigned, no active team yet"
+            icon="compass"
+            tone="violet"
           ></app-kpi-stat-card>
-        }
-        @if (projectStats.inactiveAssignments > 0) {
           <app-kpi-stat-card
-            label="Inactive assignments"
-            [value]="projectStats.inactiveAssignments"
-            hint="Paused or ended allocations"
-            icon="unlink"
-            tone="rose"
+            label="Assigned"
+            [value]="projectStats.assigned"
+            hint="Projects with active employee assignments"
+            icon="users"
+            tone="amber"
           ></app-kpi-stat-card>
+          <app-kpi-stat-card
+            label="Active assignments"
+            [value]="projectStats.activeAssignments"
+            hint="Live project–employee links"
+            icon="link"
+            tone="emerald"
+          ></app-kpi-stat-card>
+          @if (projectStats.archived > 0) {
+            <app-kpi-stat-card
+              label="Archived"
+              [value]="projectStats.archived"
+              hint="Excluded from active calculations"
+              icon="archive"
+              tone="slate"
+            ></app-kpi-stat-card>
+          }
+          @if (projectStats.nonAssigned > 0) {
+            <app-kpi-stat-card
+              label="Unassigned"
+              [value]="projectStats.nonAssigned"
+              hint="No active employee assignments"
+              icon="user-x"
+              tone="rose"
+            ></app-kpi-stat-card>
+          }
+          @if (projectStats.inactiveAssignments > 0) {
+            <app-kpi-stat-card
+              label="Inactive assignments"
+              [value]="projectStats.inactiveAssignments"
+              hint="Paused or ended allocations"
+              icon="unlink"
+              tone="rose"
+            ></app-kpi-stat-card>
+          }
         }
-      }
-    </section>
+      </section>
 
-    <!-- Charts -->
-    @if (projectStatusSlices.length || assignmentSlices.length) {
+      <!-- Charts -->
+      @if (projectStatusSlices.length || assignmentSlices.length) {
+        <section class="grid gap-6 lg:grid-cols-2">
+          <article
+            class="rounded-[28px] border border-white/10 bg-white/5/70 p-4 shadow-[0_35px_100px_rgba(8,12,32,0.55)] backdrop-blur-md"
+          >
+            <h2 class="text-base font-medium text-white sm:text-xl">
+              Project Portfolio Mix
+            </h2>
+            <p class="mb-4 text-xs sm:text-sm text-white/50">
+              Active, planning, inactive, and archived counts from live data
+            </p>
+            @if (projectStatusSlices.length) {
+              <app-dashboard-chart
+                title="Project portfolio mix"
+                type="doughnut"
+                [slices]="projectStatusSlices"
+              ></app-dashboard-chart>
+            } @else {
+              <p class="py-16 text-center text-sm text-white/50">
+                No project status data yet.
+              </p>
+            }
+          </article>
+          <article
+            class="rounded-[28px] border border-white/10 bg-white/5/70 p-4 shadow-[0_35px_100px_rgba(8,12,32,0.55)] backdrop-blur-md"
+          >
+            <h2 class="text-base font-medium text-white sm:text-xl">
+              Assignment & Capacity
+            </h2>
+            <p class="mb-4 text-xs sm:text-sm text-white/50">
+              Active vs inactive allocations and unassigned projects
+            </p>
+            @if (assignmentSlices.length) {
+              <app-dashboard-chart
+                title="Assignment & Capacity"
+                type="bar"
+                [slices]="assignmentSlices"
+              ></app-dashboard-chart>
+            } @else {
+              <p class="py-16 text-center text-sm text-white/50">
+                No assignment data yet.
+              </p>
+            }
+          </article>
+        </section>
+      }
+
       <section class="grid gap-6 lg:grid-cols-2">
         <article
-          class="rounded-[28px] border border-white/10 bg-white/5/70 p-4 shadow-[0_35px_100px_rgba(8,12,32,0.55)] backdrop-blur-md"
+          class="rounded-[28px] border border-white/10 bg-white/5/70 p-2 sm:p-4 shadow-[0_35px_100px_rgba(8,12,32,0.55)] backdrop-blur-md"
         >
-          <h2 class="text-base font-medium text-white sm:text-xl">
-            Project Portfolio Mix
-          </h2>
-          <p class="mb-4 text-xs sm:text-sm text-white/50">
-            Active, planning, inactive, and archived counts from live data
-          </p>
-          @if (projectStatusSlices.length) {
-            <app-dashboard-chart
-              title="Project portfolio mix"
-              type="doughnut"
-              [slices]="projectStatusSlices"
-            ></app-dashboard-chart>
-          } @else {
-            <p class="py-16 text-center text-sm text-white/50">
-              No project status data yet.
-            </p>
-          }
-        </article>
-        <article
-          class="rounded-[28px] border border-white/10 bg-white/5/70 p-4 shadow-[0_35px_100px_rgba(8,12,32,0.55)] backdrop-blur-md"
-        >
-          <h2 class="text-base font-medium text-white sm:text-xl">
-            Assignment & Capacity
-          </h2>
-          <p class="mb-4 text-xs sm:text-sm text-white/50">
-            Active vs inactive allocations and unassigned projects
-          </p>
-          @if (assignmentSlices.length) {
-            <app-dashboard-chart
-              title="Assignment & Capacity"
-              type="bar"
-              [slices]="assignmentSlices"
-            ></app-dashboard-chart>
-          } @else {
-            <p class="py-16 text-center text-sm text-white/50">
-              No assignment data yet.
-            </p>
-          }
-        </article>
-      </section>
-    }
-
-    <section class="grid gap-6 lg:grid-cols-2">
-      <article
-        class="rounded-[28px] border border-white/10 bg-white/5/70 p-2 sm:p-4 shadow-[0_35px_100px_rgba(8,12,32,0.55)] backdrop-blur-md"
-      >
-        <header class="flex items-center justify-between gap-4 pb-4">
-          <div>
-            <h2
-              class="text-base sm:text-xl leading-tight font-medium text-white"
-            >
-              Latest Projects
-            </h2>
-            <p class="text-xs sm:text-sm text-white/50">
-              Recently updated delivery work
-            </p>
-          </div>
-          <span
-            class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/70"
-          >
-            {{ dashboardData?.recentProjects?.length || 0 }} projects
-          </span>
-        </header>
-        <ul class="space-y-2">
-          @for (
-            item of dashboardData?.recentProjects ?? [];
-            track item.projectId;
-            let i = $index
-          ) {
-            <li
-              class="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/80 shadow-sm shadow-slate-950/20"
-            >
-              <div class="flex min-w-0 items-center gap-3">
-                <span
-                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/15 text-xs font-medium text-white/80"
-                  >{{ i + 1 }}</span
-                >
-                <div class="min-w-0">
-                  <p class="truncate font-medium text-white">
-                    {{ item.projectName }}
-                  </p>
-                  <p
-                    class="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-xs text-white/45"
-                  >
-                    <lucide-icon
-                      name="calendar"
-                      [size]="12"
-                      class="shrink-0"
-                    ></lucide-icon>
-                    <span>{{
-                      item.startDate
-                        ? (item.startDate | date: "mediumDate")
-                        : "No start date"
-                    }}</span>
-                    @if (item.clientName) {
-                      <span class="text-white/30" aria-hidden="true">·</span>
-                      <lucide-icon
-                        name="building-2"
-                        [size]="12"
-                        class="shrink-0"
-                      ></lucide-icon>
-                      <span class="truncate">{{ item.clientName }}</span>
-                    }
-                    @if (item.employeeName) {
-                      <span class="text-white/30" aria-hidden="true">·</span>
-                      <lucide-icon
-                        name="user"
-                        [size]="12"
-                        class="shrink-0"
-                      ></lucide-icon>
-                      <span class="truncate">{{ item.employeeName }}</span>
-                    }
-                  </p>
-                </div>
-              </div>
-              <span
-                class="inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium capitalize backdrop-blur-sm"
-                [class]="projectStatusTone(item.status)"
+          <header class="flex items-center justify-between gap-4 pb-4">
+            <div>
+              <h2
+                class="text-base sm:text-xl leading-tight font-medium text-white"
               >
-                <lucide-icon
-                  [name]="projectStatusIcon(item.status)"
-                  [size]="12"
-                ></lucide-icon>
-                {{ formatStatusLabel(item.status) | titlecase }}
-              </span>
-            </li>
-          }
-          @if (hasLoaded() && !dashboardData?.recentProjects?.length) {
-            <li
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-8 text-center text-sm text-white/60"
+                Latest Projects
+              </h2>
+              <p class="text-xs sm:text-sm text-white/50">
+                Recently updated delivery work
+              </p>
+            </div>
+            <span
+              class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/70"
             >
-              No recent projects recorded.
-            </li>
-          }
-        </ul>
-      </article>
-
-      <article
-        class="rounded-[28px] border border-white/10 bg-white/5/70 p-2 sm:p-4 shadow-[0_35px_100px_rgba(8,12,32,0.55)] backdrop-blur-md"
-      >
-        <header class="flex items-center justify-between gap-4 pb-4">
-          <div>
-            <h2
-              class="text-base sm:text-xl leading-tight font-medium text-white"
-            >
-              New Employees
-            </h2>
-            <p class="text-xs sm:text-sm text-white/50">
-              Recent joiners across the organization
-            </p>
-          </div>
-          <span
-            class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/70"
-          >
-            {{ dashboardData?.recentEmployee?.length || 0 }} joined
-          </span>
-        </header>
-        <ul class="space-y-2">
-          @for (
-            item of dashboardData?.recentEmployee ?? [];
-            track item.employeeId
-          ) {
-            <li
-              class="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/80 shadow-sm shadow-slate-950/20"
-            >
-              <span
-                class="flex min-w-0 items-center gap-3 font-medium text-white"
+              {{ dashboardData?.recentProjects?.length || 0 }} projects
+            </span>
+          </header>
+          <ul class="space-y-2">
+            @for (
+              item of dashboardData?.recentProjects ?? [];
+              track item.projectId;
+              let i = $index
+            ) {
+              <li
+                class="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/80 shadow-sm shadow-slate-950/20"
               >
-                <app-user-avatar
-                  [seed]="item.emailId || item.employeeName"
-                  [imageUrl]="item.avatarUrl ?? null"
-                  [label]="item.employeeName"
-                  [size]="32"
-                  [alt]="item.employeeName"
-                ></app-user-avatar>
-                <span class="min-w-0">
-                  <span class="block truncate">{{ item.employeeName }}</span>
+                <div class="flex min-w-0 items-center gap-3">
                   <span
-                    class="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-xs font-normal text-white/45"
+                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/15 text-xs font-medium text-white/80"
+                    >{{ i + 1 }}</span
                   >
-                    <lucide-icon
-                      name="contact"
-                      [size]="12"
-                      class="shrink-0"
-                    ></lucide-icon>
-                    <span>{{ item.role || "Team member" }}</span>
-                    @if (item.department) {
-                      <span class="text-white/30" aria-hidden="true">·</span>
+                  <div class="min-w-0">
+                    <p class="truncate font-medium text-white">
+                      {{ item.projectName }}
+                    </p>
+                    <p
+                      class="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-xs text-white/45"
+                    >
                       <lucide-icon
-                        name="building-2"
+                        name="calendar"
                         [size]="12"
                         class="shrink-0"
                       ></lucide-icon>
-                      <span class="truncate">{{ item.department }}</span>
-                    }
+                      <span>{{
+                        item.startDate
+                          ? (item.startDate | date: "mediumDate")
+                          : "No start date"
+                      }}</span>
+                      @if (item.clientName) {
+                        <span class="text-white/30" aria-hidden="true">·</span>
+                        <lucide-icon
+                          name="building-2"
+                          [size]="12"
+                          class="shrink-0"
+                        ></lucide-icon>
+                        <span class="truncate">{{ item.clientName }}</span>
+                      }
+                      @if (item.employeeName) {
+                        <span class="text-white/30" aria-hidden="true">·</span>
+                        <lucide-icon
+                          name="user"
+                          [size]="12"
+                          class="shrink-0"
+                        ></lucide-icon>
+                        <span class="truncate">{{ item.employeeName }}</span>
+                      }
+                    </p>
+                  </div>
+                </div>
+                <span
+                  class="inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-xs sm:text-sm font-medium capitalize backdrop-blur-sm"
+                  [class]="projectStatusTone(item.status)"
+                >
+                  <lucide-icon
+                    [name]="projectStatusIcon(item.status)"
+                    [size]="12"
+                  ></lucide-icon>
+                  {{ formatStatusLabel(item.status) | titlecase }}
+                </span>
+              </li>
+            }
+            @if (hasLoaded() && !dashboardData?.recentProjects?.length) {
+              <li
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-8 text-center text-sm text-white/60"
+              >
+                No recent projects recorded.
+              </li>
+            }
+          </ul>
+        </article>
+
+        <article
+          class="rounded-[28px] border border-white/10 bg-white/5/70 p-2 sm:p-4 shadow-[0_35px_100px_rgba(8,12,32,0.55)] backdrop-blur-md"
+        >
+          <header class="flex items-center justify-between gap-4 pb-4">
+            <div>
+              <h2
+                class="text-base sm:text-xl leading-tight font-medium text-white"
+              >
+                New Employees
+              </h2>
+              <p class="text-xs sm:text-sm text-white/50">
+                Recent joiners across the organization
+              </p>
+            </div>
+            <span
+              class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/70"
+            >
+              {{ dashboardData?.recentEmployee?.length || 0 }} joined
+            </span>
+          </header>
+          <ul class="space-y-2">
+            @for (
+              item of dashboardData?.recentEmployee ?? [];
+              track item.employeeId
+            ) {
+              <li
+                class="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/80 shadow-sm shadow-slate-950/20"
+              >
+                <span
+                  class="flex min-w-0 items-center gap-3 font-medium text-white"
+                >
+                  <app-user-avatar
+                    [seed]="item.emailId || item.employeeName"
+                    [imageUrl]="item.avatarUrl ?? null"
+                    [label]="item.employeeName"
+                    [size]="32"
+                    [alt]="item.employeeName"
+                  ></app-user-avatar>
+                  <span class="min-w-0">
+                    <span class="block truncate">{{ item.employeeName }}</span>
+                    <span
+                      class="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-xs font-normal text-white/45"
+                    >
+                      <lucide-icon
+                        name="contact"
+                        [size]="12"
+                        class="shrink-0"
+                      ></lucide-icon>
+                      <span>{{ item.role || "Team member" }}</span>
+                      @if (item.department) {
+                        <span class="text-white/30" aria-hidden="true">·</span>
+                        <lucide-icon
+                          name="building-2"
+                          [size]="12"
+                          class="shrink-0"
+                        ></lucide-icon>
+                        <span class="truncate">{{ item.department }}</span>
+                      }
+                    </span>
                   </span>
                 </span>
-              </span>
-              <span
-                class="inline-flex shrink-0 items-center gap-1 rounded-full border border-sky-400/35 bg-sky-500/15 px-2.5 py-1 text-[11px] font-medium text-sky-100 shadow-[0_8px_24px_rgba(2,132,199,0.25)] backdrop-blur-sm"
+                <span
+                  class="inline-flex shrink-0 items-center gap-1 rounded-full border border-sky-400/35 bg-sky-500/15 px-2.5 py-1 text-xs sm:text-sm font-medium text-sky-100 shadow-[0_8px_24px_rgba(2,132,199,0.25)] backdrop-blur-sm"
+                >
+                  <lucide-icon name="calendar" [size]="12"></lucide-icon>
+                  @if (item.hireDate || item.createdAt) {
+                    {{
+                      (item.hireDate || item.createdAt)! | date: "mediumDate"
+                    }}
+                  } @else {
+                    Recently joined
+                  }
+                </span>
+              </li>
+            }
+            @if (hasLoaded() && !dashboardData?.recentEmployee?.length) {
+              <li
+                class="rounded-2xl border border-white/10 bg-white/5 px-4 py-8 text-center text-sm text-white/60"
               >
-                <lucide-icon name="calendar" [size]="12"></lucide-icon>
-                @if (item.hireDate || item.createdAt) {
-                  {{ (item.hireDate || item.createdAt)! | date: "mediumDate" }}
-                } @else {
-                  Recently joined
-                }
-              </span>
-            </li>
-          }
-          @if (hasLoaded() && !dashboardData?.recentEmployee?.length) {
-            <li
-              class="rounded-2xl border border-white/10 bg-white/5 px-4 py-8 text-center text-sm text-white/60"
-            >
-              No new employees yet.
-            </li>
-          }
-        </ul>
-      </article>
-    </section>
+                No new employees yet.
+              </li>
+            }
+          </ul>
+        </article>
+      </section>
 
-    <section
-      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_100px_rgba(8,12,32,0.5)] backdrop-blur-md"
-    >
-      <header
-        class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+      <section
+        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_100px_rgba(8,12,32,0.5)] backdrop-blur-md"
       >
-        <div>
-          <h2 class="text-base sm:text-xl leading-tight font-medium text-white">
-            Employee Departments
-          </h2>
-          <p class="text-xs sm:text-sm text-white/50">
-            Parent divisions across the Organization
-          </p>
-        </div>
-        <span
-          class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/70"
+        <header
+          class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
         >
-          {{ parentDepartments.length }} employee departments
-        </span>
-      </header>
-
-      <div
-        class="grid gap-4"
-        style="
-          grid-template-columns: repeat(
-            auto-fit,
-            minmax(min(100%, 14rem), 1fr)
-          );
-        "
-      >
-        @for (dept of parentDepartments; track dept.departmentId) {
-          <div
-            class="group flex min-w-0 flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-center shadow-sm shadow-slate-950/25 transition hover:border-primary/40 hover:bg-white/10"
-          >
-            <div
-              class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-sky-400/35 bg-sky-500/15 shadow-[0_16px_40px_rgba(56,189,248,0.35)]"
+          <div>
+            <h2
+              class="text-base sm:text-xl leading-tight font-medium text-white"
             >
-              @if (
-                getDepartmentLogo(dept.departmentLogo) &&
-                !preferColoredDeptIcon(dept.departmentName)
-              ) {
-                <img
-                  [src]="getDepartmentLogo(dept.departmentLogo)"
-                  [alt]="dept.departmentName"
-                  class="h-10 w-10 object-contain"
-                  data-testid="dept-logo-img"
-                />
-              } @else {
-                <lucide-icon
-                  [name]="departmentIcon(dept.departmentName)"
-                  [size]="28"
-                  class="text-sky-200"
-                  [attr.data-testid]="
-                    'dept-icon-' + departmentIcon(dept.departmentName)
-                  "
-                ></lucide-icon>
-              }
-            </div>
-            <p class="text-sm font-medium text-white">
-              {{ dept.departmentName }}
-            </p>
-            <p class="text-xs leading-relaxed text-white/55">
-              {{ departmentBlurb(dept) }}
+              Employee Departments
+            </h2>
+            <p class="text-xs sm:text-sm text-white/50">
+              Parent divisions across the Organization
             </p>
           </div>
-        }
-
-        @if (hasLoaded() && !parentDepartments.length) {
-          <div
-            class="col-span-full rounded-2xl border border-dashed border-white/15 bg-white/5 px-4 py-10 text-center text-sm text-white/60"
+          <span
+            class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/70"
           >
-            No employee departments available.
-          </div>
-        }
-      </div>
-    </section>
-  }
+            {{ parentDepartments.length }} employee departments
+          </span>
+        </header>
+
+        <div
+          class="grid gap-4"
+          style="
+            grid-template-columns: repeat(
+              auto-fit,
+              minmax(min(100%, 14rem), 1fr)
+            );
+          "
+        >
+          @for (dept of parentDepartments; track dept.departmentId) {
+            <div
+              class="group flex min-w-0 flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-center shadow-sm shadow-slate-950/25 transition hover:border-primary/40 hover:bg-white/10"
+            >
+              <div
+                class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-sky-400/35 bg-sky-500/15 shadow-[0_16px_40px_rgba(56,189,248,0.35)]"
+              >
+                @if (
+                  getDepartmentLogo(dept.departmentLogo) &&
+                  !preferColoredDeptIcon(dept.departmentName)
+                ) {
+                  <img
+                    [src]="getDepartmentLogo(dept.departmentLogo)"
+                    [alt]="dept.departmentName"
+                    class="h-10 w-10 object-contain"
+                    data-testid="dept-logo-img"
+                  />
+                } @else {
+                  <lucide-icon
+                    [name]="departmentIcon(dept.departmentName)"
+                    [size]="28"
+                    class="text-sky-200"
+                    [attr.data-testid]="
+                      'dept-icon-' + departmentIcon(dept.departmentName)
+                    "
+                  ></lucide-icon>
+                }
+              </div>
+              <p class="text-sm font-medium text-white">
+                {{ dept.departmentName }}
+              </p>
+              <p class="text-xs leading-relaxed text-white/55">
+                {{ departmentBlurb(dept) }}
+              </p>
+            </div>
+          }
+
+          @if (hasLoaded() && !parentDepartments.length) {
+            <div
+              class="col-span-full rounded-2xl border border-dashed border-white/15 bg-white/5 px-4 py-10 text-center text-sm text-white/60"
+            >
+              No employee departments available.
+            </div>
+          }
+        </div>
+      </section>
+    }
   </div>
 </div>
