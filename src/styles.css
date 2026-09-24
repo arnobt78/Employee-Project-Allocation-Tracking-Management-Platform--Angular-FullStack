@@ -327,13 +327,18 @@
 
 .eh-native-date {
   color-scheme: dark;
+  position: relative;
   padding-right: 2.75rem !important;
 }
 
 .eh-native-date::-webkit-calendar-picker-indicator {
   cursor: pointer;
   opacity: 0.6;
-  margin-inline-end: 0.25rem;
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
   padding: 0.125rem;
 }
 

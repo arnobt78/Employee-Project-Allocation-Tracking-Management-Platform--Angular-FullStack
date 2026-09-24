@@ -31,6 +31,23 @@ import { ListPageRowVariant } from '@/app/constants/private-page-meta';
             </div>
             <div class="h-4 w-14 shrink-0 rounded-full bg-white/10"></div>
           </div>
+        } @else if (rowVariant === 'assignment') {
+          <div
+            class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5 px-2 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-4"
+          >
+            <div
+              class="flex min-w-0 flex-1 flex-col gap-2 md:flex-row md:flex-wrap md:items-center"
+            >
+              @for (chip of chipWidths; track $index) {
+                <div
+                  class="h-7 rounded-full bg-white/10"
+                  [style.width.px]="chip"
+                ></div>
+              }
+              <div class="h-4 w-36 rounded-full bg-white/10"></div>
+            </div>
+            <div class="h-4 w-14 shrink-0 rounded-full bg-white/10"></div>
+          </div>
         } @else {
           <div
             class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-4"
@@ -79,7 +96,8 @@ export class ListSkeletonComponent {
       case 'project':
         return [88, 120, 100];
       case 'assignment':
-        return [110, 100, 88, 64];
+        // project, employee, role, status (+ separate date bar in template)
+        return [120, 110, 96, 72];
       default:
         return [80, 96, 112];
     }

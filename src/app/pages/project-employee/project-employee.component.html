@@ -12,25 +12,20 @@
     <button
       listShellActions
       type="button"
-      ubButton
-      size="sm"
-      variant="outline"
-      class="eh-btn-icon border-white/20 bg-white/5 text-white/80 hover:border-white/40 hover:text-white"
+      class="eh-action-btn eh-action-btn-outline"
       (click)="closeCreatePanel()"
     >
-      <lucide-icon name="x" [size]="16"></lucide-icon>
+      <lucide-icon name="x" [size]="14"></lucide-icon>
       <span>Close Form</span>
     </button>
   } @else {
     <button
       listShellActions
       type="button"
-      ubButton
-      size="sm"
-      class="eh-btn-icon bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+      class="eh-action-btn eh-action-btn-primary"
       (click)="startCreate()"
     >
-      <lucide-icon name="plus" [size]="16"></lucide-icon>
+      <lucide-icon name="plus" [size]="14"></lucide-icon>
       <span>Add Assignment</span>
     </button>
   }
@@ -235,26 +230,51 @@
           Enter a value between 0 and 200.
         </p>
       </div>
-      <div class="flex items-center gap-3">
-        <app-field-label text="Active" icon="circle-check"></app-field-label>
+      <div class="flex min-h-[2.75rem] items-center gap-3">
+        <span
+          class="inline-flex items-center gap-1.5 text-xs font-medium sm:text-sm"
+          [class.text-emerald-200]="projectEmployeeForm.value.isActive"
+          [class.text-slate-200]="!projectEmployeeForm.value.isActive"
+        >
+          <lucide-icon
+            [name]="
+              projectEmployeeForm.value.isActive
+                ? 'check-circle'
+                : 'pause-circle'
+            "
+            [size]="14"
+            class="shrink-0"
+            [class.text-emerald-300]="projectEmployeeForm.value.isActive"
+            [class.text-slate-300]="!projectEmployeeForm.value.isActive"
+          ></lucide-icon>
+          Active
+        </span>
         <button
           type="button"
-          class="relative inline-flex h-9 w-16 items-center rounded-full border border-white/15 bg-white/10 px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          role="switch"
+          [attr.aria-checked]="!!projectEmployeeForm.value.isActive"
+          class="relative inline-flex h-9 w-16 items-center rounded-full border px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
           (click)="
             projectEmployeeForm.patchValue({
               isActive: !projectEmployeeForm.value.isActive,
             })
           "
-          [ngClass]="{
-            'bg-emerald-500/30': projectEmployeeForm.value.isActive,
-          }"
+          [ngClass]="
+            projectEmployeeForm.value.isActive
+              ? 'border-emerald-400/50 bg-emerald-500/40'
+              : 'border-slate-400/40 bg-slate-500/35'
+          "
         >
           <span
-            class="h-7 w-7 rounded-full bg-white/80 transition"
+            class="h-7 w-7 rounded-full bg-white/90 shadow transition"
             [class.translate-x-7]="projectEmployeeForm.value.isActive"
           ></span>
         </button>
-        <span class="text-xs sm:text-sm text-white/70">
+        <span
+          class="text-xs sm:text-sm"
+          [class.text-emerald-200/80]="projectEmployeeForm.value.isActive"
+          [class.text-slate-300/80]="!projectEmployeeForm.value.isActive"
+        >
           {{
             projectEmployeeForm.value.isActive
               ? "Active assignment"
@@ -277,18 +297,21 @@
           class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white resize-none"
         ></textarea>
       </div>
-      <div class="md:col-span-2 flex justify-end gap-3 pt-4">
+      <div class="md:col-span-2 flex justify-end gap-3">
         <button
           type="submit"
-          ubButton
-          size="sm"
           [disabled]="isSaving"
-          class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+          class="eh-action-btn eh-action-btn-primary"
         >
           @if (!isSaving) {
-            <lucide-icon name="save" [size]="16"></lucide-icon>
+            <lucide-icon name="save" [size]="14"></lucide-icon>
             <span>Save Assignment</span>
           } @else {
+            <lucide-icon
+              name="loader-circle"
+              [size]="14"
+              class="animate-spin"
+            ></lucide-icon>
             <span>Saving Assignment...</span>
           }
         </button>
@@ -462,29 +485,51 @@
                 Enter a value between 0 and 200.
               </p>
             </div>
-            <div class="flex items-center gap-3">
-              <app-field-label
-                text="Active"
-                icon="circle-check"
-              ></app-field-label>
+            <div class="flex min-h-[2.75rem] items-center gap-3">
+              <span
+                class="inline-flex items-center gap-1.5 text-xs font-medium sm:text-sm"
+                [class.text-emerald-200]="projectEmployeeForm.value.isActive"
+                [class.text-slate-200]="!projectEmployeeForm.value.isActive"
+              >
+                <lucide-icon
+                  [name]="
+                    projectEmployeeForm.value.isActive
+                      ? 'check-circle'
+                      : 'pause-circle'
+                  "
+                  [size]="14"
+                  class="shrink-0"
+                  [class.text-emerald-300]="projectEmployeeForm.value.isActive"
+                  [class.text-slate-300]="!projectEmployeeForm.value.isActive"
+                ></lucide-icon>
+                Active
+              </span>
               <button
                 type="button"
-                class="relative inline-flex h-9 w-16 items-center rounded-full border border-white/15 bg-white/10 px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                role="switch"
+                [attr.aria-checked]="!!projectEmployeeForm.value.isActive"
+                class="relative inline-flex h-9 w-16 items-center rounded-full border px-1 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 (click)="
                   projectEmployeeForm.patchValue({
                     isActive: !projectEmployeeForm.value.isActive,
                   })
                 "
-                [ngClass]="{
-                  'bg-emerald-500/30': projectEmployeeForm.value.isActive,
-                }"
+                [ngClass]="
+                  projectEmployeeForm.value.isActive
+                    ? 'border-emerald-400/50 bg-emerald-500/40'
+                    : 'border-slate-400/40 bg-slate-500/35'
+                "
               >
                 <span
-                  class="h-7 w-7 rounded-full bg-white/80 transition"
+                  class="h-7 w-7 rounded-full bg-white/90 shadow transition"
                   [class.translate-x-7]="projectEmployeeForm.value.isActive"
                 ></span>
               </button>
-              <span class="text-xs sm:text-sm text-white/70">
+              <span
+                class="text-xs sm:text-sm"
+                [class.text-emerald-200/80]="projectEmployeeForm.value.isActive"
+                [class.text-slate-300/80]="!projectEmployeeForm.value.isActive"
+              >
                 {{
                   projectEmployeeForm.value.isActive
                     ? "Active assignment"
@@ -507,27 +552,31 @@
                 class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white resize-none"
               ></textarea>
             </div>
-            <div class="md:col-span-2 flex justify-end gap-3 pt-4">
+            <div class="md:col-span-2 flex justify-end gap-3">
               <button
                 type="button"
                 [disabled]="isSaving"
-                class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                class="eh-action-btn eh-action-btn-outline"
                 (click)="cancelEdit()"
               >
-                Cancel
+                <lucide-icon name="x" [size]="14"></lucide-icon>
+                <span>Cancel</span>
               </button>
               <button
                 type="submit"
-                ubButton
-                size="sm"
                 [disabled]="isSaving"
-                class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)] disabled:opacity-50 disabled:cursor-not-allowed"
+                class="eh-action-btn eh-action-btn-primary"
               >
                 @if (!isSaving) {
-                  <lucide-icon name="save" [size]="16"></lucide-icon>
+                  <lucide-icon name="save" [size]="14"></lucide-icon>
                   <span>Save Changes</span>
                 } @else {
-                  <span>Updating...</span>
+                  <lucide-icon
+                    name="loader-circle"
+                    [size]="14"
+                    class="animate-spin"
+                  ></lucide-icon>
+                  <span>Saving...</span>
                 }
               </button>
             </div>
@@ -538,7 +587,10 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs sm:text-sm text-white/45">Assigned Role</p>
+              <app-field-label
+                text="Assigned Role"
+                icon="briefcase"
+              ></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ item.role }}
               </p>
@@ -546,7 +598,10 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs sm:text-sm text-white/45">Assigned on</p>
+              <app-field-label
+                text="Assigned on"
+                icon="calendar"
+              ></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ formattedDate(item.assignedDate) }}
               </p>
@@ -554,7 +609,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs sm:text-sm text-white/45">Employee ID</p>
+              <app-field-label text="Employee ID" icon="user"></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ item.empId }} · {{ employeeNameFor(item.empId) || "—" }}
               </p>
@@ -562,7 +617,10 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs sm:text-sm text-white/45">Project ID</p>
+              <app-field-label
+                text="Project ID"
+                icon="folder-kanban"
+              ></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ item.projectId }} ·
                 {{ projectNameFor(item.projectId) || "—" }}
@@ -571,7 +629,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs sm:text-sm text-white/45">Allocation</p>
+              <app-field-label text="Allocation" icon="hash"></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ item.allocationPct ?? 0 }}%
               </p>
@@ -579,7 +637,10 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs sm:text-sm text-white/45">Unassigned</p>
+              <app-field-label
+                text="Unassigned"
+                icon="calendar"
+              ></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ formattedDate(item.unassignedAt) }}
               </p>
@@ -587,7 +648,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs sm:text-sm text-white/45">Created</p>
+              <app-field-label text="Created" icon="calendar"></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ formattedDate(item.createdAt) }}
               </p>
@@ -595,7 +656,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs sm:text-sm text-white/45">Updated</p>
+              <app-field-label text="Updated" icon="calendar"></app-field-label>
               <p class="text-base font-medium text-white">
                 {{ formattedDate(item.updatedAt) }}
               </p>
@@ -604,7 +665,7 @@
               *ngIf="item.notes && item.notes.trim()"
               class="sm:col-span-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs sm:text-sm text-white/45">Notes</p>
+              <app-field-label text="Notes" icon="file-text"></app-field-label>
               <p
                 class="mt-2 text-sm leading-relaxed text-white/80 whitespace-pre-wrap"
               >
@@ -617,15 +678,15 @@
               ></app-card-close-button>
               <button
                 type="button"
+                class="eh-action-btn eh-action-btn-outline"
                 (click)="onEdit(item)"
-                class="eh-btn-icon rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
               >
                 <lucide-icon name="pencil" [size]="14"></lucide-icon>
                 <span>Edit</span>
               </button>
               <button
                 type="button"
-                class="eh-btn-icon rounded-xl border border-rose-400/40 bg-rose-500/10 px-4 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20 hover:text-rose-100"
+                class="eh-action-btn eh-action-btn-danger"
                 (click)="onDelete(item.empProjectId)"
               >
                 <lucide-icon name="trash-2" [size]="14"></lucide-icon>

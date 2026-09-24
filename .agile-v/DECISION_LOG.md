@@ -208,3 +208,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | Pagination/filter edge cases make expand deep-links awkward; Projects already has a heavy detail page; accordion fits scan/edit for people and assignments. |
 | Linked | GATE-0017, CP-0019 |
 | Status | DEFERRED |
+
+---
+
+## DEC-0025 — Project Team UX polish mirrors Employees
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-24 |
+| Decision | Align Project Team with Employees patterns: assignment skeleton, view field-label icons, save spinner, `eh-action-btn*`, state-colored Active toggle, flush date picker; keep accordion (no detail routes). |
+| Rationale | User soak screenshots; Employees already established the shared action/label/skeleton conventions. |
+| Linked | GATE-0017, CP-0019, DEC-0024 |
+| Status | DONE |

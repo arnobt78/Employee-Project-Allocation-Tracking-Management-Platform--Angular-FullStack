@@ -1,5 +1,40 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-24 — Project Team UX polish (match Employees)
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npm run build` | **PASS** | Bundle budget warning; Sentry maps |
+| Independent verifier | **PASS WITH WARNINGS** | Non-blocking docs stale / optional a11y label |
+| Security review | **PASS** | UI-only; no auth/API/XSS findings |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Assignment list-skeleton chip-row mirror | Done |
+| View mode `app-field-label` + icons | Done |
+| `eh-native-date` indicator flush right | Done |
+| Save spinner + `eh-action-btn*` (header/forms/view) | Done |
+| Active toggle centered + emerald/slate state colors | Done |
+| Removed create/edit footer `pt-4` | Done |
+
+### Remaining
+
+- CP-0019 further prod soak (Projects page next candidate)
+- Deep-link `?expand=` and employee/assignment detail routes deferred
+
+### eval_gate_status
+
+N/A (UX polish)
+
+---
+
 ## Session 2026-09-24 — Secondary text scale (`text-xs` → `text-xs sm:text-sm`)
 
 **Node:** v24.x

@@ -18,7 +18,6 @@ import { IProjectEmployee, IProject } from '../../model/interface/master';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Employee } from '../../model/class/Employee';
 import { ToastService } from '@/app/components/ui/toast.service';
-import { UbButtonDirective } from '@/app/components/ui/button';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import {
   SelectMenuComponent,
@@ -50,7 +49,6 @@ import {
     AppIconComponent,
     CommonModule,
     ReactiveFormsModule,
-    UbButtonDirective,
     SelectMenuComponent,
     AlertDialogComponent,
     CardCloseButtonComponent,
