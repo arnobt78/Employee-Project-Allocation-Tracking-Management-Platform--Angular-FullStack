@@ -48,6 +48,34 @@ import { ListPageRowVariant } from '@/app/constants/private-page-meta';
             </div>
             <div class="h-4 w-14 shrink-0 rounded-full bg-white/10"></div>
           </div>
+        } @else if (rowVariant === 'project') {
+          <div
+            class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4"
+          >
+            <div class="min-w-0 flex-1 space-y-2">
+              <div
+                class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+              >
+                <div class="h-4 w-44 max-w-[60%] rounded-full bg-white/10"></div>
+                <div class="flex w-full max-w-[11rem] items-center gap-2">
+                  <div class="h-3 w-8 shrink-0 rounded-full bg-white/10"></div>
+                  <div class="h-2 flex-1 rounded-full bg-white/10"></div>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                @for (chip of chipWidths; track $index) {
+                  <div
+                    class="h-7 rounded-full bg-white/10"
+                    [style.width.px]="chip"
+                  ></div>
+                }
+              </div>
+            </div>
+            <div class="flex shrink-0 items-center gap-2">
+              <div class="h-8 w-20 rounded-xl bg-white/10"></div>
+              <div class="h-8 w-16 rounded-xl bg-white/10"></div>
+            </div>
+          </div>
         } @else {
           <div
             class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-4"

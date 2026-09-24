@@ -1,5 +1,13 @@
 # Changelog — Agile V project memory
 
+## 2026-09-25 — Projects page UX polish
+
+- Dedicated `project` list-skeleton (title + readiness stub + chips + Details/Delete)
+- Title-cased status badges/filters; checklist chips `titlecase` + `Pts`
+- Add/Details/Delete + form section/footer Save/Cancel → `eh-action-btn*` (spinners kept)
+- Inline readiness %/bar; expand panel for secondary facts; Details → `/update-project/:id`
+- verify-deep PASS WITH WARNINGS; lint/tsc/build PASS
+
 ## 2026-09-24 — Employees UX: labels, scroll, sticky nav, save spinner
 
 - `app-field-label` `aboveControl` → `mb-1.5` only above form controls (view mode flush)

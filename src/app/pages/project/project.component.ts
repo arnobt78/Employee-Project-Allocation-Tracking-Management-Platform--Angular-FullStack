@@ -11,12 +11,12 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IProject } from '../../model/interface/master';
 import { MasterService } from '../../service/master.service';
 import { ToastService } from '@/app/components/ui/toast.service';
-import { UbButtonDirective } from '@/app/components/ui/button';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
 import { ListPaginationComponent } from '@/app/components/ui/list-pagination.component';
 import { ListPageShellComponent } from '@/app/components/ui/list-page-shell.component';
 import { KpiStatCardComponent } from '@/app/components/ui/kpi-stat-card.component';
+import { FieldLabelComponent } from '@/app/components/ui/field-label.component';
 import {
   ListToolbarComponent,
   ListToolbarMenuFilter,
@@ -48,12 +48,12 @@ const ON_HOLD_STATUSES = new Set(['on_hold', 'on hold', 'paused', 'hold']);
   imports: [
     AppIconComponent,
     CommonModule,
-    UbButtonDirective,
     RouterLink,
     AlertDialogComponent,
     ListPaginationComponent,
     ListPageShellComponent,
     KpiStatCardComponent,
+    FieldLabelComponent,
     ListToolbarComponent,
   ],
   providers: [DatePipe],
@@ -80,6 +80,8 @@ export class ProjectComponent implements OnInit {
   readonly listPage = signal(1);
   readonly isLoading = signal(this.initialPeek === null);
   readonly hasLoaded = signal(this.initialPeek !== null);
+
+  expandedProjectId: number | null = null;
 
   readonly filteredProjects = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
@@ -224,6 +226,26 @@ export class ProjectComponent implements OnInit {
     void this.router.navigateByUrl('/new-project');
   }
 
+  toggleExpand(projectId: number | null | undefined) {
+    const target = projectId ?? null;
+    this.expandedProjectId =
+      this.expandedProjectId === target ? null : target;
+  }
+
+  readinessPercent(project: IProject): number {
+    const raw =
+      project.readinessScore ?? project.readinessChecklist?.percent ?? 0;
+    const n = typeof raw === 'number' ? raw : Number(raw);
+    if (!Number.isFinite(n)) {
+      return 0;
+    }
+    return Math.max(0, Math.min(100, Math.round(n)));
+  }
+
+  projectSummary(project: IProject): string {
+    return (project.overview?.summary ?? '').trim();
+  }
+
   onDelete(id: number) {
     const project = this.projects().find((p) => p.projectId === id);
     if (!project) return;
@@ -243,6 +265,9 @@ export class ProjectComponent implements OnInit {
         );
         this.isDeleting = false;
         this.pendingDelete = null;
+        if (this.expandedProjectId === projectId) {
+          this.expandedProjectId = null;
+        }
         this.toast.success({
           title: 'Project deleted',
           description: `${projectName} has been removed.`,
@@ -310,7 +335,7 @@ export class ProjectComponent implements OnInit {
     if (!raw) {
       return 'Unknown';
     }
-    return raw.replace(/_/g, ' ');
+    return this.formatStatusLabel(raw);
   }
 
   statusIcon(status: string | undefined): string {
@@ -351,6 +376,16 @@ export class ProjectComponent implements OnInit {
     return 'border-sky-400/30 bg-sky-500/10 text-sky-200';
   }
 
+  private formatStatusLabel(status: string): string {
+    return status.replace(/_/g, ' ').trim();
+  }
+
+  private toTitleCase(value: string): string {
+    return this.formatStatusLabel(value)
+      .toLowerCase()
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
   private normalizedStatus(project: IProject): string {
     return (project.status || project.approvalStatus || '').trim().toLowerCase();
   }
@@ -370,7 +405,7 @@ export class ProjectComponent implements OnInit {
       seen.add(key);
       options.push({
         value: raw,
-        label: raw.replace(/_/g, ' '),
+        label: this.toTitleCase(raw),
         icon: this.statusIcon(raw),
       });
     }

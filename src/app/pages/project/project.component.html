@@ -11,12 +11,10 @@
   <button
     listShellActions
     type="button"
-    ubButton
-    size="sm"
-    class="eh-btn-icon bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+    class="eh-action-btn eh-action-btn-primary"
     (click)="startCreate()"
   >
-    <lucide-icon name="folder-kanban" [size]="16"></lucide-icon>
+    <lucide-icon name="folder-kanban" [size]="14"></lucide-icon>
     <span>Add Project</span>
   </button>
 
@@ -89,24 +87,51 @@
   </app-list-toolbar>
 
   <section class="space-y-4">
-      <div
-        *ngFor="let project of pagedProjects().items"
-        class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5/75 px-3 py-3 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition hover:border-white/20 sm:flex-row sm:items-center sm:justify-between sm:px-4"
+    <div
+      *ngFor="let project of pagedProjects().items"
+      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition hover:border-white/20"
+    >
+      <button
+        type="button"
+        class="flex w-full flex-col gap-3 px-3 py-3 text-left transition hover:bg-white/5 sm:flex-row sm:items-center sm:justify-between sm:px-4"
+        (click)="toggleExpand(project.projectId)"
       >
-        <div class="min-w-0 flex-1">
-          <p class="text-base font-medium text-white">
-            {{ project.projectName }}
-          </p>
-          <div class="mt-2 flex flex-wrap items-center gap-2">
+        <div class="min-w-0 flex-1 space-y-2">
+          <div
+            class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+          >
+            <p class="truncate text-base font-medium text-white">
+              {{ project.projectName }}
+            </p>
+            <div
+              class="flex w-full max-w-[12rem] shrink-0 items-center gap-2 sm:max-w-[14rem]"
+              (click)="$event.stopPropagation()"
+            >
+              <span
+                class="shrink-0 text-xs font-medium text-white/70 sm:text-sm"
+              >
+                {{ readinessPercent(project) }}%
+              </span>
+              <div class="h-2 min-w-0 flex-1 rounded-full bg-white/10">
+                <div
+                  class="h-2 rounded-full bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 transition-all duration-300"
+                  [style.width.%]="readinessPercent(project)"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
             <span
-              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs sm:text-sm"
-              [ngClass]="statusBadgeClasses(project.status || project.approvalStatus)"
+              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs capitalize sm:text-sm"
+              [ngClass]="
+                statusBadgeClasses(project.status || project.approvalStatus)
+              "
             >
               <lucide-icon
                 [name]="statusIcon(project.status || project.approvalStatus)"
                 [size]="12"
               ></lucide-icon>
-              {{ displayStatus(project) }}
+              {{ displayStatus(project) | titlecase }}
             </span>
             <span
               *ngIf="project.clientName"
@@ -123,34 +148,137 @@
             </span>
           </div>
         </div>
-        <div class="flex shrink-0 items-center gap-2">
-          <a
-            ubButton
-            size="sm"
-            variant="outline"
-            class="eh-btn-icon border-white/20 bg-white/5 text-white/80 hover:border-white/40 hover:text-white"
-            [routerLink]="['/update-project', project.projectId || 0]"
+        <span
+          class="shrink-0 text-xs sm:text-sm text-white/40 transition"
+          [class.text-white]="expandedProjectId === project.projectId"
+        >
+          {{ expandedProjectId === project.projectId ? "Hide" : "More" }}
+        </span>
+      </button>
+
+      <div
+        *ngIf="expandedProjectId === project.projectId"
+        class="border-t border-white/10 px-3 py-3 text-sm text-white/75 sm:px-4 sm:py-4"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
           >
-            <lucide-icon name="panel-right" [size]="14"></lucide-icon>
-            <span>Details</span>
-          </a>
-          <button
-            type="button"
-            class="eh-btn-icon inline-flex items-center gap-1 rounded-xl border border-rose-400/40 bg-rose-500/10 px-3 py-2 text-xs text-rose-200 transition hover:border-rose-300/60 hover:bg-rose-500/20"
-            (click)="onDelete(project.projectId)"
+            <app-field-label text="Lead" icon="user"></app-field-label>
+            <p class="text-base font-medium text-white">
+              {{ project.employeeName || "—" }}
+            </p>
+          </div>
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
           >
-            <lucide-icon name="trash-2" [size]="14"></lucide-icon>
-            <span>Delete</span>
-          </button>
+            <app-field-label
+              text="Contact"
+              icon="contact"
+            ></app-field-label>
+            <p class="text-base font-medium text-white">
+              {{ project.contactPerson || "—" }}
+            </p>
+          </div>
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
+          >
+            <app-field-label text="Email" icon="mail"></app-field-label>
+            <p class="truncate text-base font-medium text-white">
+              {{ project.emailId || "—" }}
+            </p>
+          </div>
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
+          >
+            <app-field-label text="Phone" icon="phone"></app-field-label>
+            <p class="text-base font-medium text-white">
+              {{ project.contactNo || "—" }}
+            </p>
+          </div>
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
+          >
+            <app-field-label
+              text="Readiness"
+              icon="activity"
+            ></app-field-label>
+            <p class="text-base font-medium text-white">
+              {{ readinessPercent(project) }}%
+            </p>
+          </div>
+          <div
+            class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
+          >
+            <app-field-label text="Health" icon="activity"></app-field-label>
+            <p class="text-base font-medium capitalize text-white">
+              {{ (project.health || "—") | titlecase }}
+            </p>
+          </div>
+          <div
+            *ngIf="projectSummary(project)"
+            class="sm:col-span-2 rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
+          >
+            <app-field-label
+              text="Summary"
+              icon="file-text"
+            ></app-field-label>
+            <p
+              class="mt-1 line-clamp-3 text-sm leading-relaxed text-white/80"
+            >
+              {{ projectSummary(project) }}
+            </p>
+          </div>
+          <div class="sm:col-span-2 flex flex-wrap justify-end gap-3">
+            <a
+              class="eh-action-btn eh-action-btn-outline"
+              [routerLink]="['/update-project', project.projectId || 0]"
+            >
+              <lucide-icon name="panel-right" [size]="14"></lucide-icon>
+              <span>Details</span>
+            </a>
+            <button
+              type="button"
+              class="eh-action-btn eh-action-btn-danger"
+              (click)="onDelete(project.projectId)"
+            >
+              <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+              <span>Delete</span>
+            </button>
+          </div>
         </div>
       </div>
 
       <div
-        *ngIf="hasLoaded() && !filteredProjects().length"
-        class="rounded-[28px] border border-dashed border-white/15 bg-white/5/60 px-2 py-12 text-center text-sm text-white/60 sm:px-4"
+        *ngIf="expandedProjectId !== project.projectId"
+        class="flex flex-wrap items-center justify-end gap-2 border-t border-white/10 px-3 py-2 sm:px-4"
       >
-        No projects match your filters.
+        <a
+          class="eh-action-btn eh-action-btn-outline"
+          [routerLink]="['/update-project', project.projectId || 0]"
+          (click)="$event.stopPropagation()"
+        >
+          <lucide-icon name="panel-right" [size]="14"></lucide-icon>
+          <span>Details</span>
+        </a>
+        <button
+          type="button"
+          class="eh-action-btn eh-action-btn-danger"
+          (click)="onDelete(project.projectId); $event.stopPropagation()"
+        >
+          <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+          <span>Delete</span>
+        </button>
       </div>
+    </div>
+
+    <div
+      *ngIf="hasLoaded() && !filteredProjects().length"
+      class="rounded-[28px] border border-dashed border-white/15 bg-white/5/60 px-2 py-12 text-center text-sm text-white/60 sm:px-4"
+    >
+      No projects match your filters.
+    </div>
   </section>
 </app-list-page-shell>
 
@@ -159,11 +287,10 @@
   [title]="
     pendingDelete
       ? 'Delete ' + pendingDelete.projectName + '?'
-      : 'Delete project?'
+      : 'Delete Project?'
   "
-  description="This removes the project from the workspace. This action cannot be undone."
-  confirmLabel="Delete project"
-  cancelLabel="Cancel"
+  description="This permanently removes the project and its assignments."
+  confirmLabel="Delete Project"
   variant="destructive"
   [busy]="isDeleting"
   busyLabel="Deleting..."

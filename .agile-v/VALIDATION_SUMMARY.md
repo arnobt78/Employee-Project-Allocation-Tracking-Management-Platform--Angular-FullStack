@@ -1,5 +1,39 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-25 — Projects page UX polish
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npx tsc -p tsconfig.app.json --noEmit` | **PASS** | |
+| `npm run build` | **PASS** | Bundle budget warning; Sentry maps |
+| Independent verifier | **PASS WITH WARNINGS** | Cosmetic skeleton vs live footer drift accepted |
+| Security review | **not required** | UI-only polish |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Dedicated `project` list-skeleton (title/readiness/chips/actions) | Done |
+| Title-cased status badges, filter labels, checklist `Pts` chips | Done |
+| List Add/Details/Delete + form Save/Cancel → `eh-action-btn*` | Done |
+| Inline readiness %/bar; expand secondary facts; Details route kept | Done |
+
+### Remaining
+
+- CP-0019 further prod soak
+- Deep-link / detail routes deferred
+
+### eval_gate_status
+
+N/A (UX polish)
+
+---
+
 ## Session 2026-09-24 — Project Team Add/Edit smooth scroll
 
 **Node:** v24.x

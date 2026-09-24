@@ -112,13 +112,14 @@
 | TASK-0044 | Login soak polish: center pair, SelectMenu gap/width, label spacing | REQ-0119 | DONE | `3445214` |
 | TASK-0045 | Employees soak polish: skeleton mirror, eh-action-btn*, view labels, ID→avatar | REQ-0119–0120, REQ-0126 | DONE | `4502209` |
 | TASK-0046 | Employees Cancel icon + `.eh-btn-icon` gap-1.5 | REQ-0119 | DONE | `6db459c` |
-| TASK-0047 | Field-label aboveControl; create/edit scroll; sticky nav host; save spinner | REQ-0119 | DONE | This commit |
+| TASK-0047 | Field-label aboveControl; create/edit scroll; sticky nav host; save spinner | REQ-0119 | DONE | Employees UX |
+| TASK-0048 | Projects list UX polish: skeleton, titlecase, eh-action-btn*, readiness+expand | REQ-0119–0120, REQ-0126 | DONE | This commit |
 
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)
 
-**Closed:** Soak findings implemented under GATE-0017. Further soak slices (login + Employees) shipped 2026-09-24; CP-0019 remains for more prod feedback.
+**Closed:** Soak findings implemented under GATE-0017. Further soak slices (login + Employees + Projects) shipped; CP-0019 remains for more prod feedback.
 
 ---
 

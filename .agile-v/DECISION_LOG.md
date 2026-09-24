@@ -220,3 +220,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | User soak screenshots; Employees already established the shared action/label/skeleton conventions. |
 | Linked | GATE-0017, CP-0019, DEC-0024 |
 | Status | DONE |
+
+---
+
+## DEC-0026 — Projects list UX polish; keep heavy detail route
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-25 |
+| Decision | Enrich Projects list with readiness bar, title-cased status, `eh-action-btn*`, and accordion expand for secondary facts; keep `/update-project/:id` as the heavy detail surface (no `?expand=`). |
+| Rationale | Match Employees/PE soak patterns while preserving the existing project-form detail route. |
+| Linked | GATE-0017, CP-0019, DEC-0024, TASK-0048 |
+| Status | DONE |
