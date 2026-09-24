@@ -371,42 +371,42 @@
           </span>
           <span
             *ngIf="employee.department"
-            class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70"
+            class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs sm:text-sm text-white/70"
           >
             <lucide-icon name="building-2" [size]="12"></lucide-icon>
             {{ employee.department }}
           </span>
           <span
             *ngIf="employee.role"
-            class="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200"
+            class="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs sm:text-sm text-emerald-200"
           >
             <lucide-icon name="briefcase" [size]="12"></lucide-icon>
             {{ employee.role }}
           </span>
           <span
             *ngIf="employee.title"
-            class="inline-flex items-center gap-1.5 rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-xs text-sky-200"
+            class="inline-flex items-center gap-1.5 rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-xs sm:text-sm text-sky-200"
           >
             <lucide-icon name="id-card" [size]="12"></lucide-icon>
             {{ employee.title }}
           </span>
           <span
             *ngIf="employee.employmentType"
-            class="inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-500/10 px-3 py-1 text-xs text-amber-100"
+            class="inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-500/10 px-3 py-1 text-xs sm:text-sm text-amber-100"
           >
             <lucide-icon name="clock" [size]="12"></lucide-icon>
             {{ employee.employmentType }}
           </span>
           <span
             *ngIf="employee.location"
-            class="inline-flex items-center gap-1.5 rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1 text-xs text-violet-100"
+            class="inline-flex items-center gap-1.5 rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1 text-xs sm:text-sm text-violet-100"
           >
             <lucide-icon name="map-pin" [size]="12"></lucide-icon>
             {{ employee.location }}
           </span>
           <span
             *ngIf="employee.hireDate || employee.createdAt"
-            class="inline-flex items-center gap-1.5 text-xs text-white/45"
+            class="inline-flex items-center gap-1.5 text-xs sm:text-sm text-white/45"
           >
             <lucide-icon name="calendar" [size]="12"></lucide-icon>
             Joined

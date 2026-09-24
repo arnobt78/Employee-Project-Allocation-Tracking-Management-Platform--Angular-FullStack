@@ -58,7 +58,7 @@
               <p class="break-words text-sm font-medium text-white">
                 {{ feature.title }}
               </p>
-              <p class="break-words text-xs text-white/65">
+              <p class="break-words text-xs sm:text-sm text-white/65">
                 {{ feature.description }}
               </p>
             </div>
@@ -109,7 +109,7 @@
                 (selectionChange)="onTestAccountSelect($event)"
               ></app-select-menu>
               <p
-                class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-amber-100/80"
+                class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:text-sm text-amber-100/80"
               >
                 <span>Demo credentials:</span>
                 <span class="inline-flex items-center gap-1 text-amber-50">
@@ -222,7 +222,7 @@
         </form>
 
         <p
-          class="login-feature-enter mt-4 text-center text-xs text-white/60"
+          class="login-feature-enter mt-4 text-center text-xs sm:text-sm text-white/60"
           style="--login-stagger: 5"
         >
           By continuing you agree to our

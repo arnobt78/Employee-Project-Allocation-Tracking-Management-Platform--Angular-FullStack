@@ -26,7 +26,7 @@
           Track capacity, surface delivery risk early, and keep every assignment
           visible to leadership — without leaving this command center.
         </p>
-        <div class="mt-4 flex flex-wrap gap-2 text-xs text-white/80">
+        <div class="mt-4 flex flex-wrap gap-2 text-xs sm:text-sm text-white/80">
           <span
             class="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm"
           >
@@ -211,7 +211,7 @@
               </p>
             </div>
             <span
-              class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/70"
+              class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs sm:text-sm font-medium text-white/70"
             >
               {{ dashboardData?.recentProjects?.length || 0 }} projects
             </span>
@@ -235,7 +235,7 @@
                       {{ item.projectName }}
                     </p>
                     <p
-                      class="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-xs text-white/45"
+                      class="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-xs sm:text-sm text-white/45"
                     >
                       <lucide-icon
                         name="calendar"
@@ -305,7 +305,7 @@
               </p>
             </div>
             <span
-              class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/70"
+              class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs sm:text-sm font-medium text-white/70"
             >
               {{ dashboardData?.recentEmployee?.length || 0 }} joined
             </span>
@@ -331,7 +331,7 @@
                   <span class="min-w-0">
                     <span class="block truncate">{{ item.employeeName }}</span>
                     <span
-                      class="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-xs font-normal text-white/45"
+                      class="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-xs sm:text-sm font-normal text-white/45"
                     >
                       <lucide-icon
                         name="contact"
@@ -393,7 +393,7 @@
             </p>
           </div>
           <span
-            class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/70"
+            class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs sm:text-sm font-medium text-white/70"
           >
             {{ parentDepartments.length }} employee departments
           </span>
@@ -439,7 +439,7 @@
               <p class="text-sm font-medium text-white">
                 {{ dept.departmentName }}
               </p>
-              <p class="text-xs leading-relaxed text-white/55">
+              <p class="text-xs sm:text-sm leading-relaxed text-white/55">
                 {{ departmentBlurb(dept) }}
               </p>
             </div>

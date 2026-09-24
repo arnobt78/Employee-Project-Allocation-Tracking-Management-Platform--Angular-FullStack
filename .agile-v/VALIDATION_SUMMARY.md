@@ -1,5 +1,38 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-24 — Secondary text scale (`text-xs` → `text-xs sm:text-sm`)
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npm run build` | **PASS** | Bundle budget warning; Sentry maps |
+| Independent verifier | **PASS WITH WARNINGS** | Non-blocking: one text-link action in project-form; docs synced at commit-ready |
+| Security review | **not required** | Tailwind class scale only |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Dashboard secondary meta, blurbs, count pills | Done |
+| Employee / Project / Project Team list pills | Done |
+| Login, Business Insights, project-form muted prose | Done |
+| Index badges / validation / bordered action chrome left `text-xs` | Done |
+
+### Remaining
+
+- CP-0019 further prod soak
+- Deep-link `?expand=` and employee/assignment detail routes deferred
+
+### eval_gate_status
+
+N/A (UX polish)
+
+---
+
 ## Session 2026-09-24 — Employees labels / scroll / sticky nav / save spinner
 
 **Node:** v24.x

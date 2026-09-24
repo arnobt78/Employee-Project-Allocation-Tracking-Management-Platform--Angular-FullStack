@@ -39,7 +39,7 @@
       class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
     >
       <div>
-        <label class="mb-2 block text-xs text-white/60"> Date Range </label>
+        <label class="mb-2 block text-xs sm:text-sm text-white/60"> Date Range </label>
         <app-select-menu
           formControlName="dateRange"
           [options]="dateRangeOptions"
@@ -49,7 +49,7 @@
         ></app-select-menu>
       </div>
       <div *ngIf="filterForm.get('dateRange')?.value === 'custom'">
-        <label class="mb-2 block text-xs text-white/60"> Start Date </label>
+        <label class="mb-2 block text-xs sm:text-sm text-white/60"> Start Date </label>
         <input
           type="date"
           formControlName="startDate"
@@ -58,7 +58,7 @@
         />
       </div>
       <div *ngIf="filterForm.get('dateRange')?.value === 'custom'">
-        <label class="mb-2 block text-xs text-white/60"> End Date </label>
+        <label class="mb-2 block text-xs sm:text-sm text-white/60"> End Date </label>
         <input
           type="date"
           formControlName="endDate"
@@ -67,7 +67,7 @@
         />
       </div>
       <div>
-        <label class="mb-2 block text-xs text-white/60"> Department </label>
+        <label class="mb-2 block text-xs sm:text-sm text-white/60"> Department </label>
         <app-select-menu
           formControlName="department"
           [options]="departmentOptions()"
@@ -199,47 +199,47 @@
       >
         <div class="flex flex-wrap gap-2 items-center">
           <span
-            class="inline-flex items-center rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs font-medium text-cyan-400 border border-cyan-500/30"
+            class="inline-flex items-center rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-cyan-400 border border-cyan-500/30"
             title="Non-archived projects (used for all calculations below)"
           >
             {{ insights()?.filteredProjectCount ?? 0 }} Non-Archived
           </span>
           <span
             *ngIf="(insights()?.archivedProjectCount ?? 0) > 0"
-            class="inline-flex items-center rounded-full bg-gray-500/20 px-2 py-0.5 text-xs font-medium text-gray-400 border border-gray-500/30"
+            class="inline-flex items-center rounded-full bg-gray-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-gray-400 border border-gray-500/30"
             title="Archived projects (excluded from calculations, display only)"
           >
             {{ insights()?.archivedProjectCount ?? 0 }} Archived
           </span>
           <span
-            class="inline-flex items-center rounded-full bg-green-500/20 px-2 py-0.5 text-xs font-medium text-green-400 border border-green-500/30"
+            class="inline-flex items-center rounded-full bg-green-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-green-400 border border-green-500/30"
             title="Projects with active assignments or leads"
           >
             {{ insights()?.activeProjectCount ?? 0 }} Active
           </span>
           <span
-            class="inline-flex items-center rounded-full bg-slate-500/20 px-2 py-0.5 text-xs font-medium text-slate-400 border border-slate-500/30"
+            class="inline-flex items-center rounded-full bg-slate-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-slate-400 border border-slate-500/30"
             title="Projects with no active assignments and no lead"
           >
             {{ insights()?.inactiveProjectCount ?? 0 }} Inactive
           </span>
           <span
             *ngIf="(insights()?.planningProjectCount ?? 0) > 0"
-            class="inline-flex items-center rounded-full bg-blue-500/20 px-2 py-0.5 text-xs font-medium text-blue-400 border border-blue-500/30"
+            class="inline-flex items-center rounded-full bg-blue-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-blue-400 border border-blue-500/30"
             title="Projects with lead but no active assignments (planning/startup phase)"
           >
             {{ insights()?.planningProjectCount ?? 0 }} Planning
           </span>
           <span
             *ngIf="(insights()?.assignedProjectCount ?? 0) > 0"
-            class="inline-flex items-center rounded-full bg-purple-500/20 px-2 py-0.5 text-xs font-medium text-purple-400 border border-purple-500/30"
+            class="inline-flex items-center rounded-full bg-purple-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-purple-400 border border-purple-500/30"
             title="Projects with active employee assignments"
           >
             {{ insights()?.assignedProjectCount ?? 0 }} Assigned
           </span>
           <span
             *ngIf="(insights()?.nonAssignedProjectCount ?? 0) > 0"
-            class="inline-flex items-center rounded-full bg-orange-500/20 px-2 py-0.5 text-xs font-medium text-orange-400 border border-orange-500/30"
+            class="inline-flex items-center rounded-full bg-orange-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-orange-400 border border-orange-500/30"
             title="Projects with no active employee assignments"
           >
             {{ insights()?.nonAssignedProjectCount ?? 0 }} Non-Assigned
@@ -374,7 +374,7 @@
                 <td class="py-3 text-white/80">{{ dept.projectCount }}</td>
                 <td class="py-3">
                   <span
-                    class="inline-flex rounded-full bg-primary/20 px-3 py-1 text-xs text-primary"
+                    class="inline-flex rounded-full bg-primary/20 px-3 py-1 text-xs sm:text-sm text-primary"
                   >
                     {{ dept.averageReadiness }}%
                   </span>
@@ -637,7 +637,7 @@
                   editing/input from frontend UI is not yet implemented
                 </li>
               </ul>
-              <p class="mt-2 text-xs text-white/50">
+              <p class="mt-2 text-xs sm:text-sm text-white/50">
                 Budget values are currently read-only and managed through the
                 database. Frontend editing capabilities will be added in a
                 future update.

@@ -254,7 +254,7 @@
             [class.translate-x-7]="projectEmployeeForm.value.isActive"
           ></span>
         </button>
-        <span class="text-xs text-white/70">
+        <span class="text-xs sm:text-sm text-white/70">
           {{
             projectEmployeeForm.value.isActive
               ? "Active assignment"
@@ -311,13 +311,13 @@
         >
           <span
             *ngIf="item.projectName"
-            class="inline-flex items-center gap-1.5 rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1 text-xs text-violet-100"
+            class="inline-flex items-center gap-1.5 rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1 text-xs sm:text-sm text-violet-100"
           >
             <lucide-icon name="folder-kanban" [size]="12"></lucide-icon>
             {{ item.projectName }}
           </span>
           <span
-            class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70"
+            class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs sm:text-sm text-white/70"
           >
             <app-user-avatar
               [seed]="employeeAvatarSeed(item)"
@@ -330,7 +330,7 @@
           </span>
           <span
             *ngIf="item.role"
-            class="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200"
+            class="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs sm:text-sm text-emerald-200"
           >
             <lucide-icon name="briefcase" [size]="12"></lucide-icon>
             {{ item.role }}
@@ -344,7 +344,7 @@
           </span>
           <span
             *ngIf="item.assignedDate"
-            class="inline-flex items-center gap-1.5 text-xs text-white/45"
+            class="inline-flex items-center gap-1.5 text-xs sm:text-sm text-white/45"
           >
             <lucide-icon name="calendar" [size]="12"></lucide-icon>
             Assigned {{ formattedDate(item.assignedDate) }}
@@ -484,7 +484,7 @@
                   [class.translate-x-7]="projectEmployeeForm.value.isActive"
                 ></span>
               </button>
-              <span class="text-xs text-white/70">
+              <span class="text-xs sm:text-sm text-white/70">
                 {{
                   projectEmployeeForm.value.isActive
                     ? "Active assignment"
@@ -538,7 +538,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Assigned Role</p>
+              <p class="text-xs sm:text-sm text-white/45">Assigned Role</p>
               <p class="text-base font-medium text-white">
                 {{ item.role }}
               </p>
@@ -546,7 +546,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Assigned on</p>
+              <p class="text-xs sm:text-sm text-white/45">Assigned on</p>
               <p class="text-base font-medium text-white">
                 {{ formattedDate(item.assignedDate) }}
               </p>
@@ -554,7 +554,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Employee ID</p>
+              <p class="text-xs sm:text-sm text-white/45">Employee ID</p>
               <p class="text-base font-medium text-white">
                 {{ item.empId }} · {{ employeeNameFor(item.empId) || "—" }}
               </p>
@@ -562,7 +562,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Project ID</p>
+              <p class="text-xs sm:text-sm text-white/45">Project ID</p>
               <p class="text-base font-medium text-white">
                 {{ item.projectId }} ·
                 {{ projectNameFor(item.projectId) || "—" }}
@@ -571,7 +571,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Allocation</p>
+              <p class="text-xs sm:text-sm text-white/45">Allocation</p>
               <p class="text-base font-medium text-white">
                 {{ item.allocationPct ?? 0 }}%
               </p>
@@ -579,7 +579,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Unassigned</p>
+              <p class="text-xs sm:text-sm text-white/45">Unassigned</p>
               <p class="text-base font-medium text-white">
                 {{ formattedDate(item.unassignedAt) }}
               </p>
@@ -587,7 +587,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Created</p>
+              <p class="text-xs sm:text-sm text-white/45">Created</p>
               <p class="text-base font-medium text-white">
                 {{ formattedDate(item.createdAt) }}
               </p>
@@ -595,7 +595,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Updated</p>
+              <p class="text-xs sm:text-sm text-white/45">Updated</p>
               <p class="text-base font-medium text-white">
                 {{ formattedDate(item.updatedAt) }}
               </p>
@@ -604,7 +604,7 @@
               *ngIf="item.notes && item.notes.trim()"
               class="sm:col-span-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Notes</p>
+              <p class="text-xs sm:text-sm text-white/45">Notes</p>
               <p
                 class="mt-2 text-sm leading-relaxed text-white/80 whitespace-pre-wrap"
               >

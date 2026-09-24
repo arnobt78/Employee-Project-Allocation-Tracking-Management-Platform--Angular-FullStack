@@ -70,7 +70,7 @@
           </p>
         </div>
         <div
-          class="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/65"
+          class="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-xs sm:text-sm text-white/65"
         >
           <span class="text-2xl font-medium text-white">
             {{ readinessProgress() }}%
@@ -99,17 +99,17 @@
                   {{ task.title }}
                 </span>
                 <span
-                  class="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-xs text-white/50"
+                  class="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-xs sm:text-sm text-white/50"
                 >
                   {{ task.category }}
                 </span>
                 <span
-                  class="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-xs text-white/45"
+                  class="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-xs sm:text-sm text-white/45"
                 >
                   {{ task.weight }} pts
                 </span>
               </div>
-              <p class="text-xs text-white/65">
+              <p class="text-xs sm:text-sm text-white/65">
                 {{ task.description }}
               </p>
             </div>
@@ -361,7 +361,7 @@
               <div
                 class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
-                <p class="text-xs text-white/45">Client</p>
+                <p class="text-xs sm:text-sm text-white/45">Client</p>
                 <p class="text-base font-medium text-white">
                   {{ displayValue("clientName") }}
                 </p>
@@ -369,7 +369,7 @@
               <div
                 class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
-                <p class="text-xs text-white/45">Kick-Off</p>
+                <p class="text-xs sm:text-sm text-white/45">Kick-Off</p>
                 <p class="text-base font-medium text-white">
                   {{ displayValue("startDate") }}
                 </p>
@@ -380,7 +380,7 @@
                 *ngIf="overview.summary"
                 class="mt-6 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
               >
-                <p class="text-xs text-white/45">Summary</p>
+                <p class="text-xs sm:text-sm text-white/45">Summary</p>
                 <p class="mt-2 text-sm text-white/80">
                   {{ overview.summary }}
                 </p>
@@ -389,7 +389,7 @@
                 *ngIf="overview.objectives.length"
                 class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
               >
-                <p class="text-xs text-white/45">Objectives</p>
+                <p class="text-xs sm:text-sm text-white/45">Objectives</p>
                 <ul
                   class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
                 >
@@ -402,7 +402,7 @@
                 *ngIf="overview.successCriteria.length"
                 class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
               >
-                <p class="text-xs text-white/45">Success Criteria</p>
+                <p class="text-xs sm:text-sm text-white/45">Success Criteria</p>
                 <ul
                   class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
                 >
@@ -418,14 +418,14 @@
                 "
                 class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
               >
-                <p class="text-xs text-white/45">Stakeholder Notes</p>
+                <p class="text-xs sm:text-sm text-white/45">Stakeholder Notes</p>
                 <p class="mt-2 text-sm text-white/80">
                   {{ overview.stakeholderNotes }}
                 </p>
               </div>
               <div
                 *ngIf="overview.aiDraftSource || overview.cmsEntryId"
-                class="mt-4 flex flex-wrap items-center gap-3 text-xs text-white/45"
+                class="mt-4 flex flex-wrap items-center gap-3 text-xs sm:text-sm text-white/45"
               >
                 <span *ngIf="overview.aiDraftSource">
                   Source:
@@ -458,7 +458,7 @@
               class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
             >
               <div>
-                <p class="text-xs text-white/45">Content Helper</p>
+                <p class="text-xs sm:text-sm text-white/45">Content Helper</p>
                 <p class="text-sm text-white/65">
                   Pull the latest brief from Contentful or let AI draft a first
                   pass for you.
@@ -620,7 +620,7 @@
                   <p class="text-sm font-medium text-white">
                     {{ brief.title || "Contentful entry" }}
                   </p>
-                  <p class="text-xs text-white/55" *ngIf="brief.entryId">
+                  <p class="text-xs sm:text-sm text-white/55" *ngIf="brief.entryId">
                     Entry ID: {{ brief.entryId }}
                   </p>
                 </div>
@@ -630,7 +630,7 @@
                   *ngIf="ov.summary"
                   class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                 >
-                  <p class="text-xs text-white/45">Summary</p>
+                  <p class="text-xs sm:text-sm text-white/45">Summary</p>
                   <p class="mt-2 text-sm text-white/80">
                     {{ ov.summary }}
                   </p>
@@ -639,7 +639,7 @@
                   *ngIf="ov.objectives.length"
                   class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                 >
-                  <p class="text-xs text-white/45">Objectives</p>
+                  <p class="text-xs sm:text-sm text-white/45">Objectives</p>
                   <ul
                     class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
                   >
@@ -652,7 +652,7 @@
                   *ngIf="ov.successCriteria.length"
                   class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                 >
-                  <p class="text-xs text-white/45">Success Criteria</p>
+                  <p class="text-xs sm:text-sm text-white/45">Success Criteria</p>
                   <ul
                     class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
                   >
@@ -665,7 +665,7 @@
                   *ngIf="ov.stakeholderNotes"
                   class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                 >
-                  <p class="text-xs text-white/45">Stakeholder Notes</p>
+                  <p class="text-xs sm:text-sm text-white/45">Stakeholder Notes</p>
                   <p class="mt-2 text-sm text-white/80">
                     {{ ov.stakeholderNotes }}
                   </p>
@@ -701,7 +701,7 @@
                 <p class="text-sm font-medium text-white">
                   AI draft · {{ ai.source | uppercase }}
                 </p>
-                <span class="text-xs text-white/50" *ngIf="ai.prompt">
+                <span class="text-xs sm:text-sm text-white/50" *ngIf="ai.prompt">
                   Prompt snapshot captured
                 </span>
               </div>
@@ -709,7 +709,7 @@
                 *ngIf="ai.overview.summary"
                 class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
-                <p class="text-xs text-white/45">Summary</p>
+                <p class="text-xs sm:text-sm text-white/45">Summary</p>
                 <p class="mt-2 text-sm text-white/80">
                   {{ ai.overview.summary }}
                 </p>
@@ -718,7 +718,7 @@
                 *ngIf="ai.overview.objectives.length"
                 class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
-                <p class="text-xs text-white/45">Objectives</p>
+                <p class="text-xs sm:text-sm text-white/45">Objectives</p>
                 <ul
                   class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
                 >
@@ -731,7 +731,7 @@
                 *ngIf="ai.overview.successCriteria.length"
                 class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
-                <p class="text-xs text-white/45">Success Criteria</p>
+                <p class="text-xs sm:text-sm text-white/45">Success Criteria</p>
                 <ul
                   class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
                 >
@@ -744,7 +744,7 @@
                 *ngIf="ai.overview.stakeholderNotes"
                 class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
-                <p class="text-xs text-white/45">Stakeholder Notes</p>
+                <p class="text-xs sm:text-sm text-white/45">Stakeholder Notes</p>
                 <p class="mt-2 text-sm text-white/80">
                   {{ ai.overview.stakeholderNotes }}
                 </p>
@@ -855,7 +855,7 @@
             <div
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
-              <p class="text-xs text-white/45">Project Lead</p>
+              <p class="text-xs sm:text-sm text-white/45">Project Lead</p>
               <p class="text-base font-medium text-white">
                 {{ displayValue("leadByEmpId") }}
               </p>
@@ -901,7 +901,7 @@
                       <p class="mt-2 text-2xl font-medium text-white">
                         {{ metrics.teamSize }}
                       </p>
-                      <p class="text-xs text-white/55">
+                      <p class="text-xs sm:text-sm text-white/55">
                         Contributors currently attached to this project.
                       </p>
                     </div>
@@ -914,7 +914,7 @@
                       <p class="mt-2 text-2xl font-medium text-white">
                         {{ metrics.benchCount }}
                       </p>
-                      <p class="text-xs text-white/55">
+                      <p class="text-xs sm:text-sm text-white/55">
                         Active employees currently free for allocation.
                       </p>
                     </div>
@@ -925,7 +925,7 @@
                       <p class="mt-2 text-2xl font-medium text-white">
                         {{ metrics.overbookedCount }}
                       </p>
-                      <p class="text-xs text-white/55">
+                      <p class="text-xs sm:text-sm text-white/55">
                         Teammates exceeding recommended capacity.
                       </p>
                     </div>
@@ -938,7 +938,7 @@
                       <p class="mt-2 text-2xl font-medium text-white">
                         {{ metrics.activeAssignmentCount }}
                       </p>
-                      <p class="text-xs text-white/55">
+                      <p class="text-xs sm:text-sm text-white/55">
                         Across all projects in flight.
                       </p>
                     </div>
@@ -951,7 +951,7 @@
                       <p class="mt-2 text-2xl font-medium text-white">
                         {{ formatPercent(metrics.averageAllocation) }}
                       </p>
-                      <p class="text-xs text-white/55">
+                      <p class="text-xs sm:text-sm text-white/55">
                         Mean utilization across the active workforce.
                       </p>
                     </div>
@@ -1004,7 +1004,7 @@
                       <p class="text-sm text-white">
                         {{ formatScore(lead.fitScore) }}
                       </p>
-                      <p class="text-xs text-white/55">
+                      <p class="text-xs sm:text-sm text-white/55">
                         {{
                           lead.fitNotes || "Derived from allocation and tenure."
                         }}
@@ -1030,7 +1030,7 @@
                                 "Project #" + assignment.projectId
                             }}
                           </p>
-                          <p class="text-xs text-white/55">
+                          <p class="text-xs sm:text-sm text-white/55">
                             {{ assignment.role || "Contributor" }}
                             <span
                               *ngIf="assignment.isCurrentProject"
@@ -1040,7 +1040,7 @@
                             </span>
                           </p>
                         </div>
-                        <span class="text-xs text-white/65">
+                        <span class="text-xs sm:text-sm text-white/65">
                           {{ formatPercent(assignment.allocationPct) }}
                         </span>
                       </li>
@@ -1077,7 +1077,7 @@
                           <p class="text-sm font-medium text-white">
                             {{ candidate.employeeName }}
                           </p>
-                          <p class="text-xs text-white/55">
+                          <p class="text-xs sm:text-sm text-white/55">
                             {{ candidate.role || "Lead" }}
                             <span *ngIf="candidate.department">
                               • {{ candidate.department }}
@@ -1174,7 +1174,7 @@
                           <p class="text-sm font-medium text-white">
                             {{ assignment.employee.employeeName }}
                           </p>
-                          <p class="text-xs text-white/55">
+                          <p class="text-xs sm:text-sm text-white/55">
                             {{
                               assignment.role ||
                                 assignment.employee.role ||
@@ -1259,14 +1259,14 @@
                           <p class="text-sm font-medium text-white">
                             {{ collaborator.employeeName }}
                           </p>
-                          <p class="text-xs text-white/55">
+                          <p class="text-xs sm:text-sm text-white/55">
                             {{ collaborator.role || "Contributor" }}
                             <span *ngIf="collaborator.department">
                               • {{ collaborator.department }}
                             </span>
                           </p>
                         </div>
-                        <span class="text-xs font-medium text-white/75">
+                        <span class="text-xs sm:text-sm font-medium text-white/75">
                           {{ formatScore(collaborator.fitScore) }}
                         </span>
                       </div>
@@ -1612,7 +1612,7 @@
                   {{ approvalStatusLabel(approvalStatus()) }}
                 </span>
               </div>
-              <div class="space-y-1 text-xs text-white/55">
+              <div class="space-y-1 text-xs sm:text-sm text-white/55">
                 <p *ngIf="currentProject()?.approvalRequestedAt">
                   Requested
                   {{ formatDateTime(currentProject()?.approvalRequestedAt) }}
@@ -1742,11 +1742,11 @@
                     <span class="text-sm font-medium text-white">
                       {{ approvalStatusLabel(entry.status) }}
                     </span>
-                    <span class="text-xs text-white/60">
+                    <span class="text-xs sm:text-sm text-white/60">
                       {{ formatDateTime(entry.changedAt) }}
                     </span>
                   </div>
-                  <p class="text-xs text-white/60">
+                  <p class="text-xs sm:text-sm text-white/60">
                     {{
                       actorDisplayName(
                         entry.changedBy ?? null,
@@ -1757,13 +1757,13 @@
                       • from {{ approvalStatusLabel(entry.previousStatus) }}
                     </ng-container>
                   </p>
-                  <p *ngIf="entry.comment" class="text-xs text-white/70">
+                  <p *ngIf="entry.comment" class="text-xs sm:text-sm text-white/70">
                     {{ entry.comment }}
                   </p>
                 </div>
               </ng-container>
               <ng-template #noHistory>
-                <p class="text-xs text-white/50">
+                <p class="text-xs sm:text-sm text-white/50">
                   No approval activity recorded yet.
                 </p>
               </ng-template>
@@ -1781,22 +1781,22 @@
                     <span class="text-sm font-medium text-white">
                       {{ entry.label }}
                     </span>
-                    <span class="text-xs text-white/60">
+                    <span class="text-xs sm:text-sm text-white/60">
                       {{ formatDateTime(entry.occurredAt) }}
                     </span>
                   </div>
-                  <p class="text-xs text-white/60">
+                  <p class="text-xs sm:text-sm text-white/60">
                     {{
                       actorDisplayName(entry.actorId ?? null, entry.actorName)
                     }}
                   </p>
-                  <p *ngIf="entry.description" class="text-xs text-white/70">
+                  <p *ngIf="entry.description" class="text-xs sm:text-sm text-white/70">
                     {{ entry.description }}
                   </p>
                 </div>
               </ng-container>
               <ng-template #noTimeline>
-                <p class="text-xs text-white/50">
+                <p class="text-xs sm:text-sm text-white/50">
                   No approval timeline entries yet.
                 </p>
               </ng-template>
@@ -1917,7 +1917,7 @@
                     </span>
                   </div>
                   <div
-                    class="flex flex-wrap items-center gap-2 text-xs text-white/60"
+                    class="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-white/60"
                   >
                     <span>{{ formatDateTime(comment.createdAt) }}</span>
                     <span>•</span>
@@ -1945,7 +1945,7 @@
                   </div>
                   <button
                     type="button"
-                    class="text-xs text-white/70 transition hover:text-white"
+                    class="text-xs sm:text-sm text-white/70 transition hover:text-white"
                     (click)="toggleReviewerCommentResolved(comment)"
                     [disabled]="reviewerCommentProcessing()"
                   >

@@ -196,3 +196,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | User screenshots + approved plans; keep CP-0019 open for further prod feedback. |
 | Linked | GATE-0017, CP-0019, TASK-0044–0045, REQ-0119–0120, REQ-0126–0127 |
 | Status | DONE — login `3445214`; Employees polish this commit |
+
+---
+
+## DEC-0024 — Defer list deep-links and employee/assignment detail routes
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-24 |
+| Decision | Leave Employees / Project Team as accordion lists; do not ship `?expand=<id>` deep-links or new detail routes now. Keep polishing GATE-0017 soak (secondary text-scale shipped). Revisit detail routes later only if shareable URLs are needed. |
+| Rationale | Pagination/filter edge cases make expand deep-links awkward; Projects already has a heavy detail page; accordion fits scan/edit for people and assignments. |
+| Linked | GATE-0017, CP-0019 |
+| Status | DEFERRED |

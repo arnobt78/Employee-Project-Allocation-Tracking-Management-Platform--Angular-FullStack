@@ -610,8 +610,8 @@ export class ProjectEmployeeComponent implements OnInit {
 
   statusBadge(isActive: string | boolean | null | undefined) {
     return this.isActive(isActive)
-      ? 'inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-xs font-medium text-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.25)]'
-      : 'inline-flex items-center gap-1.5 rounded-full border border-slate-400/40 bg-slate-500/15 px-3 py-1 text-xs font-medium text-slate-200';
+      ? 'inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-xs sm:text-sm font-medium text-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.25)]'
+      : 'inline-flex items-center gap-1.5 rounded-full border border-slate-400/40 bg-slate-500/15 px-3 py-1 text-xs sm:text-sm font-medium text-slate-200';
   }
 
   isActive(value: string | boolean | null | undefined): boolean {

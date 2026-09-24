@@ -99,7 +99,7 @@
           </p>
           <div class="mt-2 flex flex-wrap items-center gap-2">
             <span
-              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs"
+              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs sm:text-sm"
               [ngClass]="statusBadgeClasses(project.status || project.approvalStatus)"
             >
               <lucide-icon
@@ -110,13 +110,13 @@
             </span>
             <span
               *ngIf="project.clientName"
-              class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/70"
+              class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs sm:text-sm text-white/70"
             >
               <lucide-icon name="building-2" [size]="12"></lucide-icon>
               {{ project.clientName }}
             </span>
             <span
-              class="inline-flex items-center gap-1.5 text-xs text-white/50"
+              class="inline-flex items-center gap-1.5 text-xs sm:text-sm text-white/50"
             >
               <lucide-icon name="calendar" [size]="12"></lucide-icon>
               {{ dateRangeLabel(project) }}
