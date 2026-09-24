@@ -1,5 +1,37 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-24 — Project Team Add/Edit smooth scroll
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npm run build` | **PASS** | Bundle budget warning; Sentry maps |
+| Independent verifier | **PASS** | Mirrors Employees `scheduleScrollTo` pattern |
+| Security review | **not required** | Viewport scroll UX only |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| `#createPanel` + `scroll-mt-24` on Add form | Done |
+| `assignment-card-{id}` + `scroll-mt-24` on list cards | Done |
+| `scheduleScrollTo` on `startCreate` / `onEdit` | Done |
+
+### Remaining
+
+- CP-0019 further prod soak (Projects page next candidate)
+- Deep-link / detail routes deferred
+
+### eval_gate_status
+
+N/A (UX polish)
+
+---
+
 ## Session 2026-09-24 — Project Team UX polish (match Employees)
 
 **Node:** v24.x

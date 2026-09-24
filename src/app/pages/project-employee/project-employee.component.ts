@@ -1,7 +1,11 @@
 import {
+  afterNextRender,
   Component,
   DestroyRef,
+  ElementRef,
+  Injector,
   OnInit,
+  ViewChild,
   computed,
   inject,
   signal,
@@ -71,9 +75,12 @@ export class ProjectEmployeeComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
   private listQuery!: ListQueryController;
 
   readonly pageMeta = PRIVATE_PAGE_META['/project-employee'];
+
+  @ViewChild('createPanel') createPanel?: ElementRef<HTMLElement>;
 
   private readonly assignmentsSignal = signal<IProjectEmployee[]>([]);
   readonly assignments = this.assignmentsSignal.asReadonly();
@@ -354,6 +361,13 @@ export class ProjectEmployeeComponent implements OnInit {
       isActive: this.isActive(projectEmployee.isActive),
       notes: projectEmployee.notes || '',
     });
+
+    const assignmentId = projectEmployee.empProjectId;
+    if (assignmentId != null) {
+      this.scheduleScrollTo(() =>
+        document.getElementById(`assignment-card-${assignmentId}`),
+      );
+    }
   }
 
   onDelete(id: number) {
@@ -520,11 +534,24 @@ export class ProjectEmployeeComponent implements OnInit {
     this.editingAssignmentId = null;
     this.expandedAssignmentId = null;
     this.resetForm();
+    this.scheduleScrollTo(() => this.createPanel?.nativeElement ?? null);
   }
 
   closeCreatePanel() {
     this.isSaving = false;
     this.showCreatePanel = false;
+  }
+
+  /** Wait for *ngIf / form DOM, then smooth-scroll into view (sticky header via scroll-mt). */
+  private scheduleScrollTo(getEl: () => HTMLElement | null | undefined) {
+    afterNextRender(
+      () => {
+        requestAnimationFrame(() => {
+          getEl()?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      },
+      { injector: this.injector },
+    );
   }
 
   updateSearch(term: string) {

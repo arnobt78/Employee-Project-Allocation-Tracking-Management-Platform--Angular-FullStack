@@ -1,9 +1,9 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0017 soak; Project Team UX polish shipped  
+**Phase / Stage:** Stage 4 — GATE-0017 soak; Project Team Add/Edit smooth scroll shipped  
 **Gate:** GATE-0017 implement **COMPLETE** (prod soak continues); GATE-0001 **CLOSED**  
-**Status:** Project Team matched Employees polish (assignment skeleton, view labels, save spinner, Active toggle colors, `eh-action-btn*`, date indicator). Deep-link/detail routes still deferred. CP-0019 open.  
+**Status:** Project Team now mirrors Employees Add/Edit viewport scroll (`scheduleScrollTo` + `scroll-mt-24`). Prior PE UX polish remains. Deep-link/detail routes deferred. CP-0019 open.  
 **Updated:** 2026-09-24  
 **resume_token:** `c1-gate17-prod-ui-soak-2026-09-23`
 
@@ -11,7 +11,7 @@
 
 ## Resume Point
 
-**Last completed (code):** Project Team UX polish — assignment list-skeleton mirror; view `app-field-label` icons; `eh-native-date` flush; create/edit save spinner + `eh-action-btn*`; state-colored Active toggle; no footer `pt-4`. Lint + build PASS; verify-deep PASS WITH WARNINGS; security PASS.
+**Last completed (code):** Project Team Add/Edit smooth scroll — `#createPanel` / `assignment-card-{id}` + `scroll-mt-24`; `scheduleScrollTo` on `startCreate` / `onEdit`. Lint + build PASS; verify-deep PASS.
 
 **Next exact action:** Continue GATE-0017 soak (e.g. Projects page polish) per human plan. Do **not** implement `?expand=` or new employee/assignment detail routes unless approved.
 
@@ -20,7 +20,7 @@
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
 Resume GATE-0017 soak (resume_token c1-gate17-prod-ui-soak-2026-09-23).
-Project Team UX polish shipped; deep-link/detail deferred. Await next polish plan.
+Project Team UX + Add/Edit scroll shipped; deep-link/detail deferred. Await next polish plan.
 ```
 
 ---
