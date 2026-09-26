@@ -5,9 +5,9 @@
 Project Name: EmpowerHub — Employee & Project Management (employee-management)  
 Description: Angular 20 SPA + Vercel serverless API + Prisma/MongoDB for employees, projects, assignments, dashboards, calendar/Gantt, insights, API docs/status, email notifications, optional Contentful + AI drafting, Sentry tunnel.
 
-Current Status: Mobile nav merged into profile dropdown; list padding + Lead/Health shipped; GATE-0018 project-detail polish awaiting human guide; GATE-0001 closed 
+Current Status: Profile menu closes on NavigationEnd; mobile nav merge + list padding + Lead/Health shipped; GATE-0018 project-detail polish awaiting human guide; GATE-0001 closed 
 Current Agile V Cycle: C1 
-Current Gate: GATE-0018 AWAITING HUMAN INPUT (MOBILE NAV MERGE + LIST PADDING + LEAD/HEALTH SHIPPED; GATE-0001 CLOSED)
+Current Gate: GATE-0018 AWAITING HUMAN INPUT (PROFILE NAV CLOSE + MOBILE NAV MERGE SHIPPED; GATE-0001 CLOSED)
 
 ---
 

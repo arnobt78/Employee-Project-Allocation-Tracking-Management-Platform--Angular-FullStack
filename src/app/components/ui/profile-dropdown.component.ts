@@ -3,12 +3,15 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { CommonModule, Location } from '@angular/common';
 import {
   Component,
+  DestroyRef,
   ElementRef,
   ViewChild,
   inject,
   signal,
 } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { AuthService } from '@/app/service/auth.service';
 import { UserAvatarComponent } from './user-avatar.component';
 import {
@@ -131,6 +134,7 @@ export class ProfileDropdownComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly location = inject(Location);
+  private readonly destroyRef = inject(DestroyRef);
 
   @ViewChild('trigger', { static: true })
   trigger!: ElementRef<HTMLButtonElement>;
@@ -138,6 +142,15 @@ export class ProfileDropdownComponent {
   readonly isOpen = signal(false);
   private overlayRef: OverlayRef | null = null;
   private panelRef: ProfileDropdownPanelComponent | null = null;
+
+  constructor() {
+    this.router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => this.close());
+  }
 
   get session() {
     return this.authService.session();

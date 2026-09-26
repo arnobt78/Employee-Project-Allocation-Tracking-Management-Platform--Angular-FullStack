@@ -1,5 +1,36 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-27 — Profile dropdown close on NavigationEnd
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npx tsc -p tsconfig.app.json --noEmit` | **PASS** | |
+| `npm run build` | **PASS** | Bundle budget warning |
+| Browser smoke | **PASS** | Open menu → non-link nav → menu closed |
+| Independent verifier | **PASS WITH WARNINGS** | Build/runtime coverage notes only |
+| Security review | **not required** | Overlay close lifecycle only |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| `NavigationEnd` → `close()` with `takeUntilDestroyed` | Done |
+
+### Remaining
+
+- GATE-0018 / CP-0020 project-detail guide
+
+### eval_gate_status
+
+N/A (shell UX)
+
+---
+
 ## Session 2026-09-27 — Mobile nav merge into profile dropdown
 
 **Node:** v24.x
