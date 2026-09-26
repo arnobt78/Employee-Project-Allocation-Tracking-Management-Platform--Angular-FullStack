@@ -9,7 +9,8 @@
 | GATE-0014 | Dead-code cleanup + initial bundle budget | Human-Decision | User-directed cleanup | **APPROVED / COMPLETE** | verify-deep PASS; security PASS; commit-ready 2026-09-11 |
 | GATE-0015 | Refresh / loading UX polish (no FOUC / flicker) + shell nav + Zod/list-query | Human-Decision | User-directed implement | **APPROVED / COMPLETE** | verify-deep PASS WITH WARNINGS; security PASS WITH WARNINGS; commit-ready 2026-09-13 |
 | GATE-0016 | Per-page UI polish (screenshot-driven) | Human-Action | Stage 4 | **COMPLETE** | Code through `416a7c5`; soak findings drove GATE-0017 |
-| GATE-0017 | Boot paint + list/form skeleton mirrors + SelectMenu width + Project Team 6 KPIs | Human-Action | Stage 4 prod soak | **AWAITING PROD VERIFY** | Core `ee55041`; soak follow-ups login + Employees + Projects; CP-0019 continues |
+| GATE-0017 | Boot paint + list/form skeleton mirrors + SelectMenu width + Project Team 6 KPIs | Human-Action | Stage 4 prod soak | **AWAITING PROD VERIFY** | List density+chevron follow-up shipped; CP-0019 continues |
+| GATE-0018 | Project detail (`project-form`) UX polish — guide-driven | Human-Action | Stage 1–2 intake | **AWAITING HUMAN INPUT** | Await detail guide; CP-0020; no detail coding until approved |
 
 ## GATE-0001 decision record
 

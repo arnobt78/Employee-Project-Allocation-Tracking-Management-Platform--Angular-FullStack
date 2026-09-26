@@ -1,5 +1,12 @@
 # Changelog — Agile V project memory
 
+## 2026-09-27 — Projects list density + border chevron
+
+- Two-row cards: title+readiness; status/client/dates + Details/Delete
+- Centered border `chevron-down` expand (rotate-180); remove More/footer strip
+- Project list-skeleton mirrored
+- verify-deep PASS WITH WARNINGS; lint/tsc/build PASS
+
 ## 2026-09-25 — Projects page UX polish
 
 - Dedicated `project` list-skeleton (title + readiness stub + chips + Details/Delete)

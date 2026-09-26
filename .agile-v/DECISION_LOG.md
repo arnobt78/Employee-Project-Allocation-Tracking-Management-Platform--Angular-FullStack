@@ -232,3 +232,27 @@ Append-only. Do not rewrite prior entries.
 | Rationale | Match Employees/PE soak patterns while preserving the existing project-form detail route. |
 | Linked | GATE-0017, CP-0019, DEC-0024, TASK-0048 |
 | Status | DONE |
+
+---
+
+## DEC-0027 — Sequence: prod list soak findings → then project detail polish
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-26 |
+| Decision | Human will share production experience of Projects **list** polish (`eec34a3`), then guide project **detail** (`project-form`) fix/polish. Open GATE-0018 / CP-0020; no coding until findings + guide approved. |
+| Rationale | Avoid speculative detail work; keep GATE-0017 list soak and detail polish as sequential human-guided slices. |
+| Linked | GATE-0017, GATE-0018, CP-0019, CP-0020, REQ-0129–0131, TASK-0049–0052 |
+| Status | PARTIAL — list findings implemented (DEC-0028); detail still awaiting guide |
+
+---
+
+## DEC-0028 — Projects list two-row density + border chevron
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-27 |
+| Decision | Collapse Projects list cards to two rows (title+readiness; meta+Details/Delete); replace More/footer with centered border `chevron-down` that rotates on expand; mirror in project skeleton. |
+| Rationale | Prod soak screenshots; reduce card height while keeping expand secondary facts and detail route. |
+| Linked | GATE-0017, CP-0019, REQ-0129, TASK-0049 |
+| Status | DONE |

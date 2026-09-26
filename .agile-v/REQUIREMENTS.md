@@ -92,6 +92,14 @@ Legend: `BASELINE` = verified as-built behavior · `GAP` = docs/code mismatch or
 | REQ-0127 | SelectMenu overlay pane width MUST match at least the trigger and ≥16rem, capped only by viewport (no fixed 24rem max). | DONE | TS measure + CSS var; soak follow-up dropped 24rem cap |
 | REQ-0128 | Project Team list page MUST show six KPI cards (parity with Employees/Projects), including unique assignees. | DONE | People KPI |
 
+## UX — GATE-0018 project detail polish (intake)
+
+| ID | Requirement | Status | Notes |
+|---|---|---|---|
+| REQ-0129 | Human MUST share production soak findings for shipped Projects **list** UX (`eec34a3`) before further list changes; findings drive targeted fixes only. | DONE | Density + border chevron 2026-09-27 |
+| REQ-0130 | Project **detail** surface (`/new-project`, `/update-project/:id` → `project-form`) MAY receive incremental polish per human guide; MUST preserve section accordion, `MasterService`, existing tokens/`eh-action-btn*`, and MUST NOT invent new detail architecture unless approved. | OPEN | Scope TBD from guide |
+| REQ-0131 | Each GATE-0018 polish slice MUST pass lint + production build (and verify-deep) before commit-ready; shell MUST stay stable (no full-page loader regressions). | OPEN | Mirrors REQ-0120 |
+
 ---
 
 ## Explicit non-goals (unless human expands scope)

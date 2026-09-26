@@ -1,5 +1,39 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-27 — Projects list density + border chevron
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npx tsc -p tsconfig.app.json --noEmit` | **PASS** | |
+| `npm run build` | **PASS** | Bundle budget warning; Sentry maps |
+| Independent verifier | **PASS WITH WARNINGS** | UI complete; docs reconciled at commit-ready |
+| Security review | **not required** | UI-only layout |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Two-row card: title+readiness; meta+Details/Delete | Done |
+| Border-centered circular chevron-down (rotate-180) | Done |
+| Removed More/Hide + footer action strip; expand facts only | Done |
+| Project list-skeleton mirrors two-row + circle stub | Done |
+
+### Remaining
+
+- GATE-0018 / CP-0020 project-detail guide
+- Deep-link / detail routes deferred
+
+### eval_gate_status
+
+N/A (UX polish)
+
+---
+
 ## Session 2026-09-25 — Projects page UX polish
 
 **Node:** v24.x

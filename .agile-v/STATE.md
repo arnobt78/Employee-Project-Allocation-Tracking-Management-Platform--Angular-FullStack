@@ -1,26 +1,26 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0017 soak; Projects list UX polish shipped  
-**Gate:** GATE-0017 implement **COMPLETE** (prod soak continues); GATE-0001 **CLOSED**  
-**Status:** Projects list mirrors Employees/PE patterns (project skeleton, title-cased status, `eh-action-btn*`, inline readiness, expand for secondary facts; Details → `/update-project/:id`). Deep-link/detail routes deferred. CP-0019 open.  
-**Updated:** 2026-09-25  
-**resume_token:** `c1-gate17-prod-ui-soak-2026-09-23`
+**Phase / Stage:** Stage 1–2 intake — GATE-0018 project detail polish (awaiting guide)  
+**Gate:** GATE-0017 list density soak follow-up **COMPLETE** locally; GATE-0018 **AWAITING HUMAN INPUT**; GATE-0001 **CLOSED**  
+**Status:** Projects list card density + border chevron shipped (two-row layout). GATE-0018 still awaits project-detail (`project-form`) guide. CP-0020 open.  
+**Updated:** 2026-09-27  
+**resume_token:** `c1-gate18-project-detail-intake-2026-09-26`
 
 ---
 
 ## Resume Point
 
-**Last completed (code):** Projects page UX polish — dedicated `project` list-skeleton; title-cased status/filters + checklist chips; Add/Details/Delete + form Save/Cancel `eh-action-btn*`; inline readiness %/bar; accordion expand for lead/contact/email/phone/readiness/health/summary. Lint + build PASS; verify-deep PASS WITH WARNINGS (cosmetic skeleton/footer drift accepted).
+**Last completed (code):** Projects list card density — two-row title/readiness + meta/actions; centered border `chevron-down` expand (rotate-180); skeleton mirrored. Lint + build PASS; verify-deep PASS WITH WARNINGS.
 
-**Next exact action:** Continue GATE-0017 soak per human feedback. Do **not** implement `?expand=` or new employee/assignment detail routes unless approved.
+**Next exact action:** Await project **detail** polish guide/screenshots (GATE-0018 / TASK-0050). Do **not** implement `?expand=` or Employees/PE detail routes unless approved.
 
 **Resume prompt:**
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
-Resume GATE-0017 soak (resume_token c1-gate17-prod-ui-soak-2026-09-23).
-Projects list UX polish shipped; deep-link/detail deferred. Await next soak feedback.
+Resume GATE-0018 intake (resume_token c1-gate18-project-detail-intake-2026-09-26).
+Projects list density+chevron shipped; await project-detail guide. Do not code detail until approved.
 ```
 
 ---

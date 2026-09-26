@@ -50,31 +50,36 @@ import { ListPageRowVariant } from '@/app/constants/private-page-meta';
           </div>
         } @else if (rowVariant === 'project') {
           <div
-            class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4"
+            class="relative rounded-[28px] border border-white/10 bg-white/5 px-3 pb-5 pt-3 sm:px-4"
           >
-            <div class="min-w-0 flex-1 space-y-2">
-              <div
-                class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
-              >
-                <div class="h-4 w-44 max-w-[60%] rounded-full bg-white/10"></div>
-                <div class="flex w-full max-w-[11rem] items-center gap-2">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between gap-3">
+                <div class="h-4 w-44 max-w-[55%] rounded-full bg-white/10"></div>
+                <div class="flex w-[7.5rem] items-center gap-2 sm:w-[14rem]">
                   <div class="h-3 w-8 shrink-0 rounded-full bg-white/10"></div>
-                  <div class="h-2 flex-1 rounded-full bg-white/10"></div>
+                  <div class="h-2 min-w-0 flex-1 rounded-full bg-white/10"></div>
                 </div>
               </div>
-              <div class="flex flex-wrap gap-2">
-                @for (chip of chipWidths; track $index) {
-                  <div
-                    class="h-7 rounded-full bg-white/10"
-                    [style.width.px]="chip"
-                  ></div>
-                }
+              <div
+                class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
+              >
+                <div class="flex flex-wrap gap-2">
+                  @for (chip of chipWidths; track $index) {
+                    <div
+                      class="h-7 rounded-full bg-white/10"
+                      [style.width.px]="chip"
+                    ></div>
+                  }
+                </div>
+                <div class="flex shrink-0 items-center gap-2">
+                  <div class="h-8 w-20 rounded-xl bg-white/10"></div>
+                  <div class="h-8 w-16 rounded-xl bg-white/10"></div>
+                </div>
               </div>
             </div>
-            <div class="flex shrink-0 items-center gap-2">
-              <div class="h-8 w-20 rounded-xl bg-white/10"></div>
-              <div class="h-8 w-16 rounded-xl bg-white/10"></div>
-            </div>
+            <div
+              class="absolute bottom-0 left-1/2 z-10 h-7 w-7 -translate-x-1/2 translate-y-1/2 rounded-full border border-white/15 bg-white/10"
+            ></div>
           </div>
         } @else {
           <div

@@ -10,7 +10,8 @@
 | CP-0016 | Human-Decision | GATE-0016 | `c1-gate16-ui-polish-2026-09-14` | **RESOLVED** | 2026-09-14 | Screenshot waves + cold-load + stack gap shipped through `416a7c5` |
 | CP-0017 | Human-Action | GATE-0016 | `c1-gate16-prod-ui-soak-2026-09-22` | **RESOLVED** | 2026-09-22 | Soak findings (blank boot, list mirrors, SelectMenu, form skeleton) implemented as GATE-0017 |
 | CP-0018 | Human-Decision | GATE-0017 | `c1-gate17-complete-2026-09-23` | **RESOLVED** | 2026-09-23 | Boot CSS, skeleton params, SelectMenu clamp, form checklist=5, Project Team People KPI |
-| CP-0019 | Human-Action | GATE-0017 | `c1-gate17-prod-ui-soak-2026-09-23` | **PENDING** | 2026-09-23 | Soak ongoing; Projects list UX polish shipped; deep-link/detail deferred |
+| CP-0019 | Human-Action | GATE-0017 | `c1-gate17-prod-ui-soak-2026-09-23` | **PENDING** | 2026-09-23 | Soak ongoing; list density+chevron shipped; further prod feedback welcome |
+| CP-0020 | Human-Action | GATE-0018 | `c1-gate18-project-detail-intake-2026-09-26` | **PENDING** | 2026-09-26 | Await project-detail polish guide; no detail coding until approved |
 
 ## Resume rules
 

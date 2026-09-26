@@ -86,41 +86,35 @@
     ></app-list-pagination>
   </app-list-toolbar>
 
-  <section class="space-y-4">
+  <section class="space-y-6">
     <div
       *ngFor="let project of pagedProjects().items"
-      class="overflow-hidden rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition hover:border-white/20"
+      class="relative rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition hover:border-white/20"
     >
-      <button
-        type="button"
-        class="flex w-full flex-col gap-3 px-3 py-3 text-left transition hover:bg-white/5 sm:flex-row sm:items-center sm:justify-between sm:px-4"
-        (click)="toggleExpand(project.projectId)"
-      >
-        <div class="min-w-0 flex-1 space-y-2">
+      <div class="relative space-y-2 px-3 pb-5 pt-3 sm:px-4 sm:pb-5">
+        <div class="flex items-center justify-between gap-3">
+          <p class="min-w-0 truncate text-base font-medium text-white">
+            {{ project.projectName }}
+          </p>
           <div
-            class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+            class="flex w-[7.5rem] shrink-0 items-center gap-2 sm:w-[14rem] sm:max-w-[14rem]"
           >
-            <p class="truncate text-base font-medium text-white">
-              {{ project.projectName }}
-            </p>
-            <div
-              class="flex w-full max-w-[12rem] shrink-0 items-center gap-2 sm:max-w-[14rem]"
-              (click)="$event.stopPropagation()"
-            >
-              <span
-                class="shrink-0 text-xs font-medium text-white/70 sm:text-sm"
-              >
-                {{ readinessPercent(project) }}%
-              </span>
-              <div class="h-2 min-w-0 flex-1 rounded-full bg-white/10">
-                <div
-                  class="h-2 rounded-full bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 transition-all duration-300"
-                  [style.width.%]="readinessPercent(project)"
-                ></div>
-              </div>
+            <span class="shrink-0 text-xs font-medium text-white/70 sm:text-sm">
+              {{ readinessPercent(project) }}%
+            </span>
+            <div class="h-2 min-w-0 flex-1 rounded-full bg-white/10">
+              <div
+                class="h-2 rounded-full bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 transition-all duration-300"
+                [style.width.%]="readinessPercent(project)"
+              ></div>
             </div>
           </div>
-          <div class="flex flex-wrap items-center gap-2">
+        </div>
+
+        <div
+          class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
+        >
+          <div class="flex min-w-0 flex-wrap items-center gap-2">
             <span
               class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs capitalize sm:text-sm"
               [ngClass]="
@@ -147,19 +141,48 @@
               {{ dateRangeLabel(project) }}
             </span>
           </div>
+          <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
+            <a
+              class="eh-action-btn eh-action-btn-outline"
+              [routerLink]="['/update-project', project.projectId || 0]"
+            >
+              <lucide-icon name="panel-right" [size]="14"></lucide-icon>
+              <span>Details</span>
+            </a>
+            <button
+              type="button"
+              class="eh-action-btn eh-action-btn-danger"
+              (click)="onDelete(project.projectId)"
+            >
+              <lucide-icon name="trash-2" [size]="14"></lucide-icon>
+              <span>Delete</span>
+            </button>
+          </div>
         </div>
-        <span
-          class="shrink-0 text-xs sm:text-sm text-white/40 transition"
-          [class.text-white]="expandedProjectId === project.projectId"
+
+        <button
+          type="button"
+          class="absolute bottom-0 left-1/2 z-10 flex h-7 w-7 -translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-[#0b1220] text-white/70 shadow-[0_8px_20px_rgba(0,0,0,0.35)] transition hover:border-white/40 hover:text-white"
+          [attr.aria-expanded]="expandedProjectId === project.projectId"
+          [attr.aria-label]="
+            expandedProjectId === project.projectId
+              ? 'Hide project details'
+              : 'Show project details'
+          "
+          (click)="toggleExpand(project.projectId)"
         >
-          {{ expandedProjectId === project.projectId ? "Hide" : "More" }}
-        </span>
-      </button>
+          <lucide-icon
+            name="chevron-down"
+            [size]="14"
+            class="transition-transform duration-200"
+            [class.rotate-180]="expandedProjectId === project.projectId"
+          ></lucide-icon>
+        </button>
+      </div>
 
       <div
         *ngIf="expandedProjectId === project.projectId"
         class="border-t border-white/10 px-3 py-3 text-sm text-white/75 sm:px-4 sm:py-4"
-        (click)="$event.stopPropagation()"
       >
         <div class="grid gap-4 sm:grid-cols-2">
           <div
@@ -230,46 +253,7 @@
               {{ projectSummary(project) }}
             </p>
           </div>
-          <div class="sm:col-span-2 flex flex-wrap justify-end gap-3">
-            <a
-              class="eh-action-btn eh-action-btn-outline"
-              [routerLink]="['/update-project', project.projectId || 0]"
-            >
-              <lucide-icon name="panel-right" [size]="14"></lucide-icon>
-              <span>Details</span>
-            </a>
-            <button
-              type="button"
-              class="eh-action-btn eh-action-btn-danger"
-              (click)="onDelete(project.projectId)"
-            >
-              <lucide-icon name="trash-2" [size]="14"></lucide-icon>
-              <span>Delete</span>
-            </button>
-          </div>
         </div>
-      </div>
-
-      <div
-        *ngIf="expandedProjectId !== project.projectId"
-        class="flex flex-wrap items-center justify-end gap-2 border-t border-white/10 px-3 py-2 sm:px-4"
-      >
-        <a
-          class="eh-action-btn eh-action-btn-outline"
-          [routerLink]="['/update-project', project.projectId || 0]"
-          (click)="$event.stopPropagation()"
-        >
-          <lucide-icon name="panel-right" [size]="14"></lucide-icon>
-          <span>Details</span>
-        </a>
-        <button
-          type="button"
-          class="eh-action-btn eh-action-btn-danger"
-          (click)="onDelete(project.projectId); $event.stopPropagation()"
-        >
-          <lucide-icon name="trash-2" [size]="14"></lucide-icon>
-          <span>Delete</span>
-        </button>
       </div>
     </div>
 
