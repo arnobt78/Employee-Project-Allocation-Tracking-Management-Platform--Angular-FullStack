@@ -1,5 +1,39 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-27 — Mobile nav merge into profile dropdown
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npx tsc -p tsconfig.app.json --noEmit` | **PASS** | |
+| `npm test -- --watch=false --browsers=ChromeHeadless` | **PASS** | 25/25 |
+| `npm run build` | **PASS** | Bundle budget warning |
+| Browser smoke (Playwright) | **PASS** | 390px: no burger; profile has primary+utility+logout. 1400px: header nav visible; profile primary `display:none` |
+| Independent verifier | **PASS WITH WARNINGS** | Stale primary-navigation comment fixed at commit-ready |
+| Security review | **not required** | Shell/nav UI only |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Remove burger + mobile drawer | Done |
+| Primary nav in profile below xl | Done |
+| Desktop header primary nav unchanged | Done |
+
+### Remaining
+
+- GATE-0018 / CP-0020 project-detail guide
+
+### eval_gate_status
+
+N/A (shell UX)
+
+---
+
 ## Session 2026-09-27 — Projects list padding parity
 
 **Node:** v24.x

@@ -5,7 +5,7 @@ export interface PrimaryNavItem {
   iconName: string;
 }
 
-/** Main app destinations shown in the shell header (and mobile drawer). */
+/** Main app destinations shown in the shell header (and profile menu below xl). */
 export const PRIMARY_NAVIGATION_ITEMS: PrimaryNavItem[] = [
   {
     label: 'Dashboard',

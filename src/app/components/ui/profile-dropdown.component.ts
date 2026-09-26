@@ -1,6 +1,6 @@
 import { Overlay, OverlayModule, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import {
   Component,
   ElementRef,
@@ -11,6 +11,12 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@/app/service/auth.service';
 import { UserAvatarComponent } from './user-avatar.component';
+import {
+  isPrimaryNavActive,
+  PRIMARY_NAVIGATION_ITEMS,
+  type PrimaryNavItem,
+  resolveBrowserPath,
+} from '@/app/constants/primary-navigation';
 import { UTILITY_NAVIGATION_ITEMS } from '@/app/constants/utility-navigation';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 
@@ -20,7 +26,7 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
   imports: [AppIconComponent, CommonModule, RouterLink],
   template: `
     <div
-      class="w-56 overflow-hidden rounded-2xl border border-white/15 bg-slate-950/95 py-2 shadow-[0_25px_70px_rgba(9,14,33,0.75)] backdrop-blur-md sm:w-64"
+      class="w-64 overflow-hidden rounded-2xl border border-white/15 bg-slate-950/95 py-2 shadow-[0_25px_70px_rgba(9,14,33,0.75)] backdrop-blur-md sm:w-72"
       role="menu"
     >
       <div class="px-2 sm:px-4 py-3">
@@ -28,24 +34,42 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
         <p class="truncate text-xs text-white/60">{{ subtitle }}</p>
       </div>
       <div class="mx-3 border-t border-white/10"></div>
-      <div class="py-1">
-        @for (item of utilityItems; track item.route) {
-          <a
-            [routerLink]="item.route"
-            role="menuitem"
-            class="flex items-center gap-1 px-4 py-2.5 text-sm text-white/85 transition hover:bg-white/10 hover:text-white"
-            (click)="onNavigate()"
-          >
-            <lucide-icon [name]="item.iconName" [size]="16"></lucide-icon>
-            <span>{{ item.label }}</span>
-          </a>
-        }
+      <div class="max-h-[min(24rem,70vh)] overflow-y-auto eh-scrollbar">
+        <div class="py-1 xl:hidden">
+          @for (item of primaryItems; track item.route) {
+            <a
+              [routerLink]="item.route"
+              role="menuitem"
+              class="flex items-center gap-2 px-4 py-2.5 text-sm text-white/85 transition hover:bg-white/10 hover:text-white"
+              [class.eh-mobile-nav-active]="isNavActive(item)"
+              [attr.aria-current]="isNavActive(item) ? 'page' : null"
+              (click)="onNavigate()"
+            >
+              <lucide-icon [name]="item.iconName" [size]="16"></lucide-icon>
+              <span>{{ item.label }}</span>
+            </a>
+          }
+        </div>
+        <div class="mx-3 border-t border-white/10 xl:hidden"></div>
+        <div class="py-1">
+          @for (item of utilityItems; track item.route) {
+            <a
+              [routerLink]="item.route"
+              role="menuitem"
+              class="flex items-center gap-2 px-4 py-2.5 text-sm text-white/85 transition hover:bg-white/10 hover:text-white"
+              (click)="onNavigate()"
+            >
+              <lucide-icon [name]="item.iconName" [size]="16"></lucide-icon>
+              <span>{{ item.label }}</span>
+            </a>
+          }
+        </div>
       </div>
       <div class="mx-3 border-t border-white/10"></div>
       <button
         type="button"
         role="menuitem"
-        class="flex w-full items-center gap-1 px-4 py-2.5 text-left text-sm text-rose-200 transition hover:bg-white/10 disabled:opacity-60"
+        class="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-rose-200 transition hover:bg-white/10 disabled:opacity-60"
         [disabled]="loggingOut"
         (click)="onLogout()"
       >
@@ -67,10 +91,16 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 class ProfileDropdownPanelComponent {
   displayName = '';
   subtitle = '';
+  currentPath = '/';
+  primaryItems = PRIMARY_NAVIGATION_ITEMS;
   utilityItems = UTILITY_NAVIGATION_ITEMS;
   loggingOut = false;
   onNavigate = () => {};
   onLogout = () => {};
+
+  isNavActive(item: PrimaryNavItem): boolean {
+    return isPrimaryNavActive(this.currentPath, item);
+  }
 }
 
 @Component({
@@ -100,6 +130,7 @@ export class ProfileDropdownComponent {
   private readonly overlay = inject(Overlay);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
 
   @ViewChild('trigger', { static: true })
   trigger!: ElementRef<HTMLButtonElement>;
@@ -183,6 +214,10 @@ export class ProfileDropdownComponent {
     this.panelRef = componentRef.instance;
     componentRef.instance.displayName = this.displayName;
     componentRef.instance.subtitle = this.subtitle;
+    componentRef.instance.currentPath = resolveBrowserPath(
+      this.location.path(),
+      this.router.url,
+    );
     componentRef.instance.onNavigate = () => this.close();
     componentRef.instance.onLogout = () => this.logout();
 
