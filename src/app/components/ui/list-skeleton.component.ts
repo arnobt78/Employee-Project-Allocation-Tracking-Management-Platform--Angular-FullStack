@@ -50,14 +50,18 @@ import { ListPageRowVariant } from '@/app/constants/private-page-meta';
           </div>
         } @else if (rowVariant === 'project') {
           <div
-            class="relative rounded-[28px] border border-white/10 bg-white/5 px-2 sm:px-4 pt-2 sm:pt-4 pb-5"
+            class="relative rounded-[28px] border border-white/10 bg-white/5 px-2 sm:px-4 pt-2 sm:pt-4 pb-4"
           >
             <div class="space-y-2">
               <div class="flex items-center justify-between gap-3">
-                <div class="h-4 w-44 max-w-[55%] rounded-full bg-white/10"></div>
+                <div
+                  class="h-4 w-44 max-w-[55%] rounded-full bg-white/10"
+                ></div>
                 <div class="flex w-[7.5rem] items-center gap-2 sm:w-[14rem]">
                   <div class="h-3 w-8 shrink-0 rounded-full bg-white/10"></div>
-                  <div class="h-2 min-w-0 flex-1 rounded-full bg-white/10"></div>
+                  <div
+                    class="h-2 min-w-0 flex-1 rounded-full bg-white/10"
+                  ></div>
                 </div>
               </div>
               <div

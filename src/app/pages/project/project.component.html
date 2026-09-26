@@ -91,7 +91,7 @@
       *ngFor="let project of pagedProjects().items"
       class="relative rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition hover:border-white/20"
     >
-      <div class="relative space-y-2 px-2 sm:px-4 pt-2 sm:pt-4 pb-5">
+      <div class="relative space-y-2 px-2 sm:px-4 pt-2 sm:pt-4 pb-4">
         <div class="flex items-center justify-between gap-3">
           <p class="min-w-0 truncate text-base font-medium text-white">
             {{ project.projectName }}
@@ -196,10 +196,7 @@
           <div
             class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
           >
-            <app-field-label
-              text="Contact"
-              icon="contact"
-            ></app-field-label>
+            <app-field-label text="Contact" icon="contact"></app-field-label>
             <p class="text-base font-medium text-white">
               {{ project.contactPerson || "—" }}
             </p>
@@ -223,10 +220,7 @@
           <div
             class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
           >
-            <app-field-label
-              text="Readiness"
-              icon="activity"
-            ></app-field-label>
+            <app-field-label text="Readiness" icon="activity"></app-field-label>
             <p class="text-base font-medium text-white">
               {{ readinessPercent(project) }}%
             </p>
@@ -243,13 +237,8 @@
             *ngIf="projectSummary(project)"
             class="sm:col-span-2 rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
           >
-            <app-field-label
-              text="Summary"
-              icon="file-text"
-            ></app-field-label>
-            <p
-              class="mt-1 line-clamp-3 text-sm leading-relaxed text-white/80"
-            >
+            <app-field-label text="Summary" icon="file-text"></app-field-label>
+            <p class="mt-1 line-clamp-3 text-sm leading-relaxed text-white/80">
               {{ projectSummary(project) }}
             </p>
           </div>

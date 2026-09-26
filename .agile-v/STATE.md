@@ -11,7 +11,7 @@
 
 ## Resume Point
 
-**Last completed (code):** Projects list padding parity — collapsed body + skeleton `px-2 sm:px-4 pt-2 sm:pt-4 pb-5`; expand `px-2 sm:px-4 py-2 sm:py-4` (Employees/PE tokens; `pb-5` kept for border chevron). Lint/tsc PASS; prior build PASS; independent verifier PASS; DOM smoke confirmed classes + chevron.
+**Last completed (code):** Projects list padding parity — collapsed body + skeleton `px-2 sm:px-4 pt-2 sm:pt-4 pb-4`; expand `px-2 sm:px-4 py-2 sm:py-4` (Employees/PE tokens; `pb-4` kept for border chevron). Lint/tsc PASS; prior build PASS; independent verifier PASS; DOM smoke confirmed classes + chevron.
 
 **Next exact action:** Await project **detail** polish guide/screenshots (GATE-0018 / TASK-0050). Do **not** implement `?expand=` or Employees/PE detail routes unless approved.
 
