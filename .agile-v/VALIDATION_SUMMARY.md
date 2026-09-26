@@ -1,5 +1,38 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-27 — Projects list padding parity
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npx tsc -p tsconfig.app.json --noEmit` | **PASS** | |
+| `npm run build` | **PASS** | Prior run same tree; bundle budget warning |
+| Independent verifier | **PASS** | Class tokens match plan + Employees/PE expand |
+| Browser DOM smoke | **PASS** | `/projects` card classes + chevron present |
+| Security review | **not required** | UI padding tokens only |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| Collapsed body `px-2 sm:px-4 pt-2 sm:pt-4 pb-5` | Done |
+| Expand panel Employees/PE parity | Done |
+| Project list-skeleton same body padding | Done |
+
+### Remaining
+
+- GATE-0018 / CP-0020 project-detail guide
+
+### eval_gate_status
+
+N/A (UI token parity)
+
+---
+
 ## Session 2026-09-27 — Lead / Health expand fix
 
 **Node:** v24.x

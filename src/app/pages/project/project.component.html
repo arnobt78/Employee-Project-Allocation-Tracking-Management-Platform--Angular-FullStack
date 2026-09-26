@@ -91,7 +91,7 @@
       *ngFor="let project of pagedProjects().items"
       class="relative rounded-[28px] border border-white/10 bg-white/5/75 shadow-[0_30px_80px_rgba(10,15,35,0.5)] backdrop-blur-md transition hover:border-white/20"
     >
-      <div class="relative space-y-2 px-3 pb-5 pt-3 sm:px-4 sm:pb-5">
+      <div class="relative space-y-2 px-2 sm:px-4 pt-2 sm:pt-4 pb-5">
         <div class="flex items-center justify-between gap-3">
           <p class="min-w-0 truncate text-base font-medium text-white">
             {{ project.projectName }}
@@ -182,7 +182,7 @@
 
       <div
         *ngIf="expandedProjectId === project.projectId"
-        class="border-t border-white/10 px-3 py-3 text-sm text-white/75 sm:px-4 sm:py-4"
+        class="border-t border-white/10 px-2 sm:px-4 py-2 sm:py-4 text-sm text-white/75"
       >
         <div class="grid gap-4 sm:grid-cols-2">
           <div
