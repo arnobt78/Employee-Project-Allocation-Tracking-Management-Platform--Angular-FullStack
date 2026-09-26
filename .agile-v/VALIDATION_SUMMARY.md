@@ -1,5 +1,42 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-09-27 — Lead / Health expand fix
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npx tsc -p tsconfig.app.json --noEmit` | **PASS** | |
+| `npm run build` | **PASS** | Bundle budget warning |
+| `npm test -- --watch=false --browsers=ChromeHeadless` | **PASS** | 25/25 |
+| `npm run db:seed` | **PASS** | 12 projects upserted |
+| Browser crawl (Playwright) | **PASS** | Login; Projects expand Aurora Lead=Ava Thompson, Health=On Track; detail Health=On Track; GetAllProjects 200 |
+| Independent verifier | **PASS WITH WARNINGS** | Create/update lead join fixed in follow-up |
+| Security review | **not required** | No auth boundary change; public demo creds only |
+
+### Delivered
+
+| Item | Status |
+|---|---|
+| API enrich `employeeName` from `leadByEmpId` (list/get/mutations) | Done |
+| Dataset `health` filled; seed Number coerce | Done |
+| project-form Health select + view | Done |
+| List `displayHealth` title-case | Done |
+
+### Remaining
+
+- GATE-0018 / CP-0020 project-detail guide
+- Deep-link / detail routes deferred
+
+### eval_gate_status
+
+N/A (data + UX fix)
+
+---
+
 ## Session 2026-09-27 — Projects list density + border chevron
 
 **Node:** v24.x

@@ -301,8 +301,10 @@ async function seedProject(db: any) {
             clientIndustry: project.clientIndustry || null,
             startDate: project.startDate ? new Date(project.startDate) : null,
             endDate: project.endDate ? new Date(project.endDate) : null,
-            leadByEmpId: project.leadByEmpId || null,
-            sponsorEmpId: project.sponsorEmpId || null,
+            leadByEmpId:
+              project.leadByEmpId != null ? Number(project.leadByEmpId) : null,
+            sponsorEmpId:
+              project.sponsorEmpId != null ? Number(project.sponsorEmpId) : null,
             contactPerson: project.contactPerson || null,
             contactNo: project.contactNo || null,
             emailId: project.emailId || null,

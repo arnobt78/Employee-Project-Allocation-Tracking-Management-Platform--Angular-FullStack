@@ -1435,7 +1435,7 @@ export async function deleteEmployee(employeeId) {
   return mapEmployee(employee);
 }
 
-function mapProject(project) {
+function mapProject(project, extras = {}) {
   if (!project) {
     return project;
   }
@@ -1445,6 +1445,12 @@ function mapProject(project) {
   const timeline = normalizeTimelineEntries(project.timeline);
   const reviewerComments = normalizeReviewerComments(project.reviewerComments);
   const approvalStatus = normalizeApprovalStatus(project.approvalStatus);
+  const leadByEmpId =
+    typeof project.leadByEmpId === "number"
+      ? project.leadByEmpId
+      : project.leadByEmpId
+      ? Number(project.leadByEmpId)
+      : null;
 
   return {
     projectId: project.projectId,
@@ -1453,16 +1459,12 @@ function mapProject(project) {
     clientIndustry: project.clientIndustry ?? "",
     startDate: formatDate(project.startDate),
     endDate: formatDate(project.endDate),
-    leadByEmpId:
-      typeof project.leadByEmpId === "number"
-        ? project.leadByEmpId
-        : project.leadByEmpId
-        ? Number(project.leadByEmpId)
-        : null,
+    leadByEmpId,
     sponsorEmpId: project.sponsorEmpId ?? undefined,
     contactPerson: project.contactPerson ?? "",
     contactNo: project.contactNo ?? "",
     emailId: project.emailId ?? "",
+    employeeName: extras.employeeName ?? project.employeeName ?? "",
     contactTitle: project.contactTitle ?? "",
     contactNotes: project.contactNotes ?? "",
     overview: project.overview ?? {},
@@ -1516,12 +1518,54 @@ function mapProject(project) {
   };
 }
 
+async function leadNameByEmployeeId(projects) {
+  const ids = [
+    ...new Set(
+      (projects ?? [])
+        .map((project) =>
+          project?.leadByEmpId != null ? Number(project.leadByEmpId) : null
+        )
+        .filter((id) => Number.isFinite(id) && id > 0)
+    ),
+  ];
+  if (ids.length === 0) {
+    return new Map();
+  }
+  const employees = await prisma.employee.findMany({
+    where: { employeeId: { in: ids } },
+    select: { employeeId: true, employeeName: true },
+  });
+  return new Map(
+    employees.map((employee) => [employee.employeeId, employee.employeeName])
+  );
+}
+
+async function mapProjectsWithLeadNames(projects) {
+  const nameById = await leadNameByEmployeeId(projects);
+  return projects.map((project) => {
+    const leadId =
+      project?.leadByEmpId != null ? Number(project.leadByEmpId) : null;
+    return mapProject(project, {
+      employeeName:
+        leadId && nameById.has(leadId) ? nameById.get(leadId) : "",
+    });
+  });
+}
+
+async function mapProjectWithLeadName(project) {
+  if (!project) {
+    return mapProject(project);
+  }
+  const [mapped] = await mapProjectsWithLeadNames([project]);
+  return mapped;
+}
+
 export async function listProjects() {
   await ensureBootstrapData();
   const projects = await prisma.project.findMany({
     orderBy: { projectId: "asc" },
   });
-  return projects.map(mapProject);
+  return mapProjectsWithLeadNames(projects);
 }
 
 export async function getProject(projectId) {
@@ -1529,7 +1573,7 @@ export async function getProject(projectId) {
   const project = await prisma.project.findUnique({
     where: { projectId: Number(projectId) },
   });
-  return mapProject(project);
+  return mapProjectWithLeadName(project);
 }
 
 export async function getProjectResourceInsights(projectId) {
@@ -1904,7 +1948,7 @@ export async function createProject(payload) {
     throw new Error("Failed to create project record");
   }
 
-  return mapProject(record);
+  return mapProjectWithLeadName(record);
 }
 
 export async function updateProject(projectId, payload) {
@@ -2092,7 +2136,7 @@ export async function updateProject(projectId, payload) {
 
   // If no fields to update, return the existing record
   if (Object.keys(updateData).length === 0) {
-    return mapProject(existingRecord);
+    return mapProjectWithLeadName(existingRecord);
   }
 
   // Use MongoDB native driver fallback for update
@@ -2112,7 +2156,7 @@ export async function updateProject(projectId, payload) {
     throw new Error(`Failed to update project with projectId ${projectId}`);
   }
 
-  return mapProject(record);
+  return mapProjectWithLeadName(record);
 }
 
 function buildApprovalHistoryEntry({
@@ -2223,7 +2267,7 @@ export async function transitionProjectApproval(projectId, action, payload) {
   }
 
   if (nextStatus === currentStatus && action !== "reset") {
-    return mapProject(project);
+    return mapProjectWithLeadName(project);
   }
 
   const history = normalizeStatusHistory(project.statusHistory);
@@ -2285,7 +2329,7 @@ export async function transitionProjectApproval(projectId, action, payload) {
     throw new Error(`Failed to update project approval status for projectId ${numericId}`);
   }
 
-  return mapProject(updated);
+  return mapProjectWithLeadName(updated);
 }
 
 export async function addProjectReviewerComment(projectId, payload) {
@@ -2360,7 +2404,7 @@ export async function addProjectReviewerComment(projectId, payload) {
     throw new Error(`Failed to add reviewer comment for projectId ${numericId}`);
   }
 
-  return mapProject(updated);
+  return mapProjectWithLeadName(updated);
 }
 
 export async function resolveProjectReviewerComment(
@@ -2423,7 +2467,7 @@ export async function resolveProjectReviewerComment(
     throw new Error(`Failed to resolve reviewer comment for projectId ${numericId}`);
   }
 
-  return mapProject(updated);
+  return mapProjectWithLeadName(updated);
 }
 
 export async function deleteProject(projectId) {
@@ -2439,7 +2483,7 @@ export async function deleteProject(projectId) {
   }
 
   // Map project to get formatted data
-  const mappedProject = mapProject(project);
+  const mappedProject = await mapProjectWithLeadName(project);
 
   // Delete related project employees first
   await prisma.projectEmployee.deleteMany({

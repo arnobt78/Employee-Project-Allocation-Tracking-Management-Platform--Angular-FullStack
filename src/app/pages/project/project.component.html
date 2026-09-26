@@ -235,8 +235,8 @@
             class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
           >
             <app-field-label text="Health" icon="activity"></app-field-label>
-            <p class="text-base font-medium capitalize text-white">
-              {{ (project.health || "—") | titlecase }}
+            <p class="text-base font-medium text-white">
+              {{ displayHealth(project) }}
             </p>
           </div>
           <div

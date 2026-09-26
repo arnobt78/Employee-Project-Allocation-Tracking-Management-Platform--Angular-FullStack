@@ -257,6 +257,18 @@
                   Choose a start date for the initiative.
                 </p>
               </div>
+              <div>
+                <label for="health" class="text-xs sm:text-sm text-white/50"
+                  >Health</label
+                >
+                <app-select-menu
+                  id="health"
+                  formControlName="health"
+                  [options]="healthSelectOptions"
+                  placeholder="Select health"
+                  emptyIcon="activity"
+                ></app-select-menu>
+              </div>
             </div>
             <div
               class="mt-6 grid gap-4 md:grid-cols-2"
@@ -371,6 +383,14 @@
                 <p class="text-xs sm:text-sm text-white/45">Kick-Off</p>
                 <p class="text-base font-medium text-white">
                   {{ displayValue("startDate") }}
+                </p>
+              </div>
+              <div
+                class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+              >
+                <p class="text-xs sm:text-sm text-white/45">Health</p>
+                <p class="text-base font-medium text-white">
+                  {{ displayValue("health") }}
                 </p>
               </div>
             </div>

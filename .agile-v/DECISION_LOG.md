@@ -256,3 +256,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | Prod soak screenshots; reduce card height while keeping expand secondary facts and detail route. |
 | Linked | GATE-0017, CP-0019, REQ-0129, TASK-0049 |
 | Status | DONE |
+
+---
+
+## DEC-0029 — Lead name via API join; Health stored + seeded + form
+
+| Field | Value |
+|---|---|
+| Date | 2026-09-27 |
+| Decision | Do not add Prisma `employeeName` on Project; resolve lead name at map time from `leadByEmpId`. Keep `health` as stored string (`on_track`/`at_risk`/`off_track`); seed values + overview form control; not computed from readiness. |
+| Rationale | List expand showed "—" due to missing join and null health seed, not missing schema. |
+| Linked | GATE-0017, CP-0019, REQ-0129 |
+| Status | DONE |

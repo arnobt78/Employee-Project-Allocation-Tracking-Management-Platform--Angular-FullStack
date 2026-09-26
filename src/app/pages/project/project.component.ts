@@ -338,6 +338,14 @@ export class ProjectComponent implements OnInit {
     return this.formatStatusLabel(raw);
   }
 
+  displayHealth(project: IProject): string {
+    const raw = (project.health ?? '').trim();
+    if (!raw) {
+      return '—';
+    }
+    return this.toTitleCase(raw);
+  }
+
   statusIcon(status: string | undefined): string {
     const key = (status || '').toLowerCase().replace(/[\s-]+/g, '_');
     if (key.includes('active') || key === 'approved') return 'zap';

@@ -1,5 +1,12 @@
 # Changelog — Agile V project memory
 
+## 2026-09-27 — Lead / Health expand fix
+
+- API joins lead employee name on list/get/create/update project responses
+- Dataset health filled (`on_track` / `at_risk` / `off_track`); seed ID coerce
+- project-form Health select; list expand title-cased health
+- verify-deep PASS WITH WARNINGS; lint/tsc/build/unit/browser PASS
+
 ## 2026-09-27 — Projects list density + border chevron
 
 - Two-row cards: title+readiness; status/client/dates + Details/Delete

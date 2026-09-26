@@ -190,6 +190,12 @@ export class ProjectFormComponent implements OnInit {
             : 'circle-dashed',
   }));
 
+  readonly healthSelectOptions: SelectMenuOption[] = [
+    { value: 'on_track', label: 'On Track', icon: 'activity' },
+    { value: 'at_risk', label: 'At Risk', icon: 'siren' },
+    { value: 'off_track', label: 'Off Track', icon: 'x' },
+  ];
+
   readonly reviewerSectionOptions: SelectMenuOption[] =
     REVIEWER_COMMENT_SECTIONS.map((section) => ({
       value: section.value,
@@ -347,6 +353,7 @@ export class ProjectFormComponent implements OnInit {
     projectName: ['', [Validators.required, Validators.minLength(3)]],
     clientName: ['', [Validators.required, Validators.minLength(3)]],
     startDate: ['', Validators.required],
+    health: [''],
     leadByEmpId: [null],
     contactPerson: [''],
     contactNo: ['', [Validators.pattern(/^[\d\s+\-()]{7,20}$/)]],
@@ -479,6 +486,7 @@ export class ProjectFormComponent implements OnInit {
         projectName: current.projectName,
         clientName: current.clientName,
         startDate: current.startDate?.substring(0, 10),
+        health: current.health ?? '',
         leadByEmpId: current.leadByEmpId ?? null,
         contactPerson: current.contactPerson ?? '',
         contactNo: current.contactNo ?? '',
@@ -636,6 +644,13 @@ export class ProjectFormComponent implements OnInit {
         return value
           ? this.leadName(value) ?? `Employee #${value}`
           : 'Unassigned';
+      case 'health': {
+        const raw = (value ?? '').toString().trim();
+        if (!raw) {
+          return 'Not set';
+        }
+        return raw.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+      }
       case 'contactNo':
         return value || 'Not provided';
       case 'emailId':
@@ -1704,6 +1719,7 @@ export class ProjectFormComponent implements OnInit {
         startDate: snapshot.startDate
           ? snapshot.startDate.substring(0, 10)
           : '',
+        health: snapshot.health ?? '',
         leadByEmpId: snapshot.leadByEmpId ?? null,
         contactPerson: snapshot.contactPerson ?? '',
         contactNo: snapshot.contactNo ?? '',
@@ -1829,6 +1845,7 @@ type FieldKey =
   | 'projectName'
   | 'clientName'
   | 'startDate'
+  | 'health'
   | 'leadByEmpId'
   | 'contactPerson'
   | 'contactNo'
