@@ -1,5 +1,14 @@
 # Changelog — Agile V project memory
 
+## 2026-10-10 — GATE-0018 single-layer skeletons + A–Z verify fixes
+
+- Mirror skeletons for Project detail, API Doc, API Status, Insights, Calendar (shared with route placeholder); `text-stub` primitive
+- Calendar split: `calendar-month` helpers + `calendar-month-shell`; `events` signal input
+- API Doc cached; API Status timer cleared on destroy + refresh-failed notice
+- Mutation emails sent in background (`waitUntil`); stale-chunk reload; `**` → dashboard
+- Project mutation vs in-flight read race fixed; caches cleared on login
+- lint PASS; unit 63/63; build PASS; browser A–Z sweep PASS
+
 ## 2026-09-27 — Lead / Health expand fix
 
 - API joins lead employee name on list/get/create/update project responses

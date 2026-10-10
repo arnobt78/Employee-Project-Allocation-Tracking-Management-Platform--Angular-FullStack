@@ -1,199 +1,76 @@
-<div class="space-y-4">
-  <div class="flex items-center justify-between">
-    <h3 class="text-base sm:text-xl font-medium text-white">
-      {{ monthName() }} {{ currentYear() }}
-    </h3>
-    <div class="flex items-center gap-2">
-      <button
-        (click)="previousMonth()"
-        class="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/10"
-        title="Previous month"
-      >
-        <svg
-          class="h-4 w-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </button>
-      <button
-        (click)="goToToday()"
-        class="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white transition-colors hover:bg-white/10"
-        title="Go to today"
-      >
-        Today
-      </button>
-      <button
-        (click)="nextMonth()"
-        class="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/10"
-        title="Next month"
-      >
-        <svg
-          class="h-4 w-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </button>
-    </div>
-  </div>
+<app-calendar-month-shell
+  [title]="title()"
+  [days]="calendarDays()"
+  [dayTemplate]="dayCell"
+  (previous)="previousMonth()"
+  (today)="goToToday()"
+  (next)="nextMonth()"
+></app-calendar-month-shell>
 
-  <!-- Calendar Grid -->
-  <div
-    class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md"
-  >
-    <!-- Day Headers -->
-    <div class="mb-2 grid grid-cols-7 gap-2">
-      <div
-        *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']"
-        class="py-2 text-center text-xs font-medium tracking-wider text-white/60"
-      >
-        {{ day }}
+<ng-template #dayCell let-day>
+  @if (day.events.length > 2) {
+    <div
+      [class]="
+        'w-full rounded-xl border p-2 transition-all ' +
+        dayCellTone(day) +
+        (isDateExpanded(day.date) ? ' min-h-auto' : ' min-h-[100px]')
+      "
+      (mouseleave)="onMoreMouseLeave()"
+    >
+      <div class="mb-1 text-sm font-medium" [class]="dayNumberTone(day)">
+        {{ day.day }}
       </div>
-    </div>
-
-    <!-- Calendar Days -->
-    <div class="relative grid grid-cols-7 gap-2">
-      <ng-container *ngFor="let day of calendarDays()">
-        @if (day.events.length > 2) {
+      <div class="space-y-1">
+        @for (
+          event of isDateExpanded(day.date) ? day.events : day.events.slice(0, 2);
+          track $index
+        ) {
+          <ng-container
+            [ngTemplateOutlet]="eventChip"
+            [ngTemplateOutletContext]="{ $implicit: event }"
+          ></ng-container>
+        }
+        @if (!isDateExpanded(day.date)) {
           <div
-            [class]="
-              'w-full rounded-xl border p-2 transition-all ' +
-              (day.isCurrentMonth
-                ? isToday(day.date)
-                  ? 'border-primary bg-primary/10'
-                  : 'border-white/10 bg-white/5'
-                : 'border-white/5 bg-white/2') +
-              (isDateExpanded(day.date) ? ' min-h-auto' : ' min-h-[100px]')
-            "
-            (mouseleave)="onMoreMouseLeave()"
+            class="cursor-pointer text-xs text-white/60 transition-colors hover:text-white"
+            (mouseenter)="onMoreMouseEnter(day.date)"
           >
-            <div
-              class="mb-1 text-sm font-medium"
-              [class]="
-                day.isCurrentMonth
-                  ? isToday(day.date)
-                    ? 'text-primary'
-                    : 'text-white'
-                  : 'text-white/40'
-              "
-            >
-              {{ day.day }}
-            </div>
-            <div class="space-y-1">
-              @if (isDateExpanded(day.date)) {
-                <!-- Expanded view: show all events -->
-                <div
-                  *ngFor="let event of day.events"
-                  [routerLink]="['/update-project', event.projectId]"
-                  class="cursor-pointer rounded px-1.5 py-0.5 text-xs transition-colors hover:opacity-80"
-                  [class]="getEventTypeColor(event.type)"
-                >
-                  <div class="truncate font-medium">{{ event.title }}</div>
-                  <div class="truncate text-xs opacity-75">
-                    {{ event.projectName }}
-                  </div>
-                </div>
-              } @else {
-                <!-- Collapsed view: show only first 2 events -->
-                <div
-                  *ngFor="let event of day.events.slice(0, 2)"
-                  [routerLink]="['/update-project', event.projectId]"
-                  class="cursor-pointer rounded px-1.5 py-0.5 text-xs transition-colors hover:opacity-80"
-                  [class]="getEventTypeColor(event.type)"
-                >
-                  <div class="truncate font-medium">{{ event.title }}</div>
-                  <div class="truncate text-xs opacity-75">
-                    {{ event.projectName }}
-                  </div>
-                </div>
-                <div
-                  class="cursor-pointer text-xs text-white/60 transition-colors hover:text-white"
-                  (mouseenter)="onMoreMouseEnter(day.date)"
-                >
-                  +{{ day.events.length - 2 }} more
-                </div>
-              }
-            </div>
-          </div>
-        } @else {
-          <div
-            [class]="
-              'min-h-[100px] rounded-xl border p-2 transition-colors ' +
-              (day.isCurrentMonth
-                ? isToday(day.date)
-                  ? 'border-primary bg-primary/10'
-                  : 'border-white/10 bg-white/5'
-                : 'border-white/5 bg-white/2')
-            "
-          >
-            <div
-              class="mb-1 text-sm font-medium"
-              [class]="
-                day.isCurrentMonth
-                  ? isToday(day.date)
-                    ? 'text-primary'
-                    : 'text-white'
-                  : 'text-white/40'
-              "
-            >
-              {{ day.day }}
-            </div>
-            <div class="space-y-1">
-              <div
-                *ngFor="let event of day.events"
-                [routerLink]="['/update-project', event.projectId]"
-                class="cursor-pointer rounded px-1.5 py-0.5 text-xs transition-colors hover:opacity-80"
-                [class]="getEventTypeColor(event.type)"
-              >
-                <div class="truncate font-medium">{{ event.title }}</div>
-                <div class="truncate text-xs opacity-75">
-                  {{ event.projectName }}
-                </div>
-              </div>
-            </div>
+            +{{ day.events.length - 2 }} more
           </div>
         }
-      </ng-container>
+      </div>
     </div>
-  </div>
+  } @else {
+    <div
+      [class]="
+        'min-h-[100px] rounded-xl border p-2 transition-colors ' +
+        dayCellTone(day)
+      "
+    >
+      <div class="mb-1 text-sm font-medium" [class]="dayNumberTone(day)">
+        {{ day.day }}
+      </div>
+      <div class="space-y-1">
+        @for (event of day.events; track $index) {
+          <ng-container
+            [ngTemplateOutlet]="eventChip"
+            [ngTemplateOutletContext]="{ $implicit: event }"
+          ></ng-container>
+        }
+      </div>
+    </div>
+  }
+</ng-template>
 
-  <!-- Legend -->
-  <div class="flex flex-wrap gap-4 text-xs">
-    <div class="flex items-center gap-2">
-      <div
-        class="h-3 w-3 rounded border"
-        [class]="getEventTypeColor('milestone')"
-      ></div>
-      <span class="text-white/60">Milestone</span>
-    </div>
-    <div class="flex items-center gap-2">
-      <div
-        class="h-3 w-3 rounded border"
-        [class]="getEventTypeColor('due-date')"
-      ></div>
-      <span class="text-white/60">Due Date</span>
-    </div>
-    <div class="flex items-center gap-2">
-      <div
-        class="h-3 w-3 rounded border"
-        [class]="getEventTypeColor('reminder')"
-      ></div>
-      <span class="text-white/60">Reminder</span>
+<ng-template #eventChip let-event>
+  <div
+    [routerLink]="['/update-project', event.projectId]"
+    class="cursor-pointer rounded px-1.5 py-0.5 text-xs transition-colors hover:opacity-80"
+    [class]="getEventTypeColor(event.type)"
+  >
+    <div class="truncate font-medium">{{ event.title }}</div>
+    <div class="truncate text-xs opacity-75">
+      {{ event.projectName }}
     </div>
   </div>
-</div>
+</ng-template>

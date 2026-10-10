@@ -1,70 +1,58 @@
-import { Component, OnInit, computed, signal, inject } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MasterService } from '../../service/master.service';
+import {
+  ApiHttpMethod,
+  IApiDocumentation,
+} from '../../model/interface/master';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
-import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
+import { ApiDocSkeletonComponent } from '@/app/components/ui/api-doc-skeleton.component';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
-
-export interface IApiEndpoint {
-  path: string;
-  method: string;
-  description: string;
-  url: string;
-  parameters?: Array<{
-    name: string;
-    type: string;
-    required: boolean;
-    description: string;
-  }>;
-  requestBody?: {
-    contentType: string;
-    schema: any;
-  };
-  response: {
-    status: number;
-    body: any;
-  };
-  errorResponses?: Array<{
-    status: number;
-    body: any;
-  }>;
-  category: string;
-}
-
-export interface IApiDocumentation {
-  info: {
-    title: string;
-    version: string;
-    description: string;
-    baseUrl: string;
-  };
-  endpoints: {
-    GET: IApiEndpoint[];
-    POST: IApiEndpoint[];
-    PUT: IApiEndpoint[];
-    DELETE: IApiEndpoint[];
-  };
-}
+import {
+  API_DOC_CHIP_ACTIVE_CLASS,
+  API_DOC_CHIP_IDLE_CLASS,
+  API_DOC_COPY,
+  API_DOC_METHOD_TABS,
+  API_DOC_TAB_ACTIVE_CLASS,
+  API_DOC_TAB_IDLE_CLASS,
+} from '@/app/constants/api-doc';
 
 @Component({
   selector: 'app-api-doc',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, ListSkeletonComponent],
+  imports: [CommonModule, PageHeaderComponent, ApiDocSkeletonComponent],
   templateUrl: './api-doc.component.html',
   styleUrls: ['./api-doc.component.css'],
 })
 export class ApiDocComponent implements OnInit {
   private readonly masterService = inject(MasterService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly pageMeta = PRIVATE_PAGE_META['/api-doc'];
-  readonly apiDocSignal = signal<IApiDocumentation | null>(null);
+  readonly copy = API_DOC_COPY;
+  readonly methodTabs = API_DOC_METHOD_TABS;
+  readonly tabActiveClass = API_DOC_TAB_ACTIVE_CLASS;
+  readonly tabIdleClass = API_DOC_TAB_IDLE_CLASS;
+  readonly chipActiveClass = API_DOC_CHIP_ACTIVE_CLASS;
+  readonly chipIdleClass = API_DOC_CHIP_IDLE_CLASS;
+  readonly apiDocSignal = signal<IApiDocumentation | null>(
+    this.masterService.peekApiDocumentation()
+  );
   readonly apiDoc = this.apiDocSignal.asReadonly();
   readonly loadingSignal = signal<boolean>(false);
   readonly loading = this.loadingSignal.asReadonly();
   readonly errorSignal = signal<string | null>(null);
   readonly error = this.errorSignal.asReadonly();
 
-  readonly activeTabSignal = signal<'GET' | 'POST' | 'PUT' | 'DELETE'>('GET');
+  readonly activeTabSignal = signal<ApiHttpMethod>('GET');
   readonly activeTab = this.activeTabSignal.asReadonly();
 
   readonly activeCategorySignal = signal<string | null>(null);
@@ -100,25 +88,31 @@ export class ApiDocComponent implements OnInit {
   }
 
   loadApiDocumentation(): void {
+    if (this.apiDoc()) {
+      return;
+    }
     this.loadingSignal.set(true);
     this.errorSignal.set(null);
 
-    this.masterService.getApiDocumentation().subscribe({
-      next: (data) => {
-        this.apiDocSignal.set(data);
-        this.loadingSignal.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading API documentation:', error);
-        this.errorSignal.set(
-          error?.message || 'Failed to load API documentation'
-        );
-        this.loadingSignal.set(false);
-      },
-    });
+    this.masterService
+      .getApiDocumentation()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.apiDocSignal.set(data);
+          this.loadingSignal.set(false);
+        },
+        error: (error) => {
+          console.error('Error loading API documentation:', error);
+          this.errorSignal.set(
+            error?.message || 'Failed to load API documentation'
+          );
+          this.loadingSignal.set(false);
+        },
+      });
   }
 
-  setActiveTab(tab: 'GET' | 'POST' | 'PUT' | 'DELETE'): void {
+  setActiveTab(tab: ApiHttpMethod): void {
     this.activeTabSignal.set(tab);
     this.activeCategorySignal.set(null);
   }
@@ -157,10 +151,10 @@ export class ApiDocComponent implements OnInit {
     return colors[category] || 'bg-gray-500/20 text-gray-400';
   }
 
-  formatSchema(schema: any): string {
+  formatSchema(schema: unknown): string {
     if (typeof schema === 'string') return schema;
     if (Array.isArray(schema)) return 'Array';
-    if (typeof schema === 'object') {
+    if (schema && typeof schema === 'object') {
       const keys = Object.keys(schema);
       if (keys.length === 0) return 'object';
       return `{ ${keys.join(', ')} }`;

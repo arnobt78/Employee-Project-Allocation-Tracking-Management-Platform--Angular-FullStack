@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, shareReplay, tap } from 'rxjs';
+import { Observable, defer, shareReplay, tap } from 'rxjs';
 import {
   IApiResponse,
   IProject,
@@ -11,6 +11,8 @@ import {
   IGenerateOverviewDraftRequest,
   AuthUser,
   DemoAccount,
+  IApiDocumentation,
+  IApiStatus,
 } from '../model/interface/master';
 import { Employee } from '../model/class/Employee';
 import { environment } from '../../environments/environment';
@@ -32,6 +34,10 @@ export class MasterService {
   private projectsCache$: Observable<IProject[]> | null = null;
   private projectsCacheAt = 0;
   private projectsSnapshot: IProject[] | null = null;
+  private readonly projectDetailSnapshots = new Map<
+    number,
+    { project: IProject; at: number }
+  >();
 
   private projectEmployeesCache$: Observable<IProjectEmployee[]> | null = null;
   private projectEmployeesCacheAt = 0;
@@ -48,6 +54,10 @@ export class MasterService {
   private scheduleCache$: Observable<any> | null = null;
   private scheduleCacheAt = 0;
   private scheduleSnapshot: any | null = null;
+
+  private apiDocumentationCache$: Observable<IApiDocumentation> | null = null;
+  private apiDocumentationSnapshot: IApiDocumentation | null = null;
+  private apiStatusSnapshot: IApiStatus | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -83,6 +93,23 @@ export class MasterService {
     return this.projectsSnapshot;
   }
 
+  /**
+   * Detail snapshots come from mutation/GetProject responses and survive list
+   * invalidation, so create -> edit navigation renders without a cold load.
+   * `fresh` means the entry is authoritative enough to skip revalidation.
+   */
+  peekProject(id: number): { project: IProject; fresh: boolean } | null {
+    const detail = this.projectDetailSnapshots.get(id);
+    const listed = this.projectsSnapshot?.find((p) => p.projectId === id);
+    if (detail && (!listed || detail.at >= this.projectsCacheAt)) {
+      return {
+        project: detail.project,
+        fresh: Date.now() - detail.at < this.cacheTtlMs,
+      };
+    }
+    return listed ? { project: listed, fresh: false } : null;
+  }
+
   peekProjectEmployees(): IProjectEmployee[] | null {
     return this.projectEmployeesSnapshot;
   }
@@ -114,16 +141,21 @@ export class MasterService {
     this.scheduleCacheAt = 0;
     this.employeesSnapshot = null;
     this.projectsSnapshot = null;
+    this.projectDetailSnapshots.clear();
     this.projectEmployeesSnapshot = null;
     this.dashboardSnapshot = null;
     this.departmentsSnapshot = null;
     this.scheduleSnapshot = null;
+    this.apiDocumentationCache$ = null;
+    this.apiDocumentationSnapshot = null;
+    this.apiStatusSnapshot = null;
   }
 
   invalidateEmployees(): void {
     this.employeesCache$ = null;
     this.employeesCacheAt = 0;
     this.employeesSnapshot = null;
+    this.projectDetailSnapshots.clear();
     this.dashboardCache$ = null;
     this.dashboardCacheAt = 0;
     this.dashboardSnapshot = null;
@@ -232,16 +264,14 @@ export class MasterService {
   }
 
   saveProject(obj: IProject): Observable<IProject> {
-    return this.http
-      .post<IProject>(this.getProxyUrl('CreateProject'), obj)
-      .pipe(tap(() => this.invalidateProjects()));
+    return this.trackProjectMutation(
+      this.http.post<IProject>(this.getProxyUrl('CreateProject'), obj)
+    );
   }
 
   updateProject(obj: IProject): Observable<IProject> {
     const queryUrl = this.getProxyUrl('UpdateProject') + `?id=${obj.projectId}`;
-    return this.http
-      .put<IProject>(queryUrl, obj)
-      .pipe(tap(() => this.invalidateProjects()));
+    return this.trackProjectMutation(this.http.put<IProject>(queryUrl, obj));
   }
 
   getAllProjects(): Observable<IProject[]> {
@@ -266,7 +296,12 @@ export class MasterService {
 
   getProjectById(id: number): Observable<IProject> {
     const queryUrl = this.getProxyUrl('GetProject') + `?id=${id}`;
-    return this.http.get<IProject>(queryUrl);
+    return defer(() => {
+      const issuedAt = Date.now();
+      return this.http
+        .get<IProject>(queryUrl)
+        .pipe(tap((project) => this.rememberProject(project, issuedAt)));
+    });
   }
 
   getProjectResourceInsights(
@@ -314,51 +349,59 @@ export class MasterService {
 
   deleteProjectById(id: number): Observable<IApiResponse> {
     const queryUrl = this.getProxyUrl('DeleteProject') + `?id=${id}`;
-    return this.http
-      .delete<IApiResponse>(queryUrl)
-      .pipe(tap(() => this.invalidateProjects()));
+    return this.http.delete<IApiResponse>(queryUrl).pipe(
+      tap(() => {
+        this.invalidateProjects();
+        this.projectDetailSnapshots.delete(id);
+      })
+    );
   }
 
   requestProjectApproval(
     projectId: number,
     payload: Record<string, unknown>
   ): Observable<IProject> {
-    return this.http.post<IProject>(this.getProxyUrl('RequestApproval'), {
-      projectId,
-      ...payload,
-    });
+    return this.trackProjectMutation(
+      this.http.post<IProject>(this.getProxyUrl('RequestApproval'), {
+        projectId,
+        ...payload,
+      })
+    );
   }
 
   approveProject(
     projectId: number,
     payload: Record<string, unknown>
   ): Observable<IProject> {
-    return this.http.post<IProject>(this.getProxyUrl('ApproveProject'), {
-      projectId,
-      ...payload,
-    });
+    return this.trackProjectMutation(
+      this.http.post<IProject>(this.getProxyUrl('ApproveProject'), {
+        projectId,
+        ...payload,
+      })
+    );
   }
 
   rejectProject(
     projectId: number,
     payload: Record<string, unknown>
   ): Observable<IProject> {
-    return this.http.post<IProject>(this.getProxyUrl('RejectProject'), {
-      projectId,
-      ...payload,
-    });
+    return this.trackProjectMutation(
+      this.http.post<IProject>(this.getProxyUrl('RejectProject'), {
+        projectId,
+        ...payload,
+      })
+    );
   }
 
   resetProjectApproval(
     projectId: number,
     payload: Record<string, unknown> = {}
   ): Observable<IProject> {
-    return this.http.post<IProject>(
-      this.getProxyUrl('ResetProjectApproval'),
-      {
+    return this.trackProjectMutation(
+      this.http.post<IProject>(this.getProxyUrl('ResetProjectApproval'), {
         projectId,
         ...payload,
-      }
+      })
     );
   }
 
@@ -366,10 +409,12 @@ export class MasterService {
     projectId: number,
     payload: Record<string, unknown>
   ): Observable<IProject> {
-    return this.http.post<IProject>(this.getProxyUrl('AddReviewerComment'), {
-      projectId,
-      ...payload,
-    });
+    return this.trackProjectMutation(
+      this.http.post<IProject>(this.getProxyUrl('AddReviewerComment'), {
+        projectId,
+        ...payload,
+      })
+    );
   }
 
   resolveReviewerComment(
@@ -377,13 +422,12 @@ export class MasterService {
     commentId: string,
     payload: Record<string, unknown>
   ): Observable<IProject> {
-    return this.http.post<IProject>(
-      this.getProxyUrl('ResolveReviewerComment'),
-      {
+    return this.trackProjectMutation(
+      this.http.post<IProject>(this.getProxyUrl('ResolveReviewerComment'), {
         projectId,
         commentId,
         ...payload,
-      }
+      })
     );
   }
 
@@ -468,12 +512,43 @@ export class MasterService {
     );
   }
 
-  getApiDocumentation(): Observable<any> {
-    return this.http.get<any>(this.getProxyUrl('GetApiDocumentation'));
+  peekApiDocumentation(): IApiDocumentation | null {
+    return this.apiDocumentationSnapshot;
   }
 
-  getApiStatus(): Observable<any> {
-    return this.http.get<any>(this.getProxyUrl('GetApiStatus'));
+  peekApiStatus(): IApiStatus | null {
+    return this.apiStatusSnapshot;
+  }
+
+  /** The API reference is static per deployment, so it is cached for the session. */
+  getApiDocumentation(): Observable<IApiDocumentation> {
+    if (!this.apiDocumentationCache$) {
+      this.apiDocumentationCache$ = this.http
+        .get<IApiDocumentation>(this.getProxyUrl('GetApiDocumentation'))
+        .pipe(
+          tap({
+            next: (doc) => {
+              this.apiDocumentationSnapshot = doc;
+            },
+            error: () => {
+              this.apiDocumentationCache$ = null;
+            },
+          }),
+          shareReplay({ bufferSize: 1, refCount: false })
+        );
+    }
+    return this.apiDocumentationCache$;
+  }
+
+  /** Live data: always refetched; the snapshot only seeds the next visit. */
+  getApiStatus(): Observable<IApiStatus> {
+    return this.http
+      .get<IApiStatus>(this.getProxyUrl('GetApiStatus'))
+      .pipe(
+        tap((status) => {
+          this.apiStatusSnapshot = status;
+        })
+      );
   }
 
   private getCached<T>(
@@ -498,6 +573,36 @@ export class MasterService {
     );
     setCache(nextCache);
     return nextCache;
+  }
+
+  /** Every project mutation returns the full document: refresh lists + seed the detail snapshot. */
+  private trackProjectMutation(
+    request$: Observable<IProject>
+  ): Observable<IProject> {
+    return request$.pipe(
+      tap((project) => {
+        this.invalidateProjects();
+        this.rememberProject(project);
+      })
+    );
+  }
+
+  /** `issuedAt` keeps a slow read from overwriting a newer mutation response. */
+  private rememberProject(
+    project: IProject | null | undefined,
+    issuedAt = Date.now()
+  ): void {
+    if (!project?.projectId || project.projectId <= 0) {
+      return;
+    }
+    const existing = this.projectDetailSnapshots.get(project.projectId);
+    if (existing && existing.at > issuedAt) {
+      return;
+    }
+    this.projectDetailSnapshots.set(project.projectId, {
+      project,
+      at: issuedAt,
+    });
   }
 
   private getProxyUrl(endpoint: string): string {

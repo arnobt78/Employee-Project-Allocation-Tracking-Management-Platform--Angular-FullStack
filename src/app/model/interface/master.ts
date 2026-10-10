@@ -401,3 +401,96 @@ export interface Employee {
 
 export type SectionId = 'overview' | 'team' | 'contact' | 'approval';
 
+export type ApiHttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
+export interface IApiEndpoint {
+  path: string;
+  method: string;
+  description: string;
+  url: string;
+  parameters?: Array<{
+    name: string;
+    type: string;
+    required: boolean;
+    description: string;
+  }>;
+  requestBody?: {
+    contentType: string;
+    schema: unknown;
+  };
+  response: {
+    status: number;
+    body: unknown;
+  };
+  errorResponses?: Array<{
+    status: number;
+    body: unknown;
+  }>;
+  category: string;
+}
+
+export interface IApiDocumentation {
+  info: {
+    title: string;
+    version: string;
+    description: string;
+    baseUrl: string;
+  };
+  endpoints: Record<ApiHttpMethod, IApiEndpoint[]>;
+}
+
+export interface IApiStatus {
+  timestamp: string;
+  overallStatus: 'operational' | 'degraded' | 'down';
+  systemHealth: {
+    database: {
+      status: string;
+      responseTime: number;
+      connected: boolean;
+    };
+    api: {
+      status: string;
+      uptime: string;
+      totalRequests: number;
+      avgResponseTime: number;
+      successRate: number;
+    };
+    data: {
+      employees: number;
+      projects: number;
+      assignments: number;
+      departments: number;
+    };
+  };
+  endpointHealth: Array<{
+    category: string;
+    total: number;
+    healthy: number;
+    avgResponseTime: number;
+    status: string;
+  }>;
+  performanceHistory: Array<{
+    date: string;
+    day: string;
+    avgResponseTime: number;
+    requests: number;
+    successRate: number;
+    errors: number;
+  }>;
+  recentActivity: Array<{
+    timestamp: string;
+    endpoint: string;
+    method: string;
+    status: number;
+    responseTime: number;
+  }>;
+  metrics: {
+    totalEndpoints: number;
+    activeEndpoints: number;
+    successRate: number;
+    avgResponseTime: number;
+    totalRequests: number;
+    errorRate: number;
+  };
+}
+

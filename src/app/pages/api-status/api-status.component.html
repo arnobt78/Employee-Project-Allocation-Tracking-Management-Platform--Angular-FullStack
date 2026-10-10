@@ -1,5 +1,7 @@
-<div class="space-y-6 text-white/85">
-  <!-- Header -->
+@if (loading() && !status()) {
+<app-api-status-skeleton></app-api-status-skeleton>
+} @else {
+<div class="text-white/85">
   <app-page-header
     [title]="pageMeta.title"
     [subtitle]="pageMeta.subtitle"
@@ -10,25 +12,40 @@
       [disabled]="loading()"
       class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
     >
-      {{ loading() ? "Refreshing..." : "Refresh" }}
+      {{ loading() ? copy.refreshing : copy.refresh }}
     </button>
   </app-page-header>
 
-  <!-- Loading State -->
-  <div *ngIf="loading() && !status()">
-    <app-list-skeleton [rows]="4"></app-list-skeleton>
-  </div>
+  <div class="eh-content-stack">
+    @if (error() && !status()) {
+      <div
+        class="rounded-[28px] border border-red-500/30 bg-red-500/10 p-2 sm:p-4 text-center text-red-400"
+      >
+        {{ error() }}
+      </div>
+    }
 
-  <!-- Error State -->
-  <div
-    *ngIf="error()"
-    class="rounded-[28px] border border-red-500/30 bg-red-500/10 p-2 sm:p-4 text-center text-red-400"
-  >
-    {{ error() }}
-  </div>
+    @if (status(); as current) {
+    @if (error()) {
+      <div
+        class="flex items-center justify-between gap-3 rounded-2xl border border-amber-400/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-200 sm:text-sm"
+        role="status"
+        data-testid="api-status-refresh-failed"
+      >
+        <span>
+          {{ copy.refreshFailed }} {{ formatTimestamp(current.timestamp) }}.
+        </span>
+        <button
+          type="button"
+          (click)="loadApiStatus()"
+          [disabled]="loading()"
+          class="rounded-lg border border-amber-400/40 px-3 py-1 transition-colors hover:bg-amber-500/20 disabled:opacity-50"
+        >
+          {{ copy.retry }}
+        </button>
+      </div>
+    }
 
-  <!-- Main Content -->
-  <div *ngIf="status() && !error()" class="space-y-6">
     <!-- Overall Status Card -->
     <div
       class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
@@ -36,17 +53,17 @@
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-base sm:text-xl font-medium text-white mb-2">
-            Overall Status
+            {{ copy.overallStatus }}
           </h2>
           <div class="flex items-center gap-3">
             <span
               class="inline-flex rounded-full border px-3 py-1 text-sm font-medium capitalize"
               [class]="overallHealthBg()"
             >
-              {{ status()?.overallStatus }}
+              {{ current.overallStatus }}
             </span>
             <span class="text-sm text-white/60">
-              Last updated: {{ formatTimestamp(status()!.timestamp) }}
+              {{ copy.lastUpdated }} {{ formatTimestamp(current.timestamp) }}
             </span>
           </div>
         </div>
@@ -55,55 +72,43 @@
             class="text-xl sm:text-2xl leading-none font-medium"
             [class]="overallHealthColor()"
           >
-            {{ status()?.metrics?.successRate ?? 0 }}%
+            {{ current.metrics.successRate }}%
           </div>
-          <div class="text-xs sm:text-sm text-white/60">Success Rate</div>
+          <div class="text-xs sm:text-sm text-white/60">
+            {{ copy.successRate }}
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Metrics Cards -->
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <div
-        class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
-      >
-        <div class="text-sm text-white/60 mb-2">Total Endpoints</div>
-        <div class="text-xl sm:text-2xl leading-none font-medium text-white">
-          {{ status()?.metrics?.totalEndpoints ?? 0 }}
+      @for (card of metricCards; track card.label; let i = $index) {
+        <div
+          class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
+        >
+          <div class="text-sm text-white/60 mb-2">{{ card.label }}</div>
+          <div class="text-xl sm:text-2xl leading-none font-medium text-white">
+            @switch (i) {
+              @case (0) {
+                {{ current.metrics.totalEndpoints }}
+              }
+              @case (1) {
+                {{ current.metrics.avgResponseTime }}ms
+              }
+              @case (2) {
+                {{ current.metrics.totalRequests | number }}
+              }
+              @default {
+                {{ current.metrics.errorRate }}%
+              }
+            }
+          </div>
+          <div class="mt-2 text-xs sm:text-sm" [class]="card.captionClass">
+            {{ card.caption ?? current.metrics.activeEndpoints + ' active' }}
+          </div>
         </div>
-        <div class="mt-2 text-xs sm:text-sm text-green-400">
-          {{ status()?.metrics?.activeEndpoints ?? 0 }} active
-        </div>
-      </div>
-      <div
-        class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
-      >
-        <div class="text-sm text-white/60 mb-2">Avg Response Time</div>
-        <div class="text-xl sm:text-2xl leading-none font-medium text-white">
-          {{ status()?.metrics?.avgResponseTime ?? 0 }}ms
-        </div>
-        <div class="mt-2 text-xs sm:text-sm text-white/60">Last 24 hours</div>
-      </div>
-      <div
-        class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
-      >
-        <div class="text-sm text-white/60 mb-2">Total Requests</div>
-        <div class="text-xl sm:text-2xl leading-none font-medium text-white">
-          {{ status()?.metrics?.totalRequests ?? 0 | number }}
-        </div>
-        <div class="mt-2 text-xs sm:text-sm text-white/60">Last 7 days</div>
-      </div>
-      <div
-        class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
-      >
-        <div class="text-sm text-white/60 mb-2">Error Rate</div>
-        <div class="text-xl sm:text-2xl leading-none font-medium text-white">
-          {{ status()?.metrics?.errorRate ?? 0 }}%
-        </div>
-        <div class="mt-2 text-xs sm:text-sm text-red-400">
-          Requires attention
-        </div>
-      </div>
+      }
     </div>
 
     <!-- Tabs -->
@@ -111,46 +116,15 @@
       class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
     >
       <div class="mb-6 flex flex-wrap gap-2 border-b border-white/10">
-        <button
-          (click)="setActiveTab('overview')"
-          [class]="
-            activeTab() === 'overview'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
-              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
-          "
-        >
-          Overview
-        </button>
-        <button
-          (click)="setActiveTab('endpoints')"
-          [class]="
-            activeTab() === 'endpoints'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
-              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
-          "
-        >
-          Endpoints
-        </button>
-        <button
-          (click)="setActiveTab('performance')"
-          [class]="
-            activeTab() === 'performance'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
-              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
-          "
-        >
-          Performance
-        </button>
-        <button
-          (click)="setActiveTab('activity')"
-          [class]="
-            activeTab() === 'activity'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
-              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
-          "
-        >
-          Activity
-        </button>
+        @for (tab of tabs; track tab.id) {
+          <button
+            type="button"
+            (click)="setActiveTab(tab.id)"
+            [class]="activeTab() === tab.id ? activeTabClass : idleTabClass"
+          >
+            {{ tab.label }}
+          </button>
+        }
       </div>
 
       <!-- Overview Tab -->
@@ -158,48 +132,51 @@
         <!-- System Health -->
         <div>
           <h3 class="text-base sm:text-xl font-medium text-white mb-4">
-            System Health
+            {{ copy.systemHealth }}
           </h3>
           <div class="grid gap-4 sm:grid-cols-2">
             <!-- Database -->
             <div class="rounded-xl border border-white/10 bg-white/5 p-4">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-white">Database</span>
+                <span class="text-sm font-medium text-white">{{
+                  copy.database
+                }}</span>
                 <span
                   class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
-                  [class]="
-                    getStatusColor(status()!.systemHealth.database.status)
-                  "
+                  [class]="getStatusColor(current.systemHealth.database.status)"
                 >
-                  {{ status()!.systemHealth.database.status }}
+                  {{ current.systemHealth.database.status }}
                 </span>
               </div>
               <div class="text-xs sm:text-sm text-white/60">
-                Response Time:
-                {{ status()!.systemHealth.database.responseTime }}ms
+                {{ copy.responseTime }}
+                {{ current.systemHealth.database.responseTime }}ms
               </div>
               <div class="text-xs sm:text-sm text-white/60">
-                Connected:
-                {{ status()!.systemHealth.database.connected ? "Yes" : "No" }}
+                {{ copy.connected }}
+                {{ current.systemHealth.database.connected ? "Yes" : "No" }}
               </div>
             </div>
 
             <!-- API -->
             <div class="rounded-xl border border-white/10 bg-white/5 p-4">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-white">API Service</span>
+                <span class="text-sm font-medium text-white">{{
+                  copy.apiService
+                }}</span>
                 <span
                   class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
-                  [class]="getStatusColor(status()!.systemHealth.api.status)"
+                  [class]="getStatusColor(current.systemHealth.api.status)"
                 >
-                  {{ status()!.systemHealth.api.status }}
+                  {{ current.systemHealth.api.status }}
                 </span>
               </div>
               <div class="text-xs sm:text-sm text-white/60">
-                Uptime: {{ status()!.systemHealth.api.uptime }}
+                {{ copy.uptime }} {{ current.systemHealth.api.uptime }}
               </div>
               <div class="text-xs sm:text-sm text-white/60">
-                Avg Response: {{ status()!.systemHealth.api.avgResponseTime }}ms
+                {{ copy.avgResponse }}
+                {{ current.systemHealth.api.avgResponseTime }}ms
               </div>
             </div>
           </div>
@@ -208,41 +185,19 @@
         <!-- Data Statistics -->
         <div>
           <h3 class="text-base sm:text-xl font-medium text-white mb-4">
-            Data Statistics
+            {{ copy.dataStatistics }}
           </h3>
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div class="rounded-xl border border-white/10 bg-white/5 p-4">
-              <div class="text-sm text-white/60 mb-2">Employees</div>
-              <div
-                class="text-xl sm:text-2xl leading-none font-medium text-white"
-              >
-                {{ status()!.systemHealth.data.employees }}
+            @for (item of dataStatistics(); track item.label) {
+              <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+                <div class="text-sm text-white/60 mb-2">{{ item.label }}</div>
+                <div
+                  class="text-xl sm:text-2xl leading-none font-medium text-white"
+                >
+                  {{ item.value }}
+                </div>
               </div>
-            </div>
-            <div class="rounded-xl border border-white/10 bg-white/5 p-4">
-              <div class="text-sm text-white/60 mb-2">Projects</div>
-              <div
-                class="text-xl sm:text-2xl leading-none font-medium text-white"
-              >
-                {{ status()!.systemHealth.data.projects }}
-              </div>
-            </div>
-            <div class="rounded-xl border border-white/10 bg-white/5 p-4">
-              <div class="text-sm text-white/60 mb-2">Assignments</div>
-              <div
-                class="text-xl sm:text-2xl leading-none font-medium text-white"
-              >
-                {{ status()!.systemHealth.data.assignments }}
-              </div>
-            </div>
-            <div class="rounded-xl border border-white/10 bg-white/5 p-4">
-              <div class="text-sm text-white/60 mb-1">Departments</div>
-              <div
-                class="text-xl sm:text-2xl leading-none font-medium text-white"
-              >
-                {{ status()!.systemHealth.data.departments }}
-              </div>
-            </div>
+            }
           </div>
         </div>
       </div>
@@ -384,5 +339,7 @@
         </div>
       </div>
     </div>
+    }
   </div>
 </div>
+}

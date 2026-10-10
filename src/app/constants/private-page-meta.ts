@@ -1,9 +1,16 @@
+import { PROJECT_DETAIL_SUBTITLE } from './project-detail';
+
 export type PrivateSkeletonKind =
   | 'dashboard'
   | 'list'
+  | 'project-detail'
   | 'insights'
-  | 'simple'
-  | 'project-form';
+  | 'calendar'
+  | 'api-doc'
+  | 'api-status'
+  | 'simple';
+
+export type ProjectDetailMode = 'create' | 'edit';
 
 export type ListPageRowVariant = 'default' | 'employee' | 'project' | 'assignment';
 
@@ -11,7 +18,7 @@ export interface PrivatePageMeta {
   title: string;
   subtitle: string;
   icon: string;
-  /** Shape of the shared refresh placeholder (not the page’s own data skeleton). */
+  /** Loading mirror for the refresh placeholder; must match the page's own cold-load skeleton. */
   skeleton: PrivateSkeletonKind;
   /** KPI tile count for `list` skeleton (default 6). */
   listKpiCount?: number;
@@ -21,6 +28,8 @@ export interface PrivatePageMeta {
   listShowPagination?: boolean;
   /** List row chip density for skeleton mirror. */
   listRowVariant?: ListPageRowVariant;
+  /** Project detail mirror mode (create shows the draft title; edit pends the project name). */
+  projectMode?: ProjectDetailMode;
 }
 
 /** Static page chrome for instant refresh paint (matches app-page-header copy). */
@@ -54,17 +63,17 @@ export const PRIVATE_PAGE_META: Record<string, PrivatePageMeta> = {
   },
   '/new-project': {
     title: 'Untitled project',
-    subtitle:
-      'Configure the essentials before rolling the project out to your teams. Organize the information into focused sections, edit inline, and save when you are ready.',
+    subtitle: PROJECT_DETAIL_SUBTITLE,
     icon: 'folder-kanban',
-    skeleton: 'project-form',
+    skeleton: 'project-detail',
+    projectMode: 'create',
   },
   '/update-project': {
     title: 'Project setup',
-    subtitle:
-      'Configure the essentials before rolling the project out to your teams. Organize the information into focused sections, edit inline, and save when you are ready.',
+    subtitle: PROJECT_DETAIL_SUBTITLE,
     icon: 'pencil',
-    skeleton: 'project-form',
+    skeleton: 'project-detail',
+    projectMode: 'edit',
   },
   '/project-employee': {
     title: 'Project Team',
@@ -86,19 +95,19 @@ export const PRIVATE_PAGE_META: Record<string, PrivatePageMeta> = {
     title: 'Calendar & Timeline',
     subtitle: 'View project milestones, timelines, and due date reminders',
     icon: 'calendar-range',
-    skeleton: 'insights',
+    skeleton: 'calendar',
   },
   '/api-doc': {
     title: 'API Documentation',
     subtitle: 'Complete API reference for Employee Management System',
     icon: 'file-text',
-    skeleton: 'simple',
+    skeleton: 'api-doc',
   },
   '/api-status': {
     title: 'API Status',
     subtitle: 'Monitor API health, performance, and activity in real-time',
     icon: 'activity',
-    skeleton: 'simple',
+    skeleton: 'api-status',
   },
 };
 
@@ -114,11 +123,8 @@ export function resolvePrivatePageMeta(url: string): PrivatePageMeta {
   if (PRIVATE_PAGE_META[path]) {
     return PRIVATE_PAGE_META[path];
   }
-  if (path.startsWith('/update-project/')) {
+  if (path.startsWith('/update-project/') || path.startsWith('/new-project/')) {
     return PRIVATE_PAGE_META['/update-project'];
-  }
-  if (path.startsWith('/new-project/')) {
-    return PRIVATE_PAGE_META['/new-project'];
   }
   const prefixes = Object.keys(PRIVATE_PAGE_META).sort(
     (a, b) => b.length - a.length

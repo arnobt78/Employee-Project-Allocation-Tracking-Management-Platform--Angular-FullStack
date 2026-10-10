@@ -1,63 +1,59 @@
-<div class="space-y-6">
-  <!-- Header -->
+@if (loading() && !apiDoc()) {
+<app-api-doc-skeleton></app-api-doc-skeleton>
+} @else {
+<div class="text-white/85">
   <app-page-header
     [title]="pageMeta.title"
     [subtitle]="pageMeta.subtitle"
     [icon]="pageMeta.icon"
   >
-    <div
-      *ngIf="apiDoc()"
-      class="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2"
-    >
-      <span class="text-xs text-white/60">Version</span>
-      <span class="text-sm font-medium text-white">{{
-        apiDoc()!.info.version
-      }}</span>
-    </div>
+    @if (apiDoc(); as doc) {
+      <div
+        class="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2"
+      >
+        <span class="text-xs text-white/60">{{ copy.versionPill }}</span>
+        <span class="text-sm font-medium text-white">{{
+          doc.info.version
+        }}</span>
+      </div>
+    }
   </app-page-header>
 
-  <!-- Loading State -->
-  <div *ngIf="loading() && !apiDoc()">
-    <app-list-skeleton [rows]="4"></app-list-skeleton>
-  </div>
+  <div class="eh-content-stack">
+    @if (error() && !apiDoc()) {
+      <div class="rounded-lg border border-red-500/30 bg-red-500/10 p-4">
+        <p class="text-sm text-red-400">{{ error() }}</p>
+        <button
+          (click)="loadApiDocumentation()"
+          class="mt-2 rounded-lg bg-red-500/20 px-4 py-2 text-sm text-red-400 transition-colors hover:bg-red-500/30"
+        >
+          Retry
+        </button>
+      </div>
+    }
 
-  <!-- Error State -->
-  <div
-    *ngIf="error() && !loading()"
-    class="rounded-lg border border-red-500/30 bg-red-500/10 p-4"
-  >
-    <p class="text-sm text-red-400">{{ error() }}</p>
-    <button
-      (click)="loadApiDocumentation()"
-      class="mt-2 rounded-lg bg-red-500/20 px-4 py-2 text-sm text-red-400 transition-colors hover:bg-red-500/30"
-    >
-      Retry
-    </button>
-  </div>
-
-  <!-- API Documentation Content -->
-  <div *ngIf="apiDoc()" class="space-y-6">
+    @if (apiDoc(); as doc) {
     <!-- API Info Card -->
     <div
       class="rounded-2xl border border-white/10 bg-white/5 p-2 sm:p-4 backdrop-blur-md"
     >
       <h2 class="mb-4 text-xl font-medium text-white">
-        {{ apiDoc()!.info.title }}
+        {{ doc.info.title }}
       </h2>
       <p class="mb-4 text-sm text-white/70">
-        {{ apiDoc()!.info.description }}
+        {{ doc.info.description }}
       </p>
       <div class="flex flex-wrap items-center gap-4">
         <div class="flex items-center gap-2">
-          <span class="text-xs text-white/60">Base URL:</span>
+          <span class="text-xs text-white/60">{{ copy.baseUrl }}</span>
           <code class="rounded bg-white/10 px-2 py-1 text-xs text-white">{{
-            apiDoc()!.info.baseUrl
+            doc.info.baseUrl
           }}</code>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-xs text-white/60">Version:</span>
+          <span class="text-xs text-white/60">{{ copy.version }}</span>
           <span class="text-sm font-medium text-white">{{
-            apiDoc()!.info.version
+            doc.info.version
           }}</span>
         </div>
       </div>
@@ -68,71 +64,37 @@
       class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
     >
       <div class="mb-6 flex gap-2 border-b border-white/10">
-        <button
-          (click)="setActiveTab('GET')"
-          [class]="
-            activeTab() === 'GET'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
-              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
-          "
-        >
-          GET
-        </button>
-        <button
-          (click)="setActiveTab('POST')"
-          [class]="
-            activeTab() === 'POST'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
-              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
-          "
-        >
-          POST
-        </button>
-        <button
-          (click)="setActiveTab('PUT')"
-          [class]="
-            activeTab() === 'PUT'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
-              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
-          "
-        >
-          PUT
-        </button>
-        <button
-          (click)="setActiveTab('DELETE')"
-          [class]="
-            activeTab() === 'DELETE'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
-              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
-          "
-        >
-          DELETE
-        </button>
+        @for (method of methodTabs; track method) {
+          <button
+            type="button"
+            (click)="setActiveTab(method)"
+            [class]="activeTab() === method ? tabActiveClass : tabIdleClass"
+          >
+            {{ method }}
+          </button>
+        }
       </div>
 
       <!-- Category Filter -->
       <div class="mb-6 flex flex-wrap gap-2">
         <button
+          type="button"
           (click)="setActiveCategory(null)"
-          [class]="
-            activeCategory() === null
-              ? 'rounded-full border border-primary bg-primary/20 px-3 py-1 text-xs font-medium text-primary'
-              : 'rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/60 transition-colors hover:border-white/20 hover:bg-white/10 hover:text-white'
-          "
+          [class]="activeCategory() === null ? chipActiveClass : chipIdleClass"
         >
-          All Categories
+          {{ copy.allCategories }}
         </button>
-        <button
-          *ngFor="let category of categories()"
-          (click)="setActiveCategory(category)"
-          [class]="
-            activeCategory() === category
-              ? 'rounded-full border border-primary bg-primary/20 px-3 py-1 text-xs font-medium text-primary'
-              : 'rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/60 transition-colors hover:border-white/20 hover:bg-white/10 hover:text-white'
-          "
-        >
-          {{ category }}
-        </button>
+        @for (category of categories(); track category) {
+          <button
+            type="button"
+            (click)="setActiveCategory(category)"
+            [class]="
+              activeCategory() === category ? chipActiveClass : chipIdleClass
+            "
+          >
+            {{ category }}
+          </button>
+        }
       </div>
 
       <!-- Endpoints List -->
@@ -170,7 +132,7 @@
               class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/60 transition-colors hover:border-white/20 hover:bg-white/10 hover:text-white"
               title="Copy URL"
             >
-              📋 Copy URL
+              {{ copy.copyUrl }}
             </button>
           </div>
 
@@ -302,5 +264,7 @@
         </div>
       </div>
     </div>
+    }
   </div>
 </div>
+}

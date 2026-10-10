@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { AppIconComponent } from './app-icon.component';
+import { TextStubComponent } from './text-stub.component';
 
 @Component({
   selector: 'app-page-header',
   standalone: true,
-  imports: [CommonModule, AppIconComponent],
+  imports: [CommonModule, AppIconComponent, TextStubComponent],
   host: { class: 'block' },
   template: `
     <div
@@ -22,9 +23,17 @@ import { AppIconComponent } from './app-icon.component';
           </span>
         }
         <div>
-          <h1 class="text-xl leading-tight font-medium text-white sm:text-2xl">
-            {{ title }}
-          </h1>
+          @if (titlePending) {
+            <app-text-stub
+              class="block text-xl leading-tight font-medium sm:text-2xl"
+              data-testid="page-header-title-pending"
+              bar="inset-y-0 left-0 my-auto h-5 w-48 rounded-full sm:h-6"
+            ></app-text-stub>
+          } @else {
+            <h1 class="text-xl leading-tight font-medium text-white sm:text-2xl">
+              {{ title }}
+            </h1>
+          }
           @if (subtitle) {
             <p class="text-xs text-white/60 sm:text-sm">{{ subtitle }}</p>
           }
@@ -40,4 +49,6 @@ export class PageHeaderComponent {
   @Input({ required: true }) title = '';
   @Input() subtitle = '';
   @Input() icon = '';
+  /** Render a title-height stub while a data-driven title (e.g. project name) loads. */
+  @Input() titlePending = false;
 }

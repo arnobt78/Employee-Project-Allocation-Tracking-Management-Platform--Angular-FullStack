@@ -268,3 +268,51 @@ Append-only. Do not rewrite prior entries.
 | Rationale | List expand showed "—" due to missing join and null health seed, not missing schema. |
 | Linked | GATE-0017, CP-0019, REQ-0129 |
 | Status | DONE |
+
+---
+
+## DEC-0030 — Single-layer skeleton contract (proposed)
+
+| Field | Value |
+|---|---|
+| Date | 2026-10-10 |
+| Decision | Extend the Dashboard/list pattern to every remaining private page: one page-specific mirror skeleton component, rendered by **both** the route placeholder and the page's cold-load branch, inside the same wrapper (`text-white/85` → header → `.eh-content-stack`). Header action stubs come from `PRIVATE_PAGE_META` so both phases render the same stubs. No new loader architecture. |
+| Rationale | Investigation shows the "double layer" is a mismatch between two loading phases, not two loaders at once: placeholder uses generic `simple`/`insights`/`project-form` shapes while pages render different wrappers (`space-y-6` / `space-y-10`), different header actions, and generic list rows. |
+| Linked | GATE-0018, CP-0021, REQ-0132–0135, TASK-0053–0059 |
+| Status | DONE — approved + shipped 2026-10-10 |
+
+---
+
+## DEC-0031 — Send mutation emails in the background via `waitUntil`
+
+| Field | Value |
+|---|---|
+| Date | 2026-10-10 |
+| Decision | Mutations respond as soon as data is persisted; Resend → SMTP delivery runs via `@vercel/functions` `waitUntil` (`notifyInBackground` in `handler.mjs`). Failures are logged only. |
+| Rationale | Awaited email added ~5 s to every create/update/delete (UpdateEmployee ~6 s → ~1.9 s after). `waitUntil` keeps the Vercel function alive until delivery settles; locally the long-lived dev server finishes the promise. |
+| Linked | GATE-0018, TASK-0060, RISK-0017 |
+| Status | DONE |
+
+---
+
+## DEC-0032 — Stale-chunk reload + wildcard redirect
+
+| Field | Value |
+|---|---|
+| Date | 2026-10-10 |
+| Decision | `withNavigationErrorHandler` reloads once to the target URL on chunk-load errors (10 s cooldown in `sessionStorage`); unknown paths redirect to `dashboard`. |
+| Rationale | Tabs open across a deploy request removed lazy chunks; unknown URLs previously threw NG04002. |
+| Linked | TASK-0060 |
+| Status | DONE |
+
+---
+
+## DEC-0033 — Mutation results win over in-flight reads; clear caches on login
+
+| Field | Value |
+|---|---|
+| Date | 2026-10-10 |
+| Decision | Project mutation responses bump the form request token and the service keeps the newest detail snapshot by issue time; approval/comment actions no longer refetch. Successful login clears all client caches. |
+| Rationale | verify-deep: slow `GetProject` could overwrite a just-saved project. Security review: session expiry + re-login in the same tab could show the previous user's cached data. |
+| Linked | TASK-0060 |
+| Status | DONE |

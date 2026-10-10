@@ -1,5 +1,38 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-10 — GATE-0018 skeleton parity + A–Z verify sweep
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npm test -- --watch=false --browsers=ChromeHeadless` | **PASS** | 63/63 |
+| `npx ng build` | **PASS** | Initial 989.03 kB, no warnings |
+| `node --check api/employee-management/handler.mjs` | **PASS** | |
+| Browser A–Z sweep (Playwright, local `npm start`) | **PASS** | 10 routes direct + in-app nav, back/forward, logout/login guard, Employee/Project/Assignment CRUD → lists + dashboard fresh, API Status failure notice, stale-chunk reload, `**` redirect; test records cleaned up |
+| Mutation latency (local) | **PASS** | Update ~6 s → 1.9 s, Delete 6.8 s → 1.4 s; emails delivered after response (Resend → SMTP fallback logged) |
+| Skeleton geometry parity | **PASS** | Placeholder ↔ page identical; API Doc code block 1 px (pre-existing) |
+| Independent verifier | **PASS WITH WARNINGS** | Calendar `@Input` in `computed` (fixed), project read race (fixed), notice flicker (fixed) |
+| Security review | **PASS WITH WARNINGS** | Cross-session cache on re-login (fixed: clear on login); no XSS/secret findings |
+
+### Console / network
+
+Only remaining error: guest `GET Session` 401 on the login page (intentional `requireAuth`). No page errors, no other 4xx/5xx.
+
+### Remaining
+
+- Pre-existing low items listed in STATE.md
+- Prod soak after push (GATE-0002)
+
+### eval_gate_status
+
+N/A (UX + API latency)
+
+---
+
 ## Session 2026-09-27 — Profile dropdown close on NavigationEnd
 
 **Node:** v24.x

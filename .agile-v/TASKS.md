@@ -126,6 +126,19 @@
 | TASK-0051 | Implement only approved detail slices; preserve tokens/shell | REQ-0130–0131 | BLOCKED | Needs detail guide approval |
 | TASK-0052 | verify-deep + commit-ready for approved detail slice(s) | REQ-0131 | BLOCKED | After TASK-0051 |
 
+## Wave — GATE-0018 single-layer mirrored skeletons (intake 2026-10-10)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0053 | Intake human screenshots (Project detail, API Status, API Doc); confirm findings and whether Insights/Calendar join this wave | REQ-0132–0133 | DONE | Screenshots received; Insights/Calendar included |
+| TASK-0054 | Shared contract: header-action stub spec on `PRIVATE_PAGE_META`; new skeleton kinds; placeholder renders the same page mirror component as the page | REQ-0132 | DONE | Approved CP-0021 |
+| TASK-0055 | API Doc: mirror skeleton (info card, method tabs, category chips, endpoint cards) + cache/peek | REQ-0132–0134 | DONE | 2026-10-10 |
+| TASK-0056 | API Status: mirror skeleton (overall card, 4 metric tiles, tabs, panel) + clear auto-refresh timer on destroy | REQ-0132–0133, REQ-0135 | DONE | 2026-10-10 |
+| TASK-0057 | Project detail: loading wrapper + header stubs match placeholder; extend form skeleton with section accordion stubs | REQ-0130, REQ-0132–0133 | DONE | 2026-10-10 |
+| TASK-0058 | Insights + Calendar: same single-layer mirror treatment | REQ-0132–0133 | DONE | 2026-10-10 |
+| TASK-0059 | Spec coverage (placeholder kind matches page skeleton) + verify-deep + commit-ready per page | REQ-0131 | DONE | 2026-10-10 |
+| TASK-0060 | A–Z verify sweep fixes: background email (`waitUntil`), stale-chunk reload, `**` redirect, mutation-vs-read race, cache clear on login, API Status notice clear-on-success | REQ-0131 | DONE | 2026-10-10 |
+
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)

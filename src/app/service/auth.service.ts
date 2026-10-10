@@ -56,6 +56,7 @@ export class AuthService {
     return this.masterService.login({ username, password }).pipe(
       tap((response) => {
         if (response.result && response.data) {
+          this.masterService.clearAllCaches();
           this.sessionSignal.set(response.data);
           this.sessionResolvedSignal.set(true);
         }

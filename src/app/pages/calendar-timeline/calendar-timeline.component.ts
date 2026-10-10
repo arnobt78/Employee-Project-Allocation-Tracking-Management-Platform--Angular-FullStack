@@ -4,12 +4,15 @@ import { MasterService } from '../../service/master.service';
 import { CalendarViewComponent } from '../../components/calendar-view/calendar-view.component';
 import { TimelineViewComponent } from '../../components/timeline-view/timeline-view.component';
 import { GanttViewComponent } from '../../components/gantt-view/gantt-view.component';
-import {
-  ListSkeletonComponent,
-  StatPillSkeletonComponent,
-} from '@/app/components/ui/list-skeleton.component';
+import { CalendarSkeletonComponent } from '@/app/components/ui/calendar-skeleton.component';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
+import {
+  CALENDAR_TABS,
+  CALENDAR_TAB_ACTIVE_CLASS,
+  CALENDAR_TAB_IDLE_CLASS,
+  CalendarTabId,
+} from '@/app/constants/calendar-timeline';
 
 export interface IScheduleData {
   milestones: IMilestone[];
@@ -65,8 +68,7 @@ export interface IProjectTimeline {
     CalendarViewComponent,
     TimelineViewComponent,
     GanttViewComponent,
-    ListSkeletonComponent,
-    StatPillSkeletonComponent,
+    CalendarSkeletonComponent,
     PageHeaderComponent,
   ],
   templateUrl: './calendar-timeline.component.html',
@@ -80,8 +82,11 @@ export class CalendarTimelineComponent implements OnInit {
   readonly scheduleData = this.scheduleDataSignal.asReadonly();
   readonly loadingSignal = signal<boolean>(false);
   readonly loading = this.loadingSignal.asReadonly();
-  readonly activeTabSignal = signal<'calendar' | 'timeline' | 'gantt'>('calendar');
+  readonly activeTabSignal = signal<CalendarTabId>('calendar');
   readonly activeTab = this.activeTabSignal.asReadonly();
+  readonly tabs = CALENDAR_TABS;
+  readonly activeTabClass = CALENDAR_TAB_ACTIVE_CLASS;
+  readonly idleTabClass = CALENDAR_TAB_IDLE_CLASS;
 
   // Computed values for calendar view
   readonly calendarEvents = computed(() => {
@@ -194,7 +199,7 @@ export class CalendarTimelineComponent implements OnInit {
     });
   }
 
-  setActiveTab(tab: 'calendar' | 'timeline' | 'gantt'): void {
+  setActiveTab(tab: CalendarTabId): void {
     this.activeTabSignal.set(tab);
   }
 

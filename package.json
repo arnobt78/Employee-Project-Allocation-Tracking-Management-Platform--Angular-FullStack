@@ -36,6 +36,7 @@
     "@sentry/angular": "^10.74.0",
     "@sentry/core": "^10.74.0",
     "@sentry/node": "^10.74.0",
+    "@vercel/functions": "^3.9.11",
     "bcryptjs": "^3.0.3",
     "chart.js": "^4.5.1",
     "chartjs-plugin-datalabels": "^2.2.0",

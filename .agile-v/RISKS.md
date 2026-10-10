@@ -16,6 +16,9 @@
 | RISK-0012 | Blind major bumps (Angular 21+, Prisma 7+, Tailwind 4, ESLint 10, lucide → `@lucide/angular`) break peers / UI | High | Confirmed by outdated map | REQ-0112 | Stay on Angular 20 LTS + Prisma 6 + Tailwind 3 | Mitigated (plan lock) |
 | RISK-0013 | Vercel dashboard Node still on 20 despite `engines` 24.x | Medium | Possible | REQ-0111 | Confirm Project Settings → Node 24 (package.json overrides when set) | Open |
 | RISK-0014 | Private shell shown before session fails could briefly flash chrome then redirect to login | Medium | Possible after TASK-0022 | REQ-0114 | Instant shell accepted: nav+placeholder paint early; child routes + API still guarded | Accepted (UX) |
+| RISK-0015 | Mirror skeletons drift from live layout as pages evolve, reintroducing a visible second layer | Medium | Likely over time | REQ-0132–0133 | One shared mirror component per page used by placeholder + page; spec asserts placeholder kind ↔ page skeleton test id | Mitigated |
+| RISK-0016 | API Status `setInterval` never cleared — polling continues after leaving the page and stacks on each revisit | Medium | Confirmed (code inspection) | REQ-0135 | Clear timer via `DestroyRef` on destroy | Mitigated |
+| RISK-0017 | Background email failures (Resend + SMTP both down) are only logged, not surfaced to the user | Low | Possible | — | `waitUntil` + `[Notification]` logs; mutation already persisted | Accepted (DEC-0031) |
 
 ## Notes
 

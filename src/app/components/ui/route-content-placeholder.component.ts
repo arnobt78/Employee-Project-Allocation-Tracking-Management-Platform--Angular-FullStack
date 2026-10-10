@@ -6,13 +6,14 @@ import { filter, map, startWith } from 'rxjs/operators';
 import { resolvePrivatePageMeta } from '@/app/constants/private-page-meta';
 import { resolveBrowserPath } from '@/app/constants/primary-navigation';
 import { PageHeaderComponent } from './page-header.component';
-import {
-  ListSkeletonComponent,
-  StatPillSkeletonComponent,
-} from './list-skeleton.component';
+import { ListSkeletonComponent } from './list-skeleton.component';
 import { DashboardSkeletonComponent } from './dashboard-skeleton.component';
 import { ListPageSkeletonComponent } from './list-page-skeleton.component';
-import { ProjectFormSkeletonComponent } from './project-form-skeleton.component';
+import { ProjectDetailSkeletonComponent } from './project-detail-skeleton.component';
+import { InsightsSkeletonComponent } from './insights-skeleton.component';
+import { CalendarSkeletonComponent } from './calendar-skeleton.component';
+import { ApiDocSkeletonComponent } from './api-doc-skeleton.component';
+import { ApiStatusSkeletonComponent } from './api-status-skeleton.component';
 
 @Component({
   selector: 'app-route-content-placeholder',
@@ -21,62 +22,74 @@ import { ProjectFormSkeletonComponent } from './project-form-skeleton.component'
     CommonModule,
     PageHeaderComponent,
     ListSkeletonComponent,
-    StatPillSkeletonComponent,
     DashboardSkeletonComponent,
     ListPageSkeletonComponent,
-    ProjectFormSkeletonComponent,
+    ProjectDetailSkeletonComponent,
+    InsightsSkeletonComponent,
+    CalendarSkeletonComponent,
+    ApiDocSkeletonComponent,
+    ApiStatusSkeletonComponent,
   ],
   template: `
     <div
-      class="text-white/85"
       data-testid="route-content-placeholder"
       aria-busy="true"
       aria-live="polite"
     >
-      <app-page-header
-        [title]="meta().title"
-        [subtitle]="meta().subtitle"
-        [icon]="meta().icon"
-      >
-        @if (meta().skeleton !== 'dashboard') {
-          <div
-            class="h-9 w-32 animate-pulse rounded-xl border border-white/10 bg-white/5"
-          ></div>
+      @switch (meta().skeleton) {
+        @case ('project-detail') {
+          <app-project-detail-skeleton
+            [mode]="meta().projectMode ?? 'edit'"
+          ></app-project-detail-skeleton>
         }
-      </app-page-header>
+        @case ('insights') {
+          <app-insights-skeleton></app-insights-skeleton>
+        }
+        @case ('calendar') {
+          <app-calendar-skeleton></app-calendar-skeleton>
+        }
+        @case ('api-doc') {
+          <app-api-doc-skeleton></app-api-doc-skeleton>
+        }
+        @case ('api-status') {
+          <app-api-status-skeleton></app-api-status-skeleton>
+        }
+        @default {
+          <div class="text-white/85">
+            <app-page-header
+              [title]="meta().title"
+              [subtitle]="meta().subtitle"
+              [icon]="meta().icon"
+            >
+              @if (meta().skeleton !== 'dashboard') {
+                <div
+                  class="h-9 w-32 animate-pulse rounded-xl border border-white/10 bg-white/5"
+                ></div>
+              }
+            </app-page-header>
 
-      <div class="eh-content-stack">
-        @switch (meta().skeleton) {
-          @case ('dashboard') {
-            <app-dashboard-skeleton></app-dashboard-skeleton>
-          }
-          @case ('list') {
-            <app-list-page-skeleton
-              [rows]="6"
-              [kpiCount]="meta().listKpiCount ?? 6"
-              [filterCount]="meta().listFilterCount ?? 3"
-              [showPagination]="meta().listShowPagination ?? false"
-              [rowVariant]="meta().listRowVariant ?? 'default'"
-            ></app-list-page-skeleton>
-          }
-          @case ('project-form') {
-            <app-project-form-skeleton
-              [checklistRows]="5"
-            ></app-project-form-skeleton>
-          }
-          @case ('insights') {
-            <div class="flex flex-wrap gap-3">
-              <app-stat-pill-skeleton [width]="120"></app-stat-pill-skeleton>
-              <app-stat-pill-skeleton [width]="140"></app-stat-pill-skeleton>
-              <app-stat-pill-skeleton [width]="100"></app-stat-pill-skeleton>
+            <div class="eh-content-stack">
+              @switch (meta().skeleton) {
+                @case ('dashboard') {
+                  <app-dashboard-skeleton></app-dashboard-skeleton>
+                }
+                @case ('list') {
+                  <app-list-page-skeleton
+                    [rows]="6"
+                    [kpiCount]="meta().listKpiCount ?? 6"
+                    [filterCount]="meta().listFilterCount ?? 3"
+                    [showPagination]="meta().listShowPagination ?? false"
+                    [rowVariant]="meta().listRowVariant ?? 'default'"
+                  ></app-list-page-skeleton>
+                }
+                @default {
+                  <app-list-skeleton [rows]="4"></app-list-skeleton>
+                }
+              }
             </div>
-            <app-list-skeleton [rows]="5"></app-list-skeleton>
-          }
-          @default {
-            <app-list-skeleton [rows]="4"></app-list-skeleton>
-          }
+          </div>
         }
-      </div>
+      }
     </div>
   `,
 })

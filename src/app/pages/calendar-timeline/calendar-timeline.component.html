@@ -1,5 +1,7 @@
-<div class="space-y-6">
-  <!-- Header -->
+@if (loading() && !scheduleData()) {
+<app-calendar-skeleton></app-calendar-skeleton>
+} @else {
+<div class="text-white/85">
   <app-page-header
     [title]="pageMeta.title"
     [subtitle]="pageMeta.subtitle"
@@ -25,23 +27,40 @@
     </span>
   </app-page-header>
 
-  <!-- Loading State (inline skeletons — first paint only when cache is cold) -->
-  <div *ngIf="loading() && !scheduleData()" class="space-y-6">
-    <section
-      class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-4"
-    >
-      <div class="flex flex-wrap gap-2">
-        <app-stat-pill-skeleton
-          *ngFor="let pill of [1, 2, 3]"
-          [width]="110"
-        ></app-stat-pill-skeleton>
-      </div>
-    </section>
-    <app-list-skeleton [rows]="4"></app-list-skeleton>
-  </div>
-
-  <!-- Content -->
+  <div class="eh-content-stack">
   <div *ngIf="scheduleData()" class="space-y-6">
+    <!-- Tabs -->
+    <div
+      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
+    >
+      <div class="mb-6 flex gap-2 border-b border-white/10">
+        @for (tab of tabs; track tab.id) {
+          <button
+            type="button"
+            (click)="setActiveTab(tab.id)"
+            [class]="activeTab() === tab.id ? activeTabClass : idleTabClass"
+          >
+            {{ tab.label }}
+          </button>
+        }
+      </div>
+
+      <!-- Calendar Tab -->
+      <div *ngIf="activeTab() === 'calendar'" class="space-y-4">
+        <app-calendar-view [events]="calendarEvents()"></app-calendar-view>
+      </div>
+
+      <!-- Timeline Tab -->
+      <div *ngIf="activeTab() === 'timeline'" class="space-y-4">
+        <app-timeline-view [projects]="timelineProjects()"></app-timeline-view>
+      </div>
+
+      <!-- Gantt Tab -->
+      <div *ngIf="activeTab() === 'gantt'" class="space-y-4">
+        <app-gantt-view [projects]="ganttData()"></app-gantt-view>
+      </div>
+    </div>
+
     <!-- Upcoming Reminders -->
     <div
       *ngIf="upcomingReminders().length > 0"
@@ -101,59 +120,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Tabs -->
-    <div
-      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
-    >
-      <div class="mb-6 flex gap-2 border-b border-white/10">
-        <button
-          (click)="setActiveTab('calendar')"
-          [class]="
-            activeTab() === 'calendar'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
-              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
-          "
-        >
-          Calendar View
-        </button>
-        <button
-          (click)="setActiveTab('timeline')"
-          [class]="
-            activeTab() === 'timeline'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
-              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
-          "
-        >
-          Timeline View
-        </button>
-        <button
-          (click)="setActiveTab('gantt')"
-          [class]="
-            activeTab() === 'gantt'
-              ? 'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary'
-              : 'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white'
-          "
-        >
-          Gantt View
-        </button>
-      </div>
-
-      <!-- Calendar Tab -->
-      <div *ngIf="activeTab() === 'calendar'" class="space-y-4">
-        <app-calendar-view [events]="calendarEvents()"></app-calendar-view>
-      </div>
-
-      <!-- Timeline Tab -->
-      <div *ngIf="activeTab() === 'timeline'" class="space-y-4">
-        <app-timeline-view [projects]="timelineProjects()"></app-timeline-view>
-      </div>
-
-      <!-- Gantt Tab -->
-      <div *ngIf="activeTab() === 'gantt'" class="space-y-4">
-        <app-gantt-view [projects]="ganttData()"></app-gantt-view>
-      </div>
-    </div>
   </div>
 
   <!-- Empty State -->
@@ -163,4 +129,6 @@
   >
     <p class="text-sm text-white/60">No schedule data available.</p>
   </div>
+  </div>
 </div>
+}

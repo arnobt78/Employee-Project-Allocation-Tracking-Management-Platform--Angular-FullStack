@@ -12,7 +12,7 @@ import {
   FormGroup,
   ReactiveFormsModule,
   Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MasterService } from '../../service/master.service';
 import {
@@ -46,44 +46,21 @@ import {
   SelectMenuComponent,
   SelectMenuOption,
 } from '@/app/components/ui/select-menu.component';
-import { ProjectFormSkeletonComponent } from '@/app/components/ui/project-form-skeleton.component';
+import { ProjectDetailSkeletonComponent } from '@/app/components/ui/project-detail-skeleton.component';
+import { ProjectHeaderMetaComponent } from '@/app/components/ui/project-header-meta.component';
+import {
+  PROJECT_CONTENT_HELPER_COPY,
+  PROJECT_CREATE_SECTION_VALUES,
+  PROJECT_DETAIL_FOOTER_COPY,
+  PROJECT_DETAIL_SECTION_LABELS,
+  PROJECT_DETAIL_SUBTITLE,
+  PROJECT_OVERVIEW_FIELD_LABELS,
+  READINESS_CHECKLIST_COPY,
+  READINESS_FIELD_LABELS,
+  READINESS_TASK_DEFINITIONS,
+} from '@/app/constants/project-detail';
 
-const readinessTaskDefinitions = [
-  {
-    id: 'scopeDefined',
-    title: 'Scope confirmed',
-    description: 'Requirements baseline captured and shared with stakeholders.',
-    category: 'Scope',
-    weight: 25,
-    defaultDueInDays: 7 },
-  {
-    id: 'budgetApproved',
-    title: 'Budget approved',
-    description: 'Finance sign-off received for the projected spend.',
-    category: 'Budget',
-    weight: 20,
-    defaultDueInDays: 14 },
-  {
-    id: 'legalReviewed',
-    title: 'Contracts reviewed',
-    description: 'Master services agreement and NDAs cleared with legal.',
-    category: 'Legal',
-    weight: 20,
-    defaultDueInDays: 21 },
-  {
-    id: 'assetsPrepared',
-    title: 'Assets prepared',
-    description: 'Brand assets, data rooms, and collateral ready to share.',
-    category: 'Assets',
-    weight: 15,
-    defaultDueInDays: 10 },
-  {
-    id: 'kickoffScheduled',
-    title: 'Kickoff scheduled',
-    description: 'Kickoff meeting on calendar with internal and client teams.',
-    category: 'Timeline',
-    weight: 20,
-    defaultDueInDays: 28 }] as const;
+const readinessTaskDefinitions = READINESS_TASK_DEFINITIONS;
 
 type ReadinessTaskDefinition = (typeof readinessTaskDefinitions)[number];
 type ReadinessTaskId = ReadinessTaskDefinition['id'];
@@ -145,13 +122,13 @@ const REVIEWER_SEVERITIES = [
   imports: [
     AppIconComponent,
     CommonModule,
-    RouterLink,
     ReactiveFormsModule,
     UbButtonDirective,
     SelectMenuComponent,
     AlertDialogComponent,
     PageHeaderComponent,
-    ProjectFormSkeletonComponent,
+    ProjectDetailSkeletonComponent,
+    ProjectHeaderMetaComponent,
   ],
   templateUrl: './project-form.component.html',
   styleUrl: './project-form.component.css' })
@@ -226,6 +203,7 @@ export class ProjectFormComponent implements OnInit {
   readonly currentProject = this.currentProjectSignal.asReadonly();
 
   private resourceInsightsRequestToken = 0;
+  private projectRequestToken = 0;
   private readonly resourceInsightsSignal =
     signal<IProjectResourceInsights | null>(null);
   readonly resourceInsights = this.resourceInsightsSignal.asReadonly();
@@ -237,6 +215,13 @@ export class ProjectFormComponent implements OnInit {
   readonly isLoading = this.isLoadingSignal.asReadonly();
 
   readonly readinessTasks = readinessTaskDefinitions;
+  readonly subtitle = PROJECT_DETAIL_SUBTITLE;
+  readonly sectionLabels = PROJECT_DETAIL_SECTION_LABELS;
+  readonly fieldLabels = READINESS_FIELD_LABELS;
+  readonly checklistCopy = READINESS_CHECKLIST_COPY;
+  readonly footerCopy = PROJECT_DETAIL_FOOTER_COPY;
+  readonly overviewLabels = PROJECT_OVERVIEW_FIELD_LABELS;
+  readonly contentHelperCopy = PROJECT_CONTENT_HELPER_COPY;
   readonly readinessTotal = this.readinessTasks.length;
   readonly readinessForm = this.fb.group(
     this.buildReadinessControls()
@@ -433,9 +418,9 @@ export class ProjectFormComponent implements OnInit {
       if (id > 0) {
         this.modeSignal.set('edit');
         this.editingSection.set(null);
-        this.isLoadingSignal.set(true);
         this.fetchProject(id);
       } else {
+        this.projectRequestToken++;
         this.modeSignal.set('create');
         this.isLoadingSignal.set(false);
         this.editingSection.set('overview');
@@ -554,15 +539,15 @@ export class ProjectFormComponent implements OnInit {
       cmsContentRefs: this.cmsReferencesSignal() };
     this.isSaving.set(true);
 
-    const request$ =
-      payload.projectId && payload.projectId !== 0
-        ? this.masterService.updateProject(payload)
-        : this.masterService.saveProject(payload as any);
+    const isCreate = !payload.projectId;
+    const request$ = isCreate
+      ? this.masterService.saveProject(payload as any)
+      : this.masterService.updateProject(payload);
 
     request$.subscribe({
       next: (res) => {
         this.isSaving.set(false);
-        this.hydrateProject(res);
+        this.applyMutationResult(res, { loadInsights: !isCreate });
         if (res.projectId && res.projectId > 0) {
           this.router.navigate(['/update-project', res.projectId], {
             replaceUrl: true });
@@ -643,7 +628,7 @@ export class ProjectFormComponent implements OnInit {
       case 'leadByEmpId':
         return value
           ? this.leadName(value) ?? `Employee #${value}`
-          : 'Unassigned';
+          : PROJECT_CREATE_SECTION_VALUES.team;
       case 'health': {
         const raw = (value ?? '').toString().trim();
         if (!raw) {
@@ -656,9 +641,9 @@ export class ProjectFormComponent implements OnInit {
       case 'emailId':
         return value || 'Not provided';
       case 'contactPerson':
-        return value || 'Not assigned';
+        return value || PROJECT_CREATE_SECTION_VALUES.contact;
       default:
-        return value || 'None';
+        return value || PROJECT_CREATE_SECTION_VALUES.overview;
     }
   }
 
@@ -1135,7 +1120,7 @@ export class ProjectFormComponent implements OnInit {
       .subscribe({
         next: (updatedProject) => {
           this.reviewerCommentProcessing.set(false);
-          this.hydrateProject(updatedProject);
+          this.applyMutationResult(updatedProject);
           this.reviewerCommentForm.reset(
             {
               section: payload.section ?? 'overview',
@@ -1152,7 +1137,6 @@ export class ProjectFormComponent implements OnInit {
           this.toast.success({
             title: 'Comment added',
             description: 'Reviewer feedback has been logged.' });
-          this.refreshProjectSnapshot(updatedProject.projectId);
         },
         error: () => {
           this.reviewerCommentProcessing.set(false);
@@ -1180,14 +1164,13 @@ export class ProjectFormComponent implements OnInit {
       .subscribe({
         next: (updatedProject) => {
           this.reviewerCommentProcessing.set(false);
-          this.hydrateProject(updatedProject);
+          this.applyMutationResult(updatedProject);
           const message = comment.resolved
             ? 'Comment reopened'
             : 'Comment resolved';
           this.toast.success({
             title: message,
             description: 'Reviewer comment state has been updated.' });
-          this.refreshProjectSnapshot(updatedProject.projectId);
         },
         error: () => {
           this.reviewerCommentProcessing.set(false);
@@ -1254,7 +1237,7 @@ export class ProjectFormComponent implements OnInit {
       next: (updatedProject) => {
         this.approvalProcessing.set(false);
         const snapshot = this.cloneProject(updatedProject);
-        this.hydrateProject(snapshot);
+        this.applyMutationResult(snapshot);
         this.approvalForm.patchValue({ comment: '' }, { emitEvent: false });
         if (action === 'reset') {
           this.approvalForm.patchValue({ actorName: '' }, { emitEvent: false });
@@ -1264,7 +1247,6 @@ export class ProjectFormComponent implements OnInit {
           description: `Status is now ${this.approvalStatusLabel(
             snapshot.approvalStatus
           )}.` });
-        this.refreshProjectSnapshot(snapshot.projectId);
       },
       error: () => {
         this.approvalProcessing.set(false);
@@ -1313,10 +1295,40 @@ export class ProjectFormComponent implements OnInit {
     return control.invalid && (control.dirty || control.touched);
   }
 
+  /**
+   * Warm entry (list or detail snapshot) hydrates instantly. A fresh snapshot
+   * (e.g. the create/update response) skips revalidation; otherwise the
+   * authoritative GetProject response only re-hydrates the forms while nothing
+   * is edited, and just refreshes the save/cancel baseline when dirty.
+   */
   private fetchProject(id: number) {
+    const requestToken = ++this.projectRequestToken;
+    const snapshot = this.masterService.peekProject(id);
+    if (snapshot?.fresh) {
+      this.hydrateProject(snapshot.project);
+      return;
+    }
+    const cached = snapshot?.project ?? null;
+    if (cached) {
+      this.hydrateProject(cached);
+    } else {
+      this.isLoadingSignal.set(true);
+    }
     this.masterService.getProjectById(id).subscribe({
-      next: (project) => this.hydrateProject(project),
+      next: (project) => {
+        if (requestToken !== this.projectRequestToken) {
+          return;
+        }
+        if (cached && !this.formsPristine()) {
+          this.currentProjectSignal.set(this.cloneProject(project));
+          return;
+        }
+        this.hydrateProject(project, { loadInsights: !cached });
+      },
       error: () => {
+        if (requestToken !== this.projectRequestToken || cached) {
+          return;
+        }
         this.isLoadingSignal.set(false);
         this.toast.error({
           title: 'Load failed',
@@ -1696,7 +1708,28 @@ export class ProjectFormComponent implements OnInit {
     return JSON.parse(JSON.stringify(project)) as IProject;
   }
 
-  private hydrateProject(project: IProject | null) {
+  private formsPristine(): boolean {
+    return (
+      this.projectForm.pristine &&
+      this.readinessForm.pristine &&
+      this.overviewDetailsForm.pristine
+    );
+  }
+
+  /** Mutation responses are newer than any in-flight GetProject; drop those reads. */
+  private applyMutationResult(
+    project: IProject,
+    options: { loadInsights?: boolean } = {}
+  ) {
+    this.projectRequestToken++;
+    this.hydrateProject(project, options);
+  }
+
+  private hydrateProject(
+    project: IProject | null,
+    options: { loadInsights?: boolean } = {}
+  ) {
+    const loadInsights = options.loadInsights ?? true;
     if (!project) {
       this.resourceInsightsSignal.set(null);
       this.isLoadingSignal.set(false);
@@ -1731,7 +1764,9 @@ export class ProjectFormComponent implements OnInit {
     this.applyDefaultApprovalActor(snapshot);
     this.projectForm.markAsPristine();
     if (snapshot.projectId && snapshot.projectId > 0) {
-      this.loadResourceInsights(snapshot.projectId);
+      if (loadInsights) {
+        this.loadResourceInsights(snapshot.projectId);
+      }
     } else {
       this.resourceInsightsSignal.set(null);
     }
@@ -1742,8 +1777,13 @@ export class ProjectFormComponent implements OnInit {
     if (!projectId) {
       return;
     }
+    const requestToken = ++this.projectRequestToken;
     this.masterService.getProjectById(projectId).subscribe({
-      next: (project) => this.hydrateProject(project),
+      next: (project) => {
+        if (requestToken === this.projectRequestToken) {
+          this.hydrateProject(project);
+        }
+      },
       error: (error) => {
         this.toast.error({
           title: 'Refresh failed',

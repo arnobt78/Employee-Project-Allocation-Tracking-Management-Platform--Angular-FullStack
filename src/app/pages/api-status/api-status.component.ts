@@ -1,84 +1,58 @@
-import { Component, OnInit, computed, signal, inject } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { interval } from 'rxjs';
 import { MasterService } from '../../service/master.service';
+import { IApiStatus } from '../../model/interface/master';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
-import { ListSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
+import { ApiStatusSkeletonComponent } from '@/app/components/ui/api-status-skeleton.component';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
+import {
+  API_STATUS_COPY,
+  API_STATUS_DATA_LABELS,
+  API_STATUS_METRIC_CARDS,
+  API_STATUS_TABS,
+  API_STATUS_TAB_ACTIVE_CLASS,
+  API_STATUS_TAB_IDLE_CLASS,
+  ApiStatusTabId,
+} from '@/app/constants/api-status';
 
-export interface IApiStatus {
-  timestamp: string;
-  overallStatus: 'operational' | 'degraded' | 'down';
-  systemHealth: {
-    database: {
-      status: string;
-      responseTime: number;
-      connected: boolean;
-    };
-    api: {
-      status: string;
-      uptime: string;
-      totalRequests: number;
-      avgResponseTime: number;
-      successRate: number;
-    };
-    data: {
-      employees: number;
-      projects: number;
-      assignments: number;
-      departments: number;
-    };
-  };
-  endpointHealth: Array<{
-    category: string;
-    total: number;
-    healthy: number;
-    avgResponseTime: number;
-    status: string;
-  }>;
-  performanceHistory: Array<{
-    date: string;
-    day: string;
-    avgResponseTime: number;
-    requests: number;
-    successRate: number;
-    errors: number;
-  }>;
-  recentActivity: Array<{
-    timestamp: string;
-    endpoint: string;
-    method: string;
-    status: number;
-    responseTime: number;
-  }>;
-  metrics: {
-    totalEndpoints: number;
-    activeEndpoints: number;
-    successRate: number;
-    avgResponseTime: number;
-    totalRequests: number;
-    errorRate: number;
-  };
-}
+const AUTO_REFRESH_MS = 30_000;
 
 @Component({
   selector: 'app-api-status',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, ListSkeletonComponent],
+  imports: [CommonModule, PageHeaderComponent, ApiStatusSkeletonComponent],
   templateUrl: './api-status.component.html',
   styleUrls: ['./api-status.component.css'],
 })
 export class ApiStatusComponent implements OnInit {
   private readonly masterService = inject(MasterService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly pageMeta = PRIVATE_PAGE_META['/api-status'];
-  readonly statusSignal = signal<IApiStatus | null>(null);
+  readonly copy = API_STATUS_COPY;
+  readonly tabs = API_STATUS_TABS;
+  readonly activeTabClass = API_STATUS_TAB_ACTIVE_CLASS;
+  readonly idleTabClass = API_STATUS_TAB_IDLE_CLASS;
+  readonly metricCards = API_STATUS_METRIC_CARDS;
+  readonly statusSignal = signal<IApiStatus | null>(
+    this.masterService.peekApiStatus()
+  );
   readonly status = this.statusSignal.asReadonly();
   readonly loadingSignal = signal<boolean>(false);
   readonly loading = this.loadingSignal.asReadonly();
   readonly errorSignal = signal<string | null>(null);
   readonly error = this.errorSignal.asReadonly();
 
-  readonly activeTabSignal = signal<'overview' | 'endpoints' | 'performance' | 'activity'>('overview');
+  readonly activeTabSignal = signal<ApiStatusTabId>('overview');
   readonly activeTab = this.activeTabSignal.asReadonly();
 
   readonly overallHealthColor = computed(() => {
@@ -95,29 +69,53 @@ export class ApiStatusComponent implements OnInit {
     return 'bg-red-500/20 border-red-500/30';
   });
 
+  readonly dataStatistics = computed(() => {
+    const data = this.status()?.systemHealth.data;
+    const values = [
+      data?.employees,
+      data?.projects,
+      data?.assignments,
+      data?.departments,
+    ];
+    return API_STATUS_DATA_LABELS.map((label, i) => ({
+      label,
+      value: values[i] ?? 0,
+    }));
+  });
+
   ngOnInit(): void {
     this.loadApiStatus();
-    // Auto-refresh every 30 seconds
-    setInterval(() => this.loadApiStatus(), 30000);
+    interval(AUTO_REFRESH_MS)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (!this.loading()) {
+          this.loadApiStatus();
+        }
+      });
   }
 
   loadApiStatus(): void {
     this.loadingSignal.set(true);
-    this.errorSignal.set(null);
-    this.masterService.getApiStatus().subscribe({
-      next: (data: IApiStatus) => {
-        this.statusSignal.set(data);
-        this.loadingSignal.set(false);
-      },
-      error: (err) => {
-        console.error('Failed to load API status', err);
-        this.errorSignal.set('Failed to load API status. Please try again later.');
-        this.loadingSignal.set(false);
-      },
-    });
+    this.masterService
+      .getApiStatus()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.statusSignal.set(data);
+          this.errorSignal.set(null);
+          this.loadingSignal.set(false);
+        },
+        error: (err) => {
+          console.error('Failed to load API status', err);
+          this.errorSignal.set(
+            'Failed to load API status. Please try again later.'
+          );
+          this.loadingSignal.set(false);
+        },
+      });
   }
 
-  setActiveTab(tab: 'overview' | 'endpoints' | 'performance' | 'activity'): void {
+  setActiveTab(tab: ApiStatusTabId): void {
     this.activeTabSignal.set(tab);
   }
 

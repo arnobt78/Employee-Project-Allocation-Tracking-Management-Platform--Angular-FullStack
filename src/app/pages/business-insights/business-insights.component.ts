@@ -9,9 +9,18 @@ import { MasterService } from '../../service/master.service';
 import { IProject, IProjectEmployee } from '../../model/interface/master';
 import { Employee } from '../../model/class/Employee';
 import { UbButtonDirective } from '@/app/components/ui/button';
+import { InsightsSkeletonComponent } from '@/app/components/ui/insights-skeleton.component';
 import {
-  ListSkeletonComponent,
-  StatPillSkeletonComponent } from '@/app/components/ui/list-skeleton.component';
+  INSIGHTS_DEFAULT_FILTER_DISPLAY,
+  INSIGHTS_FILTER_LABELS,
+  INSIGHTS_KPI_LABELS,
+  INSIGHTS_READINESS_DISTRIBUTION_TITLE,
+  INSIGHTS_READINESS_RANGES,
+  INSIGHTS_STATUS_DISTRIBUTION_TITLE,
+  INSIGHTS_STATUS_ITEMS,
+  INSIGHTS_TABS,
+  InsightsTabId,
+} from '@/app/constants/business-insights';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import {
   SelectMenuComponent,
@@ -88,8 +97,7 @@ export interface IBusinessInsights {
     FormsModule,
     ReactiveFormsModule,
     UbButtonDirective,
-    ListSkeletonComponent,
-    StatPillSkeletonComponent,
+    InsightsSkeletonComponent,
     SelectMenuComponent,
     PageHeaderComponent,
   ],
@@ -110,7 +118,7 @@ export class BusinessInsightsComponent implements OnInit {
   readonly projectEmployeesSignal = signal<IProjectEmployee[]>([]);
 
   readonly dateRangeOptions: SelectMenuOption[] = [
-    { value: 'all', label: 'All Time', icon: 'infinity' },
+    { value: 'all', ...INSIGHTS_DEFAULT_FILTER_DISPLAY.dateRange },
     { value: 'last30', label: 'Last 30 Days', icon: 'calendar-days' },
     { value: 'last90', label: 'Last 90 Days', icon: 'calendar-range' },
     { value: 'last365', label: 'Last Year', icon: 'calendar' },
@@ -130,7 +138,7 @@ export class BusinessInsightsComponent implements OnInit {
   });
 
   readonly departmentOptions = computed<SelectMenuOption[]>(() => [
-    { value: 'all', label: 'All Departments', icon: 'building-2' },
+    { value: 'all', ...INSIGHTS_DEFAULT_FILTER_DISPLAY.department },
     ...this.departmentsSignal().map((dept) => ({
       value: dept,
       label: dept,
@@ -140,10 +148,22 @@ export class BusinessInsightsComponent implements OnInit {
 
   filterForm: FormGroup;
 
-  readonly activeTabSignal = signal<
-    'overview' | 'projects' | 'resources' | 'financials'
-  >('overview');
+  readonly activeTabSignal = signal<InsightsTabId>('overview');
   readonly activeTab = this.activeTabSignal.asReadonly();
+
+  readonly tabs = INSIGHTS_TABS;
+  readonly filterLabels = INSIGHTS_FILTER_LABELS;
+  readonly kpiLabels = INSIGHTS_KPI_LABELS;
+  readonly statusTitle = INSIGHTS_STATUS_DISTRIBUTION_TITLE;
+  readonly readinessTitle = INSIGHTS_READINESS_DISTRIBUTION_TITLE;
+  readonly statusDistribution = computed(() => {
+    const distribution = this.insights()?.projectStatusDistribution;
+    return INSIGHTS_STATUS_ITEMS.map((item) => ({
+      label: item.label,
+      color: item.color,
+      value: distribution?.[item.key] || 0,
+    }));
+  });
 
   constructor() {
     this.filterForm = this.fb.group({
@@ -243,6 +263,7 @@ export class BusinessInsightsComponent implements OnInit {
     const projectEmployees = this.projectEmployeesSignal();
 
     if (!projects.length || !employees.length) {
+      this.loadingSignal.set(false);
       return;
     }
 
@@ -765,11 +786,10 @@ export class BusinessInsightsComponent implements OnInit {
         : 0;
 
     // Distribution includes ALL projects (including 0% readiness)
-    const distribution = [
-      { range: '0-25%', count: 0 },
-      { range: '26-50%', count: 0 },
-      { range: '51-75%', count: 0 },
-      { range: '76-100%', count: 0 }];
+    const distribution = INSIGHTS_READINESS_RANGES.map((range) => ({
+      range,
+      count: 0,
+    }));
 
     allScores.forEach((score) => {
       if (score <= 25) distribution[0].count++;
@@ -938,9 +958,7 @@ export class BusinessInsightsComponent implements OnInit {
           : 0 }));
   }
 
-  setActiveTab(
-    tab: 'overview' | 'projects' | 'resources' | 'financials'
-  ): void {
+  setActiveTab(tab: InsightsTabId): void {
     this.activeTabSignal.set(tab);
   }
 

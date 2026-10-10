@@ -98,7 +98,16 @@ Legend: `BASELINE` = verified as-built behavior · `GAP` = docs/code mismatch or
 |---|---|---|---|
 | REQ-0129 | Human MUST share production soak findings for shipped Projects **list** UX (`eec34a3`) before further list changes; findings drive targeted fixes only. | DONE | Density + border chevron 2026-09-27 |
 | REQ-0130 | Project **detail** surface (`/new-project`, `/update-project/:id` → `project-form`) MAY receive incremental polish per human guide; MUST preserve section accordion, `MasterService`, existing tokens/`eh-action-btn*`, and MUST NOT invent new detail architecture unless approved. | OPEN | Scope TBD from guide |
-| REQ-0131 | Each GATE-0018 polish slice MUST pass lint + production build (and verify-deep) before commit-ready; shell MUST stay stable (no full-page loader regressions). | OPEN | Mirrors REQ-0120 |
+| REQ-0131 | Each GATE-0018 polish slice MUST pass lint + production build (and verify-deep) before commit-ready; shell MUST stay stable (no full-page loader regressions). | DONE (skeleton slice) | lint/test/build + verify-deep 2026-10-10 |
+
+## UX — GATE-0018 single-layer mirrored skeletons (intake 2026-10-10)
+
+| ID | Requirement | Status | Notes |
+|---|---|---|---|
+| REQ-0132 | On cold entry to any private route, the route placeholder (`route-content-placeholder`) and the page's own loading state MUST render identical chrome — same wrapper, same header action stubs, same `.eh-content-stack` spacing, same mirror skeleton component — so the handoff reads as **one** loading layer (Dashboard/Employees/Projects/Project Team pattern). | PROPOSED | DONE 2026-10-10 — all private pages; placeholder specs assert parity |
+| REQ-0133 | Loading skeletons for Project detail, API Doc, API Status (and Insights/Calendar if confirmed) MUST mirror the live layout regions (cards, tabs, metric tiles, sections), not generic list rows. | DONE | API Doc/Status/Project detail/Insights/Calendar mirror skeletons |
+| REQ-0134 | Static API documentation SHOULD use the existing `MasterService` cache + peek pattern so warm soft navigation skips the skeleton (REQ-0123 parity). API Status stays live but MUST only show a skeleton on cold first paint. | DONE | API Doc cached + peek; API Status seeds from last snapshot |
+| REQ-0135 | API Status auto-refresh timer MUST be cleared when the page is destroyed (no background polling or stacked intervals after navigating away). | DONE | `interval` + `takeUntilDestroyed` |
 
 ---
 

@@ -1,15 +1,6 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
-import { LayoutComponent } from './pages/layout/layout.component'; // Corrected path
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { EmployeeComponent } from './pages/employee/employee.component';
-import { ProjectComponent } from './pages/project/project.component';
-import { ProjectFormComponent } from './pages/project-form/project-form.component';
-import { ProjectEmployeeComponent } from './pages/project-employee/project-employee.component';
-import { BusinessInsightsComponent } from './pages/business-insights/business-insights.component';
-import { CalendarTimelineComponent } from './pages/calendar-timeline/calendar-timeline.component';
-import { ApiDocComponent } from './pages/api-doc/api-doc.component';
-import { ApiStatusComponent } from './pages/api-status/api-status.component';
+import { LayoutComponent } from './pages/layout/layout.component';
 import { authGuard } from './guards/auth.guard';
 import { guestGuard } from './guards/guest.guard';
 
@@ -35,7 +26,10 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        component: DashboardComponent,
+        loadComponent: () =>
+          import('./pages/dashboard/dashboard.component').then(
+            (m) => m.DashboardComponent
+          ),
         data: {
           layout: 'private',
           pageTitle: 'Dashboard',
@@ -43,7 +37,10 @@ export const routes: Routes = [
       },
       {
         path: 'employee',
-        component: EmployeeComponent,
+        loadComponent: () =>
+          import('./pages/employee/employee.component').then(
+            (m) => m.EmployeeComponent
+          ),
         data: {
           layout: 'private',
           pageTitle: 'Employees',
@@ -51,7 +48,10 @@ export const routes: Routes = [
       },
       {
         path: 'projects',
-        component: ProjectComponent,
+        loadComponent: () =>
+          import('./pages/project/project.component').then(
+            (m) => m.ProjectComponent
+          ),
         data: {
           layout: 'private',
           pageTitle: 'Projects',
@@ -59,7 +59,10 @@ export const routes: Routes = [
       },
       {
         path: 'new-project',
-        component: ProjectFormComponent,
+        loadComponent: () =>
+          import('./pages/project-form/project-form.component').then(
+            (m) => m.ProjectFormComponent
+          ),
         data: {
           layout: 'private',
           pageTitle: 'Project setup',
@@ -67,7 +70,10 @@ export const routes: Routes = [
       },
       {
         path: 'update-project/:id',
-        component: ProjectFormComponent,
+        loadComponent: () =>
+          import('./pages/project-form/project-form.component').then(
+            (m) => m.ProjectFormComponent
+          ),
         data: {
           layout: 'private',
           pageTitle: 'Project setup',
@@ -80,7 +86,10 @@ export const routes: Routes = [
       },
       {
         path: 'project-employee',
-        component: ProjectEmployeeComponent,
+        loadComponent: () =>
+          import('./pages/project-employee/project-employee.component').then(
+            (m) => m.ProjectEmployeeComponent
+          ),
         data: {
           layout: 'private',
           pageTitle: 'Project assignments',
@@ -88,7 +97,10 @@ export const routes: Routes = [
       },
       {
         path: 'business-insights',
-        component: BusinessInsightsComponent,
+        loadComponent: () =>
+          import('./pages/business-insights/business-insights.component').then(
+            (m) => m.BusinessInsightsComponent
+          ),
         data: {
           layout: 'private',
           pageTitle: 'Business Insights',
@@ -96,7 +108,10 @@ export const routes: Routes = [
       },
       {
         path: 'calendar-timeline',
-        component: CalendarTimelineComponent,
+        loadComponent: () =>
+          import('./pages/calendar-timeline/calendar-timeline.component').then(
+            (m) => m.CalendarTimelineComponent
+          ),
         data: {
           layout: 'private',
           pageTitle: 'Calendar & Timeline',
@@ -104,7 +119,10 @@ export const routes: Routes = [
       },
       {
         path: 'api-doc',
-        component: ApiDocComponent,
+        loadComponent: () =>
+          import('./pages/api-doc/api-doc.component').then(
+            (m) => m.ApiDocComponent
+          ),
         data: {
           layout: 'private',
           pageTitle: 'API Documentation',
@@ -112,12 +130,19 @@ export const routes: Routes = [
       },
       {
         path: 'api-status',
-        component: ApiStatusComponent,
+        loadComponent: () =>
+          import('./pages/api-status/api-status.component').then(
+            (m) => m.ApiStatusComponent
+          ),
         data: {
           layout: 'private',
           pageTitle: 'API Status',
         },
       },
     ],
+  },
+  {
+    path: '**',
+    redirectTo: 'dashboard',
   },
 ];
