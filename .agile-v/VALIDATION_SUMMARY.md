@@ -1,5 +1,28 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-10 — GATE-0021 server auth test suite
+
+**Node:** v22.22.3 local (Vercel 24.x)
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run test:api` | **PASS** | 47/47 (cache 12, auth 24, HTTP flow 11); stable over 9+ runs; ~1 s |
+| Mutation checks | **PASS** | Removing empty-token guard, revoke check, cookie decode fix, `$lookup` target, `isActive` projection, `Secure` flag → each caught |
+| `npm run lint` | **PASS** | |
+| `npm test -- --watch=false --browsers=ChromeHeadless` | **PASS** | 105/105 |
+| `npx ng build` | **PASS** | |
+| `node --check` (tests + `auth.mjs`) | **PASS** | |
+| CRUD probe (real DB) | **PASS** | Create/update/delete persist, 0 leftovers; latency 0.7–3.7 s varies with DB network (counter query 0.2–1.6 s); auth 0 ms cached |
+| Browser A–Z (Playwright) | **PASS** | 12 routes incl. detail + `**`; 69 API calls, 0 failures; logout → login 38 ms; reload stays signed out; guard redirect; malformed cookie via proxy → 401 |
+| Independent verifier | **PASS WITH WARNINGS (fixed)** | Vacuous empty-token test, unchecked pipeline, env leakage, `Secure` untested → fixed; re-check static only (read-only mode) |
+| Security review | **PASS** | No medium+ findings; tests not deployed; no secrets |
+
+### Console / network
+
+Only guest `Session` 401s on the login page (intentional). NG0913 LCP warning fixed. Resend 422 for seed `example.com` recipients is pre-existing (seed data).
+
 ## Session 2026-10-10 — GATE-0020 session caching, idle warm-up, instant logout
 
 **Node:** v24.x

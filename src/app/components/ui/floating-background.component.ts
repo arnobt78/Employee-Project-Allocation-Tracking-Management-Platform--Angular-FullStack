@@ -22,6 +22,7 @@ import { OptimizedImageComponent } from './optimized-image.component';
             [src]="primary"
             [alt]="primaryAlt()"
             [publicAsset]="primaryPublicAsset()"
+            [priority]="true"
             [class]="primaryImageClass()"
           />
         </div>

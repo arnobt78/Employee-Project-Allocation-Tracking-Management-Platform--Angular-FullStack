@@ -364,3 +364,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | Waiting on the server showed "Logging Out…" for a round trip. `keepalive` keeps the revoke alive across an immediate reload/close (verified). |
 | Linked | GATE-0020, TASK-0071, REQ-0143, RISK-0023 |
 | Status | DONE |
+
+---
+
+## DEC-0038 — Server tests with `node:test` and module mocks
+
+| Field | Value |
+|---|---|
+| Date | 2026-10-10 |
+| Decision | API tests use built-in `node:test` (`--experimental-test-module-mocks`) under top-level `tests/api/` (outside `api/`, so Vercel never deploys them). Only `prisma-client.mjs`, `mongo-client.mjs` and `timing.mjs` are mocked; auth, session cache, handler and the Vercel entry run for real. The fake checks the session aggregate's `$lookup`/`$project` shape and mimics Prisma's "undefined filter deletes all rows". |
+| Rationale | No new dependencies; tests run in ~1 s without a database. `mock.module` `namedExports` may be deprecated in later Node majors (RISK-0024). |
+| Linked | GATE-0021, TASK-0072–0074, REQ-0144 |
+| Status | DONE |

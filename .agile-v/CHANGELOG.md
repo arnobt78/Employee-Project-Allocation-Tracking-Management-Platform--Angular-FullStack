@@ -1,5 +1,12 @@
 # Changelog — Agile V project memory
 
+## 2026-10-10 — GATE-0021 server auth test suite
+
+- `npm run test:api`: 47 `node:test` tests for session cache, auth helpers and the HTTP Login/Session/Logout flow (fake DB, no network)
+- Malformed `Cookie` header now returns 401 instead of 500
+- Login background image loads eagerly (NG0913 warning removed)
+- lint PASS; API 47/47; unit 105/105; build PASS; browser A–Z PASS
+
 ## 2026-10-10 — GATE-0020 session caching, idle warm-up, instant logout
 
 - Per-instance session cache + single-query lookup: auth ~460 ms → ~1 ms warm / ~233 ms cold; CRUD ~0.45 s faster

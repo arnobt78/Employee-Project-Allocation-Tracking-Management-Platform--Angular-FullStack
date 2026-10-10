@@ -5,9 +5,9 @@
 Project Name: EmpowerHub — Employee & Project Management (employee-management)  
 Description: Angular 20 SPA + Vercel serverless API + Prisma/MongoDB for employees, projects, assignments, dashboards, calendar/Gantt, insights, API docs/status, email notifications, optional Contentful + AI drafting, Sentry tunnel.
 
-Current Status: GATE-0020 shipped (cached session check, idle list prefetch, instant logout) on top of GATE-0019 (pending buttons, cache cascade, email log); next: prod soak + project-detail polish guide (CP-0020) 
+Current Status: GATE-0021 shipped (server auth test suite `npm run test:api`) on top of GATE-0020 (cached session check, idle list prefetch, instant logout); next: prod soak + project-detail polish guide (CP-0020) 
 Current Agile V Cycle: C1 
-Current Gate: GATE-0020 COMPLETE; DETAIL POLISH (CP-0020) AWAITING GUIDE
+Current Gate: GATE-0021 COMPLETE; DETAIL POLISH (CP-0020) AWAITING GUIDE
 
 ---
 
@@ -19,7 +19,7 @@ Database: MongoDB via Prisma 6.19
 Authentication: HttpOnly session cookie (`eh_session`), bcrypt `AppUser`, `authGuard` / `guestGuard`, API auth middleware  
 Infrastructure: Vercel (`vercel.json`), local `tools/dev-api-server.mjs` + proxy  
 Deployment: Vercel (live demo URL in README)  
-Testing: Jasmine/Karma unit specs; ESLint via `npm run lint`
+Testing: Jasmine/Karma unit specs; API auth tests via `npm run test:api` (`node:test`, `tests/api/`, fake DB); ESLint via `npm run lint`
 
 ---
 
@@ -77,6 +77,7 @@ Before considering work complete:
 - `npm run lint`
 - `npm run build`
 - `npm test` (as applicable)
+- `npm run test:api` (when `api/` changes)
 - Record results in `.agile-v/VALIDATION_SUMMARY.md`
 
 ---

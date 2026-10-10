@@ -160,6 +160,14 @@
 | TASK-0070 | Idle warm-up of Employees/Projects/Project Team lists from `LayoutComponent` | REQ-0142 | DONE | Soft nav served from cache |
 | TASK-0071 | Instant logout: local sign-out + navigate; keepalive revoke with timeout/retry/warning; login waits for pending revoke; stale-401 epoch guard; in-flight reads dropped on cache clear | REQ-0143 | DONE | DEC-0037; logout → login ~70 ms |
 
+## Wave — GATE-0021 server auth test suite (2026-10-10)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0072 | `tests/api/support/fake-db.mjs`: in-memory Prisma + Mongo `Session` aggregate fakes (pipeline shape checked), `seedUser`, lookup gate, `pinTestEnv` | REQ-0144 | DONE | DEC-0038 |
+| TASK-0073 | `session-cache.test.mjs` (12), `auth.test.mjs` (24), `auth-flow.test.mjs` (11, real Vercel entry over HTTP); `npm run test:api` | REQ-0144 | DONE | 47/47; mutation checks caught |
+| TASK-0074 | Fixes found while testing: malformed cookie → 401 not 500 (`parseCookies`); login background image eager + `fetchpriority` (NG0913) | REQ-0144 | DONE | `OptimizedImageComponent` `priority` input |
+
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)

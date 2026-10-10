@@ -21,7 +21,8 @@ type OptimizeOptions = {
       [attr.width]="width() ?? null"
       [attr.height]="height() ?? null"
       [class]="class()"
-      loading="lazy"
+      [attr.loading]="priority() ? 'eager' : 'lazy'"
+      [attr.fetchpriority]="priority() ? 'high' : null"
       decoding="async"
       [attr.sizes]="sizes() ?? null"
     />
@@ -36,6 +37,8 @@ export class OptimizedImageComponent {
   readonly height = input<number | null | undefined>(undefined);
   readonly sizes = input<string | null | undefined>(undefined);
   readonly publicAsset = input(false);
+  /** Above-the-fold images (e.g. LCP): load eagerly with high fetch priority. */
+  readonly priority = input(false);
   readonly optimizeOptions = input<OptimizeOptions | undefined>(undefined);
 
   /**

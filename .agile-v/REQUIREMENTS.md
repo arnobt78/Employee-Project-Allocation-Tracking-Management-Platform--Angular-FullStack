@@ -119,6 +119,7 @@ Legend: `BASELINE` = verified as-built behavior · `GAP` = docs/code mismatch or
 | REQ-0139 | Calendar "+N more" MUST work with mouse, keyboard and touch without flicker or double toggles. | DONE | Mouse-only hover; Escape refocuses toggle |
 | REQ-0141 | Authenticated API requests SHOULD NOT pay a database round trip for the session check when the session was validated recently; logout MUST revoke immediately on the handling instance (other instances within `SESSION_CACHE_TTL_SECONDS`, default 30 s). | DONE | Warm ~1 ms, cold ~233 ms; logout + immediate reload → 401 (4/4) |
 | REQ-0142 | Main nav lists SHOULD be prefetched after first paint when idle so their pages open from cache. | DONE | Project Team opened with 0 API calls |
+| REQ-0144 | Server auth (session cache, session lookup, login, logout, rate limit, cookie flags) MUST have automated tests that run without a real database (`npm run test:api`); malformed cookies MUST be treated as signed out. | DONE | 47/47 `node:test`; malformed cookie → 401 |
 | REQ-0143 | Log out MUST return to the login page instantly; server revoke runs in the background, survives page unload, and its failure is surfaced. | DONE | ~70 ms to login; offline → "Sign-out not confirmed" toast |
 | REQ-0140 | Background email failures MUST be recorded and surfaced (toast after mutation + API Status deliveries panel) without delaying the mutation; stored errors MUST NOT contain email addresses. | DONE | `NotificationLog`; redaction smoke test |
 

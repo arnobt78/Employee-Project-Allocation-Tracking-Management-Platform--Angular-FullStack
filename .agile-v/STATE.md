@@ -1,15 +1,20 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0020 session caching + idle warm-up + instant logout shipped; prod soak next  
-**Gate:** GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **PENDING**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** Committed locally (not pushed). lint PASS, unit 105/105, production build PASS (initial 922.92 kB), A–Z browser sweep PASS.  
+**Phase / Stage:** Stage 4 — GATE-0021 server auth tests shipped on top of GATE-0020; prod soak next  
+**Gate:** GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **PENDING**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
+**Status:** Committed locally (not pushed). lint PASS, API tests 47/47, unit 105/105, production build PASS, A–Z browser sweep PASS.  
 **Updated:** 2026-10-10  
-**resume_token:** `c1-gate20-prod-soak-2026-10-10`
+**resume_token:** `c1-gate21-prod-soak-2026-10-10`
 
 ---
 
 ## Resume Point
+
+**Completed (GATE-0021, TASK-0072–0074):**
+
+- `npm run test:api` — 47 `node:test` tests in `tests/api/` (DEC-0038): session cache, auth helpers, HTTP Login/Session/Logout via the real Vercel entry; fake DB in `tests/api/support/fake-db.mjs`.
+- Malformed `Cookie` header → 401 (was 500). Login background image eager (NG0913 gone).
 
 **Completed (GATE-0020, TASK-0068–0071):**
 
@@ -29,7 +34,8 @@
 **Remaining / known (low):**
 
 - Cross-instance revocation window up to 30 s (RISK-0022, accepted).
-- No automated tests for `api/` code (session cache covered by a manual Node smoke script).
+- API tests cover auth only (not repository/CRUD handlers); `mock.module` `namedExports` deprecation on future Node (RISK-0024).
+- Resend rejects seed `example.com` recipients (seed data; logged in `NotificationLog`).
 - `NotificationLog` has no retention/TTL (RISK-0018).
 - Prisma `$transaction` deletes need a MongoDB replica set (RISK-0020).
 - Calendar event chips are `div` + `routerLink` (not keyboard-focusable).
@@ -45,8 +51,8 @@
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
-Resume resume_token c1-gate20-prod-soak-2026-10-10.
-GATE-0020 committed locally. Await push/prod soak feedback, then CP-0020 detail-polish guide.
+Resume resume_token c1-gate21-prod-soak-2026-10-10.
+GATE-0021 (API auth tests) + GATE-0020 committed locally. Await push/prod soak feedback, then CP-0020 detail-polish guide.
 ```
 
 ---

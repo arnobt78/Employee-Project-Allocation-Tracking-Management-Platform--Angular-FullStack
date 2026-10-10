@@ -13,6 +13,7 @@
 | GATE-0018 | Project detail (`project-form`) UX polish + single-layer mirrored skeletons (Project detail, API Doc, API Status; Insights/Calendar if confirmed) | Human-Decision | Stage 4 | **COMPLETE (skeleton parity)** | verify-deep PASS WITH WARNINGS; security PASS WITH WARNINGS (fixed); commit-ready 2026-10-10. Detail-polish guide (CP-0020) still open |
 | GATE-0019 | CRUD speed, inline pending UX, cache cascade, email delivery visibility | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat; verifier + security PASS WITH WARNINGS (fixed); commit-ready 2026-10-10 |
 | GATE-0020 | Session check caching, idle list warm-up, instant logout | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat; verifier PASS WITH WARNINGS (fixed); security PASS WITH WARNINGS (RISK-0022 accepted); commit-ready 2026-10-10 |
+| GATE-0021 | Server auth automated test suite | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat; verifier PASS WITH WARNINGS (fixed); security PASS; commit-ready 2026-10-10 |
 
 ## GATE-0001 decision record
 

@@ -12,6 +12,7 @@
     "build": "node tools/generate-env-prod.cjs && ng build && node tools/sentry-upload-sourcemaps.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:api": "node --test --experimental-test-module-mocks --disable-warning=ExperimentalWarning --test-timeout=10000 \"tests/api/*.test.mjs\"",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "vercel-dev": "node -e \"console.log('Vercel dev ready'); setInterval(() => {}, 1 << 30);\"",

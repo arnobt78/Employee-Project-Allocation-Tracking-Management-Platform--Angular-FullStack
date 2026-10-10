@@ -36,7 +36,11 @@ export function parseCookies(headerValue) {
     if (!rawKey) {
       return cookies;
     }
-    cookies[rawKey] = decodeURIComponent(rawValue.join("="));
+    try {
+      cookies[rawKey] = decodeURIComponent(rawValue.join("="));
+    } catch {
+      // Malformed percent-encoding: skip the cookie rather than fail the request.
+    }
     return cookies;
   }, {});
 }
