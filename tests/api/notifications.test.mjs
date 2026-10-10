@@ -113,16 +113,14 @@ describe("sendNotification", () => {
     assert.equal(entry.recipientCount, 1);
   });
 
-  test("when every primary recipient is dropped, CC is promoted but BCC never is", async () => {
+  test("when every To recipient is a test address, nothing is sent even with a real CC or BCC", async () => {
     stubResend();
-    const promoted = await notify(withResend, { to: ["a@example.com"], cc: [REAL] });
-    assert.equal(promoted.status, "sent");
-    assert.deepEqual(sentBody().to, [REAL]);
-    assert.equal(sentBody().cc, undefined);
-
-    const bccOnly = await notify(withResend, { to: ["a@example.com"], bcc: [REAL] });
-    assert.equal(bccOnly.status, "skipped");
-    assert.equal(fetchMock.mock.callCount(), 1);
+    const result = await notify(withResend, { to: ["a@example.com"], cc: [REAL], bcc: [REAL] });
+    assert.equal(result.status, "skipped");
+    assert.equal(fetchMock.mock.callCount(), 0);
+    const [entry] = deliveries();
+    assert.equal(entry.status, "skipped");
+    assert.equal(entry.recipientCount, 0);
   });
 
   test("a single string recipient is filtered the same way", async () => {

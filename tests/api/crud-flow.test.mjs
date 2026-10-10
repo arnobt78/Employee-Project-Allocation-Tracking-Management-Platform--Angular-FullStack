@@ -9,8 +9,8 @@ installFakeDb(db);
 let api;
 let cookie;
 
-async function request(action, { method = "GET", body } = {}) {
-  const response = await api.call(action, { method, body, cookie });
+async function request(action, { method = "GET", body, rawBody } = {}) {
+  const response = await api.call(action, { method, body, rawBody, cookie });
   const json = await response.json().catch(() => null);
   return { status: response.status, json, data: unwrap(json) };
 }
@@ -223,6 +223,116 @@ describe("CRUD HTTP flow", () => {
       assert.equal((await put("UpdateProjectEmployee/999999", { role: "x" })).status, 404);
       assert.equal((await del("DeleteProjectEmployee/999999")).status, 404);
     });
+
+    test("moving an assignment to an unknown project or employee is a 404 and changes nothing", async () => {
+      const employee = await createEmployee();
+      const project = await createProject();
+      const assignment = await createAssignment(project.projectId, employee.employeeId);
+      const id = assignment.empProjectId;
+      const stored = () => db.tables.projectEmployee.get(id);
+
+      const badProject = await put(`UpdateProjectEmployee/${id}`, { projectId: 999999, role: "Moved" });
+      assert.equal(badProject.status, 404);
+      assert.equal(badProject.json.message, "Project not found");
+      const badEmployee = await put(`UpdateProjectEmployee/${id}`, { empId: 999999, role: "Moved" });
+      assert.equal(badEmployee.status, 404);
+      assert.equal(badEmployee.json.message, "Employee not found");
+      assert.equal(stored().projectId, project.projectId);
+      assert.equal(stored().empId, employee.employeeId);
+      assert.equal(stored().role, "Developer");
+
+      const other = await createProject();
+      const moved = await put(`UpdateProjectEmployee/${id}`, { projectId: other.projectId });
+      assert.equal(moved.status, 200);
+      assert.equal(stored().projectId, other.projectId);
+    });
+
+    test("a missing assignment is reported before a missing project", async () => {
+      const response = await put("UpdateProjectEmployee/999999", { projectId: 999998 });
+      assert.equal(response.status, 404);
+      assert.equal(response.json.message, "Project employee not found");
+    });
+
+    test("non-integer project or employee ids are a 400 and write nothing", async () => {
+      const employee = await createEmployee();
+      const project = await createProject();
+      const assignment = await createAssignment(project.projectId, employee.employeeId);
+      const before = db.tables.projectEmployee.size;
+
+      const created = await post("CreateProjectEmployee", { projectId: "abc", empId: employee.employeeId });
+      assert.equal(created.status, 400);
+      assert.equal(created.json.message, "projectId must be a positive whole number");
+      const moved = await put(`UpdateProjectEmployee/${assignment.empProjectId}`, { empId: 1.5 });
+      assert.equal(moved.status, 400);
+      assert.equal(moved.json.message, "empId must be a positive whole number");
+
+      assert.equal(db.tables.projectEmployee.size, before);
+      assert.equal(db.tables.projectEmployee.get(assignment.empProjectId).empId, employee.employeeId);
+    });
+  });
+
+  test("non-integer path ids are a 400 on every CRUD route", async () => {
+    for (const [method, action] of [
+      ["GET", "GetProject/1.5"],
+      ["PUT", "UpdateEmployee/1.5"],
+      ["PUT", "UpdateProject/-1"],
+      ["PUT", "UpdateProjectEmployee/abc"],
+      ["DELETE", "DeleteEmployee/1.5"],
+      ["DELETE", "DeleteProject/0"],
+      ["DELETE", "DeleteProjectEmployee/2.5"],
+    ]) {
+      const response = await request(action, { method, body: method === "PUT" ? {} : undefined });
+      assert.equal(response.status, 400, `${method} ${action}`);
+    }
+  });
+
+  test("a malformed JSON body is a 400, writes nothing and is not logged as a server error", async (t) => {
+    const serverErrors = t.mock.method(console, "error", () => {});
+    const employeesBefore = db.tables.employee.size;
+    const created = await request("CreateEmployee", { method: "POST", rawBody: "{bad json" });
+    assert.equal(created.status, 400);
+    assert.equal(created.json.message, "Invalid JSON body");
+    assert.equal(db.tables.employee.size, employeesBefore);
+
+    const updated = await request("UpdateProjectEmployee/1", { method: "PUT", rawBody: "{" });
+    assert.equal(updated.status, 400);
+    assert.equal(updated.json.message, "Invalid JSON body");
+    assert.equal(serverErrors.mock.callCount(), 0);
+  });
+
+  test("API documentation lists the CRUD validation responses", async () => {
+    const { status, json } = await request("GetApiDocumentation");
+    assert.equal(status, 200);
+    const listed = (method, path) =>
+      json.endpoints[method]
+        .find((e) => e.path === path)
+        .errorResponses.map((e) => `${e.status} ${e.body.message}`);
+    const expectations = {
+      "POST CreateEmployee": ["400 employeeName is required to create an employee", "400 Invalid JSON body"],
+      "POST CreateProject": ["400 projectName is required to create a project", "400 Invalid JSON body"],
+      "POST CreateProjectEmployee": [
+        "400 projectId must be a positive whole number",
+        "404 Project not found",
+        "404 Employee not found",
+        "400 Invalid JSON body",
+      ],
+      "PUT UpdateEmployee/{id}": ["400 Invalid employee identifier", "400 Invalid JSON body"],
+      "PUT UpdateProject/{id}": ["400 Invalid project identifier", "400 Invalid JSON body"],
+      "PUT UpdateProjectEmployee/{id}": [
+        "404 Project employee not found",
+        "404 Project not found",
+        "404 Employee not found",
+        "400 Invalid JSON body",
+      ],
+      "DELETE DeleteProjectEmployee/{id}": ["400 Invalid project employee identifier"],
+    };
+    for (const [key, expected] of Object.entries(expectations)) {
+      const [method, path] = key.split(" ");
+      const responses = listed(method, path);
+      for (const line of expected) {
+        assert.ok(responses.includes(line), `${key}: ${line}`);
+      }
+    }
   });
 
   test("every CRUD route requires a session", async () => {

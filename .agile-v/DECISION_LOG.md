@@ -384,7 +384,7 @@ Append-only. Do not rewrite prior entries.
 | Field | Value |
 |---|---|
 | Date | 2026-10-10 |
-| Decision | `sendNotification` drops recipients on reserved domains (`example.com/.net/.org`, `.test`, `.example`, `.invalid`, `.localhost`) before calling Resend/SMTP. If no To remains, CC becomes To; BCC is never promoted. Nothing left → logged as `skipped`. Repository input errors use `clientError(status, message)` (`expose: true`); the handler returns only those as 4xx, everything else stays 500. |
-| Rationale | Seed data uses `example.com`, which Resend rejects (422) and made the deliveries panel show false failures. Exposing only flagged errors keeps internal messages out of 4xx responses. |
-| Linked | GATE-0022, TASK-0075–0078, REQ-0145, REQ-0146 |
+| Decision | `sendNotification` drops recipients on reserved domains (`example.com/.net/.org`, `.test`, `.example`, `.invalid`, `.localhost`) before calling Resend/SMTP. If no To remains, nothing is sent and the delivery is logged as `skipped` (CC/BCC are not promoted; amended in GATE-0023). Input errors use `clientError(status, message)` (`expose: true`), including malformed JSON and non-integer ids; the handler returns only those as 4xx, everything else stays 500. |
+| Rationale | Seed data uses `example.com`, which Resend rejects (422) and made the deliveries panel show false failures. Emails are worded for the To recipient, so CC'd leads should not receive them alone. Exposing only flagged errors keeps internal messages out of 4xx responses and client mistakes out of Sentry. |
+| Linked | GATE-0022, GATE-0023, TASK-0075–0082, REQ-0145–0147 |
 | Status | DONE |

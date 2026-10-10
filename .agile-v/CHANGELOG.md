@@ -1,8 +1,16 @@
 # Changelog — Agile V project memory
 
+## 2026-10-10 — GATE-0023 API input validation
+
+- Malformed JSON → 400 (was 500 + Sentry); non-integer ids → 400
+- Editing an assignment to an unknown project/employee → 404, nothing written
+- No CC/BCC promotion: test-domain-only To → nothing sent, logged as skipped
+- API docs list CRUD 400/404 responses; `/api-doc` shows error messages
+- Node 24.21: lint PASS; API 75/75; unit 106/106; build PASS; browser A–Z PASS
+
 ## 2026-10-10 — GATE-0022 email skip + CRUD API tests
 
-- Email to reserved test domains (e.g. seed `example.com`) is skipped and logged, no longer a Resend 422 failure; CC promoted when no To remains
+- Email to reserved test domains (e.g. seed `example.com`) is skipped and logged, no longer a Resend 422 failure
 - CRUD create with missing fields → 400; assignment for unknown project/employee → 404 (was 500 / orphan row)
 - `npm run test:api` now 69 tests (auth, CRUD, email); requires Node 24
 - Node 24.21: lint PASS; API 69/69; unit 105/105; build PASS; browser A–Z PASS

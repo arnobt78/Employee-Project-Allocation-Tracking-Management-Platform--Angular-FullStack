@@ -160,18 +160,16 @@ function deliverableOnly(list) {
 
 /**
  * Sends one notification (Resend first, SMTP fallback) and records the outcome
- * in the NotificationLog. Recipients on reserved test domains are dropped.
+ * in the NotificationLog. Recipients on reserved test domains are dropped;
+ * with no deliverable To address nothing is sent and the outcome is `skipped`.
  * Resolves `{ status, provider, ... }`; rethrows when no provider succeeded.
  */
 export async function sendNotification(options) {
   const { metadata = {} } = options;
-  let to = deliverableOnly(options.to);
-  let cc = deliverableOnly(options.cc);
-  const bcc = deliverableOnly(options.bcc);
-  // Keep CC'd stakeholders informed when every primary recipient was dropped (never promote BCC).
-  if (to.length === 0 && cc.length > 0) {
-    [to, cc] = [cc, []];
-  }
+  const to = deliverableOnly(options.to);
+  // CC/BCC are never promoted: their wording addresses the primary recipient.
+  const cc = to.length ? deliverableOnly(options.cc) : [];
+  const bcc = to.length ? deliverableOnly(options.bcc) : [];
   try {
     const result = await deliver({ ...options, to, cc, bcc });
     const status = result.skipped ? "skipped" : "sent";

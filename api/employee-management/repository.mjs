@@ -15,8 +15,13 @@ const DEFAULT_COUNTER_SEEDS = {
 let bootstrapPromise;
 
 /** Client errors the handler returns with `status` and message instead of a 500. */
-function clientError(status, message) {
+export function clientError(status, message) {
   return Object.assign(new Error(message), { status, expose: true });
+}
+
+/** Record ids are positive integers (Prisma `Int`); anything else is rejected before a query. */
+export function isRecordId(value) {
+  return Number.isInteger(value) && value > 0;
 }
 
 const READINESS_DEFINITIONS = [
@@ -2510,6 +2515,33 @@ export async function listProjectEmployees() {
   );
 }
 
+/**
+ * Throws 400 for a non-integer id and 404 when a referenced project or
+ * employee is missing; omitted ids are not checked.
+ */
+async function assertAssignmentTargetsExist({ projectId, empId }) {
+  if (projectId !== undefined && !isRecordId(projectId)) {
+    throw clientError(400, "projectId must be a positive whole number");
+  }
+  if (empId !== undefined && !isRecordId(empId)) {
+    throw clientError(400, "empId must be a positive whole number");
+  }
+  const [project, employee] = await Promise.all([
+    projectId === undefined
+      ? true
+      : prisma.project.findUnique({ where: { projectId }, select: { projectId: true } }),
+    empId === undefined
+      ? true
+      : prisma.employee.findUnique({ where: { employeeId: empId }, select: { employeeId: true } }),
+  ]);
+  if (!project) {
+    throw clientError(404, "Project not found");
+  }
+  if (!employee) {
+    throw clientError(404, "Employee not found");
+  }
+}
+
 export async function createProjectEmployee(payload) {
   await ensureBootstrapData();
 
@@ -2524,17 +2556,10 @@ export async function createProjectEmployee(payload) {
   const projectId = Number(payload.projectId);
   const empId = Number(payload.empId);
   // Existence checks run alongside the id increment; a rejected request only leaves an id gap.
-  const [project, employee, empProjectId] = await Promise.all([
-    prisma.project.findUnique({ where: { projectId }, select: { projectId: true } }),
-    prisma.employee.findUnique({ where: { employeeId: empId }, select: { employeeId: true } }),
+  const [, empProjectId] = await Promise.all([
+    assertAssignmentTargetsExist({ projectId, empId }),
     getNextSequenceValue("projectEmployee"),
   ]);
-  if (!project) {
-    throw clientError(404, "Project not found");
-  }
-  if (!employee) {
-    throw clientError(404, "Employee not found");
-  }
 
   const record = await prisma.projectEmployee.create({
     data: {
@@ -2633,12 +2658,34 @@ export async function updateProjectEmployee(empProjectId, payload) {
     updateData.unassignedAt = toDate(payload.unassignedAt);
   }
 
+  const notFound = () =>
+    Object.assign(new Error(`Project employee assignment with empProjectId ${empProjectId} not found`), {
+      code: "P2025",
+    });
+
+  if (updateData.projectId !== undefined || updateData.empId !== undefined) {
+    // A missing assignment is reported before a missing project/employee.
+    const [existing, targetsError] = await Promise.all([
+      prisma.projectEmployee.findUnique({ where: { empProjectId: id }, select: { empProjectId: true } }),
+      assertAssignmentTargetsExist(updateData).then(
+        () => null,
+        (error) => error
+      ),
+    ]);
+    if (!existing) {
+      throw notFound();
+    }
+    if (targetsError) {
+      throw targetsError;
+    }
+  }
+
   if (Object.keys(updateData).length === 0) {
     const existingRecord = await prisma.projectEmployee.findUnique({
       where: { empProjectId: id },
     });
     if (!existingRecord) {
-      throw Object.assign(new Error(`Project employee assignment with empProjectId ${empProjectId} not found`), { code: "P2025" });
+      throw notFound();
     }
     return mapAssignmentRecord(existingRecord);
   }

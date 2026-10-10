@@ -172,10 +172,19 @@
 
 | ID | Task | REQ | Status | Notes |
 |---|---|---|---|---|
-| TASK-0075 | `notifications.mjs`: skip reserved test-domain recipients (`isDeliverableAddress`), promote CC when no To remains, never promote BCC; log as skipped | REQ-0145 | DONE | DEC-0039; live probe 0 failures |
+| TASK-0075 | `notifications.mjs`: skip reserved test-domain recipients (`isDeliverableAddress`); log as skipped (CC promotion later removed in TASK-0081) | REQ-0145 | DONE | DEC-0039; live probe 0 failures |
 | TASK-0076 | Fake DB covers every Prisma model + Mongo counter (shape checked); shared `startApiServer` helper; Node 24 guard | REQ-0146 | DONE | `tests/api/support/` |
 | TASK-0077 | `crud-flow.test.mjs` (14) and `notifications.test.mjs` (8) | REQ-0145, REQ-0146 | DONE | 69/69 on Node 24.16 and 24.21 |
 | TASK-0078 | Fixes found while testing: missing create fields → 400; assignment for unknown project/employee → 404 (no orphan row) via `clientError` + `expose` | REQ-0146 | DONE | Handler only passes through `expose` 4xx |
+
+## Wave — GATE-0023 API input validation (2026-10-10)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0079 | `updateProjectEmployee`: 404 for unknown project/employee (shared `assertAssignmentTargetsExist`), missing assignment reported first, non-integer ids → 400 (`isRecordId`) | REQ-0146 | DONE | No write on rejection |
+| TASK-0080 | Malformed JSON → 400 `clientError`; path ids validated with `isRecordId` on Get/Update/Delete routes; exposed-4xx branch sets `statusCodeRef` explicitly | REQ-0147 | DONE | Not sent to Sentry |
+| TASK-0081 | Remove CC/BCC promotion: no deliverable To → nothing sent, `skipped`, 0 recipients | REQ-0145 | DONE | DEC-0039 amended |
+| TASK-0082 | API docs list CRUD 400/404 responses (`errorResponse` helper); `/api-doc` shows error messages; tests (75 API, 106 unit) | REQ-0147 | DONE | Docs test guards drift |
 
 ---
 

@@ -13,20 +13,20 @@ export async function startApiServer() {
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
   const baseUrl = `http://127.0.0.1:${server.address().port}/api/employee-management`;
 
-  /** Each call gets its own client IP unless `ip` is given, so the login rate limiter stays isolated. */
-  function call(action, { method = "GET", cookie, body, ip } = {}) {
+  /**
+   * Each call gets its own client IP unless `ip` is given, so the login rate limiter stays isolated.
+   * `rawBody` is sent as-is (for malformed JSON); `body` is JSON-encoded.
+   */
+  function call(action, { method = "GET", cookie, body, rawBody, ip } = {}) {
     const headers = { "x-forwarded-for": ip ?? `198.51.100.${(++ipCounter % 250) + 1}` };
     if (cookie) {
       headers.cookie = cookie;
     }
-    if (body !== undefined) {
+    const payload = rawBody ?? (body === undefined ? undefined : JSON.stringify(body));
+    if (payload !== undefined) {
       headers["content-type"] = "application/json";
     }
-    return fetch(`${baseUrl}/${action}`, {
-      method,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
+    return fetch(`${baseUrl}/${action}`, { method, headers, body: payload });
   }
 
   return {

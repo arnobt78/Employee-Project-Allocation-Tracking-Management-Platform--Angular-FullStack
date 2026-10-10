@@ -54,4 +54,29 @@ describe('ApiDocComponent', () => {
     expect(el.textContent).toContain('Employee Management API');
     expect(getSpy).not.toHaveBeenCalled();
   });
+
+  it('shows the message of each error response', () => {
+    const withErrors: IApiDocumentation = {
+      ...doc,
+      endpoints: {
+        ...doc.endpoints,
+        GET: [
+          {
+            path: 'GetProject/{id}',
+            method: 'GET',
+            description: 'Get a project',
+            url: '/api/GetProject/{id}',
+            response: { status: 200, body: 'Project' },
+            errorResponses: [{ status: 404, body: { result: false, message: 'Project not found' } }],
+            category: 'Projects',
+          },
+        ],
+      },
+    };
+    spyOn(master, 'peekApiDocumentation').and.returnValue(withErrors);
+    spyOn(master, 'getApiDocumentation').and.returnValue(NEVER);
+    const el = create();
+    expect(el.textContent).toContain('Message:');
+    expect(el.textContent).toContain('Project not found');
+  });
 });

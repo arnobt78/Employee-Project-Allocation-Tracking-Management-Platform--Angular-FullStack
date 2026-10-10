@@ -1,5 +1,23 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-10 — GATE-0023 API input validation
+
+**Node:** v24.21.0 via fnm
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run test:api` | **PASS** | 75/75 (CRUD 20, email 8, auth 47) |
+| Mutation checks | **PASS** | Removing update existence check, JSON `clientError`, no-promotion, docs entry, `isRecordId` strictness, body id check, not-found order → each caught |
+| `npm run lint` | **PASS** | |
+| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 106/106 (new `/api-doc` message spec) |
+| `npm run build` | **PASS** | |
+| Live probe (real DB) | **PASS** | Bad JSON 400 (create + update); edit to unknown project/employee 404; missing assignment first; `1.5` path/body ids 400; valid move 200; deliveries 0 failed (test-domain To → skipped, 0 recipients); no server errors logged |
+| Browser (Playwright) | **PASS** | `/api-doc` PUT tab shows new rows with messages; Project Team edit → PUT 200 in 2.3 s, list refresh, toast; 11 routes 1.6–3.7 s; logout + reload stays signed out; only guest `Session` 401s |
+| Independent verifier | **PASS WITH WARNINGS (fixed)** | Integer ids, not-found order, docs/test coverage gaps → fixed; docs synced |
+| Security review | **PASS** | No medium+ findings |
+
+Remote DB briefly slowed list calls to 8–47 s during the sweep (unchanged list code); recovered to 0.2–1.4 s and the sweep re-ran clean.
+
 ## Session 2026-10-10 — GATE-0022 email skip + CRUD API tests
 
 **Node:** v24.21.0 via fnm (also 24.16; Vercel 24.x)

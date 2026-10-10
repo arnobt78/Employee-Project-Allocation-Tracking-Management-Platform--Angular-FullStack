@@ -12,3 +12,4 @@ Append-only human gate records.
 | 2026-10-10 | GATE-0019 | `c1-gate19-crud-speed-2026-10-10` | User (chat) | APPROVED | CRUD speed + pending UX + cache cascade + email visibility plan | Plan attached + implement; DEC-0034 deviation recorded |
 | 2026-10-10 | GATE-0020 | `c1-gate20-session-cache-2026-10-10` | User (chat) | APPROVED | Session check caching + idle warm-up plan; instant logout request | Default cache TTL 30 s (plan said 60 s) after security review |
 | 2026-10-10 | GATE-0022 | `c1-gate22-prod-soak-2026-10-10` | User (chat) | APPROVED | Test-domain email skip + CRUD API tests on Node 24 | CC promotion and 400/404 fixes added during verification |
+| 2026-10-10 | GATE-0023 | `c1-gate23-prod-soak-2026-10-10` | User (chat) | APPROVED | Close remaining API gaps plan; skip instead of CC promotion | Verifier findings (integer ids, not-found order) fixed in scope |

@@ -5,6 +5,8 @@ import {
   buildDashboardSnapshot,
   buildScheduleData,
   buildApiStatus,
+  clientError,
+  isRecordId,
   createEmployee,
   createProject,
   createProjectEmployee,
@@ -108,8 +110,8 @@ async function readRequestBody(request) {
   }
   try {
     return JSON.parse(Buffer.concat(chunks).toString("utf-8"));
-  } catch (error) {
-    throw new Error("Invalid JSON body");
+  } catch {
+    throw clientError(400, "Invalid JSON body");
   }
 }
 
@@ -1811,6 +1813,8 @@ function buildApiDocumentation(request) {
   // Use relative path for baseUrl - works in both localhost and production
   // The frontend uses relative paths, so this ensures consistency
   const baseUrl = "/api/employee-management";
+  const errorResponse = (status, message) => ({ status, body: { result: false, message } });
+  const invalidJson = errorResponse(400, "Invalid JSON body");
 
   return {
     info: {
@@ -1900,10 +1904,8 @@ function buildApiDocumentation(request) {
             body: "Project",
           },
           errorResponses: [
-            {
-              status: 404,
-              body: { result: false, message: "Project not found" },
-            },
+            errorResponse(400, "Invalid project ID"),
+            errorResponse(404, "Project not found"),
           ],
           category: "Projects",
         },
@@ -2100,6 +2102,10 @@ function buildApiDocumentation(request) {
               data: "Employee",
             },
           },
+          errorResponses: [
+            errorResponse(400, "employeeName is required to create an employee"),
+            invalidJson,
+          ],
           category: "Employees",
         },
         {
@@ -2115,6 +2121,10 @@ function buildApiDocumentation(request) {
             status: 201,
             body: "Project",
           },
+          errorResponses: [
+            errorResponse(400, "projectName is required to create a project"),
+            invalidJson,
+          ],
           category: "Projects",
         },
         {
@@ -2130,6 +2140,15 @@ function buildApiDocumentation(request) {
             status: 201,
             body: "ProjectEmployee",
           },
+          errorResponses: [
+            errorResponse(400, "projectId is required to create a project employee assignment"),
+            errorResponse(400, "empId is required to create a project employee assignment"),
+            errorResponse(400, "projectId must be a positive whole number"),
+            errorResponse(400, "empId must be a positive whole number"),
+            errorResponse(404, "Project not found"),
+            errorResponse(404, "Employee not found"),
+            invalidJson,
+          ],
           category: "Assignments",
         },
         {
@@ -2336,10 +2355,9 @@ function buildApiDocumentation(request) {
             },
           },
           errorResponses: [
-            {
-              status: 404,
-              body: { result: false, message: "Employee not found" },
-            },
+            errorResponse(400, "Invalid employee identifier"),
+            errorResponse(404, "Employee not found"),
+            invalidJson,
           ],
           category: "Employees",
         },
@@ -2365,10 +2383,9 @@ function buildApiDocumentation(request) {
             body: "Project",
           },
           errorResponses: [
-            {
-              status: 404,
-              body: { result: false, message: "Project not found" },
-            },
+            errorResponse(400, "Invalid project identifier"),
+            errorResponse(404, "Project not found"),
+            invalidJson,
           ],
           category: "Projects",
         },
@@ -2394,10 +2411,13 @@ function buildApiDocumentation(request) {
             body: "ProjectEmployee",
           },
           errorResponses: [
-            {
-              status: 404,
-              body: { result: false, message: "Project employee not found" },
-            },
+            errorResponse(400, "Invalid project employee identifier"),
+            errorResponse(400, "projectId must be a positive whole number"),
+            errorResponse(400, "empId must be a positive whole number"),
+            errorResponse(404, "Project employee not found"),
+            errorResponse(404, "Project not found"),
+            errorResponse(404, "Employee not found"),
+            invalidJson,
           ],
           category: "Assignments",
         },
@@ -2424,10 +2444,8 @@ function buildApiDocumentation(request) {
             },
           },
           errorResponses: [
-            {
-              status: 404,
-              body: { result: false, message: "Employee not found" },
-            },
+            errorResponse(400, "Invalid employee identifier"),
+            errorResponse(404, "Employee not found"),
           ],
           category: "Employees",
         },
@@ -2452,10 +2470,8 @@ function buildApiDocumentation(request) {
             },
           },
           errorResponses: [
-            {
-              status: 404,
-              body: { result: false, message: "Project not found" },
-            },
+            errorResponse(400, "Invalid project identifier"),
+            errorResponse(404, "Project not found"),
           ],
           category: "Projects",
         },
@@ -2480,10 +2496,8 @@ function buildApiDocumentation(request) {
             },
           },
           errorResponses: [
-            {
-              status: 404,
-              body: { result: false, message: "Project employee not found" },
-            },
+            errorResponse(400, "Invalid project employee identifier"),
+            errorResponse(404, "Project employee not found"),
           ],
           category: "Assignments",
         },
@@ -2631,7 +2645,7 @@ export async function handleEmployeeManagementRequest(request, response) {
         if (action === "GetProject") {
           // Support both path parameter (GetProject/5001) and query parameter (GetProject?id=5001)
           const projectId = Number(rawId || url.searchParams.get("id"));
-          if (!projectId || isNaN(projectId)) {
+          if (!isRecordId(projectId)) {
             return sendJson(
               response,
               400,
@@ -2690,7 +2704,7 @@ export async function handleEmployeeManagementRequest(request, response) {
         if (action === "GetProjectResources") {
           // Support both path parameter (GetProjectResources/5001) and query parameter (GetProjectResources?id=5001)
           const projectId = Number(rawId || url.searchParams.get("id"));
-          if (!projectId || isNaN(projectId)) {
+          if (!isRecordId(projectId)) {
             return sendJson(
               response,
               400,
@@ -3061,7 +3075,7 @@ export async function handleEmployeeManagementRequest(request, response) {
 
         if (action === "UpdateEmployee") {
           const employeeId = Number(rawId || url.searchParams.get("id"));
-          if (!employeeId || isNaN(employeeId)) {
+          if (!isRecordId(employeeId)) {
             return sendJson(
               response,
               400,
@@ -3098,7 +3112,7 @@ export async function handleEmployeeManagementRequest(request, response) {
 
         if (action === "UpdateProject") {
           const projectId = Number(rawId || url.searchParams.get("id"));
-          if (!projectId || isNaN(projectId)) {
+          if (!isRecordId(projectId)) {
             return sendJson(
               response,
               400,
@@ -3126,7 +3140,7 @@ export async function handleEmployeeManagementRequest(request, response) {
 
         if (action === "UpdateProjectEmployee") {
           const empProjectId = Number(rawId || url.searchParams.get("id"));
-          if (!empProjectId || isNaN(empProjectId)) {
+          if (!isRecordId(empProjectId)) {
             return sendJson(
               response,
               400,
@@ -3161,7 +3175,7 @@ export async function handleEmployeeManagementRequest(request, response) {
       case "DELETE": {
         if (action === "DeleteEmployee") {
           const employeeId = Number(rawId || url.searchParams.get("id"));
-          if (!employeeId || isNaN(employeeId)) {
+          if (!isRecordId(employeeId)) {
             return sendJson(
               response,
               400,
@@ -3197,7 +3211,7 @@ export async function handleEmployeeManagementRequest(request, response) {
 
         if (action === "DeleteProject") {
           const projectId = Number(rawId || url.searchParams.get("id"));
-          if (!projectId || isNaN(projectId)) {
+          if (!isRecordId(projectId)) {
             return sendJson(
               response,
               400,
@@ -3237,7 +3251,7 @@ export async function handleEmployeeManagementRequest(request, response) {
 
         if (action === "DeleteProjectEmployee") {
           const empProjectId = Number(rawId || url.searchParams.get("id"));
-          if (!empProjectId || isNaN(empProjectId)) {
+          if (!isRecordId(empProjectId)) {
             return sendJson(
               response,
               400,
@@ -3287,6 +3301,7 @@ export async function handleEmployeeManagementRequest(request, response) {
     );
   } catch (err) {
     if (err?.expose === true && err.status >= 400 && err.status < 500) {
+      statusCodeRef.value = err.status;
       return sendJson(
         response,
         err.status,

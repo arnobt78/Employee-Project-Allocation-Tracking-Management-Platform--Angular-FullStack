@@ -248,6 +248,10 @@
                     formatSchema(error.body)
                   }}</code>
                 </div>
+                <div *ngIf="errorMessage(error.body) as message" class="mt-1">
+                  <span class="text-xs text-white/60">Message:</span>
+                  <code class="ml-2 text-xs text-white">{{ message }}</code>
+                </div>
               </div>
             </div>
           </div>

@@ -162,6 +162,11 @@ export class ApiDocComponent implements OnInit {
     return String(schema);
   }
 
+  errorMessage(body: unknown): string | null {
+    const message = (body as { message?: unknown } | null)?.message;
+    return typeof message === 'string' ? message : null;
+  }
+
   copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text).then(() => {
       // Clipboard write succeeded; toast can be added here if needed.
