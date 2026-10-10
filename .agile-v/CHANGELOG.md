@@ -1,5 +1,12 @@
 # Changelog — Agile V project memory
 
+## 2026-10-10 — GATE-0022 email skip + CRUD API tests
+
+- Email to reserved test domains (e.g. seed `example.com`) is skipped and logged, no longer a Resend 422 failure; CC promoted when no To remains
+- CRUD create with missing fields → 400; assignment for unknown project/employee → 404 (was 500 / orphan row)
+- `npm run test:api` now 69 tests (auth, CRUD, email); requires Node 24
+- Node 24.21: lint PASS; API 69/69; unit 105/105; build PASS; browser A–Z PASS
+
 ## 2026-10-10 — GATE-0021 server auth test suite
 
 - `npm run test:api`: 47 `node:test` tests for session cache, auth helpers and the HTTP Login/Session/Logout flow (fake DB, no network)

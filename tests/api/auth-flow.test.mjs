@@ -1,48 +1,26 @@
 import assert from "node:assert/strict";
-import { createServer } from "node:http";
 import { after, before, beforeEach, describe, test } from "node:test";
+import { sessionCookie, startApiServer } from "./support/api-server.mjs";
 import { createFakeDb, importApi, installFakeDb } from "./support/fake-db.mjs";
 
 const db = createFakeDb();
 installFakeDb(db);
 
-const { default: vercelHandler } = await importApi("employee-management/[...segments].js");
 const sessionCache = await importApi("_lib/session-cache.mjs");
 
 const PASSWORD = "correct horse";
-let server;
-let baseUrl;
-let ipCounter = 0;
+let api;
 
-function call(action, { method = "GET", cookie, body, ip } = {}) {
-  const headers = { "x-forwarded-for": ip ?? `198.51.100.${++ipCounter}` };
-  if (cookie) {
-    headers.cookie = cookie;
-  }
-  if (body !== undefined) {
-    headers["content-type"] = "application/json";
-  }
-  return fetch(`${baseUrl}/${action}`, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-}
-
+const call = (...args) => api.call(...args);
 const login = (username, password, ip) =>
   call("Login", { method: "POST", body: { username, password }, ip });
 
-/** `eh_session=<token>` from a Set-Cookie header. */
-const sessionCookie = (response) => response.headers.get("set-cookie").split(";")[0];
-
 describe("auth HTTP flow", () => {
   before(async () => {
-    server = createServer(vercelHandler);
-    await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-    baseUrl = `http://127.0.0.1:${server.address().port}/api/employee-management`;
+    api = await startApiServer();
   });
 
-  after(() => new Promise((resolve) => server.close(resolve)));
+  after(() => api.close());
 
   beforeEach(async () => {
     db.reset();

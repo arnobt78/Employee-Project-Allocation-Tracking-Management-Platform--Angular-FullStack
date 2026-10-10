@@ -11,3 +11,4 @@ Append-only human gate records.
 | 2026-10-10 | GATE-0018 | `c1-gate18-skeleton-parity-2026-10-10` | User (chat) | APPROVED | DEC-0030 single-layer skeletons; background email via `waitUntil` | implement-deep → verify-deep → security → commit-ready |
 | 2026-10-10 | GATE-0019 | `c1-gate19-crud-speed-2026-10-10` | User (chat) | APPROVED | CRUD speed + pending UX + cache cascade + email visibility plan | Plan attached + implement; DEC-0034 deviation recorded |
 | 2026-10-10 | GATE-0020 | `c1-gate20-session-cache-2026-10-10` | User (chat) | APPROVED | Session check caching + idle warm-up plan; instant logout request | Default cache TTL 30 s (plan said 60 s) after security review |
+| 2026-10-10 | GATE-0022 | `c1-gate22-prod-soak-2026-10-10` | User (chat) | APPROVED | Test-domain email skip + CRUD API tests on Node 24 | CC promotion and 400/404 fixes added during verification |

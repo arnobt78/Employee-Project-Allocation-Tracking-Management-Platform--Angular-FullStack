@@ -14,6 +14,7 @@
 | GATE-0019 | CRUD speed, inline pending UX, cache cascade, email delivery visibility | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat; verifier + security PASS WITH WARNINGS (fixed); commit-ready 2026-10-10 |
 | GATE-0020 | Session check caching, idle list warm-up, instant logout | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat; verifier PASS WITH WARNINGS (fixed); security PASS WITH WARNINGS (RISK-0022 accepted); commit-ready 2026-10-10 |
 | GATE-0021 | Server auth automated test suite | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat; verifier PASS WITH WARNINGS (fixed); security PASS; commit-ready 2026-10-10 |
+| GATE-0022 | Test-domain email skip + CRUD API tests (Node 24) | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat; verifier PASS WITH WARNINGS (fixed); security PASS; commit-ready 2026-10-10 |
 
 ## GATE-0001 decision record
 

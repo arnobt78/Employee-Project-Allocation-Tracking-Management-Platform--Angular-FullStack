@@ -1,15 +1,21 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0021 server auth tests shipped on top of GATE-0020; prod soak next  
-**Gate:** GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **PENDING**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** Committed locally (not pushed). lint PASS, API tests 47/47, unit 105/105, production build PASS, A–Z browser sweep PASS.  
+**Phase / Stage:** Stage 4 — GATE-0022 email skip + CRUD API tests shipped on top of GATE-0021; prod soak next  
+**Gate:** GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **PENDING**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
+**Status:** Committed locally (not pushed). Node 24.21: lint PASS, API tests 69/69, unit 105/105, production build PASS, A–Z browser sweep PASS.  
 **Updated:** 2026-10-10  
-**resume_token:** `c1-gate21-prod-soak-2026-10-10`
+**resume_token:** `c1-gate22-prod-soak-2026-10-10`
 
 ---
 
 ## Resume Point
+
+**Completed (GATE-0022, TASK-0075–0078):**
+
+- Email to reserved test domains (`example.com/.net/.org`, `.test`, `.example`, `.invalid`, `.localhost`) is skipped, not sent (DEC-0039). CC is promoted to To when every To was dropped; BCC never is. Live probe: 0 failed deliveries.
+- CRUD bad input returns 400 (missing fields) and 404 (assignment for unknown project/employee) instead of 500 / orphan rows (`clientError` with `expose`).
+- `npm run test:api` — 69 tests (auth 47 + CRUD 14 + email 8); fake DB covers all models; needs Node 24 (fails fast below).
 
 **Completed (GATE-0021, TASK-0072–0074):**
 
@@ -34,8 +40,9 @@
 **Remaining / known (low):**
 
 - Cross-instance revocation window up to 30 s (RISK-0022, accepted).
-- API tests cover auth only (not repository/CRUD handlers); `mock.module` `namedExports` deprecation on future Node (RISK-0024).
-- Resend rejects seed `example.com` recipients (seed data; logged in `NotificationLog`).
+- `updateProjectEmployee` doesn't re-check project/employee existence when ids change; invalid JSON body returns 500; API docs don't list the new 400/404 responses.
+- CC promotion means a lead may receive the employee-worded email when the employee address is a test domain (product to confirm).
+- Fake DB doesn't reject unknown Prisma fields.
 - `NotificationLog` has no retention/TTL (RISK-0018).
 - Prisma `$transaction` deletes need a MongoDB replica set (RISK-0020).
 - Calendar event chips are `div` + `routerLink` (not keyboard-focusable).
@@ -51,8 +58,8 @@
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
-Resume resume_token c1-gate21-prod-soak-2026-10-10.
-GATE-0021 (API auth tests) + GATE-0020 committed locally. Await push/prod soak feedback, then CP-0020 detail-polish guide.
+Resume resume_token c1-gate22-prod-soak-2026-10-10.
+GATE-0022 (email skip + CRUD API tests), GATE-0021 and GATE-0020 committed locally. Await push/prod soak feedback, then CP-0020 detail-polish guide.
 ```
 
 ---

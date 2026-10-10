@@ -168,6 +168,15 @@
 | TASK-0073 | `session-cache.test.mjs` (12), `auth.test.mjs` (24), `auth-flow.test.mjs` (11, real Vercel entry over HTTP); `npm run test:api` | REQ-0144 | DONE | 47/47; mutation checks caught |
 | TASK-0074 | Fixes found while testing: malformed cookie → 401 not 500 (`parseCookies`); login background image eager + `fetchpriority` (NG0913) | REQ-0144 | DONE | `OptimizedImageComponent` `priority` input |
 
+## Wave — GATE-0022 email skip + CRUD API tests (2026-10-10)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0075 | `notifications.mjs`: skip reserved test-domain recipients (`isDeliverableAddress`), promote CC when no To remains, never promote BCC; log as skipped | REQ-0145 | DONE | DEC-0039; live probe 0 failures |
+| TASK-0076 | Fake DB covers every Prisma model + Mongo counter (shape checked); shared `startApiServer` helper; Node 24 guard | REQ-0146 | DONE | `tests/api/support/` |
+| TASK-0077 | `crud-flow.test.mjs` (14) and `notifications.test.mjs` (8) | REQ-0145, REQ-0146 | DONE | 69/69 on Node 24.16 and 24.21 |
+| TASK-0078 | Fixes found while testing: missing create fields → 400; assignment for unknown project/employee → 404 (no orphan row) via `clientError` + `expose` | REQ-0146 | DONE | Handler only passes through `expose` 4xx |
+
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)

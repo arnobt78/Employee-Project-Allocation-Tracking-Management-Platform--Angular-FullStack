@@ -11,22 +11,214 @@ const SESSION_LOOKUP = {
   as: "user",
 };
 
+/** Per model: the field rows are keyed by, unique fields, and schema defaults. */
+const MODELS = {
+  appUser: { key: "id", unique: ["id", "username"], defaults: { role: "admin", isActive: true } },
+  session: { key: "token", unique: ["token"], defaults: {} },
+  notificationLog: { key: "id", unique: ["id"], defaults: { recipientCount: 0 } },
+  counter: { key: "key", unique: ["key"], defaults: {} },
+  departmentParent: { key: "departmentId", unique: ["departmentId"], defaults: {} },
+  departmentChild: { key: "childDeptId", unique: ["childDeptId"], defaults: {} },
+  employee: { key: "employeeId", unique: ["employeeId"], defaults: { isActive: true } },
+  project: {
+    key: "projectId",
+    unique: ["projectId"],
+    defaults: { status: "draft", approvalStatus: "draft" },
+  },
+  projectEmployee: { key: "empProjectId", unique: ["empProjectId"], defaults: { isActive: true } },
+};
+
+/** Native collection name -> Prisma model, for `updateWithMongoFallback`. */
+const COLLECTION_MODELS = {
+  Employee: "employee",
+  Project: "project",
+  ProjectEmployee: "projectEmployee",
+};
+
+const ENV_TO_CLEAR = [
+  "VERCEL",
+  "SESSION_CACHE_TTL_SECONDS",
+  "SESSION_TTL_HOURS",
+  "SENTRY_DSN",
+  "NG_APP_SENTRY_DSN",
+  "NEXT_PUBLIC_SENTRY_DSN",
+  "RESEND_TOKEN",
+  "SMTP_HOST",
+  "SMTP_PORT",
+  "SMTP_USER",
+  "SMTP_PASS",
+  "EMAIL_FROM",
+  "EMAIL_DRY_RUN",
+  "NOTIFY_APPROVAL_TO",
+];
+
 /**
- * Pins env the auth layer reads so ambient shell values cannot change results.
- * Each test file runs in its own process, so no restore is needed.
+ * Pins env the API reads so ambient shell values cannot change results and no
+ * real email provider is configured. Each test file runs in its own process,
+ * so no restore is needed.
  */
 export function pinTestEnv() {
   process.env.NODE_ENV = "test";
-  for (const name of [
-    "VERCEL",
-    "SESSION_CACHE_TTL_SECONDS",
-    "SESSION_TTL_HOURS",
-    "SENTRY_DSN",
-    "NG_APP_SENTRY_DSN",
-    "NEXT_PUBLIC_SENTRY_DSN",
-  ]) {
+  for (const name of ENV_TO_CLEAR) {
     delete process.env[name];
   }
+}
+
+const prismaError = (code, message) => Object.assign(new Error(message), { code });
+const clone = (value) => structuredClone(value);
+const sameValue = (a, b) =>
+  a instanceof Date && b instanceof Date ? a.getTime() === b.getTime() : a === b;
+
+/** Supports the filters the API uses: equality, `in`, `gt`/`lt`. `undefined` matches all, as in Prisma. */
+function matches(row, where = {}) {
+  return Object.entries(where).every(([field, condition]) => {
+    if (condition === undefined) {
+      return true;
+    }
+    if (condition && typeof condition === "object" && !(condition instanceof Date)) {
+      return Object.entries(condition).every(([op, value]) => {
+        switch (op) {
+          case "in":
+            return value.some((item) => sameValue(row[field], item));
+          case "gt":
+            return row[field] > value;
+          case "lt":
+            return row[field] < value;
+          default:
+            throw new Error(`fake prisma: unsupported filter "${op}" on ${field}`);
+        }
+      });
+    }
+    return sameValue(row[field], condition);
+  });
+}
+
+function pick(row, select) {
+  if (!row) {
+    return null;
+  }
+  if (!select) {
+    return clone(row);
+  }
+  return Object.fromEntries(
+    Object.entries(select)
+      .filter(([, include]) => include)
+      .map(([field]) => [field, clone(row[field] ?? null)])
+  );
+}
+
+function sortRows(rows, orderBy) {
+  if (!orderBy) {
+    return rows;
+  }
+  const [[field, direction]] = Object.entries(orderBy);
+  const sign = direction === "desc" ? -1 : 1;
+  return [...rows].sort((a, b) => (a[field] > b[field] ? sign : a[field] < b[field] ? -sign : 0));
+}
+
+const withoutUndefined = (data) =>
+  Object.fromEntries(Object.entries(data).filter(([, value]) => value !== undefined));
+
+function createModel(name, { key, unique, defaults }) {
+  const rows = new Map();
+
+  const findRows = (where) => [...rows.values()].filter((row) => matches(row, where));
+
+  const assertUnique = (candidate, ignore) => {
+    for (const field of unique) {
+      if (candidate[field] === undefined) {
+        continue;
+      }
+      const clash = [...rows.values()].find(
+        (row) => row !== ignore && sameValue(row[field], candidate[field])
+      );
+      if (clash) {
+        throw prismaError("P2002", `Unique constraint failed on ${name}.${field}`);
+      }
+    }
+  };
+
+  const findUniqueRow = (where) => {
+    const fields = Object.keys(where ?? {});
+    if (fields.length !== 1 || !unique.includes(fields[0]) || where[fields[0]] === undefined) {
+      throw new Error(`fake prisma: ${name} unique lookup needs one defined unique field`);
+    }
+    return findRows(where)[0] ?? null;
+  };
+
+  const insert = (data) => {
+    const now = new Date();
+    const row = {
+      id: randomBytes(12).toString("hex"),
+      ...defaults,
+      createdAt: now,
+      updatedAt: now,
+      ...withoutUndefined(clone(data)),
+    };
+    if (row[key] === undefined || row[key] === null || Number.isNaN(row[key])) {
+      throw new Error(`fake prisma: ${name}.${key} is required`);
+    }
+    assertUnique(row);
+    rows.set(row[key], row);
+    return row;
+  };
+
+  const updateRow = (row, data) => {
+    const next = { ...row, ...withoutUndefined(clone(data)), updatedAt: new Date() };
+    assertUnique(next, row);
+    rows.delete(row[key]);
+    rows.set(next[key], next);
+    return next;
+  };
+
+  const methods = {
+    async findMany({ where, select, orderBy, take } = {}) {
+      const sorted = sortRows(findRows(where), orderBy);
+      return (take ? sorted.slice(0, take) : sorted).map((row) => pick(row, select));
+    },
+    async findUnique({ where, select }) {
+      return pick(findUniqueRow(where), select);
+    },
+    async findFirst({ where, select, orderBy } = {}) {
+      return pick(sortRows(findRows(where), orderBy)[0], select);
+    },
+    async count({ where } = {}) {
+      return findRows(where).length;
+    },
+    async create({ data, select }) {
+      return pick(insert(data), select);
+    },
+    async createMany({ data }) {
+      data.forEach(insert);
+      return { count: data.length };
+    },
+    async update({ where, data, select }) {
+      const row = findUniqueRow(where);
+      if (!row) {
+        throw prismaError("P2025", `${name} to update not found`);
+      }
+      return pick(updateRow(row, data), select);
+    },
+    async upsert({ where, create, update, select }) {
+      const row = findUniqueRow(where);
+      return pick(row ? updateRow(row, update) : insert(create), select);
+    },
+    async delete({ where, select }) {
+      const row = findUniqueRow(where);
+      if (!row) {
+        throw prismaError("P2025", `${name} to delete not found`);
+      }
+      rows.delete(row[key]);
+      return pick(row, select);
+    },
+    async deleteMany({ where } = {}) {
+      const doomed = findRows(where);
+      doomed.forEach((row) => rows.delete(row[key]));
+      return { count: doomed.length };
+    },
+  };
+
+  return { rows, methods, updateRow };
 }
 
 /**
@@ -39,53 +231,43 @@ function projectUser(projection, found) {
     throw new Error("fake mongo: session pipeline must project `user` via $let");
   }
   const user = {};
-  for (const [key, expr] of Object.entries(fields)) {
+  for (const [field, expr] of Object.entries(fields)) {
     const source = typeof expr === "string" && expr.startsWith("$$found.") ? expr.slice(8) : null;
     if (!source || !found) {
       continue;
     }
-    user[key] = source === "_id" ? { toString: () => found.id } : found[source];
+    user[field] = source === "_id" ? { toString: () => found.id } : found[source];
   }
   return user;
 }
 
 /**
- * In-memory stand-ins for the Prisma client and native Mongo collections used
- * by the auth layer. Unknown Prisma models/methods throw, so a test fails
- * loudly if code under test reaches for data it should not need.
+ * In-memory stand-ins for the Prisma client and the native Mongo collections
+ * the API uses. Unknown models, methods, filters or collections throw, so a
+ * test fails loudly if code reaches for something the fake does not model.
  */
 export function createFakeDb() {
-  const users = new Map();
-  const sessions = new Map();
+  const models = Object.fromEntries(
+    Object.entries(MODELS).map(([name, spec]) => [name, createModel(name, spec)])
+  );
+  const tables = Object.fromEntries(Object.entries(models).map(([name, m]) => [name, m.rows]));
+  const users = tables.appUser;
+  const sessions = tables.session;
   const stats = { aggregateCalls: 0 };
   let aggregateGate = null;
 
   const prisma = {
-    appUser: {
-      async findUnique({ where }) {
-        return [...users.values()].find((user) => user.username === where.username) ?? null;
-      },
-    },
-    session: {
-      async create({ data }) {
-        sessions.set(data.token, { ...data });
-        return { ...data };
-      },
-      /** Like Prisma, an `undefined` filter value matches every row. */
-      async deleteMany({ where }) {
-        if (where?.token === undefined) {
-          const count = sessions.size;
-          sessions.clear();
-          return { count };
-        }
-        const existed = sessions.delete(where.token);
-        return { count: existed ? 1 : 0 };
-      },
-    },
-    notificationLog: {
-      async findMany() {
-        return [];
-      },
+    ...Object.fromEntries(Object.entries(models).map(([name, m]) => [name, m.methods])),
+    /** Array form only; operations run in order. */
+    async $transaction(operations) {
+      if (!Array.isArray(operations)) {
+        throw new Error("fake prisma: only array $transaction is supported");
+      }
+      const results = [];
+      for (const operation of operations) {
+        results.push(await operation);
+      }
+      return results;
     },
   };
 
@@ -93,6 +275,9 @@ export function createFakeDb() {
     get(target, model) {
       if (!(model in target)) {
         throw new Error(`fake prisma: unexpected model "${String(model)}"`);
+      }
+      if (typeof target[model] === "function") {
+        return target[model];
       }
       return new Proxy(target[model], {
         get(methods, method) {
@@ -124,11 +309,46 @@ export function createFakeDb() {
     return [{ expiresAt: row.expiresAt, user: projectUser(projection, users.get(row.userId)) }];
   }
 
-  async function mongoCollection(name) {
-    if (name !== "Session") {
-      throw new Error(`fake mongo: unexpected collection "${name}"`);
+  /** Mirrors the counter pipeline: `value = ($value ?? seed - 1) + 1`, upserting. */
+  async function incrementCounter(filter, pipeline, options) {
+    const seedMinusOne = pipeline?.[0]?.$set?.value?.$add?.[0]?.$ifNull?.[1];
+    if (
+      typeof filter?.key !== "string" ||
+      typeof seedMinusOne !== "number" ||
+      !options?.upsert ||
+      options.returnDocument !== "after"
+    ) {
+      throw new Error("fake mongo: unexpected counter update shape");
     }
-    return { aggregate: (pipeline) => ({ toArray: () => aggregateSession(pipeline) }) };
+    const counter = models.counter;
+    const existing = counter.rows.get(filter.key);
+    const value = (existing?.value ?? seedMinusOne) + 1;
+    return existing
+      ? clone(counter.updateRow(existing, { value }))
+      : counter.methods.create({ data: { key: filter.key, value } });
+  }
+
+  async function mongoCollection(name) {
+    if (name === "Session") {
+      return { aggregate: (pipeline) => ({ toArray: () => aggregateSession(pipeline) }) };
+    }
+    if (name === "Counter") {
+      return { findOneAndUpdate: incrementCounter };
+    }
+    const modelName = COLLECTION_MODELS[name];
+    if (modelName) {
+      const model = models[modelName];
+      return {
+        async updateOne(filter, update) {
+          const [row] = [...model.rows.values()].filter((item) => matches(item, filter));
+          if (row) {
+            model.updateRow(row, update.$set ?? {});
+          }
+          return { matchedCount: row ? 1 : 0, modifiedCount: row ? 1 : 0 };
+        },
+      };
+    }
+    throw new Error(`fake mongo: unexpected collection "${name}"`);
   }
 
   function releaseLookups() {
@@ -140,6 +360,7 @@ export function createFakeDb() {
   return {
     prisma: guardedPrisma,
     mongoCollection,
+    tables,
     users,
     sessions,
     stats,
@@ -160,21 +381,16 @@ export function createFakeDb() {
       return { rowRead, release: releaseLookups };
     },
     async seedUser({ username, password, isActive = true, role = "admin" }) {
-      const user = {
-        id: randomBytes(12).toString("hex"),
-        username,
-        displayName: `${username} user`,
-        role,
-        isActive,
-        passwordHash: await bcrypt.hash(password, 4),
-      };
-      users.set(user.id, user);
-      return user;
+      const passwordHash = await bcrypt.hash(password, 4);
+      const row = await models.appUser.methods.create({
+        data: { username, displayName: `${username} user`, role, isActive, passwordHash },
+      });
+      return row;
     },
+    /** Clears every table. The repository seeds domain data only once per process. */
     reset() {
       releaseLookups();
-      users.clear();
-      sessions.clear();
+      Object.values(tables).forEach((rows) => rows.clear());
       stats.aggregateCalls = 0;
     },
   };
@@ -185,13 +401,19 @@ export function createFakeDb() {
  * afterwards). Also pins env and silences dev timing logs.
  */
 export function installFakeDb(db) {
+  const major = Number(process.versions.node.split(".")[0]);
+  if (major < 24) {
+    throw new Error(
+      `API tests need Node 24 (Vercel runtime, see .nvmrc); running ${process.version}. Use \`fnm use\` or \`nvm use\`.`
+    );
+  }
   pinTestEnv();
-  mock.module(apiModule("_lib/prisma-client.mjs"), { namedExports: { prisma: db.prisma } });
+  mock.module(apiModule("_lib/prisma-client.mjs"), { exports: { prisma: db.prisma } });
   mock.module(apiModule("_lib/mongo-client.mjs"), {
-    namedExports: { mongoCollection: db.mongoCollection },
+    exports: { mongoCollection: db.mongoCollection },
   });
   mock.module(apiModule("_lib/timing.mjs"), {
-    namedExports: { logTiming: () => {}, timed: (_label, task) => task() },
+    exports: { logTiming: () => {}, timed: (_label, task) => task() },
   });
 }
 

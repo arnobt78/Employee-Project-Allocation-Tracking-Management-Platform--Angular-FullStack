@@ -376,3 +376,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | No new dependencies; tests run in ~1 s without a database. `mock.module` `namedExports` may be deprecated in later Node majors (RISK-0024). |
 | Linked | GATE-0021, TASK-0072–0074, REQ-0144 |
 | Status | DONE |
+
+---
+
+## DEC-0039 — Skip test-domain recipients; expose client errors
+
+| Field | Value |
+|---|---|
+| Date | 2026-10-10 |
+| Decision | `sendNotification` drops recipients on reserved domains (`example.com/.net/.org`, `.test`, `.example`, `.invalid`, `.localhost`) before calling Resend/SMTP. If no To remains, CC becomes To; BCC is never promoted. Nothing left → logged as `skipped`. Repository input errors use `clientError(status, message)` (`expose: true`); the handler returns only those as 4xx, everything else stays 500. |
+| Rationale | Seed data uses `example.com`, which Resend rejects (422) and made the deliveries panel show false failures. Exposing only flagged errors keeps internal messages out of 4xx responses. |
+| Linked | GATE-0022, TASK-0075–0078, REQ-0145, REQ-0146 |
+| Status | DONE |

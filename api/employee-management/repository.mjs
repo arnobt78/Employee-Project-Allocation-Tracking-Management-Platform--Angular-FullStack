@@ -14,6 +14,11 @@ const DEFAULT_COUNTER_SEEDS = {
 
 let bootstrapPromise;
 
+/** Client errors the handler returns with `status` and message instead of a 500. */
+function clientError(status, message) {
+  return Object.assign(new Error(message), { status, expose: true });
+}
+
 const READINESS_DEFINITIONS = [
   {
     id: "scopeDefined",
@@ -1138,7 +1143,7 @@ export async function createEmployee(payload) {
 
   // Validate required fields
   if (!payload.employeeName) {
-    throw new Error("employeeName is required to create an employee");
+    throw clientError(400, "employeeName is required to create an employee");
   }
 
   const [employeeId, departmentName] = await Promise.all([
@@ -1768,7 +1773,7 @@ export async function createProject(payload) {
 
   // Validate required fields
   if (!payload.projectName) {
-    throw new Error("projectName is required to create a project");
+    throw clientError(400, "projectName is required to create a project");
   }
 
   const [projectId, leadNames] = await Promise.all([
@@ -2510,23 +2515,32 @@ export async function createProjectEmployee(payload) {
 
   // Validate required fields
   if (!payload.projectId) {
-    throw new Error(
-      "projectId is required to create a project employee assignment"
-    );
+    throw clientError(400, "projectId is required to create a project employee assignment");
   }
   if (!payload.empId) {
-    throw new Error(
-      "empId is required to create a project employee assignment"
-    );
+    throw clientError(400, "empId is required to create a project employee assignment");
   }
 
-  const empProjectId = await getNextSequenceValue("projectEmployee");
+  const projectId = Number(payload.projectId);
+  const empId = Number(payload.empId);
+  // Existence checks run alongside the id increment; a rejected request only leaves an id gap.
+  const [project, employee, empProjectId] = await Promise.all([
+    prisma.project.findUnique({ where: { projectId }, select: { projectId: true } }),
+    prisma.employee.findUnique({ where: { employeeId: empId }, select: { employeeId: true } }),
+    getNextSequenceValue("projectEmployee"),
+  ]);
+  if (!project) {
+    throw clientError(404, "Project not found");
+  }
+  if (!employee) {
+    throw clientError(404, "Employee not found");
+  }
 
   const record = await prisma.projectEmployee.create({
     data: {
       empProjectId,
-      projectId: Number(payload.projectId),
-      empId: Number(payload.empId),
+      projectId,
+      empId,
       assignedDate: toDate(payload.assignedDate),
       role: payload.role ?? null,
       isActive:

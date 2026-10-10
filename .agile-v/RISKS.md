@@ -25,7 +25,7 @@
 | RISK-0021 | Assignment API responses include `employeeEmail` (pre-existing exposure to signed-in users) | Low | Confirmed | — | Auth-only API; revisit if roles are added | Accepted |
 | RISK-0022 | Session cache is per instance: after logout/deactivation on one instance, a holder of the cookie can still use another warm instance for up to `SESSION_CACHE_TTL_SECONDS` (30 s) | Medium | Possible (needs stolen cookie) | REQ-0141 | Short TTL; immediate on handling instance; set TTL `0` to disable; shared store if stricter revocation is needed | Accepted (DEC-0036) |
 | RISK-0023 | If the background revoke never reaches the server, the HttpOnly cookie stays valid while the UI shows signed out | Low | Possible (offline) | REQ-0143 | `keepalive`, 2 retries, "Sign-out not confirmed" toast | Mitigated |
-| RISK-0024 | `mock.module` `namedExports` option is slated for deprecation in newer Node majors; `test:api` may warn or break after moving past Node 24 | Low | Likely on Node upgrade | REQ-0144 | Switch to the `exports` option when the minimum Node supports it | Open |
+| RISK-0024 | `mock.module` `namedExports` is deprecated on Node 24.x (warning on 24.21) | Low | Confirmed | REQ-0144 | Tests use `exports` (verified on 24.16 and 24.21); fail fast with a clear message below Node 24 (`.nvmrc`) | Mitigated |
 
 ## Notes
 

@@ -3286,6 +3286,14 @@ export async function handleEmployeeManagementRequest(request, response) {
       statusCodeRef
     );
   } catch (err) {
+    if (err?.expose === true && err.status >= 400 && err.status < 500) {
+      return sendJson(
+        response,
+        err.status,
+        createApiResponse(false, err.message),
+        statusCodeRef
+      );
+    }
     error = err;
     statusCodeRef.value = 500;
     console.error("Employee management handler error:", err);

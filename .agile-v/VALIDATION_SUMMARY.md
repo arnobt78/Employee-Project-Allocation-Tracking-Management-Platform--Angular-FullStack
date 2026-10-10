@@ -1,5 +1,23 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-10 — GATE-0022 email skip + CRUD API tests
+
+**Node:** v24.21.0 via fnm (also 24.16; Vercel 24.x)
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run test:api` | **PASS** | 69/69 (session cache 12, auth 24, auth flow 11, CRUD 14, email 8); ~2 s |
+| Mutation checks | **PASS** | Removing domain filter, CC promotion, existence checks, `expose` gate → each caught |
+| `npm run lint` | **PASS** | |
+| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 105/105 |
+| `npm run build` | **PASS** | |
+| Live probe (real DB) | **PASS** | CRUD persists, 0 leftovers; missing name → 400; unknown project → 404; deliveries 0 failed |
+| Browser A–Z (Playwright) | **PASS** | 11 routes incl. `/update-project/:id` and `**` → `/dashboard`; guard redirect; 72 API calls, only guest `Session` 401s; soft nav 48–74 ms with 0 API calls; back button OK; logout → login 37 ms; reload stays signed out; deliveries 12 sent / 8 skipped / 0 failed |
+| Independent verifier | **PASS WITH WARNINGS (fixed)** | Vacuous email/redaction tests, broad 4xx passthrough, address edge cases, fake gaps → fixed |
+| Security review | **PASS** | No medium+ findings |
+
+Login took ~6.5 s on the first request after server start (cold DB connection); hard route loads 1.7–4.8 s against the remote DB.
+
 ## Session 2026-10-10 — GATE-0021 server auth test suite
 
 **Node:** v22.22.3 local (Vercel 24.x)

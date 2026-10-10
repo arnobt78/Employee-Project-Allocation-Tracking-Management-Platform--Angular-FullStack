@@ -116,7 +116,7 @@ You can run the UI against the **live demo** immediately, or clone and run **loc
 - Single API client: `MasterService` (prefer extending this over adding new HTTP clients)
 - Feature flags via public env (`NG_APP_FEATURE_*`)
 - `.env.example` documents every variable and where to obtain keys
-- Lint (`npm run lint`), unit tests (`npm test`), API auth tests (`npm run test:api`), production build (`npm run build`)
+- Lint (`npm run lint`), unit tests (`npm test`), API tests (`npm run test:api`), production build (`npm run build`)
 
 ---
 
@@ -255,6 +255,8 @@ npm test -- --watch=false --browsers=ChromeHeadless
 npm run test:api
 npm run build
 ```
+
+`npm run test:api` needs Node 24 (same as Vercel; run `fnm use` or `nvm use` to pick up `.nvmrc`).
 
 ---
 
@@ -601,7 +603,7 @@ const completion = await completeChatWithFallback(prompt);
 | `npm run build`             | Generate prod env → `ng build` → quiet Sentry map upload |
 | `npm run lint` / `lint:fix` | ESLint via Angular                                       |
 | `npm test`                  | Karma / Jasmine                                          |
-| `npm run test:api`          | Node `node:test` server auth tests (no DB)               |
+| `npm run test:api`          | Node 24 `node:test` auth, CRUD and email tests (no DB)   |
 | `npm run db:seed`           | Domain seed from repo `dataset/`                         |
 | `npm run db:seed:auth`      | Demo `admin` user                                        |
 | `npm run db:wipe:local`     | Clear domain collections (requires `ALLOW_DB_WIPE=1`; localhost only unless override) |

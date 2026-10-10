@@ -136,15 +136,44 @@ async function sendViaSmtp(payload) {
   };
 }
 
+/** Reserved names (RFC 2606 / RFC 6761) can never receive mail; providers reject them. */
+const RESERVED_DOMAINS = ["example.com", "example.net", "example.org"];
+const RESERVED_TLDS = [".example", ".test", ".invalid", ".localhost"];
+
+export function isDeliverableAddress(address) {
+  const value = String(address ?? "").trim().toLowerCase();
+  const at = value.lastIndexOf("@");
+  const domain = at === -1 ? "" : value.slice(at + 1).replace(/>$/, "").replace(/\.$/, "");
+  if (!domain) {
+    return false;
+  }
+  return (
+    !RESERVED_DOMAINS.some((reserved) => domain === reserved || domain.endsWith(`.${reserved}`)) &&
+    !RESERVED_TLDS.some((tld) => domain.endsWith(tld) || domain === tld.slice(1))
+  );
+}
+
+function deliverableOnly(list) {
+  const entries = Array.isArray(list) ? list : list ? [list] : [];
+  return entries.filter(isDeliverableAddress);
+}
+
 /**
  * Sends one notification (Resend first, SMTP fallback) and records the outcome
- * in the NotificationLog. Resolves `{ status, provider, ... }`; rethrows when no
- * provider succeeded.
+ * in the NotificationLog. Recipients on reserved test domains are dropped.
+ * Resolves `{ status, provider, ... }`; rethrows when no provider succeeded.
  */
 export async function sendNotification(options) {
-  const { to, cc, bcc, metadata = {} } = options;
+  const { metadata = {} } = options;
+  let to = deliverableOnly(options.to);
+  let cc = deliverableOnly(options.cc);
+  const bcc = deliverableOnly(options.bcc);
+  // Keep CC'd stakeholders informed when every primary recipient was dropped (never promote BCC).
+  if (to.length === 0 && cc.length > 0) {
+    [to, cc] = [cc, []];
+  }
   try {
-    const result = await deliver(options);
+    const result = await deliver({ ...options, to, cc, bcc });
     const status = result.skipped ? "skipped" : "sent";
     await recordDelivery({ metadata, to, cc, bcc, status, provider: result.provider });
     return { ...result, status, error: null };
@@ -164,15 +193,17 @@ async function deliver({
   from = EMAIL_FROM,
   metadata = {},
 }) {
-  if (!to || (Array.isArray(to) && to.length === 0)) {
-    console.warn("[Notification] Skipped sending email: missing recipient.");
+  if (to.length === 0) {
+    console.info("[Notification] Skipped: no deliverable recipient.", {
+      action: metadata?.action,
+    });
     return { provider: null, messageId: null, response: null, skipped: true };
   }
 
   const payload = {
     to,
-    cc,
-    bcc,
+    cc: cc.length ? cc : undefined,
+    bcc: bcc.length ? bcc : undefined,
     subject,
     html,
     text,
