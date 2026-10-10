@@ -20,9 +20,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MasterService } from '../../service/master.service';
 import { Employee } from '../../model/class/Employee';
 import { CommonModule } from '@angular/common';
-import { ToastService } from '@/app/components/ui/toast.service';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
+import { ActionButtonComponent } from '@/app/components/ui/action-button.component';
 import { CardCloseButtonComponent } from '@/app/components/ui/card-close-button.component';
 import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
 import { ListPaginationComponent } from '@/app/components/ui/list-pagination.component';
@@ -41,6 +41,11 @@ import {
   ListQueryController,
   paginateList,
 } from '@/app/lib/list-query';
+import { MutationTracker, PendingSet } from '@/app/lib/mutation-tracker';
+import { removeBy, upsertBy } from '@/app/lib/list-ops';
+
+const SAVE_KEY = 'save';
+const deleteKey = (employeeId: number) => `delete:${employeeId}`;
 
 @Component({
   selector: 'app-employee',
@@ -50,6 +55,7 @@ import {
     CommonModule,
     ReactiveFormsModule,
     AlertDialogComponent,
+    ActionButtonComponent,
     CardCloseButtonComponent,
     UserAvatarComponent,
     ListPaginationComponent,
@@ -197,13 +203,21 @@ export class EmployeeComponent implements OnInit {
   showCreatePanel = false;
   pendingDelete: Employee | null = null;
   pendingSave = false;
-  isSaving = false;
-  isDeleting = false;
+  readonly pending = new PendingSet<string>();
+
+  get isSaving(): boolean {
+    return this.pending.has(SAVE_KEY);
+  }
+
+  get isDeleting(): boolean {
+    const id = this.pendingDelete?.employeeId;
+    return id != null && this.pending.has(deleteKey(id));
+  }
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly toast = inject(ToastService);
+  private readonly mutations = inject(MutationTracker);
   private listQuery!: ListQueryController;
 
   constructor(private fb: FormBuilder) {
@@ -287,7 +301,6 @@ export class EmployeeComponent implements OnInit {
   }
 
   startCreate() {
-    this.isSaving = false;
     this.showCreatePanel = true;
     this.editingEmployeeId = null;
     this.expandedEmployeeId = null;
@@ -311,7 +324,6 @@ export class EmployeeComponent implements OnInit {
   }
 
   closeCreatePanel() {
-    this.isSaving = false;
     this.showCreatePanel = false;
   }
 
@@ -368,7 +380,6 @@ export class EmployeeComponent implements OnInit {
   }
 
   cancelEdit() {
-    this.isSaving = false;
     this.pendingSave = false;
     this.editingEmployeeId = null;
   }
@@ -385,32 +396,31 @@ export class EmployeeComponent implements OnInit {
   }
 
   confirmDelete() {
-    if (!this.pendingDelete?.employeeId || this.isDeleting) {
+    const target = this.pendingDelete;
+    if (!target?.employeeId) {
       return;
     }
-    const { employeeId, employeeName } = this.pendingDelete;
-    this.isDeleting = true;
-    this.masterService.deleteEmpById(employeeId).subscribe({
-      next: () => {
+    const { employeeId, employeeName } = target;
+    this.mutations.track(this.masterService.deleteEmpById(employeeId), {
+      pending: this.pending,
+      destroyRef: this.destroyRef,
+      key: deleteKey(employeeId),
+      onSuccess: () => {
         this.employeesSignal.update((list) =>
-          list.filter((emp) => emp.employeeId !== employeeId),
+          removeBy(list, 'employeeId', employeeId),
         );
-        this.isDeleting = false;
         this.pendingDelete = null;
-        this.toast.success({
-          title: 'Employee removed',
-          description: `${employeeName} has been deleted.`,
-        });
         if (this.expandedEmployeeId === employeeId) {
           this.expandedEmployeeId = null;
         }
       },
-      error: () => {
-        this.isDeleting = false;
-        this.toast.error({
-          title: 'Deletion failed',
-          description: 'Unable to delete the employee right now.',
-        });
+      successToast: {
+        title: 'Employee removed',
+        description: `${employeeName} has been deleted.`,
+      },
+      errorToast: {
+        title: 'Deletion failed',
+        description: 'Unable to delete the employee right now.',
       },
     });
   }
@@ -444,74 +454,57 @@ export class EmployeeComponent implements OnInit {
       this.runCreate(employee);
       return;
     }
-    this.isSaving = true;
-    this.masterService.updateEmp(employee).subscribe({
-      next: () => {
-        this.masterService.getAllEmp().subscribe({
-          next: (res) => {
-            this.employeesSignal.set(res ?? []);
-            this.isSaving = false;
-            this.pendingSave = false;
-            this.editingEmployeeId = null;
-            this.employeeForm.reset();
-            this.toast.success({
-              title: 'Employee updated',
-              description: 'Employee details were saved successfully.',
-            });
-          },
-          error: () => {
-            this.isSaving = false;
-            this.pendingSave = false;
-            this.toast.error({
-              title: 'Update failed',
-              description: 'Saved on server but the list could not refresh.',
-            });
-          },
-        });
+    this.mutations.track(this.masterService.updateEmp(employee), {
+      pending: this.pending,
+      destroyRef: this.destroyRef,
+      key: SAVE_KEY,
+      onSuccess: (res) => {
+        this.applySaved(res?.data as Employee | undefined, employee);
+        this.pendingSave = false;
+        this.editingEmployeeId = null;
+        this.employeeForm.reset();
       },
-      error: () => {
-        this.isSaving = false;
-        this.toast.error({
-          title: 'Update failed',
-          description: 'Something went wrong while saving changes.',
-        });
+      successToast: {
+        title: 'Employee updated',
+        description: 'Employee details were saved successfully.',
+      },
+      errorToast: {
+        title: 'Update failed',
+        description: 'Something went wrong while saving changes.',
       },
     });
   }
 
   private runCreate(employee: Employee) {
-    this.isSaving = true;
-    this.masterService.saveEmp(employee).subscribe({
-      next: () => {
-        this.masterService.getAllEmp().subscribe({
-          next: (res) => {
-            this.employeesSignal.set(res ?? []);
-            this.isSaving = false;
-            this.employeeForm.reset();
-            this.showCreatePanel = false;
-            this.toast.success({
-              title: 'Employee created',
-              description: 'A new employee record is now available.',
-            });
-          },
-          error: () => {
-            this.isSaving = false;
-            this.showCreatePanel = false;
-            this.toast.error({
-              title: 'Creation failed',
-              description: 'Created but the list could not refresh.',
-            });
-          },
-        });
+    this.mutations.track(this.masterService.saveEmp(employee), {
+      pending: this.pending,
+      destroyRef: this.destroyRef,
+      key: SAVE_KEY,
+      onSuccess: (res) => {
+        this.applySaved(res?.data as Employee | undefined, employee);
+        this.employeeForm.reset();
+        this.showCreatePanel = false;
       },
-      error: () => {
-        this.isSaving = false;
-        this.toast.error({
-          title: 'Creation failed',
-          description: 'Unable to save the new employee.',
-        });
+      successToast: {
+        title: 'Employee created',
+        description: 'A new employee record is now available.',
+      },
+      errorToast: {
+        title: 'Creation failed',
+        description: 'Unable to save the new employee.',
       },
     });
+  }
+
+  /** Show the server's record immediately; the list revalidates in the background. */
+  private applySaved(saved: Employee | undefined, submitted: Employee) {
+    const record = saved?.employeeId ? saved : submitted;
+    if (record.employeeId) {
+      this.employeesSignal.update((list) =>
+        upsertBy(list, 'employeeId', record),
+      );
+    }
+    this.getEmployees();
   }
 
   updateSearch(term: string) {

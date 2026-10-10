@@ -10,9 +10,9 @@ import { DatePipe, CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IProject } from '../../model/interface/master';
 import { MasterService } from '../../service/master.service';
-import { ToastService } from '@/app/components/ui/toast.service';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
+import { ActionButtonComponent } from '@/app/components/ui/action-button.component';
 import { ListPaginationComponent } from '@/app/components/ui/list-pagination.component';
 import { ListPageShellComponent } from '@/app/components/ui/list-page-shell.component';
 import { KpiStatCardComponent } from '@/app/components/ui/kpi-stat-card.component';
@@ -29,6 +29,8 @@ import {
   ListQueryController,
   paginateList,
 } from '@/app/lib/list-query';
+import { MutationTracker, PendingSet } from '@/app/lib/mutation-tracker';
+import { removeBy } from '@/app/lib/list-ops';
 
 const IN_FLIGHT_STATUSES = new Set([
   'approved',
@@ -50,6 +52,7 @@ const ON_HOLD_STATUSES = new Set(['on_hold', 'on hold', 'paused', 'hold']);
     CommonModule,
     RouterLink,
     AlertDialogComponent,
+    ActionButtonComponent,
     ListPaginationComponent,
     ListPageShellComponent,
     KpiStatCardComponent,
@@ -63,7 +66,7 @@ const ON_HOLD_STATUSES = new Set(['on_hold', 'on hold', 'paused', 'hold']);
 export class ProjectComponent implements OnInit {
   private readonly masterSrv = inject(MasterService);
   private readonly datePipe = inject(DatePipe);
-  private readonly toast = inject(ToastService);
+  private readonly mutations = inject(MutationTracker);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
@@ -175,7 +178,12 @@ export class ProjectComponent implements OnInit {
   );
 
   pendingDelete: IProject | null = null;
-  isDeleting = false;
+  readonly pendingDeletes = new PendingSet<number>();
+
+  get isDeleting(): boolean {
+    const id = this.pendingDelete?.projectId;
+    return id != null && this.pendingDeletes.has(id);
+  }
 
   ngOnInit(): void {
     this.listQuery = bindListQuery(
@@ -253,32 +261,29 @@ export class ProjectComponent implements OnInit {
   }
 
   confirmDelete() {
-    if (!this.pendingDelete?.projectId || this.isDeleting) {
+    const target = this.pendingDelete;
+    if (!target?.projectId) {
       return;
     }
-    const { projectId, projectName } = this.pendingDelete;
-    this.isDeleting = true;
-    this.masterSrv.deleteProjectById(projectId).subscribe({
-      next: () => {
-        this.projectsSignal.update((list) =>
-          list.filter((project) => project.projectId !== projectId)
-        );
-        this.isDeleting = false;
+    const { projectId, projectName } = target;
+    this.mutations.track(this.masterSrv.deleteProjectById(projectId), {
+      pending: this.pendingDeletes,
+      destroyRef: this.destroyRef,
+      key: projectId,
+      onSuccess: () => {
+        this.projectsSignal.update((list) => removeBy(list, 'projectId', projectId));
         this.pendingDelete = null;
         if (this.expandedProjectId === projectId) {
           this.expandedProjectId = null;
         }
-        this.toast.success({
-          title: 'Project deleted',
-          description: `${projectName} has been removed.`,
-        });
       },
-      error: () => {
-        this.isDeleting = false;
-        this.toast.error({
-          title: 'Delete failed',
-          description: 'Something went wrong while removing the project.',
-        });
+      successToast: {
+        title: 'Project deleted',
+        description: `${projectName} has been removed.`,
+      },
+      errorToast: {
+        title: 'Delete failed',
+        description: 'Something went wrong while removing the project.',
       },
     });
   }

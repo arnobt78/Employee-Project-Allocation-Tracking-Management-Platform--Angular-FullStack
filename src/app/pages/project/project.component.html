@@ -150,11 +150,14 @@
               <span>Details</span>
             </a>
             <button
+              ehAction
               type="button"
+              icon="trash-2"
+              [pending]="pendingDeletes.has(project.projectId)"
+              pendingLabel="Deleting…"
               class="eh-action-btn eh-action-btn-danger"
               (click)="onDelete(project.projectId)"
             >
-              <lucide-icon name="trash-2" [size]="14"></lucide-icon>
               <span>Delete</span>
             </button>
           </div>
@@ -266,7 +269,7 @@
   confirmLabel="Delete Project"
   variant="destructive"
   [busy]="isDeleting"
-  busyLabel="Deleting..."
+  busyLabel="Deleting…"
   (confirmed)="confirmDelete()"
   (cancelled)="dismissDelete()"
 ></app-alert-dialog>

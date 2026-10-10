@@ -11,6 +11,7 @@
 | GATE-0016 | Per-page UI polish (screenshot-driven) | Human-Action | Stage 4 | **COMPLETE** | Code through `416a7c5`; soak findings drove GATE-0017 |
 | GATE-0017 | Boot paint + list/form skeleton mirrors + SelectMenu width + Project Team 6 KPIs | Human-Action | Stage 4 prod soak | **AWAITING PROD VERIFY** | List density+chevron follow-up shipped; CP-0019 continues |
 | GATE-0018 | Project detail (`project-form`) UX polish + single-layer mirrored skeletons (Project detail, API Doc, API Status; Insights/Calendar if confirmed) | Human-Decision | Stage 4 | **COMPLETE (skeleton parity)** | verify-deep PASS WITH WARNINGS; security PASS WITH WARNINGS (fixed); commit-ready 2026-10-10. Detail-polish guide (CP-0020) still open |
+| GATE-0019 | CRUD speed, inline pending UX, cache cascade, email delivery visibility | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat; verifier + security PASS WITH WARNINGS (fixed); commit-ready 2026-10-10 |
 
 ## GATE-0001 decision record
 

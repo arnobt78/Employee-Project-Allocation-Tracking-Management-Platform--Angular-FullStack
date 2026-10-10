@@ -29,7 +29,13 @@ export const API_STATUS_COPY = {
   dataStatistics: 'Data Statistics',
   refreshFailed: "Couldn't refresh. Showing data from",
   retry: 'Retry',
+  deliveries: 'Recent Email Deliveries',
+  deliveriesEmpty: 'No email deliveries recorded yet.',
+  deliveriesFailed: "Couldn't load email deliveries.",
 } as const;
+
+/** Skeleton rows shown while the delivery log loads. */
+export const API_STATUS_DELIVERY_SKELETON_ROWS = [0, 1, 2] as const;
 
 /** Metric cards: label + static caption (`null` caption is data-driven). */
 export const API_STATUS_METRIC_CARDS = [

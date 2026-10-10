@@ -307,29 +307,18 @@
                   <span>Cancel</span>
                 </button>
                 <button
+                  ehAction
                   type="button"
                   class="eh-action-btn eh-action-btn-primary"
-                  [disabled]="isSaving()"
+                  [icon]="isEditMode() ? 'save' : 'plus'"
+                  [iconSize]="16"
+                  [pending]="isSaving()"
+                  [pendingLabel]="isEditMode() ? 'Saving…' : 'Creating project…'"
                   (click)="saveSection('overview')"
                 >
-                  @if (!isSaving()) {
-                    <lucide-icon
-                      [name]="isEditMode() ? 'save' : 'plus'"
-                      [size]="16"
-                    ></lucide-icon>
-                    <span>{{
-                      isEditMode() ? "Save Changes" : "Create Project"
-                    }}</span>
-                  } @else {
-                    <lucide-icon
-                      name="loader-circle"
-                      [size]="16"
-                      class="animate-spin"
-                    ></lucide-icon>
-                    <span>{{
-                      isEditMode() ? "Saving..." : "Creating Project..."
-                    }}</span>
-                  }
+                  <span>{{
+                    isEditMode() ? "Save Changes" : "Create Project"
+                  }}</span>
                 </button>
               </div>
             </ng-container>
@@ -840,22 +829,16 @@
                   <span>Cancel</span>
                 </button>
                 <button
+                  ehAction
                   type="button"
                   class="eh-action-btn eh-action-btn-primary"
-                  [disabled]="isSaving()"
+                  icon="save"
+                  [iconSize]="16"
+                  [pending]="isSaving()"
+                  pendingLabel="Saving…"
                   (click)="saveSection('team')"
                 >
-                  @if (!isSaving()) {
-                    <lucide-icon name="save" [size]="16"></lucide-icon>
-                    <span>Save Assignment</span>
-                  } @else {
-                    <lucide-icon
-                      name="loader-circle"
-                      [size]="16"
-                      class="animate-spin"
-                    ></lucide-icon>
-                    <span>Saving...</span>
-                  }
+                  <span>Save Assignment</span>
                 </button>
               </div>
             </ng-container>
@@ -1409,14 +1392,13 @@
                               <span>Cancel</span>
                             </button>
                             <button
+                              ehAction
                               type="submit"
                               class="eh-action-btn eh-action-btn-primary"
-                              [disabled]="collaboratorAssignmentProcessing()"
+                              icon="plus"
+                              [pending]="collaboratorAssignmentProcessing()"
+                              pendingLabel="Assigning…"
                             >
-                              <lucide-icon
-                                name="plus"
-                                [size]="14"
-                              ></lucide-icon>
                               <span>Add Assignment</span>
                             </button>
                           </div>
@@ -1532,22 +1514,16 @@
                   <span>Cancel</span>
                 </button>
                 <button
+                  ehAction
                   type="button"
                   class="eh-action-btn eh-action-btn-primary"
-                  [disabled]="isSaving()"
+                  icon="save"
+                  [iconSize]="16"
+                  [pending]="isSaving()"
+                  pendingLabel="Saving…"
                   (click)="saveSection('contact')"
                 >
-                  @if (!isSaving()) {
-                    <lucide-icon name="save" [size]="16"></lucide-icon>
-                    <span>Save Contact</span>
-                  } @else {
-                    <lucide-icon
-                      name="loader-circle"
-                      [size]="16"
-                      class="animate-spin"
-                    ></lucide-icon>
-                    <span>Saving...</span>
-                  }
+                  <span>Save Contact</span>
                 </button>
               </div>
             </ng-container>
@@ -1653,12 +1629,16 @@
                     ubButton
                     size="sm"
                     class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+                    ehAction
+                    icon="sparkles"
+                    [iconSize]="16"
+                    [pending]="pending.has('approval:request')"
+                    [pendingLabel]="approvalPendingLabels.request"
                     [disabled]="
                       approvalProcessing() || !currentProject()?.projectId
                     "
                     (click)="requestApprovalAction()"
                   >
-                    <lucide-icon name="sparkles" [size]="16"></lucide-icon>
                     <span>Request Approval</span>
                   </button>
                   <button
@@ -1667,10 +1647,14 @@
                     ubButton
                     size="sm"
                     class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)]"
+                    ehAction
+                    icon="check"
+                    [iconSize]="16"
+                    [pending]="pending.has('approval:approve')"
+                    [pendingLabel]="approvalPendingLabels.approve"
                     [disabled]="approvalProcessing()"
                     (click)="approveProjectAction()"
                   >
-                    <lucide-icon name="check" [size]="16"></lucide-icon>
                     <span>Approve</span>
                   </button>
                   <button
@@ -1679,10 +1663,14 @@
                     ubButton
                     size="sm"
                     class="bg-gradient-to-r from-rose-500 via-red-500 to-orange-500 text-white shadow-[0_20px_45px_rgba(244,63,94,0.35)]"
+                    ehAction
+                    icon="x"
+                    [iconSize]="16"
+                    [pending]="pending.has('approval:reject')"
+                    [pendingLabel]="approvalPendingLabels.reject"
                     [disabled]="approvalProcessing()"
                     (click)="rejectProjectAction()"
                   >
-                    <lucide-icon name="x" [size]="16"></lucide-icon>
                     <span>Reject</span>
                   </button>
                   <button
@@ -1692,10 +1680,14 @@
                     size="sm"
                     variant="outline"
                     class="border-white/20 bg-white/10 text-white/80 hover:border-white/40 hover:text-white"
+                    ehAction
+                    icon="rotate-ccw"
+                    [iconSize]="16"
+                    [pending]="pending.has('approval:reset')"
+                    [pendingLabel]="approvalPendingLabels.reset"
                     [disabled]="approvalProcessing()"
                     (click)="resetProjectApprovalAction()"
                   >
-                    <lucide-icon name="rotate-ccw" [size]="16"></lucide-icon>
                     <span>Reset To Draft</span>
                   </button>
                 </div>
@@ -1924,15 +1916,16 @@
                     ubButton
                     size="sm"
                     class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+                    ehAction
+                    icon="message-square-plus"
+                    [iconSize]="16"
+                    [pending]="pending.has('comment')"
+                    pendingLabel="Posting…"
                     [disabled]="
                       reviewerCommentProcessing() ||
                       !currentProject()?.projectId
                     "
                   >
-                    <lucide-icon
-                      name="message-square-plus"
-                      [size]="16"
-                    ></lucide-icon>
                     <span>Add Comment</span>
                   </button>
                 </div>
@@ -1983,10 +1976,13 @@
                       </span>
                     </div>
                     <button
+                      ehAction
                       type="button"
-                      class="text-xs sm:text-sm text-white/70 transition hover:text-white"
-                      (click)="toggleReviewerCommentResolved(comment)"
+                      class="inline-flex items-center gap-1.5 text-xs sm:text-sm text-white/70 transition hover:text-white disabled:opacity-60"
+                      [pending]="pending.has('resolve:' + comment.id)"
+                      pendingLabel="Updating…"
                       [disabled]="reviewerCommentProcessing()"
+                      (click)="toggleReviewerCommentResolved(comment)"
                     >
                       {{
                         comment.resolved ? "Reopen comment" : "Mark as resolved"
@@ -2026,29 +2022,18 @@
             </button>
           }
           <button
+            ehAction
             type="button"
             class="eh-action-btn eh-action-btn-primary"
-            [disabled]="isSaving()"
+            [icon]="isEditMode() ? 'save' : 'plus'"
+            [iconSize]="16"
+            [pending]="isSaving()"
+            [pendingLabel]="isEditMode() ? 'Saving…' : 'Creating project…'"
             (click)="saveAllChanges()"
           >
-            @if (!isSaving()) {
-              <lucide-icon
-                [name]="isEditMode() ? 'save' : 'plus'"
-                [size]="16"
-              ></lucide-icon>
-              <span>{{
-                isEditMode() ? "Save All Changes" : "Create Project"
-              }}</span>
-            } @else {
-              <lucide-icon
-                name="loader-circle"
-                [size]="16"
-                class="animate-spin"
-              ></lucide-icon>
-              <span>{{
-                isEditMode() ? "Saving..." : "Creating Project..."
-              }}</span>
-            }
+            <span>{{
+              isEditMode() ? "Save All Changes" : "Create Project"
+            }}</span>
           </button>
         </div>
       </footer>
@@ -2063,7 +2048,7 @@
   confirmLabel="Archive Project"
   variant="destructive"
   [busy]="isDeleting()"
-  busyLabel="Deleting..."
+  busyLabel="Deleting…"
   (confirmed)="confirmDelete()"
   (cancelled)="dismissDelete()"
 ></app-alert-dialog>

@@ -109,6 +109,16 @@ Legend: `BASELINE` = verified as-built behavior · `GAP` = docs/code mismatch or
 | REQ-0134 | Static API documentation SHOULD use the existing `MasterService` cache + peek pattern so warm soft navigation skips the skeleton (REQ-0123 parity). API Status stays live but MUST only show a skeleton on cold first paint. | DONE | API Doc cached + peek; API Status seeds from last snapshot |
 | REQ-0135 | API Status auto-refresh timer MUST be cleared when the page is destroyed (no background polling or stacked intervals after navigating away). | DONE | `interval` + `takeUntilDestroyed` |
 
+## CRUD speed, pending UX, email visibility (GATE-0019, 2026-10-10)
+
+| ID | Requirement | Status | Evidence |
+|---|---|---|---|
+| REQ-0136 | Deleting a project or employee MUST invalidate dependent client caches (assignments, KPIs) so no stale rows appear after navigation; a list response issued before a mutation MUST NOT be delivered as fresh. | DONE | `INVALIDATES` cascade + generation refetch; browser: 0 stale assignment rows after project delete |
+| REQ-0137 | Each CRUD action MUST show an inline pending state on its own button (spinner + dynamic label, e.g. "Deleting…") until success or failure; other rows/actions stay usable; duplicate submits are ignored. | DONE | `MutationTracker` / `ehAction`; focus kept via `aria-disabled` |
+| REQ-0138 | Mutations MUST respond as soon as data persists, without serial lookups that can run in parallel. | DONE | Counter ~3 s → ~0.23 s; CreateProject ~4.2 s → ~1.4 s (remote DB) |
+| REQ-0139 | Calendar "+N more" MUST work with mouse, keyboard and touch without flicker or double toggles. | DONE | Mouse-only hover; Escape refocuses toggle |
+| REQ-0140 | Background email failures MUST be recorded and surfaced (toast after mutation + API Status deliveries panel) without delaying the mutation; stored errors MUST NOT contain email addresses. | DONE | `NotificationLog`; redaction smoke test |
+
 ---
 
 ## Explicit non-goals (unless human expands scope)

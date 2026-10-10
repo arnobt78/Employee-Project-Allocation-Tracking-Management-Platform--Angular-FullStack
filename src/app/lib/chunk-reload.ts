@@ -6,6 +6,18 @@ const RELOAD_STAMP_KEY = 'eh-chunk-reload-at';
 /** Guards against a reload loop when the chunk is genuinely unavailable. */
 const RELOAD_COOLDOWN_MS = 10_000;
 
+export interface ChunkReloadDeps {
+  storage: Pick<Storage, 'getItem' | 'setItem'>;
+  navigate: (url: string) => void;
+  now: () => number;
+}
+
+const browserDeps = (): ChunkReloadDeps => ({
+  storage: sessionStorage,
+  navigate: (url) => window.location.assign(url),
+  now: Date.now,
+});
+
 export function isChunkLoadError(error: unknown): boolean {
   const text =
     error instanceof Error ? `${error.name} ${error.message}` : String(error);
@@ -20,18 +32,17 @@ export function isChunkLoadError(error: unknown): boolean {
 export function reloadForStaleChunk(
   error: unknown,
   targetUrl: string,
-  storage: Pick<Storage, 'getItem' | 'setItem'> = sessionStorage,
-  navigate: (url: string) => void = (url) => window.location.assign(url),
-  now: number = Date.now()
+  deps: ChunkReloadDeps = browserDeps()
 ): boolean {
   if (!isChunkLoadError(error)) {
     return false;
   }
-  const lastReload = storage.getItem(RELOAD_STAMP_KEY);
+  const now = deps.now();
+  const lastReload = deps.storage.getItem(RELOAD_STAMP_KEY);
   if (lastReload !== null && now - Number(lastReload) < RELOAD_COOLDOWN_MS) {
     return false;
   }
-  storage.setItem(RELOAD_STAMP_KEY, String(now));
-  navigate(targetUrl);
+  deps.storage.setItem(RELOAD_STAMP_KEY, String(now));
+  deps.navigate(targetUrl);
   return true;
 }

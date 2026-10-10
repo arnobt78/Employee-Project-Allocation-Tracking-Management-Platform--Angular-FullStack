@@ -1,5 +1,52 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-10 — GATE-0019 CRUD speed, pending UX, cache cascade, email visibility
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npm test -- --watch=false --browsers=ChromeHeadless` | **PASS** | 95/95 |
+| `npx ng build` | **PASS** | Initial 921.56 kB |
+| `node --check` on `api/**/*.mjs` | **PASS** | |
+| `prisma db push` + generate | **PASS** | `NotificationLog` collection + indexes |
+| Browser A–Z (Playwright, local `npm start`) | **PASS** | All private routes; Employees create/edit/delete; Project create, approval request/approve/reset, comment post/resolve; Project Team assign/update/delete; pending labels shown on the acting button only; KPIs and lists refresh |
+| Cache cascade | **PASS** | After project delete, Project Team showed 0 stale rows immediately; revalidation fired |
+| Forced email failure (`RESEND_TOKEN` invalid, `SMTP_PORT=1`) | **PASS** | Failure toast ~19 s after mutation; API Status row shows failed + error |
+| Delivery log after fixes | **PASS** | Project created/deleted emails reach 3 recipients (assignees included); all `sent` |
+| Independent verifier | **PASS WITH WARNINGS (fixed)** | Stakeholder query missing `isActive` (assignees dropped); stale in-flight list delivery; pending not cleared if `onSuccess` throws; calendar touch double-toggle |
+| Security review | **PASS WITH WARNINGS (fixed)** | Provider errors stored unredacted (now redact emails, cap 300 chars); no provider timeout on Resend |
+
+### Server timings (local dev server → remote MongoDB, ~230 ms RTT, median of 3)
+
+| Endpoint | Before | After |
+|---|---|---|
+| CreateProject | 4241 ms | 1444 ms |
+| CreateProjectEmployee | 4249 ms | 1625 ms |
+| UpdateProjectEmployee | 1853 ms | 1591 ms |
+| DeleteProjectEmployee | 1167 ms | 1143 ms |
+| DeleteProject | 2946 ms | 1602 ms |
+
+Auth costs ~460 ms (2 round trips) of every request.
+
+### Console / network
+
+7 private routes after fixes: 0 console errors, 0 failed responses. Known noise elsewhere: guest `Session` 401 on login, NG0913 lazy LCP image on login (pre-existing).
+
+### Remaining
+
+- Calendar "+N more" covered by unit tests only (no >2-event day in current data)
+- RISK-0018 `NotificationLog` retention
+
+### eval_gate_status
+
+N/A (UX + API latency)
+
+---
+
 ## Session 2026-10-10 — GATE-0018 skeleton parity + A–Z verify sweep
 
 **Node:** v24.x

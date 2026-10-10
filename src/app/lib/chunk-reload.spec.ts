@@ -1,11 +1,21 @@
-import { isChunkLoadError, reloadForStaleChunk } from './chunk-reload';
+import {
+  ChunkReloadDeps,
+  isChunkLoadError,
+  reloadForStaleChunk,
+} from './chunk-reload';
 
 describe('chunk-reload', () => {
-  const memoryStorage = () => {
+  const fakeDeps = (at: { now: number }): ChunkReloadDeps & {
+    navigate: jasmine.Spy;
+  } => {
     const data = new Map<string, string>();
     return {
-      getItem: (key: string) => data.get(key) ?? null,
-      setItem: (key: string, value: string) => void data.set(key, value),
+      storage: {
+        getItem: (key: string) => data.get(key) ?? null,
+        setItem: (key: string, value: string) => void data.set(key, value),
+      },
+      navigate: jasmine.createSpy('navigate'),
+      now: () => at.now,
     };
   };
 
@@ -22,24 +32,24 @@ describe('chunk-reload', () => {
   });
 
   it('reloads once to the target url, then backs off', () => {
-    const storage = memoryStorage();
-    const navigate = jasmine.createSpy('navigate');
+    const clock = { now: 1_000 };
+    const deps = fakeDeps(clock);
     const error = new Error('Loading chunk 645 failed.');
 
-    expect(reloadForStaleChunk(error, '/api-status', storage, navigate, 1_000)).toBeTrue();
-    expect(navigate).toHaveBeenCalledOnceWith('/api-status');
+    expect(reloadForStaleChunk(error, '/api-status', deps)).toBeTrue();
+    expect(deps.navigate).toHaveBeenCalledOnceWith('/api-status');
 
-    expect(reloadForStaleChunk(error, '/api-status', storage, navigate, 5_000)).toBeFalse();
-    expect(navigate).toHaveBeenCalledTimes(1);
+    clock.now = 5_000;
+    expect(reloadForStaleChunk(error, '/api-status', deps)).toBeFalse();
+    expect(deps.navigate).toHaveBeenCalledTimes(1);
 
-    expect(reloadForStaleChunk(error, '/api-status', storage, navigate, 20_000)).toBeTrue();
+    clock.now = 20_000;
+    expect(reloadForStaleChunk(error, '/api-status', deps)).toBeTrue();
   });
 
   it('ignores non-chunk errors', () => {
-    const navigate = jasmine.createSpy('navigate');
-    expect(
-      reloadForStaleChunk(new Error('boom'), '/x', memoryStorage(), navigate)
-    ).toBeFalse();
-    expect(navigate).not.toHaveBeenCalled();
+    const deps = fakeDeps({ now: 0 });
+    expect(reloadForStaleChunk(new Error('boom'), '/x', deps)).toBeFalse();
+    expect(deps.navigate).not.toHaveBeenCalled();
   });
 });

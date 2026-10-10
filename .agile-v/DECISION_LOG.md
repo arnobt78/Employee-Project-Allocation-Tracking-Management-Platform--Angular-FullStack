@@ -316,3 +316,27 @@ Append-only. Do not rewrite prior entries.
 | Rationale | verify-deep: slow `GetProject` could overwrite a just-saved project. Security review: session expiry + re-login in the same tab could show the previous user's cached data. |
 | Linked | TASK-0060 |
 | Status | DONE |
+
+---
+
+## DEC-0034 — Native atomic counter instead of Prisma `counter.upsert`
+
+| Field | Value |
+|---|---|
+| Date | 2026-10-10 |
+| Decision | `incrementCounter` uses one native MongoDB `findOneAndUpdate` (pipeline `$set`, `upsert`, `returnDocument: "after"`) via a cached `MongoClient`. Deviates from the plan, which proposed `prisma.counter.upsert`. |
+| Rationale | Prisma `upsert` always fails on the legacy counter documents ("required to return data, but found no record(s)") and fell back to a slow multi-step path (~3 s). The native call is one round trip (~0.23 s) and atomic. |
+| Linked | GATE-0019, TASK-0064, REQ-0138 |
+| Status | DONE |
+
+---
+
+## DEC-0035 — Persist email delivery outcomes in `NotificationLog`; surface failures in the UI
+
+| Field | Value |
+|---|---|
+| Date | 2026-10-10 |
+| Decision | Every background send records `sent` / `skipped` / `failed` (event, entity, provider, recipient count, redacted error) in a `NotificationLog` collection. The client checks `GetNotificationFailures` 6/15/30 s after a successful mutation (one coalesced schedule per burst) and shows one toast per new failure batch; API Status lists recent deliveries. Resend times out after 10 s and SMTP after 8 s connect / 15 s socket. |
+| Rationale | DEC-0031 moved email off the request path, which hid failures (RISK-0017). Polling a small indexed query avoids new infrastructure (no websockets/queues). Errors are redacted because provider messages can echo recipient addresses. |
+| Linked | GATE-0019, TASK-0065–0066, REQ-0140, RISK-0017 |
+| Status | DONE |

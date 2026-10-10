@@ -319,21 +319,14 @@
       </div>
       <div class="sm:col-span-2 flex justify-end gap-3">
         <button
+          ehAction
           type="submit"
-          [disabled]="isSaving"
+          icon="save"
+          [pending]="isSaving"
+          pendingLabel="Saving employee…"
           class="eh-action-btn eh-action-btn-primary"
         >
-          @if (!isSaving) {
-            <lucide-icon name="save" [size]="14"></lucide-icon>
-            <span>Save Employee</span>
-          } @else {
-            <lucide-icon
-              name="loader-circle"
-              [size]="14"
-              class="animate-spin"
-            ></lucide-icon>
-            <span>Saving Employee...</span>
-          }
+          <span>Save Employee</span>
         </button>
       </div>
     </form>
@@ -631,21 +624,14 @@
                 <span>Cancel</span>
               </button>
               <button
+                ehAction
                 type="submit"
-                [disabled]="isSaving"
+                icon="save"
+                [pending]="isSaving"
+                pendingLabel="Updating…"
                 class="eh-action-btn eh-action-btn-primary"
               >
-                @if (!isSaving) {
-                  <lucide-icon name="save" [size]="14"></lucide-icon>
-                  <span>Save Changes</span>
-                } @else {
-                  <lucide-icon
-                    name="loader-circle"
-                    [size]="14"
-                    class="animate-spin"
-                  ></lucide-icon>
-                  <span>Saving...</span>
-                }
+                <span>Save Changes</span>
               </button>
             </div>
           </form>
@@ -810,11 +796,14 @@
                 <span>Edit</span>
               </button>
               <button
+                ehAction
                 type="button"
+                icon="trash-2"
+                [pending]="pending.has('delete:' + employee.employeeId)"
+                pendingLabel="Deleting…"
                 class="eh-action-btn eh-action-btn-danger"
                 (click)="promptDelete(employee)"
               >
-                <lucide-icon name="trash-2" [size]="14"></lucide-icon>
                 <span>Delete</span>
               </button>
             </div>
@@ -843,7 +832,7 @@
   confirmLabel="Delete Employee"
   variant="destructive"
   [busy]="isDeleting"
-  busyLabel="Deleting..."
+  busyLabel="Deleting…"
   (confirmed)="confirmDelete()"
   (cancelled)="dismissDelete()"
 ></app-alert-dialog>
@@ -854,7 +843,7 @@
   description="Confirm saving these employee changes. The list will refresh when the update completes."
   confirmLabel="Save Changes"
   [busy]="isSaving"
-  busyLabel="Saving..."
+  busyLabel="Updating…"
   (confirmed)="confirmSave()"
   (cancelled)="dismissSave()"
 ></app-alert-dialog>

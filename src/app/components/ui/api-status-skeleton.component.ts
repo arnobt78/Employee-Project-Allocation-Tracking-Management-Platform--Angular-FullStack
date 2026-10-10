@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {
   API_STATUS_COPY,
   API_STATUS_DATA_LABELS,
+  API_STATUS_DELIVERY_SKELETON_ROWS,
   API_STATUS_METRIC_CARDS,
   API_STATUS_TABS,
   API_STATUS_TAB_ACTIVE_CLASS,
@@ -10,6 +11,7 @@ import {
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 import { PageHeaderComponent } from './page-header.component';
 import { TextStubComponent } from './text-stub.component';
+import { DeliveryRowSkeletonComponent } from './delivery-row-skeleton.component';
 
 /**
  * Full-page loading mirror of api-status (overview tab). Rendered by both the
@@ -19,7 +21,7 @@ import { TextStubComponent } from './text-stub.component';
 @Component({
   selector: 'app-api-status-skeleton',
   standalone: true,
-  imports: [PageHeaderComponent, TextStubComponent],
+  imports: [PageHeaderComponent, TextStubComponent, DeliveryRowSkeletonComponent],
   host: { class: 'block' },
   template: `
     <div class="text-white/85" data-testid="api-status-skeleton" aria-busy="true">
@@ -150,6 +152,17 @@ import { TextStubComponent } from './text-stub.component';
                 }
               </div>
             </div>
+
+            <div>
+              <h3 class="mb-4 text-base font-medium text-white sm:text-xl">
+                {{ copy.deliveries }}
+              </h3>
+              <div class="space-y-2">
+                @for (row of deliveryRows; track row) {
+                  <app-delivery-row-skeleton></app-delivery-row-skeleton>
+                }
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -164,6 +177,7 @@ export class ApiStatusSkeletonComponent {
   readonly idleTabClass = API_STATUS_TAB_IDLE_CLASS;
   readonly metricCards = API_STATUS_METRIC_CARDS;
   readonly dataLabels = API_STATUS_DATA_LABELS;
+  readonly deliveryRows = API_STATUS_DELIVERY_SKELETON_ROWS;
   readonly healthCards = [
     {
       title: API_STATUS_COPY.database,

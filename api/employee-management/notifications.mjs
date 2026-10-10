@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { recordDelivery } from "./notification-log.mjs";
 
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
 const RESEND_TOKEN = process.env.RESEND_TOKEN;
@@ -16,6 +17,10 @@ const EMAIL_FROM =
   "Employee Management <no-reply@example.com>";
 
 const EMAIL_DRY_RUN = process.env.EMAIL_DRY_RUN === "true";
+
+/** Bounded so a dead SMTP host fails fast instead of holding the function open (nodemailer defaults to 2 min). */
+const SMTP_TIMEOUTS_MS = { connection: 8_000, greeting: 8_000, socket: 15_000 };
+const RESEND_TIMEOUT_MS = 10_000;
 
 function hasResendConfig() {
   return typeof RESEND_TOKEN === "string" && RESEND_TOKEN.length > 0;
@@ -45,6 +50,7 @@ async function sendViaResend(payload) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${RESEND_TOKEN}`,
     },
+    signal: AbortSignal.timeout(RESEND_TIMEOUT_MS),
     body: JSON.stringify({
       from: payload.from,
       to: Array.isArray(payload.to) ? payload.to : [payload.to],
@@ -104,6 +110,9 @@ async function sendViaSmtp(payload) {
     host: SMTP_HOST,
     port: SMTP_PORT,
     secure: SMTP_PORT === 465,
+    connectionTimeout: SMTP_TIMEOUTS_MS.connection,
+    greetingTimeout: SMTP_TIMEOUTS_MS.greeting,
+    socketTimeout: SMTP_TIMEOUTS_MS.socket,
     auth: {
       user: SMTP_USER,
       pass: SMTP_PASS,
@@ -127,7 +136,25 @@ async function sendViaSmtp(payload) {
   };
 }
 
-export async function sendNotification({
+/**
+ * Sends one notification (Resend first, SMTP fallback) and records the outcome
+ * in the NotificationLog. Resolves `{ status, provider, ... }`; rethrows when no
+ * provider succeeded.
+ */
+export async function sendNotification(options) {
+  const { to, cc, bcc, metadata = {} } = options;
+  try {
+    const result = await deliver(options);
+    const status = result.skipped ? "skipped" : "sent";
+    await recordDelivery({ metadata, to, cc, bcc, status, provider: result.provider });
+    return { ...result, status, error: null };
+  } catch (error) {
+    await recordDelivery({ metadata, to, cc, bcc, status: "failed", error });
+    throw error;
+  }
+}
+
+async function deliver({
   to,
   cc,
   bcc,
@@ -158,8 +185,14 @@ export async function sendNotification({
     return { provider: "dry-run", messageId: null, response: null };
   }
 
+  if (!hasResendConfig() && !hasSmtpConfig()) {
+    console.warn("[Notification] Skipped sending email: no provider configured.");
+    return { provider: null, messageId: null, response: null, skipped: true };
+  }
+
   let resendResult = null;
   let resendFailed = false;
+  const failures = [];
 
   // Try Resend first
   try {
@@ -185,6 +218,7 @@ export async function sendNotification({
     }
   } catch (error) {
     resendFailed = true;
+    failures.push(error.message);
     // Check if it's a testing mode restriction (403) or other error
     if (error?.status === 403 || error?.responseText?.includes("testing emails")) {
       console.log("[Notification] Resend testing mode restriction detected. Falling back to SMTP for all recipients.", {
@@ -221,6 +255,7 @@ export async function sendNotification({
       return result;
     }
   } catch (error) {
+    failures.push(error.message);
     console.error("[Notification] SMTP failed", {
       to,
       cc: payload.cc,
@@ -237,7 +272,7 @@ export async function sendNotification({
     return resendResult;
   }
 
-  throw new Error("No available email provider succeeded.");
+  throw new Error(`No available email provider succeeded: ${failures.join("; ")}`);
 }
 
 export function buildNotificationTemplate({

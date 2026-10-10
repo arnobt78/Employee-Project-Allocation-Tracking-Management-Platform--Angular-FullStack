@@ -10,13 +10,19 @@ import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval } from 'rxjs';
 import { MasterService } from '../../service/master.service';
-import { IApiStatus } from '../../model/interface/master';
+import {
+  IApiStatus,
+  INotificationLogEntry,
+  NotificationDeliveryStatus,
+} from '../../model/interface/master';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 import { ApiStatusSkeletonComponent } from '@/app/components/ui/api-status-skeleton.component';
+import { DeliveryRowSkeletonComponent } from '@/app/components/ui/delivery-row-skeleton.component';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 import {
   API_STATUS_COPY,
   API_STATUS_DATA_LABELS,
+  API_STATUS_DELIVERY_SKELETON_ROWS,
   API_STATUS_METRIC_CARDS,
   API_STATUS_TABS,
   API_STATUS_TAB_ACTIVE_CLASS,
@@ -25,11 +31,23 @@ import {
 } from '@/app/constants/api-status';
 
 const AUTO_REFRESH_MS = 30_000;
+const DELIVERY_LOG_LIMIT = 10;
+
+const DELIVERY_STATUS_CLASS: Record<NotificationDeliveryStatus, string> = {
+  sent: 'bg-green-500/20 text-green-400 border-green-500/30',
+  failed: 'bg-red-500/20 text-red-400 border-red-500/30',
+  skipped: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
+};
 
 @Component({
   selector: 'app-api-status',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, ApiStatusSkeletonComponent],
+  imports: [
+    CommonModule,
+    PageHeaderComponent,
+    ApiStatusSkeletonComponent,
+    DeliveryRowSkeletonComponent,
+  ],
   templateUrl: './api-status.component.html',
   styleUrls: ['./api-status.component.css'],
 })
@@ -51,6 +69,11 @@ export class ApiStatusComponent implements OnInit {
   readonly loading = this.loadingSignal.asReadonly();
   readonly errorSignal = signal<string | null>(null);
   readonly error = this.errorSignal.asReadonly();
+
+  readonly deliverySkeletonRows = API_STATUS_DELIVERY_SKELETON_ROWS;
+  readonly deliveries = signal<INotificationLogEntry[] | null>(null);
+  readonly deliveriesLoading = signal(false);
+  readonly deliveriesError = signal(false);
 
   readonly activeTabSignal = signal<ApiStatusTabId>('overview');
   readonly activeTab = this.activeTabSignal.asReadonly();
@@ -95,6 +118,7 @@ export class ApiStatusComponent implements OnInit {
   }
 
   loadApiStatus(): void {
+    this.loadDeliveries();
     this.loadingSignal.set(true);
     this.masterService
       .getApiStatus()
@@ -113,6 +137,45 @@ export class ApiStatusComponent implements OnInit {
           this.loadingSignal.set(false);
         },
       });
+  }
+
+  loadDeliveries(): void {
+    if (this.deliveriesLoading()) {
+      return;
+    }
+    this.deliveriesLoading.set(true);
+    this.masterService
+      .getNotificationLog(DELIVERY_LOG_LIMIT)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (entries) => {
+          this.deliveries.set(entries);
+          this.deliveriesError.set(false);
+          this.deliveriesLoading.set(false);
+        },
+        error: () => {
+          this.deliveriesError.set(true);
+          this.deliveriesLoading.set(false);
+        },
+      });
+  }
+
+  deliveryStatusClass(status: NotificationDeliveryStatus): string {
+    return DELIVERY_STATUS_CLASS[status] ?? DELIVERY_STATUS_CLASS.skipped;
+  }
+
+  /** `assignment_created` → `Assignment created`. */
+  deliveryEventLabel(event: string): string {
+    const words = event.replace(/_/g, ' ').trim();
+    return words.charAt(0).toUpperCase() + words.slice(1);
+  }
+
+  deliveryEntityLabel(entry: INotificationLogEntry): string {
+    if (!entry.entityType || entry.entityId == null) {
+      return '';
+    }
+    const type = entry.entityType.charAt(0).toUpperCase() + entry.entityType.slice(1);
+    return `${type} #${entry.entityId}`;
   }
 
   setActiveTab(tab: ApiStatusTabId): void {

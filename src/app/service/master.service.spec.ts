@@ -6,7 +6,11 @@ import {
 } from '@angular/common/http/testing';
 
 import { MasterService } from './master.service';
-import { IApiDocumentation, IProject } from '../model/interface/master';
+import {
+  IApiDocumentation,
+  IProject,
+  IProjectEmployee,
+} from '../model/interface/master';
 
 describe('MasterService', () => {
   let service: MasterService;
@@ -78,6 +82,89 @@ describe('MasterService', () => {
 
       expect(service.peekProject(7)).toEqual({ project, fresh: false });
       expect(service.peekProject(99)).toBeNull();
+    });
+  });
+
+  describe('list cache invalidation', () => {
+    const assignment = { empProjectId: 1, projectId: 7, empId: 3 } as IProjectEmployee;
+
+    const seedAssignments = () => {
+      service.getProjectEmp().subscribe();
+      http
+        .expectOne((req) => req.url.endsWith('GetAllProjectEmployees'))
+        .flush([assignment]);
+      expect(service.peekProjectEmployees()).toEqual([assignment]);
+    };
+
+    it('shares one in-flight request between callers', () => {
+      service.getAllProjects().subscribe();
+      service.getAllProjects().subscribe();
+      http.expectOne((req) => req.url.endsWith('GetAllProjects')).flush([project]);
+    });
+
+    it('prunes the deleted project and its assignments, then revalidates', () => {
+      seedAssignments();
+      service.getAllProjects().subscribe();
+      http.expectOne((req) => req.url.endsWith('GetAllProjects')).flush([project]);
+
+      service.deleteProjectById(7).subscribe();
+      http.expectOne((req) => req.url.includes('DeleteProject')).flush({});
+
+      expect(service.peekProjectEmployees()).toEqual([]);
+      expect(service.peekProjects()).toEqual([]);
+      service.getProjectEmp().subscribe();
+      http.expectOne((req) => req.url.endsWith('GetAllProjectEmployees')).flush([]);
+    });
+
+    it('prunes assignments and drops lead-name lists after an employee delete', () => {
+      seedAssignments();
+      service.getAllProjects().subscribe();
+      http.expectOne((req) => req.url.endsWith('GetAllProjects')).flush([project]);
+
+      service.deleteEmpById(3).subscribe();
+      http.expectOne((req) => req.url.includes('DeleteEmployee')).flush({});
+
+      expect(service.peekProjectEmployees()).toEqual([]);
+      expect(service.peekProjects()).toBeNull();
+    });
+
+    it('upserts the saved assignment into the snapshot', () => {
+      seedAssignments();
+      const saved = { ...assignment, role: 'Lead' } as IProjectEmployee;
+      service.updateProjectEmp(saved).subscribe();
+      http.expectOne((req) => req.url.includes('UpdateProjectEmployee')).flush(saved);
+
+      expect(service.peekProjectEmployees()).toEqual([saved]);
+    });
+
+    it('refetches instead of delivering a list response issued before a mutation', () => {
+      const received: IProjectEmployee[][] = [];
+      service.getProjectEmp().subscribe((list) => received.push(list));
+      const stale = http.expectOne((req) =>
+        req.url.endsWith('GetAllProjectEmployees')
+      );
+
+      service.deleteProjectEmpById(1).subscribe();
+      http.expectOne((req) => req.url.includes('DeleteProjectEmployee')).flush({});
+
+      stale.flush([assignment]);
+      expect(service.peekProjectEmployees()).toBeNull();
+      expect(received).toEqual([]);
+
+      http.expectOne((req) => req.url.endsWith('GetAllProjectEmployees')).flush([]);
+      expect(received).toEqual([[]]);
+      expect(service.peekProjectEmployees()).toEqual([]);
+    });
+
+    it('retries after a failed list request', () => {
+      service.getAllProjects().subscribe({ error: () => undefined });
+      http
+        .expectOne((req) => req.url.endsWith('GetAllProjects'))
+        .flush('down', { status: 500, statusText: 'Server Error' });
+
+      service.getAllProjects().subscribe();
+      http.expectOne((req) => req.url.endsWith('GetAllProjects')).flush([project]);
+      expect(service.peekProjects()).toEqual([project]);
     });
   });
 

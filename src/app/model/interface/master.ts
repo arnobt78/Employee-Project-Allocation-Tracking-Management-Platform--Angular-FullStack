@@ -439,6 +439,21 @@ export interface IApiDocumentation {
   endpoints: Record<ApiHttpMethod, IApiEndpoint[]>;
 }
 
+export type NotificationDeliveryStatus = 'sent' | 'failed' | 'skipped';
+
+/** One email delivery outcome recorded by the API (`GetNotificationLog`). */
+export interface INotificationLogEntry {
+  id: string;
+  event: string;
+  entityType: 'employee' | 'project' | 'assignment' | null;
+  entityId: number | null;
+  status: NotificationDeliveryStatus;
+  provider: string | null;
+  recipientCount: number;
+  error: string | null;
+  createdAt: string;
+}
+
 export interface IApiStatus {
   timestamp: string;
   overallStatus: 'operational' | 'degraded' | 'down';

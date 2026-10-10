@@ -1,42 +1,43 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0018 skeleton parity shipped; prod soak next  
-**Gate:** GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **PENDING**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** Committed locally (not pushed). lint PASS, unit 63/63, production build PASS (initial 989 kB), A–Z browser sweep PASS.  
+**Phase / Stage:** Stage 4 — GATE-0019 CRUD speed + pending UX + email visibility shipped; prod soak next  
+**Gate:** GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **PENDING**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
+**Status:** Committed locally (not pushed). lint PASS, unit 95/95, production build PASS (initial 921.56 kB), A–Z browser sweep PASS.  
 **Updated:** 2026-10-10  
-**resume_token:** `c1-gate18-prod-soak-2026-10-10`
+**resume_token:** `c1-gate19-prod-soak-2026-10-10`
 
 ---
 
 ## Resume Point
 
-**Completed (GATE-0018, TASK-0053–0060):**
+**Completed (GATE-0019, TASK-0061–0067):**
 
-- One mirror skeleton per private page, shared by `route-content-placeholder` and the page's cold-load branch (Project detail, API Doc, API Status, Insights, Calendar); `text-stub` primitive for text-height stubs.
-- Calendar split into `calendar-month.ts` helpers + `calendar-month-shell`; `CalendarViewComponent.events` is a signal input (re-renders on fresh data).
-- API Doc cached + peek; API Status timer cleared on destroy, amber refresh-failed notice cleared only on success.
-- API mutations respond before email delivery (`notifyInBackground` → `@vercel/functions` `waitUntil`; DEC-0031). UpdateEmployee ~6 s → ~1.9 s locally.
-- Stale lazy chunk → one reload to target URL (`lib/chunk-reload.ts`, DEC-0032); unknown routes → `/dashboard`.
-- Project mutation responses win over in-flight `GetProject` (component token + service issue-time guard); approval/comment no longer double-fetch; login clears caches (DEC-0033).
+- Inline pending per action button (`lib/mutation-tracker.ts` `MutationTracker` + `PendingSet`, `components/ui/action-button.component.ts` `ehAction`) on Employees, Projects, Project Team, Project detail. Dynamic labels ("Deleting…", "Approving…"); duplicate submits ignored; pending buttons keep focus (`aria-disabled`).
+- `MasterService` list cache cascades invalidations (project/employee delete → assignments) and refetches responses issued before an invalidation.
+- Server: native atomic counter (DEC-0034), parallel lookups, `$transaction` deletes, dev-only timing logs (`api/_lib/timing.mjs`).
+- Email outcomes stored in `NotificationLog` (DEC-0035) with redacted errors; `NotificationMonitorService` toasts failures after mutations; API Status shows "Recent Email Deliveries". New API routes `GetNotificationLog`, `GetNotificationFailures`.
+- Calendar "+N more": mouse-only hover expand, keyboard toggle, Escape refocus, collapse timer cancelled.
 
-**Remaining / known (low, pre-existing):**
+**Remaining / known (low):**
 
-- Calendar event chips are `div` + `routerLink` (not keyboard-focusable); "+N more" collapse `setTimeout` not cancelled.
+- `NotificationLog` has no retention/TTL (RISK-0018).
+- Prisma `$transaction` deletes need a MongoDB replica set (RISK-0020).
+- Calendar event chips are `div` + `routerLink` (not keyboard-focusable).
 - `bg-white/2` / `min-h-auto` classes generate no CSS.
-- Deleting a project/employee does not invalidate the client assignment cache; employee edits don't refresh lead names in project list/schedule until TTL.
-- Guest `Session` 401 appears in browser console on the login page (intentional: Session sits behind `requireAuth`).
+- Employee edits don't refresh lead names in project list/schedule until TTL.
+- Guest `Session` 401 on the login page console (intentional).
 
-**Blockers:** none. Push/deploy needs human approval (GATE-0002).
+**Blockers:** none. Push/deploy needs human approval (GATE-0002). `prisma db push` already applied to the configured DB (`NotificationLog`).
 
-**Next exact action:** Human pushes + prod soak (mutation latency, email delivery in Vercel logs, skeleton parity on cold entry). Then CP-0020 project-detail polish guide.
+**Next exact action:** Human pushes + prod soak (mutation latency on Vercel, pending labels, deliveries panel, failure toast). Then CP-0020 project-detail polish guide.
 
 **Resume prompt:**
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
-Resume resume_token c1-gate18-prod-soak-2026-10-10.
-GATE-0018 skeleton parity committed locally. Await push/prod soak feedback, then CP-0020 detail-polish guide.
+Resume resume_token c1-gate19-prod-soak-2026-10-10.
+GATE-0019 committed locally. Await push/prod soak feedback, then CP-0020 detail-polish guide.
 ```
 
 ---

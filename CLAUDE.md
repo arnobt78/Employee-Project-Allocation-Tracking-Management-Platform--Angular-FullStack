@@ -5,9 +5,9 @@
 Project Name: EmpowerHub — Employee & Project Management (employee-management)  
 Description: Angular 20 SPA + Vercel serverless API + Prisma/MongoDB for employees, projects, assignments, dashboards, calendar/Gantt, insights, API docs/status, email notifications, optional Contentful + AI drafting, Sentry tunnel.
 
-Current Status: GATE-0018 single-layer mirrored skeletons shipped on every private page + A–Z verify fixes (background email, stale-chunk reload, mutation race); next: project-detail polish guide (CP-0020) + prod soak 
+Current Status: GATE-0019 shipped (inline pending buttons, cache cascade, faster CRUD, email delivery log + failure toast); next: prod soak + project-detail polish guide (CP-0020) 
 Current Agile V Cycle: C1 
-Current Gate: GATE-0018 SKELETON PARITY COMPLETE; DETAIL POLISH (CP-0020) AWAITING GUIDE
+Current Gate: GATE-0019 COMPLETE; DETAIL POLISH (CP-0020) AWAITING GUIDE
 
 ---
 
@@ -28,11 +28,11 @@ Testing: Jasmine/Karma unit specs; ESLint via `npm run lint`
 Follow the existing project architecture.
 
 - UI: `src/app/pages/*` (routes), `src/app/components/*` (calendar/gantt/timeline/ui)
-- API client: single `MasterService` (+ `AuthService`)
+- API client: single `MasterService` (+ `AuthService`); mutations via `MutationTracker` (`lib/mutation-tracker.ts`) + `ehAction` button
 - API server: `[...segments].js` → `handler.mjs` → `repository.mjs` + `auth.mjs` / `notifications.mjs` / `monitoring.mjs` / `ai-providers.mjs`
 - Sentry: client tunnel `POST /api/monitoring`; helpers in `api/_lib/sentry/` and `src/app/lib/sentry/`
 - Models: `src/app/model/interface/master.ts`, `model/class/Employee.ts`
-- Schema: `prisma/schema.prisma` (includes `AppUser`, `Session`)
+- Schema: `prisma/schema.prisma` (includes `AppUser`, `Session`, `NotificationLog`)
 
 Do not introduce new architectural patterns unless explicitly approved.
 

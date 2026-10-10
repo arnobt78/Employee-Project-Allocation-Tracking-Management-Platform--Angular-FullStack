@@ -13,9 +13,11 @@
       [class]="
         'w-full rounded-xl border p-2 transition-all ' +
         dayCellTone(day) +
-        (isDateExpanded(day.date) ? ' min-h-auto' : ' min-h-[100px]')
+        (isDateExpanded(day.date) ? ' min-h-0' : ' min-h-[100px]')
       "
+      (mouseenter)="cancelCollapse()"
       (mouseleave)="onMoreMouseLeave()"
+      (keydown.escape)="collapse(); moreToggle.focus()"
     >
       <div class="mb-1 text-sm font-medium" [class]="dayNumberTone(day)">
         {{ day.day }}
@@ -30,14 +32,16 @@
             [ngTemplateOutletContext]="{ $implicit: event }"
           ></ng-container>
         }
-        @if (!isDateExpanded(day.date)) {
-          <div
-            class="cursor-pointer text-xs text-white/60 transition-colors hover:text-white"
-            (mouseenter)="onMoreMouseEnter(day.date)"
-          >
-            +{{ day.events.length - 2 }} more
-          </div>
-        }
+        <button
+          #moreToggle
+          type="button"
+          class="rounded text-xs text-white/60 transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+          [attr.aria-expanded]="isDateExpanded(day.date)"
+          (pointerenter)="onMorePointerEnter($event, day.date)"
+          (click)="toggleDateExpansion(day.date)"
+        >
+          {{ isDateExpanded(day.date) ? 'Show less' : '+' + (day.events.length - 2) + ' more' }}
+        </button>
       </div>
     </div>
   } @else {
@@ -63,14 +67,17 @@
 </ng-template>
 
 <ng-template #eventChip let-event>
-  <div
+  <a
     [routerLink]="['/update-project', event.projectId]"
-    class="cursor-pointer rounded px-1.5 py-0.5 text-xs transition-colors hover:opacity-80"
-    [class]="getEventTypeColor(event.type)"
+    [attr.aria-label]="event.projectName + ': ' + event.title"
+    [class]="
+      'block rounded px-1.5 py-0.5 text-xs transition-colors hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 ' +
+      getEventTypeColor(event.type)
+    "
   >
     <div class="truncate font-medium">{{ event.title }}</div>
     <div class="truncate text-xs opacity-75">
       {{ event.projectName }}
     </div>
-  </div>
+  </a>
 </ng-template>

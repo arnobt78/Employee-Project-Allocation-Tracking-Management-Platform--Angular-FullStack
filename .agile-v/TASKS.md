@@ -139,6 +139,18 @@
 | TASK-0059 | Spec coverage (placeholder kind matches page skeleton) + verify-deep + commit-ready per page | REQ-0131 | DONE | 2026-10-10 |
 | TASK-0060 | A–Z verify sweep fixes: background email (`waitUntil`), stale-chunk reload, `**` redirect, mutation-vs-read race, cache clear on login, API Status notice clear-on-success | REQ-0131 | DONE | 2026-10-10 |
 
+## Wave — GATE-0019 CRUD speed, pending UX, cache cascade, email visibility (2026-10-10)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0061 | List cache: `INVALIDATES` cascade (project/employee delete → assignments) + refetch when a response was issued before an invalidation | REQ-0136 | DONE | `MasterService.getCached` generation check |
+| TASK-0062 | Calendar "+N more": cancelled collapse timer, keyboard toggle, mouse-only hover expand, Escape refocus | REQ-0139 | DONE | Touch tap no longer double-toggles |
+| TASK-0063 | `MutationTracker` + `PendingSet` + `ehAction` button rolled out to Employees, Projects, Project Team, Project detail (dynamic pending labels) | REQ-0137 | DONE | Per-key pending; duplicate-submit guard; `destroyRef` skips stale callbacks |
+| TASK-0064 | Server speed: native atomic counter, parallel lookups, `$transaction` deletes, assignment response mapping, dev-only timing logs | REQ-0138 | DONE | See VALIDATION_SUMMARY timings |
+| TASK-0065 | `NotificationLog` model + `GetNotificationLog` / `GetNotificationFailures`; redacted errors; Resend/SMTP timeouts | REQ-0140 | DONE | DEC-0035 |
+| TASK-0066 | `NotificationMonitorService` failure toast + API Status "Recent Email Deliveries" panel | REQ-0140 | DONE | Coalesced checks at 6/15/30 s |
+| TASK-0067 | Lint/test/build + A–Z browser sweep + verifier + security review; fix findings | REQ-0131 | DONE | 95/95 unit |
+
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)

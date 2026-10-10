@@ -28,6 +28,9 @@ import {
   SelectMenuOption,
 } from '@/app/components/ui/select-menu.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
+import { ActionButtonComponent } from '@/app/components/ui/action-button.component';
+import { MutationTracker, PendingSet } from '@/app/lib/mutation-tracker';
+import { removeBy, upsertBy } from '@/app/lib/list-ops';
 import { CardCloseButtonComponent } from '@/app/components/ui/card-close-button.component';
 import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
 import { ListPaginationComponent } from '@/app/components/ui/list-pagination.component';
@@ -46,6 +49,9 @@ import {
   paginateList,
 } from '@/app/lib/list-query';
 
+const SAVE_KEY = 'save';
+const deleteKey = (empProjectId: number) => `delete:${empProjectId}`;
+
 @Component({
   selector: 'app-project-employee',
   standalone: true,
@@ -55,6 +61,7 @@ import {
     ReactiveFormsModule,
     SelectMenuComponent,
     AlertDialogComponent,
+    ActionButtonComponent,
     CardCloseButtonComponent,
     UserAvatarComponent,
     ListPaginationComponent,
@@ -70,6 +77,7 @@ import {
 export class ProjectEmployeeComponent implements OnInit {
   private readonly masterService = inject(MasterService);
   private readonly toast = inject(ToastService);
+  private readonly mutations = inject(MutationTracker);
   private readonly datePipe = inject(DatePipe);
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
@@ -242,8 +250,16 @@ export class ProjectEmployeeComponent implements OnInit {
   showCreatePanel = false;
   pendingDelete: IProjectEmployee | null = null;
   pendingSave = false;
-  isSaving = false;
-  isDeleting = false;
+  readonly pending = new PendingSet<string>();
+
+  get isSaving(): boolean {
+    return this.pending.has(SAVE_KEY);
+  }
+
+  get isDeleting(): boolean {
+    const id = this.pendingDelete?.empProjectId;
+    return id != null && this.pending.has(deleteKey(id));
+  }
 
   ngOnInit(): void {
     this.listQuery = bindListQuery(
@@ -414,53 +430,56 @@ export class ProjectEmployeeComponent implements OnInit {
       this.runCreate();
       return;
     }
-    this.isSaving = true;
-    this.masterService.updateProjectEmp(projectEmployee).subscribe({
-      next: () => {
-        this.getProjectEmployees(() => {
-          this.isSaving = false;
-          this.pendingSave = false;
-          this.projectEmployeeForm.reset();
-          this.editingAssignmentId = null;
-          this.toast.success({
-            title: 'Assignment updated',
-            description: 'Changes saved successfully.',
-          });
-        });
+    this.mutations.track(this.masterService.updateProjectEmp(projectEmployee), {
+      pending: this.pending,
+      destroyRef: this.destroyRef,
+      key: SAVE_KEY,
+      onSuccess: (saved) => {
+        this.applySaved(saved);
+        this.pendingSave = false;
+        this.projectEmployeeForm.reset();
+        this.editingAssignmentId = null;
       },
-      error: () => {
-        this.isSaving = false;
-        this.toast.error({
-          title: 'Update failed',
-          description: 'Unable to update project assignment.',
-        });
+      successToast: {
+        title: 'Assignment updated',
+        description: 'Changes saved successfully.',
+      },
+      errorToast: {
+        title: 'Update failed',
+        description: 'Unable to update project assignment.',
       },
     });
   }
 
   private runCreate() {
-    const projectEmployee = this.buildPayload();
-    this.isSaving = true;
-    this.masterService.saveProjectEmp(projectEmployee).subscribe({
-      next: () => {
-        this.getProjectEmployees(() => {
-          this.isSaving = false;
-          this.showCreatePanel = false;
-          this.resetForm();
-          this.toast.success({
-            title: 'Assignment created',
-            description: 'A new team assignment has been added.',
-          });
-        });
+    this.mutations.track(this.masterService.saveProjectEmp(this.buildPayload()), {
+      pending: this.pending,
+      destroyRef: this.destroyRef,
+      key: SAVE_KEY,
+      onSuccess: (saved) => {
+        this.applySaved(saved);
+        this.showCreatePanel = false;
+        this.resetForm();
       },
-      error: () => {
-        this.isSaving = false;
-        this.toast.error({
-          title: 'Creation failed',
-          description: 'Unable to create project assignment.',
-        });
+      successToast: {
+        title: 'Assignment created',
+        description: 'A new team assignment has been added.',
+      },
+      errorToast: {
+        title: 'Creation failed',
+        description: 'Unable to create project assignment.',
       },
     });
+  }
+
+  /** Show the server's record immediately; the list revalidates in the background. */
+  private applySaved(saved: IProjectEmployee | null | undefined) {
+    if (saved?.empProjectId) {
+      this.assignmentsSignal.update((list) =>
+        upsertBy(list, 'empProjectId', saved),
+      );
+    }
+    this.getProjectEmployees();
   }
 
   private buildPayload() {
@@ -474,22 +493,20 @@ export class ProjectEmployeeComponent implements OnInit {
   }
 
   confirmDelete() {
-    if (!this.pendingDelete || this.isDeleting) {
+    const target = this.pendingDelete;
+    if (!target) {
       return;
     }
-    const { empProjectId, projectName } = this.pendingDelete;
-    this.isDeleting = true;
-    this.masterService.deleteProjectEmpById(empProjectId).subscribe({
-      next: () => {
+    const { empProjectId, projectName } = target;
+    this.mutations.track(this.masterService.deleteProjectEmpById(empProjectId), {
+      pending: this.pending,
+      destroyRef: this.destroyRef,
+      key: deleteKey(empProjectId),
+      onSuccess: () => {
         this.assignmentsSignal.update((list) =>
-          list.filter((item) => item.empProjectId !== empProjectId)
+          removeBy(list, 'empProjectId', empProjectId),
         );
-        this.isDeleting = false;
         this.pendingDelete = null;
-        this.toast.success({
-          title: 'Assignment removed',
-          description: `${projectName} assignment deleted.`,
-        });
         if (this.expandedAssignmentId === empProjectId) {
           this.expandedAssignmentId = null;
         }
@@ -497,12 +514,13 @@ export class ProjectEmployeeComponent implements OnInit {
           this.editingAssignmentId = null;
         }
       },
-      error: () => {
-        this.isDeleting = false;
-        this.toast.error({
-          title: 'Delete failed',
-          description: 'Unable to remove project assignment.',
-        });
+      successToast: {
+        title: 'Assignment removed',
+        description: `${projectName} assignment deleted.`,
+      },
+      errorToast: {
+        title: 'Delete failed',
+        description: 'Unable to remove project assignment.',
       },
     });
   }
@@ -529,7 +547,6 @@ export class ProjectEmployeeComponent implements OnInit {
   }
 
   startCreate() {
-    this.isSaving = false;
     this.showCreatePanel = true;
     this.editingAssignmentId = null;
     this.expandedAssignmentId = null;
@@ -538,7 +555,6 @@ export class ProjectEmployeeComponent implements OnInit {
   }
 
   closeCreatePanel() {
-    this.isSaving = false;
     this.showCreatePanel = false;
   }
 
@@ -583,7 +599,6 @@ export class ProjectEmployeeComponent implements OnInit {
   }
 
   cancelEdit() {
-    this.isSaving = false;
     this.pendingSave = false;
     if (this.editingAssignmentId !== null) {
       this.projectEmployeeForm.reset();

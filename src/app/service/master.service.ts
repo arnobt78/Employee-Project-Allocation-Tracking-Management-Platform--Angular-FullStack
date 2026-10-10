@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, defer, shareReplay, tap } from 'rxjs';
+import { Observable, defer, of, shareReplay, switchMap, tap } from 'rxjs';
 import {
   IApiResponse,
   IProject,
@@ -13,9 +13,65 @@ import {
   DemoAccount,
   IApiDocumentation,
   IApiStatus,
+  INotificationLogEntry,
 } from '../model/interface/master';
 import { Employee } from '../model/class/Employee';
 import { environment } from '../../environments/environment';
+import { removeBy, upsertBy } from '../lib/list-ops';
+
+interface ListCacheTypes {
+  employees: Employee[];
+  projects: IProject[];
+  assignments: IProjectEmployee[];
+  dashboard: any;
+  departments: IApiResponse;
+  schedule: any;
+}
+
+type ListCacheKey = keyof ListCacheTypes;
+
+interface ListCacheEntry<T> {
+  request$: Observable<T> | null;
+  /** Issue time of the cached request; 0 when expired. */
+  at: number;
+  snapshot: T | null;
+  /** Bumped on invalidation so responses from older requests are dropped. */
+  generation: number;
+}
+
+type ListCaches = { [K in ListCacheKey]: ListCacheEntry<ListCacheTypes[K]> };
+
+export type MutationDomain = 'employee' | 'project' | 'assignment';
+
+/**
+ * Lists that embed data from each domain: employee names appear as project
+ * leads and assignees; deleting a project or employee cascades to assignments.
+ */
+const INVALIDATES: Record<MutationDomain, readonly ListCacheKey[]> = {
+  employee: ['employees', 'projects', 'assignments', 'dashboard', 'schedule'],
+  project: ['projects', 'assignments', 'dashboard', 'schedule'],
+  assignment: ['assignments', 'dashboard', 'schedule'],
+};
+
+const LIST_ENDPOINTS: Record<ListCacheKey, string> = {
+  employees: 'GetAllEmployees',
+  projects: 'GetAllProjects',
+  assignments: 'GetAllProjectEmployees',
+  dashboard: 'GetDashboard',
+  departments: 'GetParentDepartment',
+  schedule: 'GetSchedule',
+};
+
+type ListPatches = {
+  [K in ListCacheKey]?: (snapshot: ListCacheTypes[K]) => ListCacheTypes[K];
+};
+
+const emptyEntry = <T>(): ListCacheEntry<T> => ({
+  request$: null,
+  at: 0,
+  snapshot: null,
+  generation: 0,
+});
 
 @Injectable({
   providedIn: 'root',
@@ -27,33 +83,19 @@ export class MasterService {
 
   private readonly cacheTtlMs = 30_000;
 
-  private employeesCache$: Observable<Employee[]> | null = null;
-  private employeesCacheAt = 0;
-  private employeesSnapshot: Employee[] | null = null;
+  private readonly lists: ListCaches = {
+    employees: emptyEntry(),
+    projects: emptyEntry(),
+    assignments: emptyEntry(),
+    dashboard: emptyEntry(),
+    departments: emptyEntry(),
+    schedule: emptyEntry(),
+  };
 
-  private projectsCache$: Observable<IProject[]> | null = null;
-  private projectsCacheAt = 0;
-  private projectsSnapshot: IProject[] | null = null;
   private readonly projectDetailSnapshots = new Map<
     number,
     { project: IProject; at: number }
   >();
-
-  private projectEmployeesCache$: Observable<IProjectEmployee[]> | null = null;
-  private projectEmployeesCacheAt = 0;
-  private projectEmployeesSnapshot: IProjectEmployee[] | null = null;
-
-  private dashboardCache$: Observable<any> | null = null;
-  private dashboardCacheAt = 0;
-  private dashboardSnapshot: any | null = null;
-
-  private departmentsCache$: Observable<IApiResponse> | null = null;
-  private departmentsCacheAt = 0;
-  private departmentsSnapshot: IApiResponse | null = null;
-
-  private scheduleCache$: Observable<any> | null = null;
-  private scheduleCacheAt = 0;
-  private scheduleSnapshot: any | null = null;
 
   private apiDocumentationCache$: Observable<IApiDocumentation> | null = null;
   private apiDocumentationSnapshot: IApiDocumentation | null = null;
@@ -86,11 +128,11 @@ export class MasterService {
   }
 
   peekEmployees(): Employee[] | null {
-    return this.employeesSnapshot;
+    return this.lists.employees.snapshot;
   }
 
   peekProjects(): IProject[] | null {
-    return this.projectsSnapshot;
+    return this.lists.projects.snapshot;
   }
 
   /**
@@ -100,8 +142,8 @@ export class MasterService {
    */
   peekProject(id: number): { project: IProject; fresh: boolean } | null {
     const detail = this.projectDetailSnapshots.get(id);
-    const listed = this.projectsSnapshot?.find((p) => p.projectId === id);
-    if (detail && (!listed || detail.at >= this.projectsCacheAt)) {
+    const listed = this.lists.projects.snapshot?.find((p) => p.projectId === id);
+    if (detail && (!listed || detail.at >= this.lists.projects.at)) {
       return {
         project: detail.project,
         fresh: Date.now() - detail.at < this.cacheTtlMs,
@@ -111,110 +153,45 @@ export class MasterService {
   }
 
   peekProjectEmployees(): IProjectEmployee[] | null {
-    return this.projectEmployeesSnapshot;
+    return this.lists.assignments.snapshot;
   }
 
   peekDashboard(): any | null {
-    return this.dashboardSnapshot;
+    return this.lists.dashboard.snapshot;
   }
 
   peekDepartments(): IApiResponse | null {
-    return this.departmentsSnapshot;
+    return this.lists.departments.snapshot;
   }
 
   peekSchedule(): any | null {
-    return this.scheduleSnapshot;
+    return this.lists.schedule.snapshot;
   }
 
   clearAllCaches(): void {
-    this.employeesCache$ = null;
-    this.projectsCache$ = null;
-    this.projectEmployeesCache$ = null;
-    this.dashboardCache$ = null;
-    this.departmentsCache$ = null;
-    this.scheduleCache$ = null;
-    this.employeesCacheAt = 0;
-    this.projectsCacheAt = 0;
-    this.projectEmployeesCacheAt = 0;
-    this.dashboardCacheAt = 0;
-    this.departmentsCacheAt = 0;
-    this.scheduleCacheAt = 0;
-    this.employeesSnapshot = null;
-    this.projectsSnapshot = null;
+    (Object.keys(this.lists) as ListCacheKey[]).forEach((key) =>
+      this.resetList(key)
+    );
     this.projectDetailSnapshots.clear();
-    this.projectEmployeesSnapshot = null;
-    this.dashboardSnapshot = null;
-    this.departmentsSnapshot = null;
-    this.scheduleSnapshot = null;
     this.apiDocumentationCache$ = null;
     this.apiDocumentationSnapshot = null;
     this.apiStatusSnapshot = null;
   }
 
-  invalidateEmployees(): void {
-    this.employeesCache$ = null;
-    this.employeesCacheAt = 0;
-    this.employeesSnapshot = null;
-    this.projectDetailSnapshots.clear();
-    this.dashboardCache$ = null;
-    this.dashboardCacheAt = 0;
-    this.dashboardSnapshot = null;
-  }
-
-  invalidateProjects(): void {
-    this.projectsCache$ = null;
-    this.projectsCacheAt = 0;
-    this.projectsSnapshot = null;
-    this.dashboardCache$ = null;
-    this.dashboardCacheAt = 0;
-    this.dashboardSnapshot = null;
-    this.scheduleCache$ = null;
-    this.scheduleCacheAt = 0;
-    this.scheduleSnapshot = null;
-  }
-
-  invalidateProjectEmployees(): void {
-    this.projectEmployeesCache$ = null;
-    this.projectEmployeesCacheAt = 0;
-    this.projectEmployeesSnapshot = null;
-    this.dashboardCache$ = null;
-    this.dashboardCacheAt = 0;
-    this.dashboardSnapshot = null;
-    this.scheduleCache$ = null;
-    this.scheduleCacheAt = 0;
-    this.scheduleSnapshot = null;
-  }
-
-  invalidateDashboard(): void {
-    this.dashboardCache$ = null;
-    this.dashboardCacheAt = 0;
-    this.dashboardSnapshot = null;
-  }
-
-  invalidateSchedule(): void {
-    this.scheduleCache$ = null;
-    this.scheduleCacheAt = 0;
-    this.scheduleSnapshot = null;
+  /**
+   * Expire every list that embeds data from `domain` (see INVALIDATES).
+   * Lists with a patch keep a corrected snapshot for instant paint and still
+   * revalidate; the rest are dropped.
+   */
+  invalidate(domain: MutationDomain, patches: ListPatches = {}): void {
+    INVALIDATES[domain].forEach((key) => this.resetList(key, patches[key]));
+    if (domain !== 'project') {
+      this.projectDetailSnapshots.clear();
+    }
   }
 
   getAllDept(): Observable<IApiResponse> {
-    return this.getCached(
-      () => this.departmentsCache$,
-      (value) => {
-        this.departmentsCache$ = value;
-      },
-      () => this.departmentsCacheAt,
-      (value) => {
-        this.departmentsCacheAt = value;
-      },
-      (value) => {
-        this.departmentsSnapshot = value;
-      },
-      () =>
-        this.http
-          .get<IApiResponse>(this.getProxyUrl('GetParentDepartment'))
-          .pipe(shareReplay({ bufferSize: 1, refCount: false }))
-    );
+    return this.getCached('departments');
   }
 
   getChildDeptById(deptid: number): Observable<IApiResponse> {
@@ -226,41 +203,32 @@ export class MasterService {
   saveEmp(obj: Employee): Observable<IApiResponse> {
     return this.http
       .post<IApiResponse>(this.getProxyUrl('CreateEmployee'), obj)
-      .pipe(tap(() => this.invalidateEmployees()));
+      .pipe(tap((res) => this.afterEmployeeSaved(res)));
   }
 
   getAllEmp(): Observable<Employee[]> {
-    return this.getCached(
-      () => this.employeesCache$,
-      (value) => {
-        this.employeesCache$ = value;
-      },
-      () => this.employeesCacheAt,
-      (value) => {
-        this.employeesCacheAt = value;
-      },
-      (value) => {
-        this.employeesSnapshot = value;
-      },
-      () =>
-        this.http
-          .get<Employee[]>(this.getProxyUrl('GetAllEmployees'))
-          .pipe(shareReplay({ bufferSize: 1, refCount: false }))
-    );
+    return this.getCached('employees');
   }
 
   updateEmp(obj: Employee): Observable<IApiResponse> {
     const queryUrl = this.getProxyUrl('UpdateEmployee') + `?id=${obj.employeeId}`;
     return this.http
       .put<IApiResponse>(queryUrl, obj)
-      .pipe(tap(() => this.invalidateEmployees()));
+      .pipe(tap((res) => this.afterEmployeeSaved(res)));
   }
 
   deleteEmpById(id: number): Observable<IApiResponse> {
     const queryUrl = this.getProxyUrl('DeleteEmployee') + `?id=${id}`;
     return this.http
       .delete<IApiResponse>(queryUrl)
-      .pipe(tap(() => this.invalidateEmployees()));
+      .pipe(
+        tap(() =>
+          this.invalidate('employee', {
+            employees: (list) => removeBy(list, 'employeeId', id),
+            assignments: (list) => removeBy(list, 'empId', id),
+          })
+        )
+      );
   }
 
   saveProject(obj: IProject): Observable<IProject> {
@@ -275,23 +243,7 @@ export class MasterService {
   }
 
   getAllProjects(): Observable<IProject[]> {
-    return this.getCached(
-      () => this.projectsCache$,
-      (value) => {
-        this.projectsCache$ = value;
-      },
-      () => this.projectsCacheAt,
-      (value) => {
-        this.projectsCacheAt = value;
-      },
-      (value) => {
-        this.projectsSnapshot = value;
-      },
-      () =>
-        this.http
-          .get<IProject[]>(this.getProxyUrl('GetAllProjects'))
-          .pipe(shareReplay({ bufferSize: 1, refCount: false }))
-    );
+    return this.getCached('projects');
   }
 
   getProjectById(id: number): Observable<IProject> {
@@ -351,7 +303,10 @@ export class MasterService {
     const queryUrl = this.getProxyUrl('DeleteProject') + `?id=${id}`;
     return this.http.delete<IApiResponse>(queryUrl).pipe(
       tap(() => {
-        this.invalidateProjects();
+        this.invalidate('project', {
+          projects: (list) => removeBy(list, 'projectId', id),
+          assignments: (list) => removeBy(list, 'projectId', id),
+        });
         this.projectDetailSnapshots.delete(id);
       })
     );
@@ -432,29 +387,13 @@ export class MasterService {
   }
 
   getProjectEmp(): Observable<IProjectEmployee[]> {
-    return this.getCached(
-      () => this.projectEmployeesCache$,
-      (value) => {
-        this.projectEmployeesCache$ = value;
-      },
-      () => this.projectEmployeesCacheAt,
-      (value) => {
-        this.projectEmployeesCacheAt = value;
-      },
-      (value) => {
-        this.projectEmployeesSnapshot = value;
-      },
-      () =>
-        this.http
-          .get<IProjectEmployee[]>(this.getProxyUrl('GetAllProjectEmployees'))
-          .pipe(shareReplay({ bufferSize: 1, refCount: false }))
-    );
+    return this.getCached('assignments');
   }
 
-  saveProjectEmp(obj: IProjectEmployee): Observable<IProject> {
+  saveProjectEmp(obj: Partial<IProjectEmployee>): Observable<IProjectEmployee> {
     return this.http
-      .post<IProject>(this.getProxyUrl('CreateProjectEmployee'), obj)
-      .pipe(tap(() => this.invalidateProjectEmployees()));
+      .post<IProjectEmployee>(this.getProxyUrl('CreateProjectEmployee'), obj)
+      .pipe(tap((saved) => this.afterAssignmentSaved(saved)));
   }
 
   updateProjectEmp(obj: IProjectEmployee): Observable<IProjectEmployee> {
@@ -462,54 +401,28 @@ export class MasterService {
       this.getProxyUrl('UpdateProjectEmployee') + `?id=${obj.empProjectId}`;
     return this.http
       .put<IProjectEmployee>(queryUrl, obj)
-      .pipe(tap(() => this.invalidateProjectEmployees()));
+      .pipe(tap((saved) => this.afterAssignmentSaved(saved)));
   }
 
   deleteProjectEmpById(id: number): Observable<IApiResponse> {
     const queryUrl = this.getProxyUrl('DeleteProjectEmployee') + `?id=${id}`;
     return this.http
       .delete<IApiResponse>(queryUrl)
-      .pipe(tap(() => this.invalidateProjectEmployees()));
+      .pipe(
+        tap(() =>
+          this.invalidate('assignment', {
+            assignments: (list) => removeBy(list, 'empProjectId', id),
+          })
+        )
+      );
   }
 
   getDashboardData(): Observable<any> {
-    return this.getCached(
-      () => this.dashboardCache$,
-      (value) => {
-        this.dashboardCache$ = value;
-      },
-      () => this.dashboardCacheAt,
-      (value) => {
-        this.dashboardCacheAt = value;
-      },
-      (value) => {
-        this.dashboardSnapshot = value;
-      },
-      () =>
-        this.http
-          .get<any>(this.getProxyUrl('GetDashboard'))
-          .pipe(shareReplay({ bufferSize: 1, refCount: false }))
-    );
+    return this.getCached('dashboard');
   }
 
   getScheduleData(): Observable<any> {
-    return this.getCached(
-      () => this.scheduleCache$,
-      (value) => {
-        this.scheduleCache$ = value;
-      },
-      () => this.scheduleCacheAt,
-      (value) => {
-        this.scheduleCacheAt = value;
-      },
-      (value) => {
-        this.scheduleSnapshot = value;
-      },
-      () =>
-        this.http
-          .get<any>(this.getProxyUrl('GetSchedule'))
-          .pipe(shareReplay({ bufferSize: 1, refCount: false }))
-    );
+    return this.getCached('schedule');
   }
 
   peekApiDocumentation(): IApiDocumentation | null {
@@ -551,28 +464,88 @@ export class MasterService {
       );
   }
 
-  private getCached<T>(
-    getCache: () => Observable<T> | null,
-    setCache: (value: Observable<T>) => void,
-    getCacheAt: () => number,
-    setCacheAt: (value: number) => void,
-    setSnapshot: (value: T) => void,
-    factory: () => Observable<T>
-  ): Observable<T> {
-    const now = Date.now();
-    const cached = getCache();
-    if (cached && now - getCacheAt() < this.cacheTtlMs) {
-      return cached;
+  getNotificationLog(limit = 20): Observable<INotificationLogEntry[]> {
+    return this.http.get<INotificationLogEntry[]>(
+      this.getProxyUrl('GetNotificationLog'),
+      { params: new HttpParams().set('limit', limit) }
+    );
+  }
+
+  getNotificationFailures(since: string): Observable<INotificationLogEntry[]> {
+    return this.http.get<INotificationLogEntry[]>(
+      this.getProxyUrl('GetNotificationFailures'),
+      { params: new HttpParams().set('since', since) }
+    );
+  }
+
+  /**
+   * 30 s TTL measured from issue time, so concurrent callers share one request.
+   * A response issued before an invalidation is discarded and refetched, so
+   * neither the snapshot nor subscribers ever see pre-mutation data.
+   */
+  private getCached<K extends ListCacheKey>(
+    key: K
+  ): Observable<ListCacheTypes[K]> {
+    const entry = this.lists[key] as ListCacheEntry<ListCacheTypes[K]>;
+    if (entry.request$ && Date.now() - entry.at < this.cacheTtlMs) {
+      return entry.request$;
     }
 
-    const nextCache = factory().pipe(
-      tap((value) => {
-        setCacheAt(Date.now());
-        setSnapshot(value);
-      })
+    const generation = entry.generation;
+    const request$: Observable<ListCacheTypes[K]> = this.http
+      .get<ListCacheTypes[K]>(this.getProxyUrl(LIST_ENDPOINTS[key]))
+      .pipe(
+        tap({
+          next: (value) => {
+            if (entry.generation === generation) {
+              entry.snapshot = value;
+            }
+          },
+          error: () => {
+            if (entry.request$ === request$) {
+              entry.request$ = null;
+              entry.at = 0;
+            }
+          },
+        }),
+        switchMap((value) =>
+          entry.generation === generation ? of(value) : this.getCached(key)
+        ),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+    entry.request$ = request$;
+    entry.at = Date.now();
+    return request$;
+  }
+
+  private resetList<K extends ListCacheKey>(
+    key: K,
+    patch?: (snapshot: ListCacheTypes[K]) => ListCacheTypes[K]
+  ): void {
+    const entry = this.lists[key] as ListCacheEntry<ListCacheTypes[K]>;
+    entry.request$ = null;
+    entry.at = 0;
+    entry.snapshot = patch && entry.snapshot ? patch(entry.snapshot) : null;
+    entry.generation += 1;
+  }
+
+  private afterEmployeeSaved(res: IApiResponse): void {
+    const saved = res?.data as Employee | undefined;
+    this.invalidate(
+      'employee',
+      saved?.employeeId
+        ? { employees: (list) => upsertBy(list, 'employeeId', saved) }
+        : {}
     );
-    setCache(nextCache);
-    return nextCache;
+  }
+
+  private afterAssignmentSaved(saved: IProjectEmployee | null | undefined): void {
+    this.invalidate(
+      'assignment',
+      saved?.empProjectId
+        ? { assignments: (list) => upsertBy(list, 'empProjectId', saved) }
+        : {}
+    );
   }
 
   /** Every project mutation returns the full document: refresh lists + seed the detail snapshot. */
@@ -581,7 +554,12 @@ export class MasterService {
   ): Observable<IProject> {
     return request$.pipe(
       tap((project) => {
-        this.invalidateProjects();
+        this.invalidate(
+          'project',
+          project?.projectId
+            ? { projects: (list) => upsertBy(list, 'projectId', project) }
+            : {}
+        );
         this.rememberProject(project);
       })
     );

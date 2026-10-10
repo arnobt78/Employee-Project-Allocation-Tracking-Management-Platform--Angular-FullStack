@@ -41,6 +41,8 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Observable, startWith } from 'rxjs';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
+import { ActionButtonComponent } from '@/app/components/ui/action-button.component';
+import { MutationTracker, PendingSet } from '@/app/lib/mutation-tracker';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 import {
   SelectMenuComponent,
@@ -61,6 +63,24 @@ import {
 } from '@/app/constants/project-detail';
 
 const readinessTaskDefinitions = READINESS_TASK_DEFINITIONS;
+
+type ApprovalAction = 'request' | 'approve' | 'reject' | 'reset';
+
+const APPROVAL_PENDING_LABELS: Record<ApprovalAction, string> = {
+  request: 'Requesting…',
+  approve: 'Approving…',
+  reject: 'Rejecting…',
+  reset: 'Resetting…',
+};
+
+const PENDING = {
+  save: 'save',
+  delete: 'delete',
+  assign: 'assign',
+  comment: 'comment',
+  approval: (action: ApprovalAction) => `approval:${action}`,
+  resolve: (commentId: string) => `resolve:${commentId}`,
+} as const;
 
 type ReadinessTaskDefinition = (typeof readinessTaskDefinitions)[number];
 type ReadinessTaskId = ReadinessTaskDefinition['id'];
@@ -126,6 +146,7 @@ const REVIEWER_SEVERITIES = [
     UbButtonDirective,
     SelectMenuComponent,
     AlertDialogComponent,
+    ActionButtonComponent,
     PageHeaderComponent,
     ProjectDetailSkeletonComponent,
     ProjectHeaderMetaComponent,
@@ -138,6 +159,7 @@ export class ProjectFormComponent implements OnInit {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
   private readonly toast = inject(ToastService);
+  private readonly mutations = inject(MutationTracker);
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly employeesSignal = signal<Employee[]>([]);
@@ -316,14 +338,22 @@ export class ProjectFormComponent implements OnInit {
   readonly canResetApproval = computed(() =>
     ['approved', 'rejected'].includes(this.approvalStatus())
   );
-  readonly approvalProcessing = signal<boolean>(false);
-  readonly reviewerCommentProcessing = signal<boolean>(false);
+  readonly pending = new PendingSet<string>();
+  readonly approvalPendingLabels = APPROVAL_PENDING_LABELS;
+  readonly approvalProcessing = computed(() =>
+    this.pending.some((key) => key.startsWith('approval:'))
+  );
+  readonly reviewerCommentProcessing = computed(() =>
+    this.pending.some((key) => key === PENDING.comment || key.startsWith('resolve:'))
+  );
 
   private readonly collaboratorAssignmentProfileSignal =
     signal<IResourceProfile | null>(null);
   readonly collaboratorAssignmentProfile =
     this.collaboratorAssignmentProfileSignal.asReadonly();
-  readonly collaboratorAssignmentProcessing = signal<boolean>(false);
+  readonly collaboratorAssignmentProcessing = computed(() =>
+    this.pending.has(PENDING.assign)
+  );
   readonly collaboratorAssignmentForm = this.fb.group({
     role: this.fb.control<string>('', { nonNullable: true }),
     allocationPct: this.fb.control<number | null>(25, [
@@ -359,8 +389,8 @@ export class ProjectFormComponent implements OnInit {
 
   readonly expandedSection = signal<SectionId | null>('overview');
   readonly editingSection = signal<SectionId | null>('overview');
-  readonly isSaving = signal<boolean>(false);
-  readonly isDeleting = signal<boolean>(false);
+  readonly isSaving = computed(() => this.pending.has(PENDING.save));
+  readonly isDeleting = computed(() => this.pending.has(PENDING.delete));
   readonly pendingDelete = signal<boolean>(false);
 
   readonly progress = computed(() => {
@@ -537,31 +567,27 @@ export class ProjectFormComponent implements OnInit {
       readinessScore: readinessChecklist.percent,
       overview: this.buildOverviewPayload(),
       cmsContentRefs: this.cmsReferencesSignal() };
-    this.isSaving.set(true);
-
     const isCreate = !payload.projectId;
     const request$ = isCreate
-      ? this.masterService.saveProject(payload as any)
+      ? this.masterService.saveProject(payload)
       : this.masterService.updateProject(payload);
 
-    request$.subscribe({
-      next: (res) => {
-        this.isSaving.set(false);
+    this.mutations.track(request$, {
+      pending: this.pending,
+      destroyRef: this.destroyRef,
+      key: PENDING.save,
+      onSuccess: (res) => {
         this.applyMutationResult(res, { loadInsights: !isCreate });
         if (res.projectId && res.projectId > 0) {
           this.router.navigate(['/update-project', res.projectId], {
             replaceUrl: true });
         }
-        if (onSuccess) {
-          onSuccess();
-        }
+        onSuccess?.();
       },
-      error: () => {
-        this.isSaving.set(false);
-        this.toast.error({
-          title: 'Save failed',
-          description: 'Unable to persist changes right now. Try again later.' });
-      } });
+      errorToast: {
+        title: 'Save failed',
+        description: 'Unable to persist changes right now. Try again later.' },
+    });
   }
 
   requestDelete() {
@@ -573,28 +599,26 @@ export class ProjectFormComponent implements OnInit {
 
   confirmDelete() {
     const projectId = this.projectForm.controls['projectId'].value;
-    if (!projectId || this.isDeleting()) {
+    if (!projectId) {
       return;
     }
-    this.isDeleting.set(true);
-    this.masterService.deleteProjectById(projectId).subscribe({
-      next: () => {
-        this.isDeleting.set(false);
+    this.mutations.track(this.masterService.deleteProjectById(projectId), {
+      pending: this.pending,
+      destroyRef: this.destroyRef,
+      key: PENDING.delete,
+      onSuccess: () => {
         this.pendingDelete.set(false);
-        this.toast.success({
-          title: 'Project removed',
-          description: 'The project has been archived successfully.',
-        });
         this.resetReadinessForm();
         this.resourceInsightsSignal.set(null);
         this.router.navigate(['/projects']);
       },
-      error: () => {
-        this.isDeleting.set(false);
-        this.toast.error({
-          title: 'Delete failed',
-          description: 'Unable to archive the project currently.',
-        });
+      successToast: {
+        title: 'Project removed',
+        description: 'The project has been archived successfully.',
+      },
+      errorToast: {
+        title: 'Delete failed',
+        description: 'Unable to archive the project currently.',
       },
     });
   }
@@ -797,28 +821,29 @@ export class ProjectFormComponent implements OnInit {
       assignedDate: value.assignedDate,
       isActive: 'Y' };
 
-    this.collaboratorAssignmentProcessing.set(true);
-    this.masterService.saveProjectEmp(payload as any).subscribe({
-      next: () => {
-        this.collaboratorAssignmentProcessing.set(false);
-        this.toast.success({
-          title: 'Contributor added',
-          description: `${profile.employeeName} has been assigned to the project.` });
+    this.mutations.track(this.masterService.saveProjectEmp(payload), {
+      pending: this.pending,
+      destroyRef: this.destroyRef,
+      key: PENDING.assign,
+      onSuccess: () => {
         this.cancelCollaboratorAssignment();
         this.refreshProjectSnapshot(project.projectId);
         this.loadResourceInsights(project.projectId);
       },
-      error: (error) => {
-        this.collaboratorAssignmentProcessing.set(false);
-        this.toast.error({
-          title: 'Assignment failed',
-          description:
-            'Unable to create the assignment right now. Please try again.' });
+      onError: (error) => {
         console.error('[Resource] collaborator assignment failed', {
           projectId: project.projectId,
           empId: profile.employeeId,
           error });
-      } });
+      },
+      successToast: {
+        title: 'Contributor added',
+        description: `${profile.employeeName} has been assigned to the project.` },
+      errorToast: {
+        title: 'Assignment failed',
+        description:
+          'Unable to create the assignment right now. Please try again.' },
+    });
   }
 
   toggleContentfulPanel() {
@@ -1114,12 +1139,13 @@ export class ProjectFormComponent implements OnInit {
     }
 
     const payload = this.reviewerCommentForm.getRawValue();
-    this.reviewerCommentProcessing.set(true);
-    this.masterService
-      .addReviewerComment(project.projectId, payload)
-      .subscribe({
-        next: (updatedProject) => {
-          this.reviewerCommentProcessing.set(false);
+    this.mutations.track(
+      this.masterService.addReviewerComment(project.projectId, payload),
+      {
+        pending: this.pending,
+        destroyRef: this.destroyRef,
+        key: PENDING.comment,
+        onSuccess: (updatedProject) => {
           this.applyMutationResult(updatedProject);
           this.reviewerCommentForm.reset(
             {
@@ -1134,19 +1160,20 @@ export class ProjectFormComponent implements OnInit {
             control.markAsUntouched()
           );
           this.reviewerCommentForm.markAsPristine();
-          this.toast.success({
-            title: 'Comment added',
-            description: 'Reviewer feedback has been logged.' });
         },
-        error: () => {
-          this.reviewerCommentProcessing.set(false);
-          this.toast.error({
-            title: 'Action failed',
-            description: 'Unable to add reviewer comment right now.' });
+        onError: () => {
           console.error('[Approval] add reviewer comment failed', {
             projectId: project.projectId,
             payload });
-        } });
+        },
+        successToast: {
+          title: 'Comment added',
+          description: 'Reviewer feedback has been logged.' },
+        errorToast: {
+          title: 'Action failed',
+          description: 'Unable to add reviewer comment right now.' },
+      }
+    );
   }
 
   toggleReviewerCommentResolved(comment: IReviewerCommentEntry) {
@@ -1155,34 +1182,27 @@ export class ProjectFormComponent implements OnInit {
       return;
     }
 
-    this.reviewerCommentProcessing.set(true);
     const payload = {
       resolved: !comment.resolved,
       ...this.buildApprovalPayload() };
-    this.masterService
-      .resolveReviewerComment(project.projectId, comment.id, payload)
-      .subscribe({
-        next: (updatedProject) => {
-          this.reviewerCommentProcessing.set(false);
-          this.applyMutationResult(updatedProject);
-          const message = comment.resolved
-            ? 'Comment reopened'
-            : 'Comment resolved';
-          this.toast.success({
-            title: message,
-            description: 'Reviewer comment state has been updated.' });
-        },
-        error: () => {
-          this.reviewerCommentProcessing.set(false);
-          this.toast.error({
-            title: 'Action failed',
-            description: 'Unable to update reviewer comment right now.' });
-        } });
+    this.mutations.track(
+      this.masterService.resolveReviewerComment(project.projectId, comment.id, payload),
+      {
+        pending: this.pending,
+        destroyRef: this.destroyRef,
+        key: PENDING.resolve(comment.id),
+        onSuccess: (updatedProject) => this.applyMutationResult(updatedProject),
+        successToast: {
+          title: comment.resolved ? 'Comment reopened' : 'Comment resolved',
+          description: 'Reviewer comment state has been updated.' },
+        errorToast: {
+          title: 'Action failed',
+          description: 'Unable to update reviewer comment right now.' },
+      }
+    );
   }
 
-  private performApprovalAction(
-    action: 'request' | 'approve' | 'reject' | 'reset'
-  ) {
+  private performApprovalAction(action: ApprovalAction) {
     const project = this.currentProjectSignal();
     if (!project?.projectId) {
       this.toast.error({
@@ -1199,7 +1219,9 @@ export class ProjectFormComponent implements OnInit {
       return;
     }
 
-    this.approvalProcessing.set(true);
+    if (this.approvalProcessing()) {
+      return;
+    }
     let request$: Observable<IProject>;
     let successTitle = '';
     switch (action) {
@@ -1229,35 +1251,35 @@ export class ProjectFormComponent implements OnInit {
         successTitle = 'Approval reset';
         break;
       default:
-        this.approvalProcessing.set(false);
         return;
     }
 
-    request$.subscribe({
-      next: (updatedProject) => {
-        this.approvalProcessing.set(false);
-        const snapshot = this.cloneProject(updatedProject);
-        this.applyMutationResult(snapshot);
+    this.mutations.track(request$, {
+      pending: this.pending,
+      destroyRef: this.destroyRef,
+      key: PENDING.approval(action),
+      onSuccess: (updatedProject) => {
+        this.applyMutationResult(this.cloneProject(updatedProject));
         this.approvalForm.patchValue({ comment: '' }, { emitEvent: false });
         if (action === 'reset') {
           this.approvalForm.patchValue({ actorName: '' }, { emitEvent: false });
         }
-        this.toast.success({
-          title: successTitle,
-          description: `Status is now ${this.approvalStatusLabel(
-            snapshot.approvalStatus
-          )}.` });
       },
-      error: () => {
-        this.approvalProcessing.set(false);
-        this.toast.error({
-          title: 'Approval update failed',
-          description: 'Unable to update approval status right now.' });
+      onError: () => {
         console.error('[Approval] approval action failed', {
           action,
           projectId: project.projectId,
           payload });
-      } });
+      },
+      successToast: (updatedProject) => ({
+        title: successTitle,
+        description: `Status is now ${this.approvalStatusLabel(
+          updatedProject.approvalStatus
+        )}.` }),
+      errorToast: {
+        title: 'Approval update failed',
+        description: 'Unable to update approval status right now.' },
+    });
   }
 
   private buildApprovalPayload() {

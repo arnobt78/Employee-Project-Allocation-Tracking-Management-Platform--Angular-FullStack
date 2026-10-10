@@ -1,4 +1,11 @@
-import { Component, computed, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import {
@@ -26,6 +33,8 @@ export interface ICalendarEvent {
   status?: string;
 }
 
+const COLLAPSE_DELAY_MS = 200;
+
 interface ICalendarEventDay extends ICalendarDay {
   events: ICalendarEvent[];
 }
@@ -38,6 +47,12 @@ interface ICalendarEventDay extends ICalendarDay {
 })
 export class CalendarViewComponent {
   readonly events = input<ICalendarEvent[]>([]);
+
+  private collapseTimer: ReturnType<typeof setTimeout> | null = null;
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.cancelCollapse());
+  }
 
   readonly currentDateSignal = signal(new Date());
   readonly currentDate = this.currentDateSignal.asReadonly();
@@ -64,18 +79,35 @@ export class CalendarViewComponent {
   }
 
   toggleDateExpansion(date: Date): void {
+    this.cancelCollapse();
     this.expandedDateSignal.set(this.isDateExpanded(date) ? null : date);
   }
 
-  onMoreMouseEnter(date: Date): void {
+  /** Hover-expand for mouse only: on touch the emulated hover would race the tap's toggle. */
+  onMorePointerEnter(event: PointerEvent, date: Date): void {
+    if (event.pointerType !== 'mouse') {
+      return;
+    }
+    this.cancelCollapse();
     this.expandedDateSignal.set(date);
   }
 
+  /** Delay lets the pointer move onto the expanded list without closing it. */
   onMoreMouseLeave(): void {
-    // Small delay before collapsing to allow moving to expanded content
-    setTimeout(() => {
-      this.expandedDateSignal.set(null);
-    }, 200);
+    this.cancelCollapse();
+    this.collapseTimer = setTimeout(() => this.collapse(), COLLAPSE_DELAY_MS);
+  }
+
+  cancelCollapse(): void {
+    if (this.collapseTimer !== null) {
+      clearTimeout(this.collapseTimer);
+      this.collapseTimer = null;
+    }
+  }
+
+  collapse(): void {
+    this.cancelCollapse();
+    this.expandedDateSignal.set(null);
   }
 
   getEventsForDate(date: Date): ICalendarEvent[] {
@@ -92,20 +124,23 @@ export class CalendarViewComponent {
   }
 
   previousMonth(): void {
-    const current = this.currentDateSignal();
-    this.currentDateSignal.set(
-      new Date(current.getFullYear(), current.getMonth() - 1, 1),
-    );
+    this.shiftMonth(-1);
   }
 
   nextMonth(): void {
-    const current = this.currentDateSignal();
-    this.currentDateSignal.set(
-      new Date(current.getFullYear(), current.getMonth() + 1, 1),
-    );
+    this.shiftMonth(1);
   }
 
   goToToday(): void {
+    this.collapse();
     this.currentDateSignal.set(new Date());
+  }
+
+  private shiftMonth(delta: number): void {
+    this.collapse();
+    const current = this.currentDateSignal();
+    this.currentDateSignal.set(
+      new Date(current.getFullYear(), current.getMonth() + delta, 1),
+    );
   }
 }

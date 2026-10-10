@@ -77,7 +77,7 @@ export function buildCalendarDays(year: number, month: number): ICalendarDay[] {
 }
 
 export function calendarDayCellTone(day: ICalendarDay): string {
-  if (!day.isCurrentMonth) return 'border-white/5 bg-white/2';
+  if (!day.isCurrentMonth) return 'border-white/5 bg-white/[0.02]';
   return isSameDay(day.date, new Date())
     ? 'border-primary bg-primary/10'
     : 'border-white/10 bg-white/5';

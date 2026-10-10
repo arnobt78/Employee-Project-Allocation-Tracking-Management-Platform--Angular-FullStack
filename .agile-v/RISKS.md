@@ -18,7 +18,11 @@
 | RISK-0014 | Private shell shown before session fails could briefly flash chrome then redirect to login | Medium | Possible after TASK-0022 | REQ-0114 | Instant shell accepted: nav+placeholder paint early; child routes + API still guarded | Accepted (UX) |
 | RISK-0015 | Mirror skeletons drift from live layout as pages evolve, reintroducing a visible second layer | Medium | Likely over time | REQ-0132–0133 | One shared mirror component per page used by placeholder + page; spec asserts placeholder kind ↔ page skeleton test id | Mitigated |
 | RISK-0016 | API Status `setInterval` never cleared — polling continues after leaving the page and stacks on each revisit | Medium | Confirmed (code inspection) | REQ-0135 | Clear timer via `DestroyRef` on destroy | Mitigated |
-| RISK-0017 | Background email failures (Resend + SMTP both down) are only logged, not surfaced to the user | Low | Possible | — | `waitUntil` + `[Notification]` logs; mutation already persisted | Accepted (DEC-0031) |
+| RISK-0017 | Background email failures (Resend + SMTP both down) are only logged, not surfaced to the user | Low | Possible | REQ-0140 | `NotificationLog` + failure toast + API Status deliveries panel (DEC-0035) | Mitigated |
+| RISK-0018 | `NotificationLog` grows without bound (no TTL/retention) | Low | Likely over time | REQ-0140 | Indexed by `createdAt`; add a TTL index or periodic prune if volume grows | Open |
+| RISK-0019 | Failure toast relies on client/server clocks within 10 s; larger skew can miss a failure toast (API Status panel still shows it) | Low | Possible | REQ-0140 | `CLOCK_SKEW_MS` tolerance; panel as fallback | Accepted |
+| RISK-0020 | Project/employee deletes use Prisma `$transaction`, which requires a MongoDB replica set | Medium | Possible on DB change | REQ-0138 | Current DB is a replica set; keep it a replica set when migrating | Accepted (watch) |
+| RISK-0021 | Assignment API responses include `employeeEmail` (pre-existing exposure to signed-in users) | Low | Confirmed | — | Auth-only API; revisit if roles are added | Accepted |
 
 ## Notes
 

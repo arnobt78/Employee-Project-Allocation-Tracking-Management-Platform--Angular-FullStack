@@ -123,6 +123,7 @@ export function resolvePrivatePageMeta(url: string): PrivatePageMeta {
   if (PRIVATE_PAGE_META[path]) {
     return PRIVATE_PAGE_META[path];
   }
+  // `new-project/:id` redirects to `update-project/:id`, so both paint the edit mirror.
   if (path.startsWith('/update-project/') || path.startsWith('/new-project/')) {
     return PRIVATE_PAGE_META['/update-project'];
   }

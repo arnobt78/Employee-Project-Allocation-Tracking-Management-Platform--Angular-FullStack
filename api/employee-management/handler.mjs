@@ -27,6 +27,7 @@ import {
   fetchContentfulBrief,
   generateOverviewDraft,
   getProjectStakeholderEmails,
+  resolveStakeholderEmails,
 } from "./repository.mjs";
 import {
   sendNotification,
@@ -34,8 +35,13 @@ import {
 } from "./notifications.mjs";
 import { prisma } from "../_lib/prisma-client.mjs";
 import { logRequest } from "./monitoring.mjs";
+import {
+  listNotificationFailures,
+  listNotificationLog,
+} from "./notification-log.mjs";
 import { parseLoginCredentials } from "../_lib/validation/auth.schema.mjs";
 import { captureApiException } from "../_lib/sentry/server.mjs";
+import { logTiming, timed } from "../_lib/timing.mjs";
 import {
   authenticateUser,
   clearLoginAttempts,
@@ -76,13 +82,15 @@ function createApiResponse(result, message, data = null) {
  * On Vercel, waitUntil keeps the function alive until the email settles;
  * locally it is a no-op and the long-lived dev server finishes the promise.
  */
-function notifyInBackground(notification) {
+function notifyInBackground(task) {
   waitUntil(
-    notification.catch((error) => {
-      console.error("[Notification] Background delivery failed", {
-        error: error?.message,
-      });
-    })
+    Promise.resolve()
+      .then(task)
+      .catch((error) => {
+        console.error("[Notification] Background delivery failed", {
+          error: error?.message,
+        });
+      })
   );
 }
 
@@ -143,7 +151,7 @@ async function notifyApprovalChange(project, action) {
       metadata: {
         projectId: project.projectId,
         projectName: project.projectName,
-        action,
+        action: `approval_${action}`,
       },
     });
   } catch (error) {
@@ -2011,6 +2019,44 @@ function buildApiDocumentation(request) {
           },
           category: "Schedule",
         },
+        {
+          path: "GetNotificationLog",
+          method: "GET",
+          description: "Recent email delivery outcomes (newest first)",
+          url: `${baseUrl}/GetNotificationLog?limit=20`,
+          parameters: [
+            {
+              name: "limit",
+              type: "number",
+              required: false,
+              description: "Maximum entries to return (default 20, max 100)",
+            },
+          ],
+          response: {
+            status: 200,
+            body: "NotificationLogEntry[]",
+          },
+          category: "Monitoring",
+        },
+        {
+          path: "GetNotificationFailures",
+          method: "GET",
+          description: "Failed email deliveries recorded after a timestamp",
+          url: `${baseUrl}/GetNotificationFailures?since={iso}`,
+          parameters: [
+            {
+              name: "since",
+              type: "string",
+              required: false,
+              description: "ISO timestamp; defaults to the last 5 minutes",
+            },
+          ],
+          response: {
+            status: 200,
+            body: "NotificationLogEntry[]",
+          },
+          category: "Monitoring",
+        },
       ],
       POST: [
         {
@@ -2490,7 +2536,7 @@ export async function handleEmployeeManagementRequest(request, response) {
   let error = null;
 
   if (!isPublicAction(method, action)) {
-    const session = await requireAuth(request, response);
+    const session = await timed("auth", () => requireAuth(request, response));
     if (!session) {
       statusCodeRef.value = 401;
       if (action !== "GetApiStatus") {
@@ -2684,6 +2730,16 @@ export async function handleEmployeeManagementRequest(request, response) {
           return sendJson(response, 200, status, statusCodeRef);
         }
 
+        if (action === "GetNotificationLog") {
+          const entries = await listNotificationLog(url.searchParams.get("limit"));
+          return sendJson(response, 200, entries, statusCodeRef);
+        }
+
+        if (action === "GetNotificationFailures") {
+          const failures = await listNotificationFailures(url.searchParams.get("since"));
+          return sendJson(response, 200, failures, statusCodeRef);
+        }
+
         if (action === "GetApiDocumentation") {
           const apiDoc = buildApiDocumentation(request);
           return sendJson(response, 200, apiDoc, statusCodeRef);
@@ -2777,7 +2833,7 @@ export async function handleEmployeeManagementRequest(request, response) {
         if (action === "CreateEmployee") {
           const employee = await createEmployee(body ?? {});
           // Send welcome email notification to the new employee
-          notifyInBackground(notifyEmployeeCreated(employee));
+          notifyInBackground(() => notifyEmployeeCreated(employee));
           return sendJson(
             response,
             201,
@@ -2789,14 +2845,14 @@ export async function handleEmployeeManagementRequest(request, response) {
         if (action === "CreateProject") {
           const project = await createProject(body ?? {});
           // Send email notification for project creation
-          notifyInBackground(notifyProjectCreated(project));
+          notifyInBackground(() => notifyProjectCreated(project));
           return sendJson(response, 201, project, statusCodeRef);
         }
 
         if (action === "CreateProjectEmployee") {
           const projectEmployee = await createProjectEmployee(body ?? {});
           // Send email notification to the assigned employee
-          notifyInBackground(notifyAssignmentCreated(projectEmployee));
+          notifyInBackground(() => notifyAssignmentCreated(projectEmployee));
           return sendJson(response, 201, projectEmployee, statusCodeRef);
         }
 
@@ -2819,7 +2875,7 @@ export async function handleEmployeeManagementRequest(request, response) {
               "request",
               body ?? {}
             );
-            notifyInBackground(notifyApprovalChange(project, "request"));
+            notifyInBackground(() => notifyApprovalChange(project, "request"));
             return sendJson(response, 200, project, statusCodeRef);
           } catch (error) {
             if (error?.message === "Project not found") {
@@ -2850,7 +2906,7 @@ export async function handleEmployeeManagementRequest(request, response) {
               "approve",
               body ?? {}
             );
-            notifyInBackground(notifyApprovalChange(project, "approve"));
+            notifyInBackground(() => notifyApprovalChange(project, "approve"));
             return sendJson(response, 200, project, statusCodeRef);
           } catch (error) {
             if (error?.message === "Project not found") {
@@ -2881,7 +2937,7 @@ export async function handleEmployeeManagementRequest(request, response) {
               "reject",
               body ?? {}
             );
-            notifyInBackground(notifyApprovalChange(project, "reject"));
+            notifyInBackground(() => notifyApprovalChange(project, "reject"));
             return sendJson(response, 200, project, statusCodeRef);
           } catch (error) {
             if (error?.message === "Project not found") {
@@ -2912,7 +2968,7 @@ export async function handleEmployeeManagementRequest(request, response) {
               "reset",
               body ?? {}
             );
-            notifyInBackground(notifyApprovalChange(project, "reset"));
+            notifyInBackground(() => notifyApprovalChange(project, "reset"));
             return sendJson(response, 200, project, statusCodeRef);
           } catch (error) {
             if (error?.message === "Project not found") {
@@ -2943,7 +2999,7 @@ export async function handleEmployeeManagementRequest(request, response) {
           try {
             const project = await addProjectReviewerComment(projectId, body);
             // Send email notification for new reviewer comment
-            notifyInBackground(notifyReviewerComment(project, body));
+            notifyInBackground(() => notifyReviewerComment(project, body));
             return sendJson(response, 200, project, statusCodeRef);
           } catch (error) {
             if (error?.message === "Project not found") {
@@ -3016,7 +3072,7 @@ export async function handleEmployeeManagementRequest(request, response) {
           try {
             const employee = await updateEmployee(employeeId, body ?? {});
             // Send email notification for employee update
-            notifyInBackground(notifyEmployeeUpdated(employee));
+            notifyInBackground(() => notifyEmployeeUpdated(employee));
             return sendJson(
               response,
               200,
@@ -3053,7 +3109,7 @@ export async function handleEmployeeManagementRequest(request, response) {
           try {
             const project = await updateProject(projectId, body ?? {});
             // Send email notification for project update
-            notifyInBackground(notifyProjectUpdated(project));
+            notifyInBackground(() => notifyProjectUpdated(project));
             return sendJson(response, 200, project, statusCodeRef);
           } catch (error) {
             if (error?.code === "P2025") {
@@ -3084,7 +3140,7 @@ export async function handleEmployeeManagementRequest(request, response) {
               body ?? {}
             );
             // Send email notification for assignment update
-            notifyInBackground(notifyAssignmentUpdated(projectEmployee));
+            notifyInBackground(() => notifyAssignmentUpdated(projectEmployee));
             return sendJson(response, 200, projectEmployee, statusCodeRef);
           } catch (error) {
             if (error?.code === "P2025") {
@@ -3116,7 +3172,7 @@ export async function handleEmployeeManagementRequest(request, response) {
           try {
             const deletedEmployee = await deleteEmployee(employeeId);
             // Send email notification for employee deletion
-            notifyInBackground(notifyEmployeeDeleted(deletedEmployee));
+            notifyInBackground(() => notifyEmployeeDeleted(deletedEmployee));
             return sendJson(
               response,
               200,
@@ -3150,16 +3206,13 @@ export async function handleEmployeeManagementRequest(request, response) {
             );
           }
           try {
-            // Fetch stakeholders before deletion for notification
-            let projectRecipients = { to: [], cc: [], bcc: [] };
-            try {
-              projectRecipients = await getProjectStakeholderEmails(projectId);
-            } catch (error) {
-                          }
-
-            const deletedProject = await deleteProject(projectId);
-            // Send email notification for project deletion
-            notifyInBackground(notifyProjectDeleted(deletedProject, projectRecipients));
+            const deleted = await deleteProject(projectId);
+            notifyInBackground(async () =>
+              notifyProjectDeleted(
+                deleted.project,
+                await resolveStakeholderEmails(deleted.stakeholderSource, deleted.assignments)
+              )
+            );
             return sendJson(
               response,
               200,
@@ -3195,7 +3248,7 @@ export async function handleEmployeeManagementRequest(request, response) {
           try {
             const deletedAssignment = await deleteProjectEmployee(empProjectId);
             // Send email notification for assignment deletion
-            notifyInBackground(notifyAssignmentDeleted(deletedAssignment));
+            notifyInBackground(() => notifyAssignmentDeleted(deletedAssignment));
             return sendJson(
               response,
               200,
@@ -3250,6 +3303,7 @@ export async function handleEmployeeManagementRequest(request, response) {
     // Log the request (skip logging for GetApiStatus to avoid recursion)
     if (action !== "GetApiStatus") {
       const responseTime = Date.now() - requestStartTime;
+      logTiming(`${method} ${action || "/"} total`, responseTime);
       logRequest({
         endpoint: action || "unknown",
         method,

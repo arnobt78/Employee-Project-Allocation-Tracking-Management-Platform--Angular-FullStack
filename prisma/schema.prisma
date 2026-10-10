@@ -181,6 +181,21 @@ model Session {
   @@index([expiresAt])
 }
 
+model NotificationLog {
+  id             String   @id @map("_id") @db.ObjectId @default(auto())
+  event          String
+  entityType     String?
+  entityId       Int?
+  status         String
+  provider       String?
+  recipientCount Int      @default(0)
+  error          String?
+  createdAt      DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([status, createdAt])
+}
+
 model ProjectEmployee {
   id               String   @id @map("_id") @db.ObjectId @default(auto())
   empProjectId     Int      @unique

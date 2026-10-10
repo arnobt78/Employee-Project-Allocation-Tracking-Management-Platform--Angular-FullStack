@@ -1,5 +1,14 @@
 # Changelog — Agile V project memory
 
+## 2026-10-10 — GATE-0019 CRUD speed, pending UX, cache cascade, email visibility
+
+- Inline per-button pending states (spinner + "Saving…/Deleting…/Assigning…" etc.) via `MutationTracker`, `PendingSet`, `ehAction`
+- Project/employee delete invalidates assignment caches; in-flight stale list responses refetched
+- Server: native atomic counter, parallel lookups, transactional deletes (CreateProject ~4.2 s → ~1.4 s on remote DB)
+- `NotificationLog` + failure toast + API Status "Recent Email Deliveries"; redacted errors; provider timeouts
+- Calendar "+N more": touch/keyboard fixes
+- lint PASS; unit 95/95; build PASS (initial 921.56 kB); browser A–Z PASS
+
 ## 2026-10-10 — GATE-0018 single-layer skeletons + A–Z verify fixes
 
 - Mirror skeletons for Project detail, API Doc, API Status, Insights, Calendar (shared with route placeholder); `text-stub` primitive

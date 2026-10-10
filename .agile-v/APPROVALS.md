@@ -9,3 +9,4 @@ Append-only human gate records.
 | _none yet_ | GATE-0001 | `c1-gate1-bootstrap-2026-08-24` | — | PENDING | Wave plan Options A/B/C | See GATES.md / TASKS.md — superseded by row below |
 | 2026-09-23 | GATE-0001 | `c1-gate1-bootstrap-2026-08-24` | User (chat) | APPROVED | Option A (security-first) as-built; session auth | Retroactive close — Waves 1+ delivered under user direction; formal row requested 2026-09-23 |
 | 2026-10-10 | GATE-0018 | `c1-gate18-skeleton-parity-2026-10-10` | User (chat) | APPROVED | DEC-0030 single-layer skeletons; background email via `waitUntil` | implement-deep → verify-deep → security → commit-ready |
+| 2026-10-10 | GATE-0019 | `c1-gate19-crud-speed-2026-10-10` | User (chat) | APPROVED | CRUD speed + pending UX + cache cascade + email visibility plan | Plan attached + implement; DEC-0034 deviation recorded |

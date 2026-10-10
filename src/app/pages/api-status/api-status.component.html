@@ -200,6 +200,77 @@
             }
           </div>
         </div>
+
+        <!-- Recent Email Deliveries -->
+        <div data-testid="api-status-deliveries">
+          <h3 class="text-base sm:text-xl font-medium text-white mb-4">
+            {{ copy.deliveries }}
+          </h3>
+          @if (deliveries(); as entries) {
+            @if (entries.length) {
+              <ul class="space-y-2">
+                @for (entry of entries; track entry.id) {
+                  <li
+                    class="rounded-xl border border-white/10 bg-white/5 p-4"
+                    [attr.data-delivery-status]="entry.status"
+                  >
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                      <div class="flex flex-wrap items-center gap-3">
+                        <span
+                          class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium capitalize"
+                          [class]="deliveryStatusClass(entry.status)"
+                        >
+                          {{ entry.status }}
+                        </span>
+                        <span class="text-sm font-medium text-white">
+                          {{ deliveryEventLabel(entry.event) }}
+                        </span>
+                        @if (deliveryEntityLabel(entry); as entity) {
+                          <span class="text-xs sm:text-sm text-white/60">{{ entity }}</span>
+                        }
+                      </div>
+                      <div class="flex items-center gap-4 text-xs sm:text-sm text-white/60">
+                        <span>
+                          {{ entry.recipientCount }}
+                          {{ entry.recipientCount === 1 ? 'recipient' : 'recipients' }}
+                        </span>
+                        @if (entry.provider) {
+                          <span class="uppercase">{{ entry.provider }}</span>
+                        }
+                        <span>{{ formatTimeAgo(entry.createdAt) }}</span>
+                      </div>
+                    </div>
+                    @if (entry.error) {
+                      <p class="mt-2 break-words text-xs text-red-300/90" [title]="entry.error">
+                        {{ entry.error }}
+                      </p>
+                    }
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="text-sm text-white/60">{{ copy.deliveriesEmpty }}</p>
+            }
+          } @else if (deliveriesError()) {
+            <div class="flex items-center justify-between gap-3 rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-200 sm:text-sm">
+              <span>{{ copy.deliveriesFailed }}</span>
+              <button
+                type="button"
+                (click)="loadDeliveries()"
+                [disabled]="deliveriesLoading()"
+                class="rounded-lg border border-amber-400/40 px-3 py-1 transition-colors hover:bg-amber-500/20 disabled:opacity-50"
+              >
+                {{ copy.retry }}
+              </button>
+            </div>
+          } @else {
+            <div class="space-y-2" aria-busy="true">
+              @for (row of deliverySkeletonRows; track row) {
+                <app-delivery-row-skeleton></app-delivery-row-skeleton>
+              }
+            </div>
+          }
+        </div>
       </div>
 
       <!-- Endpoints Tab -->
