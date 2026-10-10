@@ -24,12 +24,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     ? req.clone({ withCredentials: true })
     : req;
 
+  const issuedEpoch = authService.authEpoch;
   return next(request).pipe(
     catchError((error) => {
       if (
         error?.status === 401 &&
         shouldAttachCredentials &&
-        !isPublicApiRequest(req.url)
+        !isPublicApiRequest(req.url) &&
+        authService.authEpoch === issuedEpoch
       ) {
         authService.handleUnauthorized();
       }

@@ -340,3 +340,27 @@ Append-only. Do not rewrite prior entries.
 | Rationale | DEC-0031 moved email off the request path, which hid failures (RISK-0017). Polling a small indexed query avoids new infrastructure (no websockets/queues). Errors are redacted because provider messages can echo recipient addresses. |
 | Linked | GATE-0019, TASK-0065–0066, REQ-0140, RISK-0017 |
 | Status | DONE |
+
+---
+
+## DEC-0036 — Per-instance session cache in front of the opaque session token
+
+| Field | Value |
+|---|---|
+| Date | 2026-10-10 |
+| Decision | Keep HttpOnly opaque-token sessions. Each server instance caches validated sessions (key = SHA-256 of token, 1000 entries, TTL `SESSION_CACHE_TTL_SECONDS` default 30 s capped by session expiry); misses use one `$lookup` aggregate. Logout revokes locally with a 60 s tombstone so a lookup racing the delete cannot re-cache the session; tombstones are dropped when no row was deleted. |
+| Rationale | Prisma `include` cost two round trips (~460 ms) on every request. JWTs would lose server-side revocation. Trade-off: on other warm instances a revoked session stays valid up to the TTL (RISK-0022). |
+| Linked | GATE-0020, TASK-0068–0069, REQ-0141 |
+| Status | DONE |
+
+---
+
+## DEC-0037 — Local-first logout with background keepalive revoke
+
+| Field | Value |
+|---|---|
+| Date | 2026-10-10 |
+| Decision | Log Out clears client session/caches and navigates at once. The revoke is a `fetch` with `keepalive` (bypasses HttpClient; 8 s timeout, 2 retries, error toast on failure). Login waits for a pending revoke so its cookie-clearing response cannot wipe the new cookie. An auth epoch makes the interceptor ignore 401s from requests issued under an ended session; in-flight list reads are dropped (not refetched) after a full cache clear. |
+| Rationale | Waiting on the server showed "Logging Out…" for a round trip. `keepalive` keeps the revoke alive across an immediate reload/close (verified). |
+| Linked | GATE-0020, TASK-0071, REQ-0143, RISK-0023 |
+| Status | DONE |

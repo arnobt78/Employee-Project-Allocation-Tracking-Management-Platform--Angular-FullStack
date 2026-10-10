@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, defer, of, shareReplay, switchMap, tap } from 'rxjs';
+import { EMPTY, Observable, defer, map, of, shareReplay, switchMap, tap } from 'rxjs';
 import {
   IApiResponse,
   IProject,
@@ -28,7 +28,7 @@ interface ListCacheTypes {
   schedule: any;
 }
 
-type ListCacheKey = keyof ListCacheTypes;
+export type ListCacheKey = keyof ListCacheTypes;
 
 interface ListCacheEntry<T> {
   request$: Observable<T> | null;
@@ -66,6 +66,8 @@ type ListPatches = {
   [K in ListCacheKey]?: (snapshot: ListCacheTypes[K]) => ListCacheTypes[K];
 };
 
+const LOGOUT_TIMEOUT_MS = 8000;
+
 const emptyEntry = <T>(): ListCacheEntry<T> => ({
   request$: null,
   at: 0,
@@ -82,6 +84,8 @@ export class MasterService {
   apiUrl: string = '';
 
   private readonly cacheTtlMs = 30_000;
+  /** Bumped on sign-in/out; in-flight list reads from the old session are dropped, not refetched. */
+  private cacheEpoch = 0;
 
   private readonly lists: ListCaches = {
     employees: emptyEntry(),
@@ -113,8 +117,24 @@ export class MasterService {
     );
   }
 
-  logout(): Observable<IApiResponse<null>> {
-    return this.http.post<IApiResponse<null>>(this.getProxyUrl('Logout'), {});
+  /** `keepalive` lets the revoke finish even if the page reloads or closes right after. */
+  logout(): Observable<void> {
+    return defer(() =>
+      fetch(this.getProxyUrl('Logout'), {
+        method: 'POST',
+        credentials: 'include',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+        signal: AbortSignal.timeout(LOGOUT_TIMEOUT_MS),
+      })
+    ).pipe(
+      map((response) => {
+        if (!response.ok) {
+          throw new Error(`Logout failed (${response.status})`);
+        }
+      })
+    );
   }
 
   getSession(): Observable<IApiResponse<AuthUser>> {
@@ -168,7 +188,17 @@ export class MasterService {
     return this.lists.schedule.snapshot;
   }
 
+  /** Loads lists that have never been fetched, so their pages open from cache. */
+  warmLists(keys: readonly ListCacheKey[]): void {
+    for (const key of keys) {
+      if (this.lists[key].snapshot === null) {
+        this.getCached(key).subscribe({ error: () => undefined });
+      }
+    }
+  }
+
   clearAllCaches(): void {
+    this.cacheEpoch += 1;
     (Object.keys(this.lists) as ListCacheKey[]).forEach((key) =>
       this.resetList(key)
     );
@@ -492,6 +522,7 @@ export class MasterService {
     }
 
     const generation = entry.generation;
+    const epoch = this.cacheEpoch;
     const request$: Observable<ListCacheTypes[K]> = this.http
       .get<ListCacheTypes[K]>(this.getProxyUrl(LIST_ENDPOINTS[key]))
       .pipe(
@@ -508,9 +539,12 @@ export class MasterService {
             }
           },
         }),
-        switchMap((value) =>
-          entry.generation === generation ? of(value) : this.getCached(key)
-        ),
+        switchMap((value) => {
+          if (this.cacheEpoch !== epoch) {
+            return EMPTY;
+          }
+          return entry.generation === generation ? of(value) : this.getCached(key);
+        }),
         shareReplay({ bufferSize: 1, refCount: false })
       );
     entry.request$ = request$;

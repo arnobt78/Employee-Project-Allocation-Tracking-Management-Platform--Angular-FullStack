@@ -1,5 +1,35 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-10 — GATE-0020 session caching, idle warm-up, instant logout
+
+**Node:** v24.x
+
+### Commands run
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `npm test -- --watch=false --browsers=ChromeHeadless` | **PASS** | 105/105 (auth service, interceptor epoch, keepalive logout, warm-up, cache clear) |
+| `npx ng build` | **PASS** | Initial 922.92 kB |
+| `node --check` on `api/**/*.mjs` | **PASS** | |
+| Session cache smoke (Node script) | **PASS** | Hit, miss, expiry cap, 1000 cap, disable, blank env, revoke race, forget |
+| Auth timing (curl) | **PASS** | Warm ~1–2 ms; cold ~233 ms (was ~460 ms); first request after login is a hit |
+| CRUD timing (median of 3) | **PASS** | CreateProject 950 ms, CreateProjectEmployee 1162, UpdateProjectEmployee 1178, DeleteProjectEmployee 699, DeleteProject 1150; Employee create/update/delete 0.93/1.18/0.94 s |
+| Browser A–Z (Playwright) | **PASS** | Guard redirect, 9 private routes (no stuck skeletons), soft nav from cache, back/forward, `**` → dashboard, logout → login ~70 ms, logout + immediate reload → `/login` (7/7), fast re-login stays signed in (5/5), offline logout → warning toast |
+| Email deliveries | **PASS** | All CRUD emails `sent` |
+| Independent verifier | **PASS WITH WARNINGS (fixed)** | Stale 401 after fast re-login (epoch guard); junk-token tombstones; logout timeout |
+| Security review | **PASS WITH WARNINGS** | Cross-instance revocation window (RISK-0022, accepted); failed revoke (retry + toast, RISK-0023) |
+
+### Console / network
+
+Final sweep: 0 console errors, 0 failed API calls (guest `Session` 401 on login page excluded, intentional).
+
+### eval_gate_status
+
+N/A (performance + auth UX)
+
+---
+
 ## Session 2026-10-10 — GATE-0019 CRUD speed, pending UX, cache cascade, email visibility
 
 **Node:** v24.x

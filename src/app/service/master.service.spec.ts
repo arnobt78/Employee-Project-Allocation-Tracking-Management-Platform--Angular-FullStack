@@ -32,6 +32,48 @@ describe('MasterService', () => {
     expect(service).toBeTruthy();
   });
 
+  it('sends logout as a keepalive request so it survives a page unload', async () => {
+    const fetchSpy = spyOn(window, 'fetch').and.resolveTo(new Response('{}'));
+
+    await new Promise<void>((resolve) =>
+      service.logout().subscribe({ complete: resolve })
+    );
+
+    const [url, init] = fetchSpy.calls.mostRecent().args as [string, RequestInit];
+    expect(url).toContain('Logout');
+    expect(init).toEqual(
+      jasmine.objectContaining({ method: 'POST', keepalive: true, credentials: 'include' })
+    );
+  });
+
+  it('drops an in-flight list response after caches are cleared, without refetching', () => {
+    const received: IProject[][] = [];
+    service.getAllProjects().subscribe((list) => received.push(list));
+    const request = http.expectOne((req) => req.url.endsWith('GetAllProjects'));
+
+    service.clearAllCaches();
+    request.flush([project]);
+
+    http.expectNone((req) => req.url.endsWith('GetAllProjects'));
+    expect(received).toEqual([]);
+    expect(service.peekProjects()).toBeNull();
+  });
+
+  describe('warmLists', () => {
+    it('fetches only lists that were never loaded and shares in-flight requests', () => {
+      service.getAllProjects().subscribe();
+      http.expectOne((req) => req.url.endsWith('GetAllProjects')).flush([project]);
+
+      service.getAllEmp().subscribe();
+      service.warmLists(['employees', 'projects', 'assignments']);
+
+      http.expectOne((req) => req.url.endsWith('GetAllEmployees')).flush([]);
+      http.expectOne((req) => req.url.endsWith('GetAllProjectEmployees')).flush([]);
+      http.expectNone((req) => req.url.endsWith('GetAllProjects'));
+      expect(service.peekProjectEmployees()).toEqual([]);
+    });
+  });
+
   describe('peekProject', () => {
     it('returns a fresh detail snapshot after a create mutation', () => {
       service.saveProject(project).subscribe();

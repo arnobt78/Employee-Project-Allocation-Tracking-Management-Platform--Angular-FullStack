@@ -151,6 +151,15 @@
 | TASK-0066 | `NotificationMonitorService` failure toast + API Status "Recent Email Deliveries" panel | REQ-0140 | DONE | Coalesced checks at 6/15/30 s |
 | TASK-0067 | Lint/test/build + A–Z browser sweep + verifier + security review; fix findings | REQ-0131 | DONE | 95/95 unit |
 
+## Wave — GATE-0020 session check caching, idle warm-up, instant logout (2026-10-10)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0068 | Shared `api/_lib/mongo-client.mjs`; per-instance session cache (`api/_lib/session-cache.mjs`) + single-aggregate session lookup; login primes cache | REQ-0141 | DONE | Auth ~460 ms → ~1 ms warm / ~233 ms cold |
+| TASK-0069 | Logout revocation: tombstone closes logout-vs-lookup race; junk tokens not retained | REQ-0141 | DONE | DEC-0036 |
+| TASK-0070 | Idle warm-up of Employees/Projects/Project Team lists from `LayoutComponent` | REQ-0142 | DONE | Soft nav served from cache |
+| TASK-0071 | Instant logout: local sign-out + navigate; keepalive revoke with timeout/retry/warning; login waits for pending revoke; stale-401 epoch guard; in-flight reads dropped on cache clear | REQ-0143 | DONE | DEC-0037; logout → login ~70 ms |
+
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)

@@ -1,5 +1,13 @@
 # Changelog — Agile V project memory
 
+## 2026-10-10 — GATE-0020 session caching, idle warm-up, instant logout
+
+- Per-instance session cache + single-query lookup: auth ~460 ms → ~1 ms warm / ~233 ms cold; CRUD ~0.45 s faster
+- Logout revocation tombstone; `SESSION_CACHE_TTL_SECONDS` (default 30)
+- Idle prefetch of Employees/Projects/Project Team lists
+- Instant logout (~70 ms) with keepalive background revoke, retry + warning; stale-401 guard
+- lint PASS; unit 105/105; build PASS (initial 922.92 kB); browser A–Z PASS
+
 ## 2026-10-10 — GATE-0019 CRUD speed, pending UX, cache cascade, email visibility
 
 - Inline per-button pending states (spinner + "Saving…/Deleting…/Assigning…" etc.) via `MutationTracker`, `PendingSet`, `ehAction`

@@ -1,6 +1,6 @@
 import { prisma } from "../_lib/prisma-client.mjs";
 import { getStore } from "./store.mjs";
-import { MongoClient } from "mongodb";
+import { mongoCollection } from "../_lib/mongo-client.mjs";
 import { completeChatWithFallback } from "./ai-providers.mjs";
 import { timed } from "../_lib/timing.mjs";
 
@@ -167,27 +167,6 @@ async function incrementCounter(key, startAt) {
     throw new Error(`Failed to increment counter for key ${key}`);
   }
   return value;
-}
-
-let mongoClientPromise;
-
-/** Native-driver collection handle on a connection reused across invocations. */
-async function mongoCollection(name) {
-  const databaseUrl =
-    process.env.NG_APP_PRISMA_URL ||
-    process.env.NG_APP_MONGODB_URI ||
-    process.env.DATABASE_URL ||
-    process.env.MONGODB_URI;
-  if (!databaseUrl) {
-    throw new Error("DATABASE_URL not found in environment variables");
-  }
-  mongoClientPromise ??= new MongoClient(databaseUrl).connect().catch((error) => {
-    mongoClientPromise = undefined;
-    throw error;
-  });
-  const client = await mongoClientPromise;
-  const dbName = databaseUrl.split("/").pop()?.split("?")[0] || "employee_management_db";
-  return client.db(dbName).collection(name);
 }
 
 async function ensureBootstrapData() {

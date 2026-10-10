@@ -23,6 +23,8 @@
 | RISK-0019 | Failure toast relies on client/server clocks within 10 s; larger skew can miss a failure toast (API Status panel still shows it) | Low | Possible | REQ-0140 | `CLOCK_SKEW_MS` tolerance; panel as fallback | Accepted |
 | RISK-0020 | Project/employee deletes use Prisma `$transaction`, which requires a MongoDB replica set | Medium | Possible on DB change | REQ-0138 | Current DB is a replica set; keep it a replica set when migrating | Accepted (watch) |
 | RISK-0021 | Assignment API responses include `employeeEmail` (pre-existing exposure to signed-in users) | Low | Confirmed | — | Auth-only API; revisit if roles are added | Accepted |
+| RISK-0022 | Session cache is per instance: after logout/deactivation on one instance, a holder of the cookie can still use another warm instance for up to `SESSION_CACHE_TTL_SECONDS` (30 s) | Medium | Possible (needs stolen cookie) | REQ-0141 | Short TTL; immediate on handling instance; set TTL `0` to disable; shared store if stricter revocation is needed | Accepted (DEC-0036) |
+| RISK-0023 | If the background revoke never reaches the server, the HttpOnly cookie stays valid while the UI shows signed out | Low | Possible (offline) | REQ-0143 | `keepalive`, 2 retries, "Sign-out not confirmed" toast | Mitigated |
 
 ## Notes
 

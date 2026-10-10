@@ -72,21 +72,11 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
       <button
         type="button"
         role="menuitem"
-        class="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-rose-200 transition hover:bg-white/10 disabled:opacity-60"
-        [disabled]="loggingOut"
+        class="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-rose-200 transition hover:bg-white/10"
         (click)="onLogout()"
       >
-        @if (loggingOut) {
-          <lucide-icon
-            name="loader-circle"
-            [size]="16"
-            class="animate-spin"
-          ></lucide-icon>
-          <span>Logging Out...</span>
-        } @else {
-          <lucide-icon name="log-out" [size]="16"></lucide-icon>
-          <span>Log Out</span>
-        }
+        <lucide-icon name="log-out" [size]="16"></lucide-icon>
+        <span>Log Out</span>
       </button>
     </div>
   `,
@@ -97,7 +87,6 @@ class ProfileDropdownPanelComponent {
   currentPath = '/';
   primaryItems = PRIMARY_NAVIGATION_ITEMS;
   utilityItems = UTILITY_NAVIGATION_ITEMS;
-  loggingOut = false;
   onNavigate = () => {};
   onLogout = () => {};
 
@@ -141,7 +130,6 @@ export class ProfileDropdownComponent {
 
   readonly isOpen = signal(false);
   private overlayRef: OverlayRef | null = null;
-  private panelRef: ProfileDropdownPanelComponent | null = null;
 
   constructor() {
     this.router.events
@@ -224,7 +212,6 @@ export class ProfileDropdownComponent {
 
     const portal = new ComponentPortal(ProfileDropdownPanelComponent);
     const componentRef = this.overlayRef.attach(portal);
-    this.panelRef = componentRef.instance;
     componentRef.instance.displayName = this.displayName;
     componentRef.instance.subtitle = this.subtitle;
     componentRef.instance.currentPath = resolveBrowserPath(
@@ -248,26 +235,12 @@ export class ProfileDropdownComponent {
   close(): void {
     this.overlayRef?.dispose();
     this.overlayRef = null;
-    this.panelRef = null;
     this.isOpen.set(false);
   }
 
   private logout(): void {
-    if (this.panelRef?.loggingOut) {
-      return;
-    }
-    if (this.panelRef) {
-      this.panelRef.loggingOut = true;
-    }
-    this.authService.logout().subscribe({
-      next: () => {
-        this.close();
-        void this.router.navigateByUrl('/login');
-      },
-      error: () => {
-        this.close();
-        void this.router.navigateByUrl('/login');
-      },
-    });
+    this.authService.logout();
+    this.close();
+    void this.router.navigateByUrl('/login');
   }
 }

@@ -117,6 +117,9 @@ Legend: `BASELINE` = verified as-built behavior · `GAP` = docs/code mismatch or
 | REQ-0137 | Each CRUD action MUST show an inline pending state on its own button (spinner + dynamic label, e.g. "Deleting…") until success or failure; other rows/actions stay usable; duplicate submits are ignored. | DONE | `MutationTracker` / `ehAction`; focus kept via `aria-disabled` |
 | REQ-0138 | Mutations MUST respond as soon as data persists, without serial lookups that can run in parallel. | DONE | Counter ~3 s → ~0.23 s; CreateProject ~4.2 s → ~1.4 s (remote DB) |
 | REQ-0139 | Calendar "+N more" MUST work with mouse, keyboard and touch without flicker or double toggles. | DONE | Mouse-only hover; Escape refocuses toggle |
+| REQ-0141 | Authenticated API requests SHOULD NOT pay a database round trip for the session check when the session was validated recently; logout MUST revoke immediately on the handling instance (other instances within `SESSION_CACHE_TTL_SECONDS`, default 30 s). | DONE | Warm ~1 ms, cold ~233 ms; logout + immediate reload → 401 (4/4) |
+| REQ-0142 | Main nav lists SHOULD be prefetched after first paint when idle so their pages open from cache. | DONE | Project Team opened with 0 API calls |
+| REQ-0143 | Log out MUST return to the login page instantly; server revoke runs in the background, survives page unload, and its failure is surfaced. | DONE | ~70 ms to login; offline → "Sign-out not confirmed" toast |
 | REQ-0140 | Background email failures MUST be recorded and surfaced (toast after mutation + API Status deliveries panel) without delaying the mutation; stored errors MUST NOT contain email addresses. | DONE | `NotificationLog`; redaction smoke test |
 
 ---

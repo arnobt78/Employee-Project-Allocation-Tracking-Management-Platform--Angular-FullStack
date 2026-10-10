@@ -2787,7 +2787,7 @@ export async function handleEmployeeManagementRequest(request, response) {
           }
 
           clearLoginAttempts(request);
-          const token = await createSession(user.id);
+          const token = await createSession(user);
           setSessionCookie(response, token);
           return sendJson(
             response,

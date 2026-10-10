@@ -1,15 +1,22 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0019 CRUD speed + pending UX + email visibility shipped; prod soak next  
-**Gate:** GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **PENDING**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** Committed locally (not pushed). lint PASS, unit 95/95, production build PASS (initial 921.56 kB), A–Z browser sweep PASS.  
+**Phase / Stage:** Stage 4 — GATE-0020 session caching + idle warm-up + instant logout shipped; prod soak next  
+**Gate:** GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **PENDING**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
+**Status:** Committed locally (not pushed). lint PASS, unit 105/105, production build PASS (initial 922.92 kB), A–Z browser sweep PASS.  
 **Updated:** 2026-10-10  
-**resume_token:** `c1-gate19-prod-soak-2026-10-10`
+**resume_token:** `c1-gate20-prod-soak-2026-10-10`
 
 ---
 
 ## Resume Point
+
+**Completed (GATE-0020, TASK-0068–0071):**
+
+- Session check cached per instance (`api/_lib/session-cache.mjs`, DEC-0036): auth ~460 ms → ~1 ms warm / ~233 ms cold; login primes the cache; logout tombstone closes the revoke race. `SESSION_CACHE_TTL_SECONDS` default 30.
+- Shared native Mongo client `api/_lib/mongo-client.mjs` (auth + repository).
+- `LayoutComponent` idle-prefetches Employees/Projects/Project Team lists (`MasterService.warmLists`).
+- Instant logout (DEC-0037): local sign-out + navigate (~70 ms); keepalive revoke with retry/toast; login waits for pending revoke; interceptor ignores 401s from an ended session (auth epoch); in-flight list reads dropped on cache clear.
 
 **Completed (GATE-0019, TASK-0061–0067):**
 
@@ -21,6 +28,8 @@
 
 **Remaining / known (low):**
 
+- Cross-instance revocation window up to 30 s (RISK-0022, accepted).
+- No automated tests for `api/` code (session cache covered by a manual Node smoke script).
 - `NotificationLog` has no retention/TTL (RISK-0018).
 - Prisma `$transaction` deletes need a MongoDB replica set (RISK-0020).
 - Calendar event chips are `div` + `routerLink` (not keyboard-focusable).
@@ -30,14 +39,14 @@
 
 **Blockers:** none. Push/deploy needs human approval (GATE-0002). `prisma db push` already applied to the configured DB (`NotificationLog`).
 
-**Next exact action:** Human pushes + prod soak (mutation latency on Vercel, pending labels, deliveries panel, failure toast). Then CP-0020 project-detail polish guide.
+**Next exact action:** Human pushes + prod soak (auth/CRUD latency on Vercel, instant logout, pending labels, deliveries panel, failure toast). Optionally set `SESSION_CACHE_TTL_SECONDS` in Vercel env. Then CP-0020 project-detail polish guide.
 
 **Resume prompt:**
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
-Resume resume_token c1-gate19-prod-soak-2026-10-10.
-GATE-0019 committed locally. Await push/prod soak feedback, then CP-0020 detail-polish guide.
+Resume resume_token c1-gate20-prod-soak-2026-10-10.
+GATE-0020 committed locally. Await push/prod soak feedback, then CP-0020 detail-polish guide.
 ```
 
 ---

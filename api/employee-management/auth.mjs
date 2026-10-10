@@ -1,7 +1,15 @@
 import { randomBytes } from "node:crypto";
 import { ServerResponse } from "node:http";
 import bcrypt from "bcryptjs";
+import { mongoCollection } from "../_lib/mongo-client.mjs";
 import { prisma } from "../_lib/prisma-client.mjs";
+import {
+  cacheSession,
+  forgetRevocation,
+  getCachedSession,
+  isRevoked,
+  revokeSession,
+} from "../_lib/session-cache.mjs";
 
 export const SESSION_COOKIE_NAME = "eh_session";
 
@@ -73,16 +81,18 @@ export function clearSessionCookie(response) {
   response.setHeader("Set-Cookie", parts.join("; "));
 }
 
-export async function createSession(userId) {
+/** `user` is the public shape returned by `authenticateUser`. */
+export async function createSession(user) {
   const token = randomBytes(32).toString("hex");
   const expiresAt = new Date(Date.now() + getSessionTtlMs());
   await prisma.session.create({
     data: {
       token,
-      userId,
+      userId: user.id,
       expiresAt,
     },
   });
+  cacheSession(token, user, expiresAt);
   return token;
 }
 
@@ -90,7 +100,11 @@ export async function deleteSessionByToken(token) {
   if (!token) {
     return;
   }
-  await prisma.session.deleteMany({ where: { token } });
+  revokeSession(token);
+  const { count } = await prisma.session.deleteMany({ where: { token } });
+  if (count === 0) {
+    forgetRevocation(token);
+  }
 }
 
 export async function getSessionFromRequest(request) {
@@ -100,13 +114,15 @@ export async function getSessionFromRequest(request) {
     return null;
   }
 
-  const session = await prisma.session.findUnique({
-    where: { token },
-    include: {
-      user: true,
-    },
-  });
+  const cachedUser = getCachedSession(token);
+  if (cachedUser) {
+    return { token, user: cachedUser };
+  }
 
+  const session = await findSessionWithUser(token);
+  if (isRevoked(token)) {
+    return null;
+  }
   if (!session || session.expiresAt <= new Date() || !session.user?.isActive) {
     if (session) {
       await prisma.session.deleteMany({ where: { token } });
@@ -114,15 +130,45 @@ export async function getSessionFromRequest(request) {
     return null;
   }
 
-  return {
-    token: session.token,
-    user: {
-      id: session.user.id,
-      username: session.user.username,
-      role: session.user.role,
-      displayName: session.user.displayName,
-    },
+  const user = {
+    id: session.user._id.toString(),
+    username: session.user.username,
+    role: session.user.role,
+    displayName: session.user.displayName,
   };
+  cacheSession(token, user, session.expiresAt);
+  return { token, user };
+}
+
+/** One round trip; Prisma `include` issues a second query for the user. */
+async function findSessionWithUser(token) {
+  const sessions = await mongoCollection("Session");
+  const [session] = await sessions
+    .aggregate([
+      { $match: { token } },
+      { $limit: 1 },
+      { $lookup: { from: "AppUser", localField: "userId", foreignField: "_id", as: "user" } },
+      {
+        $project: {
+          _id: 0,
+          expiresAt: 1,
+          user: {
+            $let: {
+              vars: { found: { $arrayElemAt: ["$user", 0] } },
+              in: {
+                _id: "$$found._id",
+                username: "$$found.username",
+                role: "$$found.role",
+                displayName: "$$found.displayName",
+                isActive: "$$found.isActive",
+              },
+            },
+          },
+        },
+      },
+    ])
+    .toArray();
+  return session ?? null;
 }
 
 export async function authenticateUser(username, password) {
