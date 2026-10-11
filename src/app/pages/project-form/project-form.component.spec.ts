@@ -286,6 +286,42 @@ describe('ProjectFormComponent', () => {
       expect(component.pendingApproval()).toBeNull();
     });
 
+    it('closes the reject dialog if the reason is cleared before confirming', () => {
+      spyOn(master, 'peekProject').and.returnValue({
+        project: { ...project, approvalStatus: 'in_review' },
+        fresh: true,
+      });
+      const reject = spyOn(master, 'rejectProject').and.returnValue(NEVER);
+      create();
+      component.approvalForm.patchValue({ comment: 'Budget too high' });
+      component.rejectProjectAction();
+      component.approvalForm.patchValue({ comment: '' });
+
+      component.confirmApprovalAction();
+      expect(reject).not.toHaveBeenCalled();
+      expect(component.pendingApproval()).toBeNull();
+    });
+
+    it('ignores a save that finishes after switching to another project', () => {
+      spyOn(master, 'peekProject').and.callFake((id: number) => ({
+        project: { ...project, projectId: id, projectName: `Project ${id}` },
+        fresh: true,
+      }));
+      const update$ = new Subject<IProject>();
+      spyOn(master, 'updateProject').and.returnValue(update$);
+      const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
+      create();
+      component.saveAllChanges();
+      component.confirmSave();
+
+      params$.next({ id: '8' });
+      update$.next({ ...project, projectName: 'Late save' });
+
+      expect(component.currentProject()?.projectId).toBe(8);
+      expect(component.currentProject()?.projectName).toBe('Project 8');
+      expect(navigate).not.toHaveBeenCalled();
+    });
+
     it('names each select trigger with its field label', () => {
       spyOn(master, 'peekProject').and.returnValue({ project, fresh: true });
       const el = create();

@@ -3,7 +3,7 @@
 **Cycle:** C1  
 **Phase / Stage:** Stage 4 — GATE-0024 project detail UI consistency shipped; prod soak next  
 **Gate:** GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** GATE-0024 committed locally (not pushed); `origin/main` at `f868ecc`. Node 24.21: lint PASS, API tests 84/84, unit 119/119, production build PASS, browser sweep of `/update-project/5030` PASS.  
+**Status:** GATE-0024 committed locally (not pushed); `origin/main` at `f868ecc`. Node 24.21: lint PASS, API tests 84/84, unit 121/121, production build PASS, A–Z route sweep + live CRUD/approval probe PASS (0 console errors, 0 failed calls).  
 **Updated:** 2026-10-11  
 **resume_token:** `c1-gate24-prod-soak-2026-10-11`
 
@@ -16,7 +16,8 @@
 - Project detail uses the shared primitives: `app-field-label` with Lucide icons (`PROJECT_DETAIL_FIELD_ICONS` / `PROJECT_DETAIL_SECTION_ICONS`) and `*` on required fields; `eh-input` / `eh-textarea` / `eh-read-label` in `styles.css` (every input 44 px, same as `app-select-menu`); every button is `ehAction` + `eh-action-btn` with an icon and pending label.
 - Header: mode badge removed; readiness bar on one line, bottom-aligned with the subtitle (`page-header` `actionsAlign="end"`). Overview and Client Contact read tiles: 1 / 2 / 3 columns (`sm` / `md`). Content Helper stacks below `xl`.
 - Confirmation dialogs: save (edit mode only; create saves directly), approve, reject (comment required first), reset, archive (`app-alert-dialog` `confirmIcon`). Dialog closes on success, stays open on error, cannot be dismissed while busy, and closes when the route switches project.
-- `app-select-menu` `triggerId` + `app-field-label` `forId` → trigger named "label + value" (`aria-labelledby`).
+- `app-select-menu` `triggerId` + `app-field-label` `forId` → trigger named "label + value" (`aria-labelledby`); also on Project Team create/edit selects.
+- Mutation results for a project the user has navigated away from are ignored (`routedProjectId`); the confirmed action re-checks its preconditions and closes the dialog if they no longer hold.
 - Contentful: upstream 404 → 404, 400/422 → 400, other → generic 502 + Sentry; no upstream body exposed; entry id URL-encoded; no DB bootstrap on this route.
 - Skeleton mirrors the new layout (labels, icons, 44 px fields, buttons, footer).
 

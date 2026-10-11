@@ -7,7 +7,10 @@
 | Command | Result | Notes |
 |---|---|---|
 | `npm run lint` | **PASS** | |
-| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 119/119 (save/approve/reject/reset/archive confirmations, route change closes dialogs, select labelling, header alignment) |
+| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 121/121 (save/approve/reject/reset/archive confirmations, route change closes dialogs, late save ignored after switching project, reject re-check, select labelling, header alignment) |
+| A–Z route sweep (dev) | **PASS** | 11 routes ~100 ms from warm cache (calendar 0.8 s, API status 0.3 s); `**` → dashboard; 0 console errors/warnings, 0 Sentry events, 0 failed requests |
+| Live CRUD probe (real DB) | **PASS** | Employee/project/assignment create→update→delete, request→approve→reset: 200/201 in 0.8–3.5 s; bad id/JSON 400 in ~2 ms; deleted project 404; Contentful unknown entry 404 |
+| Security review | **PASS** | No medium+ findings; Contentful path no longer leaks upstream body |
 | `npm run test:api` | **PASS** | 84/84 (new Contentful 9: 404/400/502 mapping at repository + HTTP level, no upstream body, id encoding) |
 | `npm run build` | **PASS** | No warnings |
 | Browser (`/update-project/5030`, 956–1024 px) | **PASS** | Skeleton matches live page; readiness row bottom = subtitle bottom; all fields 44 px; Overview/Contact tiles 3 × 70 px; save dialog → PUT 200 + toast; Contentful 404 toast; AI draft toast; lead assign/cancel; Add to Team form; request → approve (dialog) → reset (dialog); reject without comment blocked; archive/save dialogs cancel; 0 failed API calls |

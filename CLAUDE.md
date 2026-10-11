@@ -5,7 +5,7 @@
 Project Name: EmpowerHub — Employee & Project Management (employee-management)  
 Description: Angular 20 SPA + Vercel serverless API + Prisma/MongoDB for employees, projects, assignments, dashboards, calendar/Gantt, insights, API docs/status, email notifications, optional Contentful + AI drafting, Sentry tunnel.
 
-Current Status: GATE-0024 shipped (project detail on shared labels/inputs/buttons/dialogs, readiness on the subtitle line, Contentful 404/400/502 mapping) on top of GATE-0023 (400 for bad JSON / non-integer ids, assignment edit existence check, no CC promotion, API docs errors) and GATE-0022 (test-domain email skip, CRUD API tests on Node 24); next: prod soak of project detail + CRUD 
+Current Status: GATE-0024 committed locally, not pushed (project detail on shared labels/inputs/buttons/dialogs, readiness on the subtitle line, Contentful 404/400/502 mapping) on top of GATE-0023 (400 for bad JSON / non-integer ids, assignment edit existence check, no CC promotion, API docs errors) and GATE-0022 (test-domain email skip, CRUD API tests on Node 24); next: prod soak of project detail + CRUD 
 Current Agile V Cycle: C1 
 Current Gate: GATE-0024 COMPLETE; PROD SOAK PENDING
 

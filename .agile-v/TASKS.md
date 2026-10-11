@@ -194,7 +194,7 @@
 | TASK-0084 | Shared field styling: `eh-input` (h-11, matches select trigger), `app-field-label` with icons + `*` on every field | REQ-0148 | DONE | `eh-input`/`eh-textarea`/`eh-read-label`; select triggers named by their labels (`triggerId`) |
 | TASK-0085 | Readiness checklist + Project Overview (titles, 3-col read grid, edit form, Content Helper buttons) | REQ-0148, REQ-0149 | DONE | Content Helper stacks below `xl` so buttons never squeeze the copy |
 | TASK-0086 | Leadership, Client Contact, Approval Process, footer: same buttons, labels, confirmations, pending labels | REQ-0148 | DONE | Save (edit), approve/reject/reset, archive dialogs; dialogs close on route change |
-| TASK-0087 | Tests, browser regression, skeleton parity | REQ-0148, REQ-0149 | DONE | Unit 119, API 84 |
+| TASK-0087 | Tests, browser regression, skeleton parity | REQ-0148, REQ-0149 | DONE | Unit 121, API 84 |
 | TASK-0088 | Contentful errors: 404/400 passthrough, generic 502, entry id URL-encoded, Sentry capture | REQ-0150 | DONE | Found during browser sweep (raw upstream JSON in a 500) |
 
 ---

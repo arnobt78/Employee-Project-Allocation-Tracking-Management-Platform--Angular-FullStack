@@ -7,7 +7,8 @@
 - Confirmation dialogs for save (edit), approve, reject, reset and archive; dialogs close when switching project
 - Select menus are named by their field labels for screen readers
 - Contentful lookup: 404/400 passed through, other failures generic 502 without the upstream body
-- Node 24.21: lint PASS; API 84/84; unit 119/119; build PASS; browser sweep PASS
+- Late save/approval/comment/archive results for a project you have left no longer replace the open project
+- Node 24.21: lint PASS; API 84/84; unit 121/121; build PASS; A–Z route sweep + live CRUD probe PASS
 
 ## 2026-10-10 — GATE-0023 API input validation
 

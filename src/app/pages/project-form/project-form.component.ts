@@ -268,6 +268,8 @@ export class ProjectFormComponent implements OnInit {
 
   private resourceInsightsRequestToken = 0;
   private projectRequestToken = 0;
+  /** Project id in the current route; 0 while creating. */
+  private routedProjectId = 0;
   private readonly resourceInsightsSignal =
     signal<IProjectResourceInsights | null>(null);
   readonly resourceInsights = this.resourceInsightsSignal.asReadonly();
@@ -513,7 +515,8 @@ export class ProjectFormComponent implements OnInit {
         const parsedId =
           idParam !== undefined && idParam !== null ? Number(idParam) : 0;
         const id = Number.isFinite(parsedId) ? parsedId : 0;
-        this.closeTransientUi();
+        this.routedProjectId = id;
+      this.closeTransientUi();
 
         if (id > 0) {
           this.modeSignal.set('edit');
@@ -640,8 +643,7 @@ export class ProjectFormComponent implements OnInit {
 
   private runSave(scope: SaveScope) {
     const wasEdit = this.isEditMode();
-    this.submitProject(() => {
-      this.pendingSave.set(null);
+    this.submitProject((applied) => {
       this.toast.success({
         title: wasEdit
           ? scope === 'all'
@@ -654,6 +656,10 @@ export class ProjectFormComponent implements OnInit {
             : 'Updates applied to the project.'
           : 'A new project has been created.',
       });
+      if (!applied) {
+        return;
+      }
+      this.pendingSave.set(null);
       this.editingSection.set(null);
       if (!wasEdit) {
         this.modeSignal.set('edit');
@@ -673,7 +679,7 @@ export class ProjectFormComponent implements OnInit {
     return false;
   }
 
-  submitProject(onSuccess?: () => void) {
+  submitProject(onSuccess?: (applied: boolean) => void) {
     if (!this.ensureFormValid()) {
       return;
     }
@@ -695,12 +701,14 @@ export class ProjectFormComponent implements OnInit {
       destroyRef: this.destroyRef,
       key: PENDING.save,
       onSuccess: (res) => {
-        this.applyMutationResult(res, { loadInsights: !isCreate });
-        if (res.projectId && res.projectId > 0) {
+        const applied = this.applyMutationResult(res, {
+          loadInsights: !isCreate,
+        });
+        if (applied && res.projectId && res.projectId > 0) {
           this.router.navigate(['/update-project', res.projectId], {
             replaceUrl: true });
         }
-        onSuccess?.();
+        onSuccess?.(applied);
       },
       errorToast: {
         title: 'Save failed',
@@ -725,6 +733,9 @@ export class ProjectFormComponent implements OnInit {
       destroyRef: this.destroyRef,
       key: PENDING.delete,
       onSuccess: () => {
+        if (projectId !== this.routedProjectId) {
+          return;
+        }
         this.pendingDelete.set(false);
         this.resetReadinessForm();
         this.resourceInsightsSignal.set(null);
@@ -953,6 +964,9 @@ export class ProjectFormComponent implements OnInit {
       destroyRef: this.destroyRef,
       key: PENDING.assign,
       onSuccess: () => {
+        if (project.projectId !== this.routedProjectId) {
+          return;
+        }
         this.cancelCollaboratorAssignment();
         this.refreshProjectSnapshot(project.projectId);
         this.loadResourceInsights(project.projectId);
@@ -1261,9 +1275,14 @@ export class ProjectFormComponent implements OnInit {
 
   confirmApprovalAction() {
     const action = this.pendingApproval();
-    if (action) {
-      this.performApprovalAction(action);
+    if (!action || this.isApprovalConfirmBusy()) {
+      return;
     }
+    if (!this.canRunApprovalAction(action)) {
+      this.pendingApproval.set(null);
+      return;
+    }
+    this.performApprovalAction(action);
   }
 
   dismissApprovalConfirm() {
@@ -1320,7 +1339,9 @@ export class ProjectFormComponent implements OnInit {
         destroyRef: this.destroyRef,
         key: PENDING.comment,
         onSuccess: (updatedProject) => {
-          this.applyMutationResult(updatedProject);
+          if (!this.applyMutationResult(updatedProject)) {
+            return;
+          }
           this.reviewerCommentForm.reset(
             {
               section: payload.section ?? 'overview',
@@ -1422,8 +1443,10 @@ export class ProjectFormComponent implements OnInit {
       destroyRef: this.destroyRef,
       key: PENDING.approval(action),
       onSuccess: (updatedProject) => {
+        if (!this.applyMutationResult(this.cloneProject(updatedProject))) {
+          return;
+        }
         this.pendingApproval.set(null);
-        this.applyMutationResult(this.cloneProject(updatedProject));
         this.approvalForm.patchValue({ comment: '' }, { emitEvent: false });
         if (action === 'reset') {
           this.approvalForm.patchValue({ actorName: '' }, { emitEvent: false });
@@ -1911,13 +1934,20 @@ export class ProjectFormComponent implements OnInit {
     );
   }
 
-  /** Mutation responses are newer than any in-flight GetProject; drop those reads. */
+  /**
+   * Mutation responses are newer than any in-flight GetProject; drop those reads.
+   * A response for a project the user has since navigated away from is ignored.
+   */
   private applyMutationResult(
     project: IProject,
     options: { loadInsights?: boolean } = {}
-  ) {
+  ): boolean {
+    if (this.routedProjectId && project.projectId !== this.routedProjectId) {
+      return false;
+    }
     this.projectRequestToken++;
     this.hydrateProject(project, options);
+    return true;
   }
 
   private hydrateProject(
