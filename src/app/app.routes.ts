@@ -65,7 +65,7 @@ export const routes: Routes = [
           ),
         data: {
           layout: 'private',
-          pageTitle: 'Project setup',
+          pageTitle: 'Project Setup',
         },
       },
       {
@@ -76,7 +76,7 @@ export const routes: Routes = [
           ),
         data: {
           layout: 'private',
-          pageTitle: 'Project setup',
+          pageTitle: 'Project Setup',
         },
       },
       {

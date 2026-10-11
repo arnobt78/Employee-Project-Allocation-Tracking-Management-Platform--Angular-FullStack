@@ -44,7 +44,7 @@ import { TextStubComponent } from './text-stub.component';
       aria-busy="true"
     >
       <app-page-header
-        [title]="mode === 'edit' ? '' : 'Untitled project'"
+        [title]="mode === 'edit' ? '' : 'Untitled Project'"
         [titlePending]="mode === 'edit'"
         [subtitle]="subtitle"
         [icon]="mode === 'edit' ? 'pencil' : 'folder-kanban'"
@@ -171,6 +171,15 @@ import { TextStubComponent } from './text-stub.component';
                   @if (mode === 'create') {
                     <span class="text-base font-medium text-white">
                       {{ createValues[section] }}
+                    </span>
+                  } @else if (section === 'team' || section === 'contact') {
+                    <span class="flex items-center gap-2" aria-hidden="true">
+                      <span
+                        class="h-6 w-6 shrink-0 animate-pulse rounded-full bg-white/10"
+                      ></span>
+                      <span
+                        class="h-5 w-32 animate-pulse rounded-full bg-white/10"
+                      ></span>
                     </span>
                   } @else {
                     <span

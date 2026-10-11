@@ -2,11 +2,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ActivatedRoute, Params, Router, provideRouter } from '@angular/router';
+import { By } from '@angular/platform-browser';
 import { BehaviorSubject, NEVER, Subject, of } from 'rxjs';
 
 import { ProjectFormComponent } from './project-form.component';
 import { MasterService } from '../../service/master.service';
 import { IProject } from '../../model/interface/master';
+import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
 
 describe('ProjectFormComponent', () => {
   let component: ProjectFormComponent;
@@ -330,6 +332,15 @@ describe('ProjectFormComponent', () => {
       expect(trigger.tagName).toBe('BUTTON');
       expect(trigger.getAttribute('aria-labelledby')).toBe(`${id}-label ${id}`);
       expect(el.querySelector(`#${id}-label`)?.textContent).toContain('Status');
+    });
+
+    it('shows a robot avatar next to the client name', () => {
+      spyOn(master, 'peekProject').and.returnValue({ project, fresh: true });
+      create();
+      const seeds = fixture.debugElement
+        .queryAll(By.directive(UserAvatarComponent))
+        .map((node) => (node.componentInstance as UserAvatarComponent).seed);
+      expect(seeds).toContain('Aurora');
     });
   });
 });

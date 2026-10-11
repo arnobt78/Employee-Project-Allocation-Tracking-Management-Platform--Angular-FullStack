@@ -3,11 +3,14 @@ import {
   API_DOC_CHIP_ACTIVE_CLASS,
   API_DOC_CHIP_IDLE_CLASS,
   API_DOC_COPY,
+  API_DOC_METHOD_ICONS,
   API_DOC_METHOD_TABS,
+  API_DOC_SECTION_ICONS,
   API_DOC_TAB_ACTIVE_CLASS,
   API_DOC_TAB_IDLE_CLASS,
 } from '@/app/constants/api-doc';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
+import { AppIconComponent } from './app-icon.component';
 import { PageHeaderComponent } from './page-header.component';
 import { TextStubComponent } from './text-stub.component';
 
@@ -19,7 +22,7 @@ import { TextStubComponent } from './text-stub.component';
 @Component({
   selector: 'app-api-doc-skeleton',
   standalone: true,
-  imports: [PageHeaderComponent, TextStubComponent],
+  imports: [AppIconComponent, PageHeaderComponent, TextStubComponent],
   host: { class: 'block' },
   template: `
     <div class="text-white/85" data-testid="api-doc-skeleton" aria-busy="true">
@@ -28,32 +31,32 @@ import { TextStubComponent } from './text-stub.component';
         [subtitle]="meta.subtitle"
         [icon]="meta.icon"
       >
-        <div
-          class="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2"
-        >
-          <span class="text-xs text-white/60">{{ copy.versionPill }}</span>
-          <app-text-stub
-            class="w-10 text-sm font-medium"
-            [bar]="versionBar"
-          ></app-text-stub>
-        </div>
+        <span class="eh-badge eh-badge-sky">
+          <lucide-icon [name]="icons.version" [size]="12"></lucide-icon>
+          {{ copy.versionPill }}
+          <span class="inline-block h-3 w-8 animate-pulse rounded-full bg-white/15" aria-hidden="true"></span>
+        </span>
       </app-page-header>
 
       <div class="eh-content-stack">
-        <div
-          class="rounded-2xl border border-white/10 bg-white/5 p-2 backdrop-blur-md sm:p-4"
-        >
-          <app-text-stub
-            class="mb-4 block text-xl font-medium"
-            bar="inset-y-0 left-0 my-auto h-5 w-64 max-w-full rounded-full"
-          ></app-text-stub>
+        <section class="eh-section-card">
+          <h2 class="eh-section-heading">
+            <lucide-icon [name]="icons.info" [size]="18"></lucide-icon>
+            <app-text-stub
+              class="block w-64 max-w-full"
+              bar="inset-y-0 left-0 my-auto h-5 w-64 max-w-full rounded-full"
+            ></app-text-stub>
+          </h2>
           <app-text-stub
             class="mb-4 block text-sm"
             bar="inset-y-0 left-0 my-auto h-3 w-3/4 rounded-full"
           ></app-text-stub>
           <div class="flex flex-wrap items-center gap-4">
             <div class="flex items-center gap-2">
-              <span class="text-xs text-white/60">{{ copy.baseUrl }}</span>
+              <span class="flex items-center gap-1.5 text-xs text-white/60">
+                <lucide-icon [name]="icons.baseUrl" [size]="14"></lucide-icon>
+                {{ copy.baseUrl }}
+              </span>
               <code
                 class="relative w-40 rounded bg-white/10 px-2 py-1 text-xs"
                 aria-hidden="true"
@@ -63,28 +66,33 @@ import { TextStubComponent } from './text-stub.component';
               ></code>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-xs text-white/60">{{ copy.version }}</span>
+              <span class="flex items-center gap-1.5 text-xs text-white/60">
+                <lucide-icon [name]="icons.version" [size]="14"></lucide-icon>
+                {{ copy.version }}
+              </span>
               <app-text-stub
                 class="w-10 text-sm font-medium"
-                [bar]="versionBar"
+                bar="inset-0 my-auto h-3 rounded-full"
               ></app-text-stub>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div
-          class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md sm:p-4"
-        >
-          <div class="mb-6 flex gap-2 border-b border-white/10">
+        <section class="eh-section-card">
+          <div class="mb-6 flex flex-wrap gap-2 border-b border-white/10">
             @for (method of methodTabs; track method; let first = $first) {
               <span [class]="first ? tabActiveClass : tabIdleClass">
+                <lucide-icon [name]="methodIcons[method]" [size]="14"></lucide-icon>
                 {{ method }}
               </span>
             }
           </div>
 
           <div class="mb-6 flex flex-wrap gap-2">
-            <span [class]="chipActiveClass">{{ copy.allCategories }}</span>
+            <span [class]="chipActiveClass">
+              <lucide-icon [name]="icons.allCategories" [size]="12"></lucide-icon>
+              {{ copy.allCategories }}
+            </span>
             @for (width of chipWidths; track $index) {
               <span
                 [class]="chipIdleClass + ' relative'"
@@ -99,21 +107,12 @@ import { TextStubComponent } from './text-stub.component';
 
           <div class="space-y-4" aria-hidden="true">
             @for (row of endpointRows; track row) {
-              <div
-                class="rounded-xl border border-white/10 bg-white/5 p-2 sm:p-4"
-              >
-                <div
-                  class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
-                >
-                  <div class="flex-1">
-                    <div class="mb-2 flex items-center gap-3">
-                      <app-text-stub
-                        class="inline-flex w-12 rounded border border-white/10 px-2 py-1 text-xs"
-                        bar="inset-0 rounded"
-                      ></app-text-stub>
-                      <app-text-stub
-                        class="inline-flex w-20 rounded-full px-2 py-1 text-xs"
-                      ></app-text-stub>
+              <div class="eh-panel">
+                <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div class="min-w-0 flex-1">
+                    <div class="mb-2 flex flex-wrap items-center gap-2">
+                      <span class="eh-badge eh-badge-neutral w-16 animate-pulse">&nbsp;</span>
+                      <span class="eh-badge eh-badge-neutral w-24 animate-pulse">&nbsp;</span>
                     </div>
                     <app-text-stub
                       class="mb-2 block text-base font-medium sm:text-xl"
@@ -124,10 +123,9 @@ import { TextStubComponent } from './text-stub.component';
                       bar="inset-y-0 left-0 my-auto h-3 w-2/3 rounded-full"
                     ></app-text-stub>
                   </div>
-                  <span
-                    class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/60"
-                  >
-                    {{ copy.copyUrl }}
+                  <span class="eh-action-btn eh-action-btn-outline shrink-0 self-start opacity-60">
+                    <lucide-icon name="copy" [size]="14"></lucide-icon>
+                    <span>{{ copy.copyUrl }}</span>
                   </span>
                 </div>
                 <div class="relative rounded-lg bg-white/5 p-3">
@@ -139,7 +137,7 @@ import { TextStubComponent } from './text-stub.component';
               </div>
             }
           </div>
-        </div>
+        </section>
       </div>
     </div>
   `,
@@ -147,12 +145,13 @@ import { TextStubComponent } from './text-stub.component';
 export class ApiDocSkeletonComponent {
   readonly meta = PRIVATE_PAGE_META['/api-doc'];
   readonly copy = API_DOC_COPY;
+  readonly icons = API_DOC_SECTION_ICONS;
   readonly methodTabs = API_DOC_METHOD_TABS;
+  readonly methodIcons = API_DOC_METHOD_ICONS;
   readonly tabActiveClass = API_DOC_TAB_ACTIVE_CLASS;
   readonly tabIdleClass = API_DOC_TAB_IDLE_CLASS;
   readonly chipActiveClass = API_DOC_CHIP_ACTIVE_CLASS;
   readonly chipIdleClass = API_DOC_CHIP_IDLE_CLASS;
-  readonly versionBar = 'inset-0 my-auto h-3 rounded-full';
   readonly chipWidths = [84, 72, 96, 88, 80, 72];
   readonly endpointRows = [1, 2, 3];
 }

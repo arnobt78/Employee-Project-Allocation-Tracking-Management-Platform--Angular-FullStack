@@ -210,6 +210,54 @@
     @apply flex items-center gap-1.5 text-xs text-white/45 sm:text-sm;
   }
 
+  .eh-badge {
+    @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-medium sm:text-sm;
+  }
+
+  .eh-badge-emerald {
+    @apply border-emerald-400/30 bg-emerald-500/10 text-emerald-200;
+  }
+
+  .eh-badge-amber {
+    @apply border-amber-400/30 bg-amber-500/10 text-amber-100;
+  }
+
+  .eh-badge-slate {
+    @apply border-slate-400/30 bg-slate-500/15 text-slate-100;
+  }
+
+  .eh-badge-violet {
+    @apply border-violet-400/30 bg-violet-500/10 text-violet-100;
+  }
+
+  .eh-badge-sky {
+    @apply border-sky-400/30 bg-sky-500/10 text-sky-200;
+  }
+
+  .eh-badge-rose {
+    @apply border-rose-400/30 bg-rose-500/10 text-rose-200;
+  }
+
+  .eh-badge-neutral {
+    @apply border-white/20 bg-white/10 text-white/70;
+  }
+
+  .eh-timeline-tooltip {
+    @apply whitespace-nowrap rounded-lg border border-white/20 bg-gray-900 px-3 py-2 text-xs text-white shadow-xl;
+  }
+
+  .eh-section-card {
+    @apply rounded-[28px] border border-white/10 p-2 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md sm:p-4;
+  }
+
+  .eh-section-heading {
+    @apply mb-4 flex items-center gap-2 text-base font-medium text-white sm:text-xl;
+  }
+
+  .eh-panel {
+    @apply rounded-2xl border border-white/10 bg-white/5 p-2 backdrop-blur-md sm:p-4;
+  }
+
   /* Shared list/card action height — Edit/Delete are the source of truth */
   .eh-action-btn {
     @apply eh-btn-icon rounded-xl px-4 py-2 text-xs sm:text-sm transition disabled:cursor-not-allowed disabled:opacity-50;

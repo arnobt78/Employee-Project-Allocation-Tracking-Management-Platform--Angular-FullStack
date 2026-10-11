@@ -50,6 +50,9 @@ import {
 } from '@/app/components/ui/select-menu.component';
 import { ProjectDetailSkeletonComponent } from '@/app/components/ui/project-detail-skeleton.component';
 import { ProjectHeaderMetaComponent } from '@/app/components/ui/project-header-meta.component';
+import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
+import { employeeAvatar, type AvatarView } from '@/app/lib/media/employee-avatar';
+import { titleCaseLabel } from '@/app/lib/format/labels';
 import {
   PROJECT_CONTENT_HELPER_COPY,
   PROJECT_CREATE_SECTION_VALUES,
@@ -144,8 +147,8 @@ type ReadinessFormValue = Record<
 >;
 
 const READINESS_STATUS_LABELS: Record<ReadinessStatus, string> = {
-  not_started: 'Not started',
-  in_progress: 'In progress',
+  not_started: 'Not Started',
+  in_progress: 'In Progress',
   blocked: 'Blocked',
   done: 'Complete' };
 
@@ -157,7 +160,7 @@ const READINESS_STATUS_VALUES: Record<ReadinessStatus, number> = {
 
 const APPROVAL_STATUS_LABELS: Record<ApprovalStatus, string> = {
   draft: 'Draft',
-  in_review: 'In review',
+  in_review: 'In Review',
   approved: 'Approved',
   rejected: 'Rejected' };
 
@@ -170,8 +173,8 @@ const APPROVAL_STATUS_CLASSES: Record<ApprovalStatus, string> = {
 const REVIEWER_COMMENT_SECTIONS: Array<{ value: SectionId; label: string }> = [
   { value: 'overview', label: 'Overview' },
   { value: 'team', label: 'Leadership' },
-  { value: 'contact', label: 'Client contact' },
-  { value: 'approval', label: 'Approval workflow' }];
+  { value: 'contact', label: 'Client Contact' },
+  { value: 'approval', label: 'Approval Workflow' }];
 
 const REVIEWER_SEVERITIES = [
   { value: 'info', label: 'Info' },
@@ -192,6 +195,7 @@ const REVIEWER_SEVERITIES = [
     PageHeaderComponent,
     ProjectDetailSkeletonComponent,
     ProjectHeaderMetaComponent,
+    UserAvatarComponent,
   ],
   templateUrl: './project-form.component.html',
   styleUrl: './project-form.component.css' })
@@ -211,7 +215,7 @@ export class ProjectFormComponent implements OnInit {
     this.employees().map((employee) => ({
       value: String(employee.employeeId),
       label: employee.employeeName,
-      imageSeed: employee.emailId || employee.employeeName,
+      imageSeed: employeeAvatar(employee).seed,
       imageUrl: employee.avatarUrl ?? null,
     }))
   );
@@ -486,7 +490,7 @@ export class ProjectFormComponent implements OnInit {
       return name;
     }
     const fallback = this.currentProjectSignal()?.projectName?.toString().trim();
-    return fallback && fallback.length > 0 ? fallback : 'Untitled project';
+    return fallback && fallback.length > 0 ? fallback : 'Untitled Project';
   });
 
   readonly isEditMode = computed(() => this.modeSignal() === 'edit');
@@ -783,11 +787,7 @@ export class ProjectFormComponent implements OnInit {
           ? this.leadName(value) ?? `Employee #${value}`
           : PROJECT_CREATE_SECTION_VALUES.team;
       case 'health': {
-        const raw = (value ?? '').toString().trim();
-        if (!raw) {
-          return 'Not set';
-        }
-        return raw.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+        return titleCaseLabel(value?.toString()) || 'Not Set';
       }
       case 'contactNo':
         return value || 'Not provided';
@@ -1231,6 +1231,48 @@ export class ProjectFormComponent implements OnInit {
     } catch {
       return value;
     }
+  }
+
+  timelineLabel(label?: string | null): string {
+    return titleCaseLabel(label);
+  }
+
+  reviewerSectionLabel(section?: string | null): string {
+    return (
+      REVIEWER_COMMENT_SECTIONS.find((item) => item.value === section)?.label ??
+      titleCaseLabel(section)
+    );
+  }
+
+  avatarFor(id: number | string | null | undefined, name?: string | null): AvatarView {
+    const numeric = Number(id);
+    const employee = numeric
+      ? this.employees().find((emp) => emp.employeeId === numeric)
+      : undefined;
+    return employeeAvatar(employee, name ?? '');
+  }
+
+  actorAvatar(actorId?: number | string | null, actorName?: string | null): AvatarView {
+    return this.avatarFor(actorId, this.actorDisplayName(actorId, actorName));
+  }
+
+  leadAvatar(): AvatarView | null {
+    const id = Number(this.projectForm.controls['leadByEmpId'].value);
+    return id ? this.avatarFor(id, this.displayValue('leadByEmpId')) : null;
+  }
+
+  clientAvatar(): AvatarView | null {
+    const name = String(this.projectForm.controls['clientName'].value ?? '').trim();
+    return name ? employeeAvatar(null, name) : null;
+  }
+
+  contactAvatar(): AvatarView | null {
+    const name = String(this.projectForm.controls['contactPerson'].value ?? '').trim();
+    if (!name) {
+      return null;
+    }
+    const email = String(this.projectForm.controls['emailId'].value ?? '').trim();
+    return employeeAvatar({ employeeName: name, emailId: email || null });
   }
 
   actorDisplayName(

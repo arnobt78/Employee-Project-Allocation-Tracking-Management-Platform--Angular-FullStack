@@ -6,7 +6,7 @@ export const PROJECT_DETAIL_SUBTITLE =
 export const READINESS_TASK_DEFINITIONS = [
   {
     id: 'scopeDefined',
-    title: 'Scope confirmed',
+    title: 'Scope Confirmed',
     description: 'Requirements baseline captured and shared with stakeholders.',
     category: 'Scope',
     weight: 25,
@@ -14,7 +14,7 @@ export const READINESS_TASK_DEFINITIONS = [
   },
   {
     id: 'budgetApproved',
-    title: 'Budget approved',
+    title: 'Budget Approved',
     description: 'Finance sign-off received for the projected spend.',
     category: 'Budget',
     weight: 20,
@@ -22,7 +22,7 @@ export const READINESS_TASK_DEFINITIONS = [
   },
   {
     id: 'legalReviewed',
-    title: 'Contracts reviewed',
+    title: 'Contracts Reviewed',
     description: 'Master services agreement and NDAs cleared with legal.',
     category: 'Legal',
     weight: 20,
@@ -30,7 +30,7 @@ export const READINESS_TASK_DEFINITIONS = [
   },
   {
     id: 'assetsPrepared',
-    title: 'Assets prepared',
+    title: 'Assets Prepared',
     description: 'Brand assets, data rooms, and collateral ready to share.',
     category: 'Assets',
     weight: 15,
@@ -38,7 +38,7 @@ export const READINESS_TASK_DEFINITIONS = [
   },
   {
     id: 'kickoffScheduled',
-    title: 'Kickoff scheduled',
+    title: 'Kickoff Scheduled',
     description: 'Kickoff meeting on calendar with internal and client teams.',
     category: 'Timeline',
     weight: 20,

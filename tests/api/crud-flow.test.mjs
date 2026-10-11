@@ -201,6 +201,39 @@ describe("CRUD HTTP flow", () => {
       assert.equal(db.tables.projectEmployee.has(created.empProjectId), false);
     });
 
+    test("deactivating stamps unassignedAt and reactivating clears it", async () => {
+      const employee = await createEmployee();
+      const project = await createProject();
+      const assignment = await createAssignment(project.projectId, employee.employeeId);
+      const id = assignment.empProjectId;
+      assert.equal(assignment.unassignedAt ?? null, null);
+
+      const before = Date.now();
+      const deactivated = await put(`UpdateProjectEmployee/${id}`, { isActive: "N" });
+      assert.equal(deactivated.status, 200);
+      const stamped = db.tables.projectEmployee.get(id).unassignedAt;
+      assert.ok(stamped instanceof Date && stamped.getTime() >= before - 1000);
+      assert.ok(deactivated.data.unassignedAt);
+
+      await put(`UpdateProjectEmployee/${id}`, { isActive: "N", role: "Still inactive" });
+      assert.equal(db.tables.projectEmployee.get(id).unassignedAt.getTime(), stamped.getTime());
+
+      const reactivated = await put(`UpdateProjectEmployee/${id}`, { isActive: "Y" });
+      assert.equal(reactivated.status, 200);
+      assert.equal(db.tables.projectEmployee.get(id).unassignedAt, null);
+
+      const explicit = await put(`UpdateProjectEmployee/${id}`, {
+        isActive: "N",
+        unassignedAt: "2026-03-15",
+      });
+      assert.equal(explicit.status, 200);
+      assert.equal(
+        db.tables.projectEmployee.get(id).unassignedAt.toISOString().slice(0, 10),
+        "2026-03-15"
+      );
+      assert.equal((await put("UpdateProjectEmployee/999999", { isActive: "N" })).status, 404);
+    });
+
     test("missing ids are a 400; unknown project or employee is a 404", async () => {
       const employee = await createEmployee();
       const project = await createProject();

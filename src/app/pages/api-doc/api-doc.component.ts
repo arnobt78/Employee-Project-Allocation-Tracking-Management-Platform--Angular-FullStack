@@ -15,26 +15,42 @@ import {
 } from '../../model/interface/master';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 import { ApiDocSkeletonComponent } from '@/app/components/ui/api-doc-skeleton.component';
+import { ActionButtonComponent } from '@/app/components/ui/action-button.component';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
+import { ToastService } from '@/app/components/ui/toast.service';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 import {
+  API_DOC_CATEGORY_META,
   API_DOC_CHIP_ACTIVE_CLASS,
   API_DOC_CHIP_IDLE_CLASS,
   API_DOC_COPY,
+  API_DOC_DEFAULT_CATEGORY,
+  API_DOC_METHOD_ICONS,
   API_DOC_METHOD_TABS,
+  API_DOC_SECTION_ICONS,
   API_DOC_TAB_ACTIVE_CLASS,
   API_DOC_TAB_IDLE_CLASS,
 } from '@/app/constants/api-doc';
+import { httpMethodTone, httpStatusTone } from '@/app/lib/status/api-badges';
+import { BADGE_TONE_CLASS, type StatusTone } from '@/app/lib/status/project-status';
 
 @Component({
   selector: 'app-api-doc',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, ApiDocSkeletonComponent],
+  imports: [
+    CommonModule,
+    PageHeaderComponent,
+    ApiDocSkeletonComponent,
+    ActionButtonComponent,
+    AppIconComponent,
+  ],
   templateUrl: './api-doc.component.html',
   styleUrls: ['./api-doc.component.css'],
 })
 export class ApiDocComponent implements OnInit {
   private readonly masterService = inject(MasterService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly toast = inject(ToastService);
 
   readonly pageMeta = PRIVATE_PAGE_META['/api-doc'];
   readonly copy = API_DOC_COPY;
@@ -43,6 +59,11 @@ export class ApiDocComponent implements OnInit {
   readonly tabIdleClass = API_DOC_TAB_IDLE_CLASS;
   readonly chipActiveClass = API_DOC_CHIP_ACTIVE_CLASS;
   readonly chipIdleClass = API_DOC_CHIP_IDLE_CLASS;
+  readonly methodIcons = API_DOC_METHOD_ICONS;
+  readonly sectionIcons = API_DOC_SECTION_ICONS;
+  readonly badgeTone = BADGE_TONE_CLASS;
+  readonly methodTone = httpMethodTone;
+  readonly httpStatusTone = httpStatusTone;
   readonly apiDocSignal = signal<IApiDocumentation | null>(
     this.masterService.peekApiDocumentation()
   );
@@ -121,34 +142,12 @@ export class ApiDocComponent implements OnInit {
     this.activeCategorySignal.set(category);
   }
 
-  getMethodColor(method: string): string {
-    switch (method) {
-      case 'GET':
-        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-      case 'POST':
-        return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'PUT':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      case 'DELETE':
-        return 'bg-red-500/20 text-red-400 border-red-500/30';
-      default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-    }
+  methodIcon(method: string): string {
+    return API_DOC_METHOD_ICONS[method as ApiHttpMethod] ?? 'code';
   }
 
-  getCategoryColor(category: string): string {
-    const colors: Record<string, string> = {
-      Employees: 'bg-blue-500/20 text-blue-400',
-      Projects: 'bg-purple-500/20 text-purple-400',
-      Assignments: 'bg-indigo-500/20 text-indigo-400',
-      Departments: 'bg-cyan-500/20 text-cyan-400',
-      Approvals: 'bg-orange-500/20 text-orange-400',
-      Dashboard: 'bg-pink-500/20 text-pink-400',
-      Schedule: 'bg-teal-500/20 text-teal-400',
-      Content: 'bg-amber-500/20 text-amber-400',
-      AI: 'bg-violet-500/20 text-violet-400',
-    };
-    return colors[category] || 'bg-gray-500/20 text-gray-400';
+  categoryMeta(category: string): { icon: string; tone: StatusTone } {
+    return API_DOC_CATEGORY_META[category] ?? API_DOC_DEFAULT_CATEGORY;
   }
 
   formatSchema(schema: unknown): string {
@@ -167,10 +166,21 @@ export class ApiDocComponent implements OnInit {
     return typeof message === 'string' ? message : null;
   }
 
-  copyToClipboard(text: string): void {
-    navigator.clipboard.writeText(text).then(() => {
-      // Clipboard write succeeded; toast can be added here if needed.
+  copyToClipboard(text: string): Promise<void> {
+    if (!navigator.clipboard) {
+      this.copyFailed();
+      return Promise.resolve();
+    }
+    return navigator.clipboard.writeText(text).then(
+      () => this.toast.success({ title: this.copy.copiedTitle, description: text }),
+      () => this.copyFailed()
+    );
+  }
+
+  private copyFailed(): void {
+    this.toast.error({
+      title: this.copy.copyFailedTitle,
+      description: this.copy.copyFailedDescription,
     });
   }
 }
-

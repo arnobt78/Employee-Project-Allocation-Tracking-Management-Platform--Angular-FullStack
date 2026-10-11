@@ -7,24 +7,20 @@
     [subtitle]="pageMeta.subtitle"
     [icon]="pageMeta.icon"
   >
-    <span
-      *ngIf="scheduleData()"
-      class="rounded-full bg-primary/20 px-3 py-1 text-xs font-medium text-primary"
-    >
-      {{ scheduleData()?.totalProjects || 0 }} Projects
-    </span>
-    <span
-      *ngIf="scheduleData()"
-      class="rounded-full bg-blue-500/20 px-3 py-1 text-xs font-medium text-blue-400"
-    >
-      {{ scheduleData()?.totalMilestones || 0 }} Milestones
-    </span>
-    <span
-      *ngIf="scheduleData()"
-      class="rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-medium text-yellow-400"
-    >
-      {{ scheduleData()?.totalDueDates || 0 }} Due Dates
-    </span>
+    @if (scheduleData(); as data) {
+      <span class="eh-badge eh-badge-sky">
+        <lucide-icon name="folder-kanban" [size]="12"></lucide-icon>
+        {{ data.totalProjects || 0 }} Projects
+      </span>
+      <span class="eh-badge eh-badge-violet">
+        <lucide-icon name="target" [size]="12"></lucide-icon>
+        {{ data.totalMilestones || 0 }} Milestones
+      </span>
+      <span class="eh-badge eh-badge-amber">
+        <lucide-icon name="calendar-check" [size]="12"></lucide-icon>
+        {{ data.totalDueDates || 0 }} Due Dates
+      </span>
+    }
   </app-page-header>
 
   <div class="eh-content-stack">
@@ -40,6 +36,7 @@
             (click)="setActiveTab(tab.id)"
             [class]="activeTab() === tab.id ? activeTabClass : idleTabClass"
           >
+            <lucide-icon [name]="tab.icon" [size]="14"></lucide-icon>
             {{ tab.label }}
           </button>
         }
@@ -61,65 +58,58 @@
       </div>
     </div>
 
-    <!-- Upcoming Reminders -->
-    <div
-      *ngIf="upcomingReminders().length > 0"
-      class="rounded-[28px] border border-yellow-500/20 bg-yellow-500/5 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
-    >
-      <h2
-        class="mb-4 flex items-center gap-2 text-xl sm:text-2xl leading-tight font-medium text-white"
+    @if (upcomingReminders().length > 0) {
+      <div
+        class="rounded-[28px] border border-amber-500/20 bg-amber-500/5 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
       >
-        <svg
-          class="h-5 w-5 text-yellow-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+        <h2
+          class="mb-4 flex items-center gap-2 text-xl sm:text-2xl leading-tight font-medium text-white"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
-        </svg>
-        Due Date Reminders (Next 30 Days)
-      </h2>
-      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <div
-          *ngFor="let reminder of upcomingReminders()"
-          class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md"
-        >
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <p class="font-medium text-white">{{ reminder.label }}</p>
-              <p class="text-xs text-white/60">
-                {{ reminder.projectName }}
-              </p>
-              <p class="mt-2 text-sm text-white/80">
-                Due: {{ reminder.dueDate | date: "MMM d, y" }}
-              </p>
+          <lucide-icon name="triangle-alert" [size]="20" class="text-amber-300"></lucide-icon>
+          <span>Due Date Reminders (Next 30 Days)</span>
+        </h2>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          @for (item of upcomingReminders(); track item.reminder.id) {
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0 flex-1 space-y-1">
+                  <p class="font-medium text-white">{{ item.reminder.label }}</p>
+                  <p class="flex items-center gap-1.5 text-xs sm:text-sm text-white/60">
+                    <lucide-icon name="folder-kanban" [size]="14"></lucide-icon>
+                    <span class="truncate">{{ item.reminder.projectName }}</span>
+                  </p>
+                  <p class="flex items-center gap-1.5 text-sm text-white/80">
+                    <lucide-icon name="calendar" [size]="14"></lucide-icon>
+                    Due: {{ item.reminder.dueDate | date: "MMM d, y" }}
+                  </p>
+                  @if (item.owner; as owner) {
+                    <p class="flex items-center gap-1.5 text-xs sm:text-sm text-white/70">
+                      <app-user-avatar
+                        [seed]="owner.seed"
+                        [label]="owner.label"
+                        [alt]="owner.label"
+                        [size]="20"
+                      ></app-user-avatar>
+                      <span class="truncate">{{ owner.label }}</span>
+                    </p>
+                  }
+                  @if (item.status) {
+                    <span class="eh-badge eh-badge-neutral">
+                      <lucide-icon name="list-checks" [size]="12"></lucide-icon>
+                      {{ item.status }}
+                    </span>
+                  }
+                </div>
+                <span class="eh-badge shrink-0" [ngClass]="badgeTone[item.due.tone]">
+                  <lucide-icon [name]="item.due.icon" [size]="12"></lucide-icon>
+                  {{ item.due.label }}
+                </span>
+              </div>
             </div>
-            <span
-              [class]="
-                isOverdue(reminder.dueDate)
-                  ? 'rounded-full bg-red-500/20 px-2 py-1 text-xs font-medium text-red-400'
-                  : isDueSoon(reminder.dueDate)
-                    ? 'rounded-full bg-yellow-500/20 px-2 py-1 text-xs font-medium text-yellow-400'
-                    : 'rounded-full bg-green-500/20 px-2 py-1 text-xs font-medium text-green-400'
-              "
-            >
-              {{
-                isOverdue(reminder.dueDate)
-                  ? "Overdue"
-                  : isDueSoon(reminder.dueDate)
-                    ? "Due Soon"
-                    : getDaysUntilDue(reminder.dueDate) + " days"
-              }}
-            </span>
-          </div>
+          }
         </div>
       </div>
-    </div>
+    }
   </div>
 
   <!-- Empty State -->

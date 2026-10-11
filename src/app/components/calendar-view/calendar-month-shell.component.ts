@@ -1,4 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { Component, TemplateRef, input, output } from '@angular/core';
 import {
   CALENDAR_EVENT_TYPE_COLORS,
@@ -15,29 +16,29 @@ import {
 @Component({
   selector: 'app-calendar-month-shell',
   standalone: true,
-  imports: [NgTemplateOutlet],
+  imports: [NgTemplateOutlet, AppIconComponent],
   host: { class: 'block space-y-4' },
   template: `
     <div class="flex items-center justify-between">
-      <h3 class="text-base font-medium text-white sm:text-xl">
-        {{ title() }}
+      <h3 class="eh-btn-icon justify-start text-base font-medium text-white sm:text-xl">
+        <lucide-icon name="calendar-days" [size]="18"></lucide-icon>
+        <span>{{ title() }}</span>
       </h3>
       <div class="flex items-center gap-2">
         <button
           type="button"
           (click)="previous.emit()"
           class="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/10"
-          title="Previous month"
+          title="Previous Month"
+          aria-label="Previous Month"
         >
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
+          <lucide-icon name="chevron-left" [size]="16"></lucide-icon>
         </button>
         <button
           type="button"
           (click)="today.emit()"
           class="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white transition-colors hover:bg-white/10"
-          title="Go to today"
+          title="Go to Today"
         >
           Today
         </button>
@@ -45,11 +46,10 @@ import {
           type="button"
           (click)="next.emit()"
           class="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white transition-colors hover:bg-white/10"
-          title="Next month"
+          title="Next Month"
+          aria-label="Next Month"
         >
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
+          <lucide-icon name="chevron-right" [size]="16"></lucide-icon>
         </button>
       </div>
     </div>

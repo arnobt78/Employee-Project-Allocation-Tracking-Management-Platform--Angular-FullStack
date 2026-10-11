@@ -20,7 +20,7 @@
 
   <app-kpi-stat-card
     listShellKpis
-    label="Total projects"
+    label="Total Projects"
     [value]="kpiTotal()"
     hint="All projects in the workspace"
     icon="folder-kanban"
@@ -28,7 +28,7 @@
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
-    label="In flight"
+    label="In Flight"
     [value]="kpiInFlight()"
     hint="Approved, active, or in review"
     icon="zap"
@@ -44,7 +44,7 @@
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
-    label="On hold"
+    label="On Hold"
     [value]="kpiOnHold()"
     hint="Paused projects"
     icon="pause-circle"
@@ -115,17 +115,10 @@
           class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
         >
           <div class="flex min-w-0 flex-wrap items-center gap-2">
-            <span
-              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs capitalize sm:text-sm"
-              [ngClass]="
-                statusBadgeClasses(project.status || project.approvalStatus)
-              "
-            >
-              <lucide-icon
-                [name]="statusIcon(project.status || project.approvalStatus)"
-                [size]="12"
-              ></lucide-icon>
-              {{ displayStatus(project) | titlecase }}
+            @let status = statusMeta(project.status || project.approvalStatus);
+            <span class="eh-badge" [ngClass]="badgeTone[status.tone]">
+              <lucide-icon [name]="status.icon" [size]="12"></lucide-icon>
+              {{ status.label }}
             </span>
             <span
               *ngIf="project.clientName"

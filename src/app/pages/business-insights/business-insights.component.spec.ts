@@ -55,5 +55,7 @@ describe('BusinessInsightsComponent', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('[data-testid="insights-skeleton"]')).toBeNull();
     expect(el.textContent).toContain('Project Status Distribution');
+    expect(el.querySelectorAll('app-kpi-stat-card').length).toBeGreaterThanOrEqual(4);
+    expect(el.querySelector('button[ehAction]')).toBeTruthy();
   });
 });

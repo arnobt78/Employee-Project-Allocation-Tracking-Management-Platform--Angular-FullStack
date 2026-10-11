@@ -1,15 +1,24 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0024 project detail UI consistency shipped; prod soak next  
-**Gate:** GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** GATE-0024 committed locally (not pushed); `origin/main` at `f868ecc`. Node 24.21: lint PASS, API tests 84/84, unit 121/121, production build PASS, A–Z route sweep + live CRUD/approval probe PASS (0 console errors, 0 failed calls).  
+**Phase / Stage:** Stage 4 — GATE-0025 avatars / Title Case / unassigned date / page consistency committed; prod soak next  
+**Gate:** GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
+**Status:** GATE-0025 committed locally (not pushed); `origin/main` at `2ee0536` (GATE-0024 pushed). Node 24.21: lint PASS, API tests 85/85, unit 138/138, production build PASS (all 7 badge tones in CSS), browser sweep of 9 pages PASS (0 console errors, 0 failed calls).  
 **Updated:** 2026-10-11  
-**resume_token:** `c1-gate24-prod-soak-2026-10-11`
+**resume_token:** `c1-gate25-prod-soak-2026-10-11`
 
 ---
 
 ## Resume Point
+
+**Completed (GATE-0025, TASK-0089–0094):**
+
+- Shared helpers: `lib/format/labels.ts` (`titleCaseLabel`), `lib/media/employee-avatar.ts` (`employeeAvatar`, seed = email else name), `lib/status/project-status.ts` (`projectStatusMeta`, `BADGE_TONE_CLASS`, fills/borders/legend), `lib/status/api-badges.ts` (health, delivery, HTTP method/status tones). Styles: `.eh-badge` + `.eh-badge-<tone>`, `.eh-section-card`, `.eh-section-heading`, `.eh-panel`. Tone classes must be referenced via `BADGE_TONE_CLASS` (string concatenation gets purged by Tailwind).
+- Avatars on project detail (lead, client, contact, team cards, status history, approval timeline, reviewer comments), Project Team (pill + Employee ID tile), Employees, Dashboard, Timeline leads (+ `shield-user`), Gantt tooltip, reminder owners.
+- Title Case everywhere (status pills, readiness, approval timeline label from the server, KPI labels, route titles).
+- `updateProjectEmployee`: deactivate stamps `unassignedAt`, reactivate clears it (one lookup shared with the target check). UI: date / "Still Assigned" / "Not Recorded".
+- Timeline/Gantt use signal inputs (fixes stale `computed` over `@Input`); schedule payload adds `leadEmail` / `leadAvatarUrl`.
+- Business Insights, API Status, API Doc + skeletons on `app-kpi-stat-card` (new `loading` input), `.eh-badge`, `ehAction`, `app-field-label`, toasts (CSV/PDF export, manual Refresh/Retry failure, Copy URL success/failure).
 
 **Completed (GATE-0024, TASK-0083–0088):**
 
@@ -61,20 +70,20 @@
 - `NotificationLog` has no retention/TTL (RISK-0018).
 - Prisma `$transaction` deletes need a MongoDB replica set (RISK-0020).
 - Calendar event chips are `div` + `routerLink` (not keyboard-focusable).
-- `bg-white/2` / `min-h-auto` classes generate no CSS.
+- `bg-white/2` / `min-h-auto` / `bg-white/5/80` classes generate no CSS (older cards; `.eh-section-card` omits it).
 - Employee edits don't refresh lead names in project list/schedule until TTL.
 - Guest `Session` 401 on the login page console (intentional).
 
 **Blockers:** none. Push/deploy needs human approval (GATE-0002). `prisma db push` already applied to the configured DB (`NotificationLog`).
 
-**Next exact action:** Human pushes GATE-0024 + prod soak of the project detail page (every section's edit/save, approval request → approve/reject → reset, archive, Contentful + AI helpers) and CRUD across Employees / Projects / Project Team. Note: dev saw one-off 40–77 s approval writes during a MongoDB latency spike (same endpoint ~2 s otherwise); watch for it on Vercel.
+**Next exact action:** Human pushes GATE-0025 + prod soak of project detail avatars, Project Team unassigned dates (deactivate/reactivate an assignment), Calendar (3 tabs), Insights (4 tabs + CSV export), API Status and API Doc (Copy URL needs a real clipboard). Earlier soak still open: prod soak of the project detail page (every section's edit/save, approval request → approve/reject → reset, archive, Contentful + AI helpers) and CRUD across Employees / Projects / Project Team. Note: dev saw one-off 40–77 s approval writes during a MongoDB latency spike (same endpoint ~2 s otherwise); watch for it on Vercel.
 
 **Resume prompt:**
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
-Resume resume_token c1-gate24-prod-soak-2026-10-11.
-GATE-0024 (project detail UI consistency + Contentful error mapping) committed locally on top of GATE-0023. Await push/prod soak feedback.
+Resume resume_token c1-gate25-prod-soak-2026-10-11.
+GATE-0025 (avatars, Title Case labels, unassigned date, page consistency) committed locally on top of GATE-0024. Await push/prod soak feedback.
 ```
 
 ---

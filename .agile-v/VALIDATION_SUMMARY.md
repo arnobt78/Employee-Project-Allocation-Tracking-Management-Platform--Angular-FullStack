@@ -1,5 +1,18 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-11 — GATE-0025 avatars, Title Case labels, unassigned date, page consistency
+
+**Node:** v24.21.0 via fnm
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 138/138 (new: `titleCaseLabel`, `employeeAvatar`, `projectStatusMeta` + api badges, timeline "On Hold" badge + lead avatar, client avatar on detail, Insights KPI cards, API Doc copy toasts, API Status manual-refresh toast, unassigned labels) |
+| `npm run test:api` | **PASS** | 85/85 (new: deactivate stamps `unassignedAt`, reactivate clears it, explicit date kept, missing row 404) |
+| `npm run build` | **PASS** | All 7 `.eh-badge-*` tones present in `dist/styles.*.css` |
+| Browser sweep (dev, admin) | **PASS** | Projects, project detail, Project Team, Calendar (3 tabs), Insights (4 tabs), API Status (4 tabs), API Doc, Dashboard, Employees: Title Case pills with icons, avatars, no bare "—", skeleton → content without jumps; 0 console errors, 0 failed requests. Copy URL in the automated browser → clipboard-blocked error toast (expected there) |
+| Independent verifier | **FAIL → fixed** | `.eh-badge-emerald` purged from the production CSS (dynamic class) → literal `BADGE_TONE_CLASS` map; also fixed: duplicate avatar seeds on Employees/Dashboard, hand-written Project Team status pill, Insights Completed tone, missing export/refresh toasts, Connected Yes/No icon, Employee ID avatar, lead `shield-user` icon, double assignment lookup, `inactive` mapped to Active |
+
 ## Session 2026-10-11 — GATE-0024 project detail UI consistency
 
 **Node:** v24.21.0 via fnm

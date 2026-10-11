@@ -2,7 +2,10 @@ import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MasterService } from '../../service/master.service';
 import { CalendarViewComponent } from '../../components/calendar-view/calendar-view.component';
-import { TimelineViewComponent } from '../../components/timeline-view/timeline-view.component';
+import {
+  TimelineViewComponent,
+  type IProjectTimeline,
+} from '../../components/timeline-view/timeline-view.component';
 import { GanttViewComponent } from '../../components/gantt-view/gantt-view.component';
 import { CalendarSkeletonComponent } from '@/app/components/ui/calendar-skeleton.component';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
@@ -13,6 +16,11 @@ import {
   CALENDAR_TAB_IDLE_CLASS,
   CalendarTabId,
 } from '@/app/constants/calendar-timeline';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
+import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
+import { titleCaseLabel } from '@/app/lib/format/labels';
+import { employeeAvatar, type AvatarView } from '@/app/lib/media/employee-avatar';
+import { BADGE_TONE_CLASS, type StatusTone } from '@/app/lib/status/project-status';
 
 export interface IScheduleData {
   milestones: IMilestone[];
@@ -49,15 +57,11 @@ export interface IDueDate {
   type: 'timeline-due' | 'milestone-due' | 'readiness';
 }
 
-export interface IProjectTimeline {
-  projectId: number;
-  projectName: string;
-  clientName: string;
-  startDate: string;
-  endDate: string | null;
+interface ReminderView {
+  reminder: IDueDate;
+  due: { label: string; tone: StatusTone; icon: string };
   status: string;
-  leadName: string;
-  leadDepartment: string;
+  owner: AvatarView | null;
 }
 
 @Component({
@@ -70,6 +74,8 @@ export interface IProjectTimeline {
     GanttViewComponent,
     CalendarSkeletonComponent,
     PageHeaderComponent,
+    AppIconComponent,
+    UserAvatarComponent,
   ],
   templateUrl: './calendar-timeline.component.html',
   styleUrls: ['./calendar-timeline.component.css'],
@@ -78,6 +84,7 @@ export class CalendarTimelineComponent implements OnInit {
   private readonly masterService = inject(MasterService);
 
   readonly pageMeta = PRIVATE_PAGE_META['/calendar-timeline'];
+  readonly badgeTone = BADGE_TONE_CLASS;
   readonly scheduleDataSignal = signal<IScheduleData | null>(null);
   readonly scheduleData = this.scheduleDataSignal.asReadonly();
   readonly loadingSignal = signal<boolean>(false);
@@ -167,11 +174,24 @@ export class CalendarTimelineComponent implements OnInit {
     }));
   });
 
-  // Computed upcoming reminders
-  readonly upcomingReminders = computed(() => {
+  readonly upcomingReminders = computed<ReminderView[]>(() => {
     const data = this.scheduleData();
     if (!data) return [];
-    return data.upcomingReminders;
+    return data.upcomingReminders.map((reminder) => {
+      const days = this.getDaysUntilDue(reminder.dueDate);
+      const due: ReminderView['due'] =
+        days < 0
+          ? { label: 'Overdue', tone: 'rose', icon: 'triangle-alert' }
+          : days <= 7
+            ? { label: 'Due Soon', tone: 'amber', icon: 'clock' }
+            : { label: `${days} Days`, tone: 'emerald', icon: 'calendar-check' };
+      return {
+        reminder,
+        due,
+        status: reminder.status ? titleCaseLabel(reminder.status) : '',
+        owner: reminder.ownerName ? employeeAvatar(null, reminder.ownerName) : null,
+      };
+    });
   });
 
   ngOnInit(): void {
@@ -211,13 +231,5 @@ export class CalendarTimelineComponent implements OnInit {
     return diffDays;
   }
 
-  isOverdue(dueDate: string): boolean {
-    return this.getDaysUntilDue(dueDate) < 0;
-  }
-
-  isDueSoon(dueDate: string): boolean {
-    const daysUntil = this.getDaysUntilDue(dueDate);
-    return daysUntil >= 0 && daysUntil <= 7;
-  }
 }
 

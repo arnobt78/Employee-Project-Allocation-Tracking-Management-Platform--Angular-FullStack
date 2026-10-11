@@ -32,7 +32,7 @@
 
   <app-kpi-stat-card
     listShellKpis
-    label="Total assignments"
+    label="Total Assignments"
     [value]="totalAssignmentsKpi()"
     hint="All records"
     icon="contact"
@@ -337,12 +337,13 @@
           <span
             class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs sm:text-sm text-white/70"
           >
+            @let avatar = avatarFor(item);
             <app-user-avatar
-              [seed]="employeeAvatarSeed(item)"
-              [imageUrl]="employeeAvatarUrl(item)"
-              [label]="item.employeeName"
+              [seed]="avatar.seed"
+              [imageUrl]="avatar.imageUrl"
+              [label]="avatar.label"
               [size]="20"
-              [alt]="item.employeeName"
+              [alt]="avatar.label"
             ></app-user-avatar>
             {{ item.employeeName }}
           </span>
@@ -353,12 +354,10 @@
             <lucide-icon name="briefcase" [size]="12"></lucide-icon>
             {{ item.role }}
           </span>
-          <span [class]="statusBadge(item.isActive)">
-            <lucide-icon
-              [name]="isActive(item.isActive) ? 'check-circle' : 'pause-circle'"
-              [size]="12"
-            ></lucide-icon>
-            {{ isActive(item.isActive) ? "Active" : "Inactive" }}
+          @let state = assignmentStatus(item.isActive);
+          <span class="eh-badge" [ngClass]="badgeTone[state.tone]">
+            <lucide-icon [name]="state.icon" [size]="12"></lucide-icon>
+            {{ state.label }}
           </span>
           <span
             *ngIf="item.assignedDate"
@@ -587,7 +586,7 @@
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
               <app-field-label
-                text="Assigned on"
+                text="Assigned On"
                 icon="calendar"
               ></app-field-label>
               <p class="text-base font-medium text-white">
@@ -598,8 +597,18 @@
               class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
             >
               <app-field-label text="Employee ID" icon="user"></app-field-label>
-              <p class="text-base font-medium text-white">
-                {{ item.empId }} · {{ employeeNameFor(item.empId) || "—" }}
+              @let member = avatarFor(item);
+              <p class="flex min-w-0 items-center gap-2 text-base font-medium text-white">
+                <app-user-avatar
+                  [seed]="member.seed"
+                  [imageUrl]="member.imageUrl"
+                  [label]="member.label"
+                  [alt]="member.label"
+                  [size]="24"
+                ></app-user-avatar>
+                <span class="min-w-0 truncate">
+                  {{ item.empId }} · {{ employeeNameFor(item.empId) || "Unknown" }}
+                </span>
               </p>
             </div>
             <div
@@ -627,10 +636,13 @@
             >
               <app-field-label
                 text="Unassigned"
-                icon="calendar"
+                icon="calendar-check"
               ></app-field-label>
-              <p class="text-base font-medium text-white">
-                {{ formattedDate(item.unassignedAt) }}
+              <p
+                class="text-base font-medium"
+                [ngClass]="item.unassignedAt ? 'text-white' : 'text-white/60'"
+              >
+                {{ unassignedLabel(item) }}
               </p>
             </div>
             <div

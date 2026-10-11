@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { DatePipe, TitleCasePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { MasterService } from '../../service/master.service';
 import {
   IParentDept,
@@ -17,6 +17,8 @@ import {
 import { DashboardSkeletonComponent } from '@/app/components/ui/dashboard-skeleton.component';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
+import { BADGE_TONE_CLASS, projectStatusMeta } from '@/app/lib/status/project-status';
+import { employeeAvatar } from '@/app/lib/media/employee-avatar';
 
 interface DashboardSnapshot {
   totalEmployee: number;
@@ -31,7 +33,6 @@ interface DashboardSnapshot {
   standalone: true,
   imports: [
     DatePipe,
-    TitleCasePipe,
     UserAvatarComponent,
     PageHeaderComponent,
     KpiStatCardComponent,
@@ -338,7 +339,7 @@ export class DashboardComponent implements OnInit {
     }
     this.projectStatusSlices = [
       {
-        label: 'Assigned active',
+        label: 'Assigned Active',
         value: stats.assigned,
         color: 'rgba(16, 185, 129, 0.85)',
       },
@@ -371,7 +372,7 @@ export class DashboardComponent implements OnInit {
         color: 'rgba(244, 63, 94, 0.75)',
       },
       {
-        label: 'Unassigned projects',
+        label: 'Unassigned Projects',
         value: stats.nonAssigned,
         color: 'rgba(245, 158, 11, 0.8)',
       },
@@ -437,39 +438,7 @@ export class DashboardComponent implements OnInit {
     return 'Parent division across the organization';
   }
 
-  projectStatusIcon(status: string | undefined): string {
-    const key = (status || '').toLowerCase().replace(/[\s-]+/g, '_');
-    if (key.includes('active') || key === 'approved') return 'zap';
-    if (key.includes('review')) return 'git-pull-request';
-    if (key.includes('hold') || key.includes('pause')) return 'pause-circle';
-    if (key.includes('draft')) return 'pencil';
-    if (key.includes('archiv')) return 'archive';
-    if (key.includes('complete') || key.includes('done')) return 'check';
-    return 'circle-dot';
-  }
-
-  projectStatusTone(status: string | undefined): string {
-    const key = (status || '').toLowerCase().replace(/[\s-]+/g, '_');
-    if (key.includes('active') || key === 'approved') {
-      return 'border-emerald-400/40 bg-emerald-500/15 text-emerald-100 shadow-[0_8px_24px_rgba(16,185,129,0.25)]';
-    }
-    if (key.includes('review')) {
-      return 'border-amber-400/40 bg-amber-500/15 text-amber-100 shadow-[0_8px_24px_rgba(245,158,11,0.25)]';
-    }
-    if (key.includes('hold') || key.includes('pause')) {
-      return 'border-slate-400/40 bg-slate-500/20 text-slate-100 shadow-[0_8px_24px_rgba(100,116,139,0.3)]';
-    }
-    if (key.includes('draft')) {
-      return 'border-violet-400/40 bg-violet-500/15 text-violet-100 shadow-[0_8px_24px_rgba(139,92,246,0.25)]';
-    }
-    if (key.includes('archiv')) {
-      return 'border-white/20 bg-white/10 text-white/70 shadow-[0_8px_24px_rgba(0,0,0,0.25)]';
-    }
-    return 'border-sky-400/40 bg-sky-500/15 text-sky-100 shadow-[0_8px_24px_rgba(2,132,199,0.25)]';
-  }
-
-  formatStatusLabel(status: string | undefined): string {
-    const raw = (status || 'in_progress').replace(/_/g, ' ');
-    return raw;
-  }
+  readonly statusMeta = projectStatusMeta;
+  readonly badgeTone = BADGE_TONE_CLASS;
+  readonly avatarFor = employeeAvatar;
 }

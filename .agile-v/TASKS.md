@@ -197,6 +197,17 @@
 | TASK-0087 | Tests, browser regression, skeleton parity | REQ-0148, REQ-0149 | DONE | Unit 121, API 84 |
 | TASK-0088 | Contentful errors: 404/400 passthrough, generic 502, entry id URL-encoded, Sentry capture | REQ-0150 | DONE | Found during browser sweep (raw upstream JSON in a 500) |
 
+## Wave — GATE-0025 avatars, Title Case, unassigned date, page consistency (2026-10-11)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0089 | Shared helpers: `lib/format/labels.ts`, `lib/media/employee-avatar.ts`, `lib/status/project-status.ts` (+ `BADGE_TONE_CLASS`), `lib/status/api-badges.ts`; `.eh-badge`/`.eh-section-card`/`.eh-panel` styles; icons registered | REQ-0151, REQ-0152 | DONE | Tone classes spelled out so Tailwind keeps them (emerald was purged) |
+| TASK-0090 | Project detail + Project Team avatars on every person/client name | REQ-0151 | DONE | Employee ID tile, lead/client/contact, team cards, history/approval/comments |
+| TASK-0091 | Title Case labels (status, readiness, approval timeline server label, KPIs, route titles) | REQ-0152 | DONE | `inactive` maps to slate, not Active |
+| TASK-0092 | `unassignedAt` stamp/clear in `updateProjectEmployee` (one lookup) + UI label | REQ-0153 | DONE | API 85 |
+| TASK-0093 | Timeline/Gantt/Calendar: signal inputs, badges, lead avatars + `shield-user`, Start/End/Duration/client icons, reminders | REQ-0151, REQ-0152, REQ-0154 | DONE | Schedule payload adds `leadEmail`/`leadAvatarUrl` |
+| TASK-0094 | Business Insights, API Status, API Doc + skeletons on shared primitives; toasts (CSV/PDF export, manual refresh failure, Copy URL) | REQ-0154 | DONE | Unit 138 |
+
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)

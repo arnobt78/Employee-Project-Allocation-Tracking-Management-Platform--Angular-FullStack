@@ -1,16 +1,18 @@
-import { Component, Input, computed } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
+import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
+import type { IProjectTimeline } from '@/app/components/timeline-view/timeline-view.component';
+import { employeeAvatar, type AvatarView } from '@/app/lib/media/employee-avatar';
+import {
+  STATUS_LEGEND,
+  STATUS_TONE_FILL,
+  projectStatusMeta,
+  type StatusMeta,
+} from '@/app/lib/status/project-status';
 
-export interface IGanttProject {
-  projectId: number;
-  projectName: string;
-  clientName: string;
-  startDate: string;
-  endDate: string | null;
-  status: string;
-  leadName: string;
-  leadDepartment: string;
+export interface IGanttProject extends IProjectTimeline {
   start: Date;
   end: Date | null;
   duration: number | null;
@@ -21,31 +23,53 @@ interface ProjectPosition {
   width: number;
 }
 
+interface GanttRow {
+  project: IGanttProject;
+  status: StatusMeta;
+  fill: string;
+  lead: AvatarView | null;
+}
+
 @Component({
   selector: 'app-gantt-view',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AppIconComponent, UserAvatarComponent],
   templateUrl: './gantt-view.component.html',
   styleUrls: ['./gantt-view.component.css'],
 })
 export class GanttViewComponent {
-  @Input() projects: IGanttProject[] = [];
+  private readonly router = inject(Router);
+
+  readonly projects = input<IGanttProject[]>([]);
+  readonly legend = STATUS_LEGEND;
+  readonly toneFill = STATUS_TONE_FILL;
 
   showTooltip: number | null = null;
   tooltipPosition = { left: 0, top: 0 };
 
-  constructor(private router: Router) {}
-
-  readonly sortedProjects = computed(() => {
-    return [...this.projects].sort((a, b) => {
-      const dateA = a.start.getTime();
-      const dateB = b.start.getTime();
-      return dateA - dateB;
-    });
-  });
+  readonly rows = computed<GanttRow[]>(() =>
+    [...this.projects()]
+      .sort((a, b) => a.start.getTime() - b.start.getTime())
+      .map((project) => {
+        const status = projectStatusMeta(project.status);
+        return {
+          project,
+          status,
+          fill: STATUS_TONE_FILL[status.tone],
+          lead: project.leadName
+            ? employeeAvatar({
+                employeeName: project.leadName,
+                emailId: project.leadEmail || null,
+                avatarUrl: project.leadAvatarUrl ?? null,
+              })
+            : null,
+        };
+      })
+  );
 
   readonly dateRange = computed(() => {
-    if (this.projects.length === 0) {
+    const projects = this.projects();
+    if (projects.length === 0) {
       return { min: new Date(), max: new Date() };
     }
 
@@ -53,7 +77,7 @@ export class GanttViewComponent {
     const dates: Date[] = [];
     const now = new Date();
     
-    this.projects.forEach((p) => {
+    projects.forEach((p) => {
       dates.push(p.start);
       if (p.end) {
         dates.push(p.end);
@@ -89,7 +113,7 @@ export class GanttViewComponent {
     const totalDays = this.totalDays();
     const positions = new Map<number, ProjectPosition>();
 
-    this.projects.forEach((project) => {
+    this.projects().forEach((project) => {
       const daysFromStart =
         (project.start.getTime() - range.min.getTime()) / (1000 * 60 * 60 * 24);
       const left = Math.max(0, (daysFromStart / totalDays) * 100);
@@ -187,26 +211,9 @@ export class GanttViewComponent {
     }, 0);
   }
 
-  getStatusColor(status: string): string {
-    switch (status?.toLowerCase()) {
-      case 'approved':
-      case 'completed':
-        return 'bg-green-500';
-      case 'in_progress':
-      case 'in_review':
-        return 'bg-blue-500';
-      case 'on_hold':
-        return 'bg-yellow-500';
-      case 'cancelled':
-      case 'rejected':
-        return 'bg-red-500';
-      case 'draft':
-      default:
-        return 'bg-gray-500';
-    }
-  }
+  readonly monthLabels = computed(() => this.getMonthLabels());
 
-  getMonthLabels(): Array<{ month: string; year: string; position: number }> {
+  private getMonthLabels(): Array<{ month: string; year: string; position: number }> {
     const range = this.dateRange();
     const labels: Array<{ month: string; year: string; position: number }> = [];
     const current = new Date(range.min);

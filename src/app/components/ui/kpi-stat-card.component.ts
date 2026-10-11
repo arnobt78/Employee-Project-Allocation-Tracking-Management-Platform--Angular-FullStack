@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { AppIconComponent } from './app-icon.component';
+import { TextStubComponent } from './text-stub.component';
 
 export type KpiStatTone =
   | 'sky'
@@ -13,7 +14,7 @@ export type KpiStatTone =
 @Component({
   selector: 'app-kpi-stat-card',
   standalone: true,
-  imports: [CommonModule, AppIconComponent],
+  imports: [CommonModule, AppIconComponent, TextStubComponent],
   template: `
     <article
       class="flex items-center justify-between gap-3 rounded-[24px] border bg-gradient-to-br p-3 sm:p-4 transition hover:brightness-110"
@@ -21,9 +22,16 @@ export type KpiStatTone =
     >
       <div class="min-w-0">
         <p class="text-xs text-white/60 sm:text-sm">{{ label }}</p>
-        <p class="mt-1 text-xl font-medium leading-none text-white sm:text-2xl">
-          {{ value }}
-        </p>
+        @if (loading) {
+          <app-text-stub
+            class="mt-1 block text-xl font-medium leading-none sm:text-2xl"
+            bar="inset-y-0 left-0 my-auto h-5 w-14 rounded-full sm:h-6"
+          ></app-text-stub>
+        } @else {
+          <p class="mt-1 text-xl font-medium leading-none text-white sm:text-2xl">
+            {{ value }}
+          </p>
+        }
         @if (hint) {
           <p class="mt-2 text-xs text-white/55 sm:text-sm">{{ hint }}</p>
         }
@@ -45,6 +53,8 @@ export class KpiStatCardComponent {
   @Input() hint = '';
   @Input() icon = '';
   @Input() tone: KpiStatTone = 'slate';
+  /** Skeleton mode: same box, value replaced by a pulse bar. */
+  @Input() loading = false;
 
   get toneClasses(): string {
     switch (this.tone) {

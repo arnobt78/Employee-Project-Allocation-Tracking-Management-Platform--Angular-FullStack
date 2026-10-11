@@ -32,7 +32,7 @@ describe('RouteContentPlaceholderComponent', () => {
     const el = render('/new-project');
     expect(el.querySelector('[data-testid="project-detail-skeleton"]')).toBeTruthy();
     expect(el.querySelector('[data-testid="page-header-title-pending"]')).toBeNull();
-    expect(el.textContent).toContain('Untitled project');
+    expect(el.textContent).toContain('Untitled Project');
     expect(el.textContent).toContain('Draft');
     expect(el.textContent).toContain('Project Name');
     expect(el.textContent).toContain('Create Project');

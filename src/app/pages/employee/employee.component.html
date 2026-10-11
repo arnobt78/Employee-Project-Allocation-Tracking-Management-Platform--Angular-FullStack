@@ -20,7 +20,7 @@
 
   <app-kpi-stat-card
     listShellKpis
-    label="Total employees"
+    label="Total Employees"
     [value]="totalEmployeesKpi()"
     hint="All records"
     icon="users"
@@ -52,7 +52,7 @@
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
-    label="Employment types"
+    label="Employment Types"
     [value]="employmentTypesKpi()"
     hint="Unique types"
     icon="clock"
@@ -351,13 +351,14 @@
           >
             {{ employee.employeeId }}
           </span>
+          @let avatar = avatarFor(employee);
           <app-user-avatar
             class="shrink-0"
-            [seed]="employee.emailId || employee.employeeName"
-            [imageUrl]="employee.avatarUrl ?? null"
-            [label]="employee.employeeName"
+            [seed]="avatar.seed"
+            [imageUrl]="avatar.imageUrl"
+            [label]="avatar.label"
             [size]="32"
-            [alt]="employee.employeeName"
+            [alt]="avatar.label"
           ></app-user-avatar>
           <span class="font-medium text-white md:text-base">
             {{ employee.employeeName }}

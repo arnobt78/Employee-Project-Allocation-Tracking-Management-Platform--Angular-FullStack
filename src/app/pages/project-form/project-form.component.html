@@ -384,7 +384,16 @@
                     ></lucide-icon>
                     <span>Client</span>
                   </p>
-                  <p class="text-base font-medium text-white">
+                  <p class="flex items-center gap-2 text-base font-medium text-white">
+                    @if (clientAvatar(); as avatar) {
+                      <app-user-avatar
+                        [seed]="avatar.seed"
+                        [imageUrl]="avatar.imageUrl"
+                        [label]="avatar.label"
+                        [alt]="avatar.label"
+                        [size]="24"
+                      ></app-user-avatar>
+                    }
                     {{ displayValue("clientName") }}
                   </p>
                 </div>
@@ -900,7 +909,16 @@
                 ></lucide-icon>
                 <span>{{ sectionLabels.team }}</span>
               </span>
-              <span class="text-base font-medium text-white">
+              <span class="flex items-center gap-2 text-base font-medium text-white">
+                @if (leadAvatar(); as avatar) {
+                  <app-user-avatar
+                    [seed]="avatar.seed"
+                    [imageUrl]="avatar.imageUrl"
+                    [label]="avatar.label"
+                    [alt]="avatar.label"
+                    [size]="24"
+                  ></app-user-avatar>
+                }
                 {{ displayValue("leadByEmpId") }}
               </span>
             </div>
@@ -974,7 +992,16 @@
                   <lucide-icon [name]="fieldIcons.lead" [size]="14"></lucide-icon>
                   <span>Project Lead</span>
                 </p>
-                <p class="text-base font-medium text-white">
+                <p class="flex items-center gap-2 text-base font-medium text-white">
+                  @if (leadAvatar(); as avatar) {
+                    <app-user-avatar
+                      [seed]="avatar.seed"
+                      [imageUrl]="avatar.imageUrl"
+                      [label]="avatar.label"
+                      [alt]="avatar.label"
+                      [size]="24"
+                    ></app-user-avatar>
+                  }
                   {{ displayValue("leadByEmpId") }}
                 </p>
               </div>
@@ -1101,7 +1128,15 @@
                           <lucide-icon name="shield-user" [size]="14"></lucide-icon>
                           <span>Current Lead</span>
                         </p>
-                        <p class="text-base sm:text-xl font-medium text-white">
+                        @let leadView = avatarFor(lead.employeeId, lead.employeeName);
+                        <p class="mt-1 flex items-center gap-2 text-base sm:text-xl font-medium text-white">
+                          <app-user-avatar
+                            [seed]="leadView.seed"
+                            [imageUrl]="leadView.imageUrl"
+                            [label]="leadView.label"
+                            [alt]="leadView.label"
+                            [size]="32"
+                          ></app-user-avatar>
                           {{ lead.employeeName }}
                         </p>
                         <p class="text-sm text-white/60">
@@ -1214,16 +1249,26 @@
                         class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                       >
                         <div class="flex items-start justify-between gap-3">
-                          <div>
-                            <p class="text-sm font-medium text-white">
-                              {{ candidate.employeeName }}
-                            </p>
-                            <p class="text-xs sm:text-sm text-white/55">
-                              {{ candidate.role || "Lead" }}
-                              <span *ngIf="candidate.department">
-                                • {{ candidate.department }}
-                              </span>
-                            </p>
+                          <div class="flex min-w-0 items-start gap-3">
+                            @let candidateView = avatarFor(candidate.employeeId, candidate.employeeName);
+                            <app-user-avatar
+                              [seed]="candidateView.seed"
+                              [imageUrl]="candidateView.imageUrl"
+                              [label]="candidateView.label"
+                              [alt]="candidateView.label"
+                              [size]="32"
+                            ></app-user-avatar>
+                            <div class="min-w-0">
+                              <p class="text-sm font-medium text-white">
+                                {{ candidate.employeeName }}
+                              </p>
+                              <p class="text-xs sm:text-sm text-white/55">
+                                {{ candidate.role || "Lead" }}
+                                <span *ngIf="candidate.department">
+                                  • {{ candidate.department }}
+                                </span>
+                              </p>
+                            </div>
                           </div>
                           <span
                             class="text-xs sm:text-sm font-medium text-white/75"
@@ -1309,20 +1354,30 @@
                         class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                       >
                         <div class="flex items-start justify-between gap-3">
-                          <div>
-                            <p class="text-sm font-medium text-white">
-                              {{ assignment.employee.employeeName }}
-                            </p>
-                            <p class="text-xs sm:text-sm text-white/55">
-                              {{
-                                assignment.role ||
-                                  assignment.employee.role ||
-                                  "Contributor"
-                              }}
-                              <span *ngIf="assignment.employee.department">
-                                • {{ assignment.employee.department }}
-                              </span>
-                            </p>
+                          <div class="flex min-w-0 items-start gap-3">
+                            @let memberView = avatarFor(assignment.employee.employeeId, assignment.employee.employeeName);
+                            <app-user-avatar
+                              [seed]="memberView.seed"
+                              [imageUrl]="memberView.imageUrl"
+                              [label]="memberView.label"
+                              [alt]="memberView.label"
+                              [size]="32"
+                            ></app-user-avatar>
+                            <div class="min-w-0">
+                              <p class="text-sm font-medium text-white">
+                                {{ assignment.employee.employeeName }}
+                              </p>
+                              <p class="text-xs sm:text-sm text-white/55">
+                                {{
+                                  assignment.role ||
+                                    assignment.employee.role ||
+                                    "Contributor"
+                                }}
+                                <span *ngIf="assignment.employee.department">
+                                  • {{ assignment.employee.department }}
+                                </span>
+                              </p>
+                            </div>
                           </div>
                           <span
                             class="text-xs sm:text-sm rounded-full border px-2 py-1"
@@ -1395,16 +1450,26 @@
                         class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                       >
                         <div class="flex items-start justify-between gap-3">
-                          <div>
-                            <p class="text-sm font-medium text-white">
-                              {{ collaborator.employeeName }}
-                            </p>
-                            <p class="text-xs sm:text-sm text-white/55">
-                              {{ collaborator.role || "Contributor" }}
-                              <span *ngIf="collaborator.department">
-                                • {{ collaborator.department }}
-                              </span>
-                            </p>
+                          <div class="flex min-w-0 items-start gap-3">
+                            @let collaboratorView = avatarFor(collaborator.employeeId, collaborator.employeeName);
+                            <app-user-avatar
+                              [seed]="collaboratorView.seed"
+                              [imageUrl]="collaboratorView.imageUrl"
+                              [label]="collaboratorView.label"
+                              [alt]="collaboratorView.label"
+                              [size]="32"
+                            ></app-user-avatar>
+                            <div class="min-w-0">
+                              <p class="text-sm font-medium text-white">
+                                {{ collaborator.employeeName }}
+                              </p>
+                              <p class="text-xs sm:text-sm text-white/55">
+                                {{ collaborator.role || "Contributor" }}
+                                <span *ngIf="collaborator.department">
+                                  • {{ collaborator.department }}
+                                </span>
+                              </p>
+                            </div>
                           </div>
                           <span
                             class="text-xs sm:text-sm font-medium text-white/75"
@@ -1598,7 +1663,16 @@
                 ></lucide-icon>
                 <span>{{ sectionLabels.contact }}</span>
               </span>
-              <span class="text-base font-medium text-white">
+              <span class="flex items-center gap-2 text-base font-medium text-white">
+                @if (contactAvatar(); as avatar) {
+                  <app-user-avatar
+                    [seed]="avatar.seed"
+                    [imageUrl]="avatar.imageUrl"
+                    [label]="avatar.label"
+                    [alt]="avatar.label"
+                    [size]="24"
+                  ></app-user-avatar>
+                }
                 {{ displayValue("contactPerson") }}
               </span>
             </div>
@@ -1719,7 +1793,16 @@
                     <lucide-icon [name]="fieldIcons.contactPerson" [size]="14"></lucide-icon>
                     <span>Primary Contact</span>
                   </p>
-                  <p class="text-base font-medium text-white">
+                  <p class="flex items-center gap-2 text-base font-medium text-white">
+                    @if (contactAvatar(); as avatar) {
+                      <app-user-avatar
+                        [seed]="avatar.seed"
+                        [imageUrl]="avatar.imageUrl"
+                        [label]="avatar.label"
+                        [alt]="avatar.label"
+                        [size]="24"
+                      ></app-user-avatar>
+                    }
                     {{ displayValue("contactPerson") }}
                   </p>
                 </div>
@@ -1977,15 +2060,18 @@
                         {{ formatDateTime(entry.changedAt) }}
                       </span>
                     </div>
-                    <p class="text-xs sm:text-sm text-white/60">
-                      {{
-                        actorDisplayName(
-                          entry.changedBy ?? null,
-                          entry.changedByName
-                        )
-                      }}
+                    @let historyActor = actorAvatar(entry.changedBy ?? null, entry.changedByName);
+                    <p class="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-white/60">
+                      <app-user-avatar
+                        [seed]="historyActor.seed"
+                        [imageUrl]="historyActor.imageUrl"
+                        [label]="historyActor.label"
+                        [alt]="historyActor.label"
+                        [size]="20"
+                      ></app-user-avatar>
+                      <span>{{ historyActor.label }}</span>
                       <ng-container *ngIf="entry.previousStatus">
-                        • from {{ approvalStatusLabel(entry.previousStatus) }}
+                        <span>• from {{ approvalStatusLabel(entry.previousStatus) }}</span>
                       </ng-container>
                     </p>
                     <p
@@ -2018,16 +2104,22 @@
                   >
                     <div class="flex items-center justify-between">
                       <span class="text-sm font-medium text-white">
-                        {{ entry.label }}
+                        {{ timelineLabel(entry.label) }}
                       </span>
                       <span class="text-xs sm:text-sm text-white/60">
                         {{ formatDateTime(entry.occurredAt) }}
                       </span>
                     </div>
-                    <p class="text-xs sm:text-sm text-white/60">
-                      {{
-                        actorDisplayName(entry.actorId ?? null, entry.actorName)
-                      }}
+                    @let timelineActor = actorAvatar(entry.actorId ?? null, entry.actorName);
+                    <p class="flex items-center gap-2 text-xs sm:text-sm text-white/60">
+                      <app-user-avatar
+                        [seed]="timelineActor.seed"
+                        [imageUrl]="timelineActor.imageUrl"
+                        [label]="timelineActor.label"
+                        [alt]="timelineActor.label"
+                        [size]="20"
+                      ></app-user-avatar>
+                      <span>{{ timelineActor.label }}</span>
                     </p>
                     <p
                       *ngIf="entry.description"
@@ -2182,7 +2274,7 @@
                       <span
                         class="rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-xs sm:text-sm text-white/50"
                       >
-                        {{ comment.section | titlecase }}
+                        {{ reviewerSectionLabel(comment.section) }}
                       </span>
                     </div>
                     <div
@@ -2190,13 +2282,16 @@
                     >
                       <span>{{ formatDateTime(comment.createdAt) }}</span>
                       <span>•</span>
-                      <span>
-                        {{
-                          actorDisplayName(
-                            comment.reviewerId,
-                            comment.reviewerName
-                          )
-                        }}
+                      @let reviewer = actorAvatar(comment.reviewerId, comment.reviewerName);
+                      <span class="inline-flex items-center gap-1.5">
+                        <app-user-avatar
+                          [seed]="reviewer.seed"
+                          [imageUrl]="reviewer.imageUrl"
+                          [label]="reviewer.label"
+                          [alt]="reviewer.label"
+                          [size]="20"
+                        ></app-user-avatar>
+                        {{ reviewer.label }}
                       </span>
                       <span
                         class="rounded-full px-2 py-0.5 text-xs sm:text-sm"

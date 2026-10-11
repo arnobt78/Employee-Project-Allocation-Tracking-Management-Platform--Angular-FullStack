@@ -27,35 +27,35 @@ export function isRecordId(value) {
 const READINESS_DEFINITIONS = [
   {
     id: "scopeDefined",
-    title: "Scope confirmed",
+    title: "Scope Confirmed",
     description: "Requirements baseline captured and shared with stakeholders.",
     category: "Scope",
     weight: 25,
   },
   {
     id: "budgetApproved",
-    title: "Budget approved",
+    title: "Budget Approved",
     description: "Finance sign-off received for the projected spend.",
     category: "Budget",
     weight: 20,
   },
   {
     id: "legalReviewed",
-    title: "Contracts reviewed",
+    title: "Contracts Reviewed",
     description: "Master services agreement and NDAs cleared with legal.",
     category: "Legal",
     weight: 20,
   },
   {
     id: "assetsPrepared",
-    title: "Assets prepared",
+    title: "Assets Prepared",
     description: "Brand assets, data rooms, and collateral ready to share.",
     category: "Assets",
     weight: 15,
   },
   {
     id: "kickoffScheduled",
-    title: "Kickoff scheduled",
+    title: "Kickoff Scheduled",
     description: "Kickoff meeting on calendar with internal and client teams.",
     category: "Timeline",
     weight: 20,
@@ -2110,7 +2110,7 @@ function buildApprovalHistoryEntry({
 function buildApprovalTimelineEntry({ status, actorId, actorName, comment }) {
   return {
     id: `approval-${Date.now()}`,
-    label: `${APPROVAL_LABELS[status] ?? status} status`,
+    label: `${APPROVAL_LABELS[status] ?? status} Status`,
     description: comment && comment.trim().length ? comment.trim() : undefined,
     state: "completed",
     occurredAt: new Date().toISOString(),
@@ -2669,20 +2669,35 @@ export async function updateProjectEmployee(empProjectId, payload) {
       code: "P2025",
     });
 
-  if (updateData.projectId !== undefined || updateData.empId !== undefined) {
+  const checksTargets = updateData.projectId !== undefined || updateData.empId !== undefined;
+  // Deactivating stamps the unassigned date and reactivating clears it, unless the client sent one.
+  const tracksUnassigned = updateData.isActive !== undefined && payload.unassignedAt === undefined;
+  if (checksTargets || tracksUnassigned) {
     // A missing assignment is reported before a missing project/employee.
     const [existing, targetsError] = await Promise.all([
-      prisma.projectEmployee.findUnique({ where: { empProjectId: id }, select: { empProjectId: true } }),
-      assertAssignmentTargetsExist(updateData).then(
-        () => null,
-        (error) => error
-      ),
+      prisma.projectEmployee.findUnique({
+        where: { empProjectId: id },
+        select: { isActive: true, unassignedAt: true },
+      }),
+      checksTargets
+        ? assertAssignmentTargetsExist(updateData).then(
+            () => null,
+            (error) => error
+          )
+        : null,
     ]);
     if (!existing) {
       throw notFound();
     }
     if (targetsError) {
       throw targetsError;
+    }
+    if (tracksUnassigned) {
+      if (!updateData.isActive && existing.isActive) {
+        updateData.unassignedAt = new Date();
+      } else if (updateData.isActive && existing.unassignedAt) {
+        updateData.unassignedAt = null;
+      }
     }
   }
 
@@ -2816,6 +2831,8 @@ export async function buildScheduleData() {
       employeeId: true,
       employeeName: true,
       department: true,
+      emailId: true,
+      avatarUrl: true,
     },
   });
 
@@ -2928,6 +2945,8 @@ export async function buildScheduleData() {
         status: project.status || "draft",
         leadName: lead?.employeeName || "",
         leadDepartment: lead?.department || "",
+        leadEmail: lead?.emailId || "",
+        leadAvatarUrl: lead?.avatarUrl || null,
       });
     }
   });

@@ -13,6 +13,7 @@ import {
 } from '../calendar-view/calendar-month';
 import { CalendarMonthShellComponent } from '../calendar-view/calendar-month-shell.component';
 import { PageHeaderComponent } from './page-header.component';
+import { AppIconComponent } from './app-icon.component';
 
 /**
  * Full-page loading mirror of calendar-timeline. The month grid is static
@@ -23,7 +24,7 @@ import { PageHeaderComponent } from './page-header.component';
 @Component({
   selector: 'app-calendar-skeleton',
   standalone: true,
-  imports: [CalendarMonthShellComponent, PageHeaderComponent],
+  imports: [CalendarMonthShellComponent, PageHeaderComponent, AppIconComponent],
   host: { class: 'block' },
   template: `
     <div
@@ -38,7 +39,7 @@ import { PageHeaderComponent } from './page-header.component';
       >
         @for (width of pillWidths; track $index) {
           <span
-            class="h-6 animate-pulse rounded-full bg-white/10"
+            class="h-[26px] animate-pulse rounded-full bg-white/10 sm:h-[30px]"
             [style.width.px]="width"
             aria-hidden="true"
           ></span>
@@ -52,6 +53,7 @@ import { PageHeaderComponent } from './page-header.component';
           <div class="mb-6 flex gap-2 border-b border-white/10">
             @for (tab of tabs; track tab.id; let first = $first) {
               <span [class]="first ? activeTabClass : idleTabClass">
+                <lucide-icon [name]="tab.icon" [size]="14"></lucide-icon>
                 {{ tab.label }}
               </span>
             }
@@ -92,5 +94,5 @@ export class CalendarSkeletonComponent {
   readonly tabs = CALENDAR_TABS;
   readonly activeTabClass = CALENDAR_TAB_ACTIVE_CLASS;
   readonly idleTabClass = CALENDAR_TAB_IDLE_CLASS;
-  readonly pillWidths = [88, 104, 100];
+  readonly pillWidths = [112, 128, 124];
 }

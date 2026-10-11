@@ -43,6 +43,12 @@ import {
   ListToolbarMenuFilterChange,
 } from '@/app/components/ui/list-toolbar.component';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
+import { employeeAvatar, type AvatarView } from '@/app/lib/media/employee-avatar';
+import {
+  BADGE_TONE_CLASS,
+  projectStatusMeta,
+  type StatusMeta,
+} from '@/app/lib/status/project-status';
 import {
   bindListQuery,
   ListQueryController,
@@ -87,6 +93,7 @@ export class ProjectEmployeeComponent implements OnInit {
   private listQuery!: ListQueryController;
 
   readonly pageMeta = PRIVATE_PAGE_META['/project-employee'];
+  readonly badgeTone = BADGE_TONE_CLASS;
 
   @ViewChild('createPanel') createPanel?: ElementRef<HTMLElement>;
 
@@ -111,7 +118,7 @@ export class ProjectEmployeeComponent implements OnInit {
     this.employees().map((employee) => ({
       value: String(employee.employeeId),
       label: employee.employeeName,
-      imageSeed: employee.emailId || employee.employeeName,
+      imageSeed: employeeAvatar(employee).seed,
       imageUrl: employee.avatarUrl ?? null,
     }))
   );
@@ -622,6 +629,13 @@ export class ProjectEmployeeComponent implements OnInit {
     return this.datePipe.transform(value, 'MMM d, y') ?? value;
   }
 
+  unassignedLabel(item: IProjectEmployee): string {
+    if (item.unassignedAt) {
+      return this.formattedDate(item.unassignedAt);
+    }
+    return this.isActive(item.isActive) ? 'Still Assigned' : 'Not Recorded';
+  }
+
   projectNameFor(id: number | null | undefined) {
     if (id == null) return '—';
     return this.projects().find((project) => project.projectId === id)
@@ -633,25 +647,16 @@ export class ProjectEmployeeComponent implements OnInit {
     return this.employees().find((emp) => emp.employeeId === id)?.employeeName;
   }
 
-  employeeAvatarSeed(item: IProjectEmployee): string {
+  avatarFor(item: IProjectEmployee): AvatarView {
     const emp = this.employees().find((e) => e.employeeId === item.empId);
-    return emp?.emailId || item.employeeName || String(item.empId);
+    const avatar = employeeAvatar(emp, item.employeeName || String(item.empId));
+    return item.employeeAvatarUrl
+      ? { ...avatar, imageUrl: item.employeeAvatarUrl }
+      : avatar;
   }
 
-  employeeAvatarUrl(item: IProjectEmployee): string | null {
-    if (item.employeeAvatarUrl) {
-      return item.employeeAvatarUrl;
-    }
-    return (
-      this.employees().find((e) => e.employeeId === item.empId)?.avatarUrl ??
-      null
-    );
-  }
-
-  statusBadge(isActive: string | boolean | null | undefined) {
-    return this.isActive(isActive)
-      ? 'inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-xs sm:text-sm font-medium text-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.25)]'
-      : 'inline-flex items-center gap-1.5 rounded-full border border-slate-400/40 bg-slate-500/15 px-3 py-1 text-xs sm:text-sm font-medium text-slate-200';
+  assignmentStatus(isActive: string | boolean | null | undefined): StatusMeta {
+    return projectStatusMeta(this.isActive(isActive) ? 'active' : 'inactive');
   }
 
   isActive(value: string | boolean | null | undefined): boolean {

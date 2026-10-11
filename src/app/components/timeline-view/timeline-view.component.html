@@ -1,124 +1,62 @@
 <div class="space-y-6">
-  <div class="flex items-center justify-between">
-    <h3 class="text-base sm:text-xl font-medium text-white">
-      Project Timeline
+  <div class="flex items-center justify-between gap-3">
+    <h3 class="eh-btn-icon justify-start text-base sm:text-xl font-medium text-white">
+      <lucide-icon name="calendar-range" [size]="18"></lucide-icon>
+      <span>Project Timeline</span>
     </h3>
-    <p class="text-sm text-white/60">{{ sortedProjects().length }} projects</p>
+    <span class="eh-badge eh-badge-neutral">
+      <lucide-icon name="folder-kanban" [size]="12"></lucide-icon>
+      {{ rows().length }} Projects
+    </span>
   </div>
 
-  <!-- Main Timeline Bar (Horizontal) -->
+  <!-- Portfolio bar: one segment and start marker per project -->
   <div class="relative mb-8" style="height: 80px">
-    <!-- Background Timeline Line -->
-    <div
-      class="absolute left-0 top-10 h-1.5 w-full rounded-full bg-white/10"
-    ></div>
+    <div class="absolute left-0 top-10 h-1.5 w-full rounded-full bg-white/10"></div>
 
-    <!-- Project Timeline Bars (visual representation of duration) -->
-    <div
-      *ngFor="let project of sortedProjects()"
-      class="group absolute top-9 h-3 rounded-full transition-all hover:opacity-100 hover:shadow-lg cursor-pointer z-10"
-      [class]="
-        project.status === 'approved' || project.status === 'completed'
-          ? 'bg-green-500/60 hover:bg-green-500/80'
-          : project.status === 'in_progress' || project.status === 'in_review'
-            ? 'bg-blue-500/60 hover:bg-blue-500/80'
-            : project.status === 'on_hold'
-              ? 'bg-yellow-500/60 hover:bg-yellow-500/80'
-              : project.status === 'cancelled' || project.status === 'rejected'
-                ? 'bg-red-500/60 hover:bg-red-500/80'
-                : 'bg-gray-500/60 hover:bg-gray-500/80'
-      "
-      [style.left.%]="getProjectPosition(project)"
-      [style.width.%]="getProjectWidth(project)"
-    >
-      <!-- Hover Tooltip for Bar -->
+    @for (row of rows(); track row.project.projectId) {
       <div
-        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20"
+        class="group absolute top-9 z-10 h-3 cursor-pointer rounded-full opacity-60 transition-all hover:opacity-90 hover:shadow-lg"
+        [ngClass]="row.fill"
+        [style.left.%]="row.position"
+        [style.width.%]="row.width"
       >
-        <div
-          class="whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-xl border border-white/20"
-        >
-          <div class="font-medium">{{ project.projectName }}</div>
-          <div class="text-white/60">
-            {{ project.startDate | date: "MMM d, y" }}
-            <span *ngIf="project.endDate">
-              - {{ project.endDate | date: "MMM d, y" }}
-            </span>
+        <div class="absolute bottom-full left-1/2 z-20 mb-2 hidden -translate-x-1/2 group-hover:block">
+          <div class="eh-timeline-tooltip">
+            <div class="font-medium">{{ row.project.projectName }}</div>
+            <div class="text-white/60">
+              {{ row.project.startDate | date: "MMM d, y" }}
+              @if (row.project.endDate) {
+                – {{ row.project.endDate | date: "MMM d, y" }}
+              }
+            </div>
+            <div class="text-white/60">Duration: {{ row.duration }}</div>
+            <div class="text-white/60">Status: {{ row.status.label }}</div>
           </div>
-          <div class="text-white/60">
-            Duration: {{ getDurationDisplay(project) }}
-          </div>
-          <div class="text-white/60">Status: {{ project.status }}</div>
         </div>
-        <!-- Tooltip Arrow -->
-        <div
-          class="absolute left-1/2 -translate-x-1/2 top-full h-0 w-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"
-        ></div>
       </div>
-    </div>
 
-    <!-- Project Timeline Nodes (circles at start of each project) -->
-    <div
-      *ngFor="let project of sortedProjects()"
-      class="group absolute top-10 left-0 transition-all hover:scale-125 hover:shadow-lg cursor-pointer z-10"
-      [style.left.%]="getProjectPosition(project)"
-      style="transform: translateX(-50%) translateY(-50%)"
-    >
-      <!-- Outer Ring -->
       <div
-        class="h-5 w-5 rounded-full border-2 flex items-center justify-center"
-        [class]="
-          project.status === 'approved' || project.status === 'completed'
-            ? 'border-green-500'
-            : project.status === 'in_progress' || project.status === 'in_review'
-              ? 'border-blue-500'
-              : project.status === 'on_hold'
-                ? 'border-yellow-500'
-                : project.status === 'cancelled' ||
-                    project.status === 'rejected'
-                  ? 'border-red-500'
-                  : 'border-gray-500'
-        "
-      >
-        <!-- Inner Circle -->
-        <div
-          class="h-3 w-3 rounded-full"
-          [class]="
-            project.status === 'approved' || project.status === 'completed'
-              ? 'bg-green-500/30'
-              : project.status === 'in_progress' ||
-                  project.status === 'in_review'
-                ? 'bg-blue-500/30'
-                : project.status === 'on_hold'
-                  ? 'bg-yellow-500/30'
-                  : project.status === 'cancelled' ||
-                      project.status === 'rejected'
-                    ? 'bg-red-500/30'
-                    : 'bg-gray-500/30'
-          "
-        ></div>
-      </div>
-      <!-- Hover Tooltip for Node -->
-      <div
-        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20"
+        class="group absolute top-10 z-10 cursor-pointer transition-all hover:scale-125"
+        [style.left.%]="row.position"
+        style="transform: translateX(-50%) translateY(-50%)"
       >
         <div
-          class="whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-xl border border-white/20"
+          class="flex h-5 w-5 items-center justify-center rounded-full border-2 bg-background"
+          [ngClass]="row.border"
         >
-          <div class="font-medium">{{ project.projectName }}</div>
-          <div class="text-white/60">
-            Start: {{ project.startDate | date: "MMM d, y" }}
-          </div>
-          <div class="text-white/60">Status: {{ project.status }}</div>
+          <div class="h-2.5 w-2.5 rounded-full opacity-60" [ngClass]="row.fill"></div>
         </div>
-        <!-- Tooltip Arrow -->
-        <div
-          class="absolute left-1/2 -translate-x-1/2 top-full h-0 w-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"
-        ></div>
+        <div class="absolute bottom-full left-1/2 z-20 mb-2 hidden -translate-x-1/2 group-hover:block">
+          <div class="eh-timeline-tooltip">
+            <div class="font-medium">{{ row.project.projectName }}</div>
+            <div class="text-white/60">Start: {{ row.project.startDate | date: "MMM d, y" }}</div>
+            <div class="text-white/60">Status: {{ row.status.label }}</div>
+          </div>
+        </div>
       </div>
-    </div>
+    }
 
-    <!-- Date Labels (optional - showing min and max dates) -->
     <div class="absolute left-0 top-0 text-xs text-white/40">
       {{ dateRange().min | date: "MMM d, y" }}
     </div>
@@ -127,153 +65,107 @@
     </div>
   </div>
 
-  <!-- Project Cards -->
   <div class="space-y-4">
-    <div
-      *ngFor="let project of sortedProjects(); let i = index"
-      class="relative"
-    >
-      <!-- Project Card -->
+    @for (row of rows(); track row.project.projectId) {
       <div
         class="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md transition-all hover:border-primary/50 hover:bg-white/10"
       >
-        <div
-          class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
-        >
-          <div class="flex-1">
-            <div class="flex items-center gap-2">
-              <h4
-                [routerLink]="['/update-project', project.projectId]"
-                class="cursor-pointer text-base sm:text-xl font-medium text-white transition-colors hover:text-primary"
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div class="min-w-0 flex-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <a
+                [routerLink]="['/update-project', row.project.projectId]"
+                class="text-base sm:text-xl font-medium text-white transition-colors hover:text-primary"
               >
-                {{ project.projectName }}
-              </h4>
-              <span
-                class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
-                [class]="getStatusColor(project.status)"
-              >
-                {{ project.status }}
+                {{ row.project.projectName }}
+              </a>
+              <span class="eh-badge" [ngClass]="badgeTone[row.status.tone]">
+                <lucide-icon [name]="row.status.icon" [size]="12"></lucide-icon>
+                {{ row.status.label }}
               </span>
             </div>
-            <p class="text-sm text-white/60">
-              {{ project.clientName }}
-            </p>
+            @if (row.project.clientName) {
+              <p class="mt-1 flex items-center gap-1.5 text-sm text-white/60">
+                <lucide-icon name="building-2" [size]="14"></lucide-icon>
+                <span>{{ row.project.clientName }}</span>
+              </p>
+            }
 
-            <!-- Mini Timeline Bar for this project -->
-            <div
-              class="mt-2 relative h-2 w-full rounded-full bg-white/5 overflow-visible"
-            >
-              <!-- Background line showing full date range -->
-              <div class="absolute inset-0 bg-white/10 rounded-full"></div>
-              <!-- This project's position and duration -->
+            <div class="relative mt-3 h-2 w-full overflow-visible rounded-full bg-white/10">
               <div
-                class="group/bar absolute h-full rounded-full transition-all cursor-pointer hover:opacity-80"
-                [class]="
-                  project.status === 'approved' ||
-                  project.status === 'completed'
-                    ? 'bg-green-500/60'
-                    : project.status === 'in_progress' ||
-                        project.status === 'in_review'
-                      ? 'bg-blue-500/60'
-                      : project.status === 'on_hold'
-                        ? 'bg-yellow-500/60'
-                        : project.status === 'cancelled' ||
-                            project.status === 'rejected'
-                          ? 'bg-red-500/60'
-                          : 'bg-gray-500/60'
-                "
-                [style.left.%]="getProjectPosition(project)"
-                [style.width.%]="getProjectWidth(project)"
+                class="group/bar absolute h-full cursor-pointer rounded-full opacity-60 transition-all hover:opacity-90"
+                [ngClass]="row.fill"
+                [style.left.%]="row.position"
+                [style.width.%]="row.width"
               >
-                <!-- Hover Tooltip for Bar -->
-                <div
-                  class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/bar:block z-30"
-                >
-                  <div
-                    class="whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-xl border border-white/20"
-                  >
-                    <div class="font-medium">{{ project.projectName }}</div>
+                <div class="absolute bottom-full left-1/2 z-30 mb-2 hidden -translate-x-1/2 group-hover/bar:block">
+                  <div class="eh-timeline-tooltip">
+                    <div class="font-medium">{{ row.project.projectName }}</div>
                     <div class="text-white/60">
-                      {{ project.startDate | date: "MMM d, y" }}
-                      <span *ngIf="project.endDate">
-                        - {{ project.endDate | date: "MMM d, y" }}
-                      </span>
+                      {{ row.project.startDate | date: "MMM d, y" }}
+                      @if (row.project.endDate) {
+                        – {{ row.project.endDate | date: "MMM d, y" }}
+                      }
                     </div>
-                    <div class="text-white/60">
-                      Duration: {{ getDurationDisplay(project) }}
-                    </div>
-                    <div class="text-white/60">
-                      Position:
-                      {{ getProjectPosition(project) | number: "1.0-1" }}% on
-                      timeline
-                    </div>
+                    <div class="text-white/60">Duration: {{ row.duration }}</div>
                   </div>
-                  <!-- Tooltip Arrow -->
-                  <div
-                    class="absolute left-1/2 -translate-x-1/2 top-full h-0 w-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"
-                  ></div>
                 </div>
               </div>
-              <!-- Start marker -->
               <div
-                class="group/marker absolute top-1/2 -translate-y-1/2 h-3 w-3 -translate-x-1/2 rounded-full border-2 bg-background transition-all cursor-pointer hover:scale-125 z-20"
-                [class]="
-                  project.status === 'approved' ||
-                  project.status === 'completed'
-                    ? 'border-green-500'
-                    : project.status === 'in_progress' ||
-                        project.status === 'in_review'
-                      ? 'border-blue-500'
-                      : project.status === 'on_hold'
-                        ? 'border-yellow-500'
-                        : project.status === 'cancelled' ||
-                            project.status === 'rejected'
-                          ? 'border-red-500'
-                          : 'border-gray-500'
-                "
-                [style.left.%]="getProjectPosition(project)"
-              >
-                <!-- Hover Tooltip for Marker -->
-                <div
-                  class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/marker:block z-30"
-                >
-                  <div
-                    class="whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-xl border border-white/20"
-                  >
-                    <div class="font-medium">{{ project.projectName }}</div>
-                    <div class="text-white/60">
-                      Start: {{ project.startDate | date: "MMM d, y" }}
-                    </div>
-                    <div class="text-white/60">
-                      Status: {{ project.status }}
-                    </div>
-                    <div class="text-white/60">
-                      Timeline Position:
-                      {{ getProjectPosition(project) | number: "1.0-1" }}%
-                    </div>
-                  </div>
-                  <!-- Tooltip Arrow -->
-                  <div
-                    class="absolute left-1/2 -translate-x-1/2 top-full h-0 w-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"
-                  ></div>
-                </div>
-              </div>
+                class="absolute top-1/2 z-20 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-background"
+                [ngClass]="row.border"
+                [style.left.%]="row.position"
+              ></div>
             </div>
 
-            <div class="mt-2 flex flex-wrap gap-4 text-xs text-white/60">
-              <span> Start: {{ project.startDate | date: "MMM d, y" }} </span>
-              <span *ngIf="project.endDate">
-                End: {{ project.endDate | date: "MMM d, y" }}
+            <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-white/60">
+              <span class="inline-flex items-center gap-1.5">
+                <lucide-icon name="calendar" [size]="14"></lucide-icon>
+                Start: {{ row.project.startDate | date: "MMM d, y" }}
               </span>
-              <span> Duration: {{ getDurationDisplay(project) }} </span>
+              <span class="inline-flex items-center gap-1.5">
+                <lucide-icon name="calendar-check" [size]="14"></lucide-icon>
+                End:
+                @if (row.project.endDate) {
+                  {{ row.project.endDate | date: "MMM d, y" }}
+                } @else {
+                  Ongoing
+                }
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <lucide-icon name="timer" [size]="14"></lucide-icon>
+                Duration: {{ row.duration }}
+              </span>
             </div>
           </div>
-          <div class="text-right text-sm">
-            <p class="text-white/80">{{ project.leadName }}</p>
-            <p class="text-white/60">{{ project.leadDepartment }}</p>
-          </div>
+
+          @if (row.lead; as lead) {
+            <div class="flex items-center gap-3 sm:justify-end">
+              <app-user-avatar
+                [seed]="lead.seed"
+                [imageUrl]="lead.imageUrl"
+                [label]="lead.label"
+                [alt]="lead.label"
+                [size]="32"
+              ></app-user-avatar>
+              <div class="min-w-0 text-sm sm:text-right">
+                <p class="flex items-center gap-1.5 truncate font-medium text-white/85 sm:justify-end">
+                  <lucide-icon name="shield-user" [size]="14" class="shrink-0 text-white/55"></lucide-icon>
+                  <span class="truncate">{{ lead.label }}</span>
+                </p>
+                @if (row.project.leadDepartment) {
+                  <p class="truncate text-white/55">{{ row.project.leadDepartment }}</p>
+                }
+              </div>
+            </div>
+          } @else {
+            <span class="eh-badge eh-badge-neutral self-start">
+              <lucide-icon name="user-x" [size]="12"></lucide-icon>
+              No Lead
+            </span>
+          }
         </div>
       </div>
-    </div>
+    }
   </div>
 </div>

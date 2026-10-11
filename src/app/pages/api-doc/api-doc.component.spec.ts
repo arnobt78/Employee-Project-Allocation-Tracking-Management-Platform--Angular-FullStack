@@ -7,6 +7,7 @@ import { NEVER } from 'rxjs';
 import { ApiDocComponent } from './api-doc.component';
 import { MasterService } from '../../service/master.service';
 import { IApiDocumentation } from '../../model/interface/master';
+import { ToastService } from '@/app/components/ui/toast.service';
 
 describe('ApiDocComponent', () => {
   let master: MasterService;
@@ -78,5 +79,31 @@ describe('ApiDocComponent', () => {
     const el = create();
     expect(el.textContent).toContain('Message:');
     expect(el.textContent).toContain('Project not found');
+  });
+
+  describe('copy URL', () => {
+    function setup(): ApiDocComponent {
+      spyOn(master, 'peekApiDocumentation').and.returnValue(doc);
+      spyOn(master, 'getApiDocumentation').and.returnValue(NEVER);
+      return TestBed.createComponent(ApiDocComponent).componentInstance;
+    }
+
+    it('shows a Copied toast after writing to the clipboard', async () => {
+      const component = setup();
+      const toast = TestBed.inject(ToastService);
+      const success = spyOn(toast, 'success');
+      spyOn(navigator.clipboard, 'writeText').and.resolveTo();
+      await component.copyToClipboard('/api/GetProjects');
+      expect(success).toHaveBeenCalledWith({ title: 'Copied', description: '/api/GetProjects' });
+    });
+
+    it('shows an error toast when the clipboard rejects', async () => {
+      const component = setup();
+      const toast = TestBed.inject(ToastService);
+      const error = spyOn(toast, 'error');
+      spyOn(navigator.clipboard, 'writeText').and.rejectWith(new Error('denied'));
+      await component.copyToClipboard('/api/GetProjects');
+      expect(error).toHaveBeenCalled();
+    });
   });
 });

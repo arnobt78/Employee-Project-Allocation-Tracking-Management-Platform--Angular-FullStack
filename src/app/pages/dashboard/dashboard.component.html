@@ -83,14 +83,14 @@
             tone="sky"
           ></app-kpi-stat-card>
           <app-kpi-stat-card
-            label="Active projects"
+            label="Active Projects"
             [value]="projectStats.active"
             hint="With active assignments or leads"
             icon="zap"
             tone="emerald"
           ></app-kpi-stat-card>
           <app-kpi-stat-card
-            label="Inactive projects"
+            label="Inactive Projects"
             [value]="projectStats.inactive"
             hint="No active assignments and no lead"
             icon="pause-circle"
@@ -111,7 +111,7 @@
             tone="amber"
           ></app-kpi-stat-card>
           <app-kpi-stat-card
-            label="Active assignments"
+            label="Active Assignments"
             [value]="projectStats.activeAssignments"
             hint="Live project–employee links"
             icon="link"
@@ -137,7 +137,7 @@
           }
           @if (projectStats.inactiveAssignments > 0) {
             <app-kpi-stat-card
-              label="Inactive assignments"
+              label="Inactive Assignments"
               [value]="projectStats.inactiveAssignments"
               hint="Paused or ended allocations"
               icon="unlink"
@@ -268,15 +268,13 @@
                     </p>
                   </div>
                 </div>
+                @let status = statusMeta(item.status || 'in_progress');
                 <span
-                  class="inline-flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-xs sm:text-sm font-medium capitalize backdrop-blur-sm"
-                  [class]="projectStatusTone(item.status)"
+                  class="eh-badge shrink-0"
+                  [class]="badgeTone[status.tone]"
                 >
-                  <lucide-icon
-                    [name]="projectStatusIcon(item.status)"
-                    [size]="12"
-                  ></lucide-icon>
-                  {{ formatStatusLabel(item.status) | titlecase }}
+                  <lucide-icon [name]="status.icon" [size]="12"></lucide-icon>
+                  {{ status.label }}
                 </span>
               </li>
             }
@@ -321,12 +319,13 @@
                 <span
                   class="flex min-w-0 items-center gap-3 font-medium text-white"
                 >
+                  @let avatar = avatarFor(item);
                   <app-user-avatar
-                    [seed]="item.emailId || item.employeeName"
-                    [imageUrl]="item.avatarUrl ?? null"
-                    [label]="item.employeeName"
+                    [seed]="avatar.seed"
+                    [imageUrl]="avatar.imageUrl"
+                    [label]="avatar.label"
                     [size]="32"
-                    [alt]="item.employeeName"
+                    [alt]="avatar.label"
                   ></app-user-avatar>
                   <span class="min-w-0">
                     <span class="block truncate">{{ item.employeeName }}</span>

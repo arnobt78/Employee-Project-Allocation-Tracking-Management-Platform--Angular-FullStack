@@ -10,34 +10,37 @@ import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval } from 'rxjs';
 import { MasterService } from '../../service/master.service';
-import {
-  IApiStatus,
-  INotificationLogEntry,
-  NotificationDeliveryStatus,
-} from '../../model/interface/master';
+import { IApiStatus, INotificationLogEntry } from '../../model/interface/master';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 import { ApiStatusSkeletonComponent } from '@/app/components/ui/api-status-skeleton.component';
 import { DeliveryRowSkeletonComponent } from '@/app/components/ui/delivery-row-skeleton.component';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 import {
   API_STATUS_COPY,
-  API_STATUS_DATA_LABELS,
+  API_STATUS_DATA_CARDS,
   API_STATUS_DELIVERY_SKELETON_ROWS,
   API_STATUS_METRIC_CARDS,
+  API_STATUS_SECTION_ICONS,
   API_STATUS_TABS,
   API_STATUS_TAB_ACTIVE_CLASS,
   API_STATUS_TAB_IDLE_CLASS,
   ApiStatusTabId,
 } from '@/app/constants/api-status';
+import { ActionButtonComponent } from '@/app/components/ui/action-button.component';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
+import { KpiStatCardComponent } from '@/app/components/ui/kpi-stat-card.component';
+import { ToastService } from '@/app/components/ui/toast.service';
+import { titleCaseLabel } from '@/app/lib/format/labels';
+import {
+  deliveryMeta,
+  healthMeta,
+  httpMethodTone,
+  httpStatusTone,
+} from '@/app/lib/status/api-badges';
+import { BADGE_TONE_CLASS } from '@/app/lib/status/project-status';
 
 const AUTO_REFRESH_MS = 30_000;
 const DELIVERY_LOG_LIMIT = 10;
-
-const DELIVERY_STATUS_CLASS: Record<NotificationDeliveryStatus, string> = {
-  sent: 'bg-green-500/20 text-green-400 border-green-500/30',
-  failed: 'bg-red-500/20 text-red-400 border-red-500/30',
-  skipped: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
-};
 
 @Component({
   selector: 'app-api-status',
@@ -47,6 +50,9 @@ const DELIVERY_STATUS_CLASS: Record<NotificationDeliveryStatus, string> = {
     PageHeaderComponent,
     ApiStatusSkeletonComponent,
     DeliveryRowSkeletonComponent,
+    ActionButtonComponent,
+    AppIconComponent,
+    KpiStatCardComponent,
   ],
   templateUrl: './api-status.component.html',
   styleUrls: ['./api-status.component.css'],
@@ -54,13 +60,13 @@ const DELIVERY_STATUS_CLASS: Record<NotificationDeliveryStatus, string> = {
 export class ApiStatusComponent implements OnInit {
   private readonly masterService = inject(MasterService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly toast = inject(ToastService);
 
   readonly pageMeta = PRIVATE_PAGE_META['/api-status'];
   readonly copy = API_STATUS_COPY;
   readonly tabs = API_STATUS_TABS;
   readonly activeTabClass = API_STATUS_TAB_ACTIVE_CLASS;
   readonly idleTabClass = API_STATUS_TAB_IDLE_CLASS;
-  readonly metricCards = API_STATUS_METRIC_CARDS;
   readonly statusSignal = signal<IApiStatus | null>(
     this.masterService.peekApiStatus()
   );
@@ -78,18 +84,28 @@ export class ApiStatusComponent implements OnInit {
   readonly activeTabSignal = signal<ApiStatusTabId>('overview');
   readonly activeTab = this.activeTabSignal.asReadonly();
 
-  readonly overallHealthColor = computed(() => {
-    const status = this.status()?.overallStatus;
-    if (status === 'operational') return 'text-green-400';
-    if (status === 'degraded') return 'text-yellow-400';
-    return 'text-red-400';
-  });
+  readonly sectionIcons = API_STATUS_SECTION_ICONS;
+  readonly badgeTone = BADGE_TONE_CLASS;
+  readonly healthMeta = healthMeta;
+  readonly deliveryMeta = deliveryMeta;
+  readonly methodTone = httpMethodTone;
+  readonly httpStatusTone = httpStatusTone;
 
-  readonly overallHealthBg = computed(() => {
-    const status = this.status()?.overallStatus;
-    if (status === 'operational') return 'bg-green-500/20 border-green-500/30';
-    if (status === 'degraded') return 'bg-yellow-500/20 border-yellow-500/30';
-    return 'bg-red-500/20 border-red-500/30';
+  readonly overallHealth = computed(() => healthMeta(this.status()?.overallStatus));
+
+  readonly metricKpis = computed(() => {
+    const metrics = this.status()?.metrics;
+    const values = [
+      metrics?.totalEndpoints ?? 0,
+      `${metrics?.avgResponseTime ?? 0}ms`,
+      (metrics?.totalRequests ?? 0).toLocaleString('en-US'),
+      `${metrics?.errorRate ?? 0}%`,
+    ];
+    return API_STATUS_METRIC_CARDS.map((card, i) => ({
+      ...card,
+      value: values[i],
+      hint: card.hint ?? `${metrics?.activeEndpoints ?? 0} Active`,
+    }));
   });
 
   readonly dataStatistics = computed(() => {
@@ -100,8 +116,8 @@ export class ApiStatusComponent implements OnInit {
       data?.assignments,
       data?.departments,
     ];
-    return API_STATUS_DATA_LABELS.map((label, i) => ({
-      label,
+    return API_STATUS_DATA_CARDS.map((card, i) => ({
+      ...card,
       value: values[i] ?? 0,
     }));
   });
@@ -117,7 +133,8 @@ export class ApiStatusComponent implements OnInit {
       });
   }
 
-  loadApiStatus(): void {
+  /** `manual` refreshes (Refresh / Retry) report failures with a toast; the 30s poll stays silent. */
+  loadApiStatus(manual = false): void {
     this.loadDeliveries();
     this.loadingSignal.set(true);
     this.masterService
@@ -135,6 +152,12 @@ export class ApiStatusComponent implements OnInit {
             'Failed to load API status. Please try again later.'
           );
           this.loadingSignal.set(false);
+          if (manual) {
+            this.toast.error({
+              title: "Couldn't Refresh API Status",
+              description: 'Showing the last known data. Please try again shortly.',
+            });
+          }
         },
       });
   }
@@ -160,64 +183,20 @@ export class ApiStatusComponent implements OnInit {
       });
   }
 
-  deliveryStatusClass(status: NotificationDeliveryStatus): string {
-    return DELIVERY_STATUS_CLASS[status] ?? DELIVERY_STATUS_CLASS.skipped;
-  }
-
-  /** `assignment_created` → `Assignment created`. */
+  /** `assignment_created` → `Assignment Created`. */
   deliveryEventLabel(event: string): string {
-    const words = event.replace(/_/g, ' ').trim();
-    return words.charAt(0).toUpperCase() + words.slice(1);
+    return titleCaseLabel(event);
   }
 
   deliveryEntityLabel(entry: INotificationLogEntry): string {
     if (!entry.entityType || entry.entityId == null) {
       return '';
     }
-    const type = entry.entityType.charAt(0).toUpperCase() + entry.entityType.slice(1);
-    return `${type} #${entry.entityId}`;
+    return `${titleCaseLabel(entry.entityType)} #${entry.entityId}`;
   }
 
   setActiveTab(tab: ApiStatusTabId): void {
     this.activeTabSignal.set(tab);
-  }
-
-  getStatusColor(status: string): string {
-    if (status === 'operational' || status === 'healthy') {
-      return 'bg-green-500/20 text-green-400 border-green-500/30';
-    }
-    if (status === 'degraded') {
-      return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-    }
-    return 'bg-red-500/20 text-red-400 border-red-500/30';
-  }
-
-  getMethodColor(method: string): string {
-    switch (method) {
-      case 'GET':
-        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-      case 'POST':
-        return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'PUT':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      case 'DELETE':
-        return 'bg-red-500/20 text-red-400 border-red-500/30';
-      default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-    }
-  }
-
-  getStatusBadgeColor(status: number): string {
-    if (status >= 200 && status < 300) {
-      return 'bg-green-500/20 text-green-400 border-green-500/30';
-    }
-    if (status >= 400 && status < 500) {
-      return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-    }
-    if (status >= 500) {
-      return 'bg-red-500/20 text-red-400 border-red-500/30';
-    }
-    return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
   }
 
   formatTimestamp(timestamp: string): string {

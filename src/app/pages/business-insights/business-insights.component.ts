@@ -8,19 +8,31 @@ import {
 import { MasterService } from '../../service/master.service';
 import { IProject, IProjectEmployee } from '../../model/interface/master';
 import { Employee } from '../../model/class/Employee';
-import { UbButtonDirective } from '@/app/components/ui/button';
 import { InsightsSkeletonComponent } from '@/app/components/ui/insights-skeleton.component';
 import {
+  INSIGHTS_BREAKDOWN_CHIPS,
+  INSIGHTS_BUDGET_KPIS,
   INSIGHTS_DEFAULT_FILTER_DISPLAY,
+  INSIGHTS_FILTER_ICONS,
   INSIGHTS_FILTER_LABELS,
-  INSIGHTS_KPI_LABELS,
+  INSIGHTS_KPIS,
   INSIGHTS_READINESS_DISTRIBUTION_TITLE,
   INSIGHTS_READINESS_RANGES,
+  INSIGHTS_RESOURCE_KPIS,
+  INSIGHTS_SECTION_ICONS,
   INSIGHTS_STATUS_DISTRIBUTION_TITLE,
   INSIGHTS_STATUS_ITEMS,
+  INSIGHTS_TAB_ACTIVE_CLASS,
+  INSIGHTS_TAB_IDLE_CLASS,
   INSIGHTS_TABS,
+  InsightsKpi,
   InsightsTabId,
 } from '@/app/constants/business-insights';
+import { ActionButtonComponent } from '@/app/components/ui/action-button.component';
+import { FieldLabelComponent } from '@/app/components/ui/field-label.component';
+import { KpiStatCardComponent } from '@/app/components/ui/kpi-stat-card.component';
+import { ToastService } from '@/app/components/ui/toast.service';
+import { BADGE_TONE_CLASS } from '@/app/lib/status/project-status';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import {
   SelectMenuComponent,
@@ -88,6 +100,16 @@ export interface IBusinessInsights {
   nonAssignedProjectCount?: number;
 }
 
+const USD = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0,
+});
+
+function withValues(kpis: readonly InsightsKpi[], values: Array<string | number>) {
+  return kpis.map((kpi, index) => ({ ...kpi, value: values[index] }));
+}
+
 @Component({
   selector: 'app-business-insights',
   standalone: true,
@@ -96,7 +118,9 @@ export interface IBusinessInsights {
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    UbButtonDirective,
+    ActionButtonComponent,
+    FieldLabelComponent,
+    KpiStatCardComponent,
     InsightsSkeletonComponent,
     SelectMenuComponent,
     PageHeaderComponent,
@@ -106,6 +130,7 @@ export interface IBusinessInsights {
 export class BusinessInsightsComponent implements OnInit {
   private readonly masterService = inject(MasterService);
   private readonly fb = inject(FormBuilder);
+  private readonly toast = inject(ToastService);
 
   readonly pageMeta = PRIVATE_PAGE_META['/business-insights'];
   readonly insightsSignal = signal<IBusinessInsights | null>(null);
@@ -152,17 +177,58 @@ export class BusinessInsightsComponent implements OnInit {
   readonly activeTab = this.activeTabSignal.asReadonly();
 
   readonly tabs = INSIGHTS_TABS;
+  readonly tabActiveClass = INSIGHTS_TAB_ACTIVE_CLASS;
+  readonly tabIdleClass = INSIGHTS_TAB_IDLE_CLASS;
   readonly filterLabels = INSIGHTS_FILTER_LABELS;
-  readonly kpiLabels = INSIGHTS_KPI_LABELS;
+  readonly filterIcons = INSIGHTS_FILTER_ICONS;
+  readonly sectionIcons = INSIGHTS_SECTION_ICONS;
+  readonly badgeTone = BADGE_TONE_CLASS;
   readonly statusTitle = INSIGHTS_STATUS_DISTRIBUTION_TITLE;
   readonly readinessTitle = INSIGHTS_READINESS_DISTRIBUTION_TITLE;
   readonly statusDistribution = computed(() => {
     const distribution = this.insights()?.projectStatusDistribution;
     return INSIGHTS_STATUS_ITEMS.map((item) => ({
-      label: item.label,
-      color: item.color,
+      ...item,
       value: distribution?.[item.key] || 0,
     }));
+  });
+
+  readonly overviewKpis = computed(() => {
+    const insights = this.insights();
+    return withValues(INSIGHTS_KPIS, [
+      insights?.totalProjectCount ?? this.projectsSignal().length,
+      (insights?.filteredEmployeeCount ?? insights?.resourceUtilization?.totalEmployees) || 0,
+      `${insights?.readinessScores?.average || 0}%`,
+      `${insights?.teamCapacity?.utilizationPercentage || 0}%`,
+    ]);
+  });
+
+  readonly resourceKpis = computed(() => {
+    const resources = this.insights()?.resourceUtilization;
+    return withValues(INSIGHTS_RESOURCE_KPIS, [
+      resources?.totalEmployees || 0,
+      resources?.activeAssignments || 0,
+      `${resources?.averageAllocation || 0}%`,
+      resources?.availableCount || 0,
+    ]);
+  });
+
+  readonly budgetKpis = computed(() => {
+    const budget = this.insights()?.budgetMetrics;
+    return withValues(
+      INSIGHTS_BUDGET_KPIS,
+      [budget?.totalBudget, budget?.allocatedBudget, budget?.spentBudget, budget?.remainingBudget].map(
+        (amount) => USD.format(amount || 0)
+      )
+    );
+  });
+
+  readonly breakdownChips = computed(() => {
+    const insights = this.insights();
+    return INSIGHTS_BREAKDOWN_CHIPS.map((chip) => ({
+      ...chip,
+      value: insights?.[chip.key] ?? 0,
+    })).filter((chip) => !chip.optional || chip.value > 0);
   });
 
   constructor() {
@@ -968,7 +1034,29 @@ export class BusinessInsightsComponent implements OnInit {
 
   exportToCSV(): void {
     const insights = this.insightsSignal();
-    if (!insights) return;
+    if (!insights) {
+      this.toast.info({
+        title: 'Nothing to Export Yet',
+        description: 'Wait for the insights to finish loading, then try again.',
+      });
+      return;
+    }
+    try {
+      this.downloadCsv(insights);
+      this.toast.success({
+        title: 'Report Exported',
+        description: 'Business insights CSV downloaded.',
+      });
+    } catch (error) {
+      console.error('CSV export failed', error);
+      this.toast.error({
+        title: "Couldn't Export Report",
+        description: 'The browser blocked the CSV download. Please try again.',
+      });
+    }
+  }
+
+  private downloadCsv(insights: IBusinessInsights): void {
 
     const csvRows: string[] = [];
     csvRows.push('Business Insights Report');
@@ -1015,7 +1103,10 @@ export class BusinessInsightsComponent implements OnInit {
   }
 
   exportToPDF(): void {
-    // Simple PDF export using window.print() - can be enhanced with a PDF library
-    window.print();
+    this.toast.info({
+      title: 'Opening Print Dialog',
+      description: 'Choose "Save as PDF" as the destination to export this report.',
+    });
+    setTimeout(() => window.print());
   }
 }

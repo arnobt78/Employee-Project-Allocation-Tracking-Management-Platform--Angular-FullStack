@@ -8,20 +8,27 @@
     [icon]="pageMeta.icon"
   >
     <button
-      (click)="loadApiStatus()"
-      [disabled]="loading()"
-      class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
+      ehAction
+      type="button"
+      class="eh-action-btn eh-action-btn-outline"
+      icon="refresh-cw"
+      [iconSize]="16"
+      [pending]="loading()"
+      [pendingLabel]="copy.refreshing"
+      (click)="loadApiStatus(true)"
     >
-      {{ loading() ? copy.refreshing : copy.refresh }}
+      <span>{{ copy.refresh }}</span>
     </button>
   </app-page-header>
 
   <div class="eh-content-stack">
     @if (error() && !status()) {
       <div
-        class="rounded-[28px] border border-red-500/30 bg-red-500/10 p-2 sm:p-4 text-center text-red-400"
+        class="flex items-center justify-center gap-2 rounded-[28px] border border-rose-500/30 bg-rose-500/10 p-2 sm:p-4 text-center text-rose-300"
+        role="alert"
       >
-        {{ error() }}
+        <lucide-icon name="octagon-alert" [size]="18"></lucide-icon>
+        <span>{{ error() }}</span>
       </div>
     }
 
@@ -32,37 +39,39 @@
         role="status"
         data-testid="api-status-refresh-failed"
       >
-        <span>
+        <span class="flex items-center gap-2">
+          <lucide-icon name="triangle-alert" [size]="14"></lucide-icon>
           {{ copy.refreshFailed }} {{ formatTimestamp(current.timestamp) }}.
         </span>
         <button
+          ehAction
           type="button"
-          (click)="loadApiStatus()"
-          [disabled]="loading()"
-          class="rounded-lg border border-amber-400/40 px-3 py-1 transition-colors hover:bg-amber-500/20 disabled:opacity-50"
+          class="eh-action-btn eh-action-btn-outline"
+          icon="rotate-ccw"
+          [pending]="loading()"
+          [pendingLabel]="copy.refreshing"
+          (click)="loadApiStatus(true)"
         >
-          {{ copy.retry }}
+          <span>{{ copy.retry }}</span>
         </button>
       </div>
     }
 
-    <!-- Overall Status Card -->
-    <div
-      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
-    >
-      <div class="flex items-center justify-between">
+    <section class="eh-section-card">
+      <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 class="text-base sm:text-xl font-medium text-white mb-2">
-            {{ copy.overallStatus }}
+          <h2 class="eh-section-heading !mb-2">
+            <lucide-icon [name]="sectionIcons.overallStatus" [size]="18"></lucide-icon>
+            <span>{{ copy.overallStatus }}</span>
           </h2>
-          <div class="flex items-center gap-3">
-            <span
-              class="inline-flex rounded-full border px-3 py-1 text-sm font-medium capitalize"
-              [class]="overallHealthBg()"
-            >
-              {{ current.overallStatus }}
+          <div class="flex flex-wrap items-center gap-3">
+            @let overall = overallHealth();
+            <span class="eh-badge" [ngClass]="badgeTone[overall.tone]">
+              <lucide-icon [name]="overall.icon" [size]="12"></lucide-icon>
+              {{ overall.label }}
             </span>
-            <span class="text-sm text-white/60">
+            <span class="flex items-center gap-1.5 text-sm text-white/60">
+              <lucide-icon name="clock" [size]="14"></lucide-icon>
               {{ copy.lastUpdated }} {{ formatTimestamp(current.timestamp) }}
             </span>
           </div>
@@ -70,82 +79,68 @@
         <div class="text-right">
           <div
             class="text-xl sm:text-2xl leading-none font-medium"
-            [class]="overallHealthColor()"
+            [ngClass]="{
+              'text-emerald-300': overall.tone === 'emerald',
+              'text-amber-300': overall.tone === 'amber',
+              'text-rose-300': overall.tone === 'rose'
+            }"
           >
             {{ current.metrics.successRate }}%
           </div>
-          <div class="text-xs sm:text-sm text-white/60">
+          <div class="mt-1 flex items-center justify-end gap-1.5 text-xs sm:text-sm text-white/60">
+            <lucide-icon name="percent" [size]="14"></lucide-icon>
             {{ copy.successRate }}
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Metrics Cards -->
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      @for (card of metricCards; track card.label; let i = $index) {
-        <div
-          class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
-        >
-          <div class="text-sm text-white/60 mb-2">{{ card.label }}</div>
-          <div class="text-xl sm:text-2xl leading-none font-medium text-white">
-            @switch (i) {
-              @case (0) {
-                {{ current.metrics.totalEndpoints }}
-              }
-              @case (1) {
-                {{ current.metrics.avgResponseTime }}ms
-              }
-              @case (2) {
-                {{ current.metrics.totalRequests | number }}
-              }
-              @default {
-                {{ current.metrics.errorRate }}%
-              }
-            }
-          </div>
-          <div class="mt-2 text-xs sm:text-sm" [class]="card.captionClass">
-            {{ card.caption ?? current.metrics.activeEndpoints + ' active' }}
-          </div>
-        </div>
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      @for (card of metricKpis(); track card.label) {
+        <app-kpi-stat-card
+          [label]="card.label"
+          [value]="card.value"
+          [hint]="card.hint"
+          [icon]="card.icon"
+          [tone]="card.tone"
+        ></app-kpi-stat-card>
       }
     </div>
 
-    <!-- Tabs -->
-    <div
-      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
-    >
+    <section class="eh-section-card">
       <div class="mb-6 flex flex-wrap gap-2 border-b border-white/10">
         @for (tab of tabs; track tab.id) {
           <button
             type="button"
             (click)="setActiveTab(tab.id)"
             [class]="activeTab() === tab.id ? activeTabClass : idleTabClass"
+            [attr.aria-pressed]="activeTab() === tab.id"
           >
+            <lucide-icon [name]="tab.icon" [size]="14"></lucide-icon>
             {{ tab.label }}
           </button>
         }
       </div>
 
-      <!-- Overview Tab -->
-      <div *ngIf="activeTab() === 'overview'" class="space-y-6">
-        <!-- System Health -->
+      @switch (activeTab()) {
+      @case ('overview') {
+      <div class="space-y-6">
         <div>
-          <h3 class="text-base sm:text-xl font-medium text-white mb-4">
-            {{ copy.systemHealth }}
+          <h3 class="eh-section-heading">
+            <lucide-icon [name]="sectionIcons.systemHealth" [size]="18"></lucide-icon>
+            <span>{{ copy.systemHealth }}</span>
           </h3>
           <div class="grid gap-4 sm:grid-cols-2">
-            <!-- Database -->
-            <div class="rounded-xl border border-white/10 bg-white/5 p-4">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-white">{{
-                  copy.database
-                }}</span>
-                <span
-                  class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
-                  [class]="getStatusColor(current.systemHealth.database.status)"
-                >
-                  {{ current.systemHealth.database.status }}
+            @let db = healthMeta(current.systemHealth.database.status);
+            <div class="eh-panel">
+              <div class="mb-2 flex items-center justify-between gap-2">
+                <span class="flex items-center gap-2 text-sm font-medium text-white">
+                  <lucide-icon [name]="sectionIcons.database" [size]="16"></lucide-icon>
+                  {{ copy.database }}
+                </span>
+                <span class="eh-badge" [ngClass]="badgeTone[db.tone]">
+                  <lucide-icon [name]="db.icon" [size]="12"></lucide-icon>
+                  {{ db.label }}
                 </span>
               </div>
               <div class="text-xs sm:text-sm text-white/60">
@@ -154,21 +149,28 @@
               </div>
               <div class="text-xs sm:text-sm text-white/60">
                 {{ copy.connected }}
-                {{ current.systemHealth.database.connected ? "Yes" : "No" }}
+                @if (current.systemHealth.database.connected) {
+                  <span class="inline-flex items-center gap-1 text-emerald-300">
+                    <lucide-icon name="circle-check" [size]="12"></lucide-icon>Yes
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center gap-1 text-rose-300">
+                    <lucide-icon name="circle-x" [size]="12"></lucide-icon>No
+                  </span>
+                }
               </div>
             </div>
 
-            <!-- API -->
-            <div class="rounded-xl border border-white/10 bg-white/5 p-4">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-white">{{
-                  copy.apiService
-                }}</span>
-                <span
-                  class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
-                  [class]="getStatusColor(current.systemHealth.api.status)"
-                >
-                  {{ current.systemHealth.api.status }}
+            @let api = healthMeta(current.systemHealth.api.status);
+            <div class="eh-panel">
+              <div class="mb-2 flex items-center justify-between gap-2">
+                <span class="flex items-center gap-2 text-sm font-medium text-white">
+                  <lucide-icon [name]="sectionIcons.apiService" [size]="16"></lucide-icon>
+                  {{ copy.apiService }}
+                </span>
+                <span class="eh-badge" [ngClass]="badgeTone[api.tone]">
+                  <lucide-icon [name]="api.icon" [size]="12"></lucide-icon>
+                  {{ api.label }}
                 </span>
               </div>
               <div class="text-xs sm:text-sm text-white/60">
@@ -182,45 +184,39 @@
           </div>
         </div>
 
-        <!-- Data Statistics -->
         <div>
-          <h3 class="text-base sm:text-xl font-medium text-white mb-4">
-            {{ copy.dataStatistics }}
+          <h3 class="eh-section-heading">
+            <lucide-icon [name]="sectionIcons.dataStatistics" [size]="18"></lucide-icon>
+            <span>{{ copy.dataStatistics }}</span>
           </h3>
-          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             @for (item of dataStatistics(); track item.label) {
-              <div class="rounded-xl border border-white/10 bg-white/5 p-4">
-                <div class="text-sm text-white/60 mb-2">{{ item.label }}</div>
-                <div
-                  class="text-xl sm:text-2xl leading-none font-medium text-white"
-                >
-                  {{ item.value }}
-                </div>
-              </div>
+              <app-kpi-stat-card
+                [label]="item.label"
+                [value]="item.value"
+                [icon]="item.icon"
+                [tone]="item.tone"
+              ></app-kpi-stat-card>
             }
           </div>
         </div>
 
-        <!-- Recent Email Deliveries -->
         <div data-testid="api-status-deliveries">
-          <h3 class="text-base sm:text-xl font-medium text-white mb-4">
-            {{ copy.deliveries }}
+          <h3 class="eh-section-heading">
+            <lucide-icon [name]="sectionIcons.deliveries" [size]="18"></lucide-icon>
+            <span>{{ copy.deliveries }}</span>
           </h3>
           @if (deliveries(); as entries) {
             @if (entries.length) {
               <ul class="space-y-2">
                 @for (entry of entries; track entry.id) {
-                  <li
-                    class="rounded-xl border border-white/10 bg-white/5 p-4"
-                    [attr.data-delivery-status]="entry.status"
-                  >
+                  @let delivery = deliveryMeta(entry.status);
+                  <li class="eh-panel" [attr.data-delivery-status]="entry.status">
                     <div class="flex flex-wrap items-center justify-between gap-3">
                       <div class="flex flex-wrap items-center gap-3">
-                        <span
-                          class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium capitalize"
-                          [class]="deliveryStatusClass(entry.status)"
-                        >
-                          {{ entry.status }}
+                        <span class="eh-badge" [ngClass]="badgeTone[delivery.tone]">
+                          <lucide-icon [name]="delivery.icon" [size]="12"></lucide-icon>
+                          {{ delivery.label }}
                         </span>
                         <span class="text-sm font-medium text-white">
                           {{ deliveryEventLabel(entry.event) }}
@@ -229,19 +225,26 @@
                           <span class="text-xs sm:text-sm text-white/60">{{ entity }}</span>
                         }
                       </div>
-                      <div class="flex items-center gap-4 text-xs sm:text-sm text-white/60">
-                        <span>
+                      <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-white/60">
+                        <span class="flex items-center gap-1.5">
+                          <lucide-icon name="users" [size]="14"></lucide-icon>
                           {{ entry.recipientCount }}
                           {{ entry.recipientCount === 1 ? 'recipient' : 'recipients' }}
                         </span>
                         @if (entry.provider) {
-                          <span class="uppercase">{{ entry.provider }}</span>
+                          <span class="flex items-center gap-1.5 uppercase">
+                            <lucide-icon name="send" [size]="14"></lucide-icon>
+                            {{ entry.provider }}
+                          </span>
                         }
-                        <span>{{ formatTimeAgo(entry.createdAt) }}</span>
+                        <span class="flex items-center gap-1.5">
+                          <lucide-icon name="clock" [size]="14"></lucide-icon>
+                          {{ formatTimeAgo(entry.createdAt) }}
+                        </span>
                       </div>
                     </div>
                     @if (entry.error) {
-                      <p class="mt-2 break-words text-xs text-red-300/90" [title]="entry.error">
+                      <p class="mt-2 break-words text-xs text-rose-300/90" [title]="entry.error">
                         {{ entry.error }}
                       </p>
                     }
@@ -253,14 +256,20 @@
             }
           } @else if (deliveriesError()) {
             <div class="flex items-center justify-between gap-3 rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-200 sm:text-sm">
-              <span>{{ copy.deliveriesFailed }}</span>
+              <span class="flex items-center gap-2">
+                <lucide-icon name="triangle-alert" [size]="14"></lucide-icon>
+                {{ copy.deliveriesFailed }}
+              </span>
               <button
+                ehAction
                 type="button"
+                class="eh-action-btn eh-action-btn-outline"
+                icon="rotate-ccw"
+                [pending]="deliveriesLoading()"
+                [pendingLabel]="copy.refreshing"
                 (click)="loadDeliveries()"
-                [disabled]="deliveriesLoading()"
-                class="rounded-lg border border-amber-400/40 px-3 py-1 transition-colors hover:bg-amber-500/20 disabled:opacity-50"
               >
-                {{ copy.retry }}
+                <span>{{ copy.retry }}</span>
               </button>
             </div>
           } @else {
@@ -272,144 +281,145 @@
           }
         </div>
       </div>
+      }
 
-      <!-- Endpoints Tab -->
-      <div *ngIf="activeTab() === 'endpoints'" class="space-y-4">
-        <h3 class="text-base sm:text-xl font-medium text-white mb-4">
-          Endpoint Health by Category
+      @case ('endpoints') {
+      <div class="space-y-4">
+        <h3 class="eh-section-heading">
+          <lucide-icon [name]="sectionIcons.endpointHealth" [size]="18"></lucide-icon>
+          <span>{{ copy.endpointHealth }}</span>
         </h3>
-        <div
-          *ngFor="let endpoint of status()!.endpointHealth"
-          class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
-        >
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-3">
-              <span class="text-sm font-medium text-white">{{
-                endpoint.category
-              }}</span>
-              <span
-                class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
-                [class]="getStatusColor(endpoint.status)"
-              >
-                {{ endpoint.status }}
+        @for (endpoint of current.endpointHealth; track endpoint.category) {
+          @let health = healthMeta(endpoint.status);
+          <div class="eh-panel transition-all hover:border-primary/50 hover:bg-white/10">
+            <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-3">
+                <span class="text-sm font-medium text-white">{{ endpoint.category }}</span>
+                <span class="eh-badge" [ngClass]="badgeTone[health.tone]">
+                  <lucide-icon [name]="health.icon" [size]="12"></lucide-icon>
+                  {{ health.label }}
+                </span>
+              </div>
+              <div class="flex items-center gap-1.5 text-sm text-white/60">
+                <lucide-icon name="circle-check" [size]="14"></lucide-icon>
+                {{ endpoint.healthy }}/{{ endpoint.total }} Healthy
+              </div>
+            </div>
+            <div class="flex items-center gap-4 text-xs sm:text-sm text-white/60">
+              <span class="flex items-center gap-1.5">
+                <lucide-icon name="timer" [size]="14"></lucide-icon>
+                Avg Response: {{ endpoint.avgResponseTime }}ms
               </span>
-            </div>
-            <div class="text-sm text-white/60">
-              {{ endpoint.healthy }}/{{ endpoint.total }} healthy
-            </div>
-          </div>
-          <div class="flex items-center gap-4 text-xs sm:text-sm text-white/60">
-            <span>Avg Response: {{ endpoint.avgResponseTime }}ms</span>
-            <div class="flex-1">
-              <div class="h-1.5 rounded-full bg-white/10">
-                <div
-                  class="h-1.5 rounded-full bg-primary transition-all"
-                  [style.width.%]="(endpoint.healthy / endpoint.total) * 100"
-                ></div>
+              <div class="flex-1">
+                <div class="h-1.5 rounded-full bg-white/10">
+                  <div
+                    class="h-1.5 rounded-full bg-primary transition-all"
+                    [style.width.%]="endpoint.total ? (endpoint.healthy / endpoint.total) * 100 : 0"
+                  ></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        }
       </div>
+      }
 
-      <!-- Performance Tab -->
-      <div *ngIf="activeTab() === 'performance'" class="space-y-4">
-        <h3 class="text-base sm:text-xl font-medium text-white mb-4">
-          Performance History (Last 7 Days)
+      @case ('performance') {
+      <div class="space-y-4">
+        <h3 class="eh-section-heading">
+          <lucide-icon [name]="sectionIcons.performanceHistory" [size]="18"></lucide-icon>
+          <span>{{ copy.performanceHistory }}</span>
         </h3>
         <div class="space-y-3">
-          <div
-            *ngFor="let day of status()!.performanceHistory"
-            class="rounded-xl border border-white/10 bg-white/5 p-4"
-          >
-            <div class="flex items-center justify-between mb-2">
-              <div>
-                <span class="text-sm font-medium text-white">{{
-                  day.day
-                }}</span>
-                <span class="text-xs sm:text-sm text-white/60 ml-2">{{
-                  day.date
-                }}</span>
+          @for (day of current.performanceHistory; track day.date) {
+            <div class="eh-panel">
+              <div class="mb-2 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <lucide-icon name="calendar" [size]="14" class="text-white/60"></lucide-icon>
+                  <span class="text-sm font-medium text-white">{{ day.day }}</span>
+                  <span class="text-xs sm:text-sm text-white/60">{{ day.date }}</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs sm:text-sm text-white/60">
+                  <lucide-icon name="chart-line" [size]="14"></lucide-icon>
+                  {{ day.requests | number }} Requests
+                </div>
               </div>
-              <div class="text-xs sm:text-sm text-white/60">
-                {{ day.requests | number }} requests
+              <div class="mt-2 grid gap-3 sm:grid-cols-3">
+                <div>
+                  <p class="eh-read-label">
+                    <lucide-icon name="timer" [size]="14"></lucide-icon>
+                    <span>Avg Response Time</span>
+                  </p>
+                  <div class="text-sm font-medium text-white">{{ day.avgResponseTime }}ms</div>
+                </div>
+                <div>
+                  <p class="eh-read-label">
+                    <lucide-icon name="percent" [size]="14"></lucide-icon>
+                    <span>Success Rate</span>
+                  </p>
+                  <div class="text-sm font-medium text-emerald-300">
+                    {{ day.successRate.toFixed(1) }}%
+                  </div>
+                </div>
+                <div>
+                  <p class="eh-read-label">
+                    <lucide-icon name="triangle-alert" [size]="14"></lucide-icon>
+                    <span>Errors</span>
+                  </p>
+                  <div class="text-sm font-medium text-rose-300">{{ day.errors }}</div>
+                </div>
+              </div>
+              <div class="mt-2">
+                <div class="h-2 rounded-full bg-white/10">
+                  <div
+                    class="h-2 rounded-full bg-gradient-to-r from-primary to-emerald-500 transition-all"
+                    [style.width.%]="day.successRate"
+                  ></div>
+                </div>
               </div>
             </div>
-            <div class="grid gap-3 sm:grid-cols-3 mt-2">
-              <div>
-                <div class="text-xs sm:text-sm text-white/60 mb-1">
-                  Avg Response Time
-                </div>
-                <div class="text-sm font-medium text-white">
-                  {{ day.avgResponseTime }}ms
-                </div>
-              </div>
-              <div>
-                <div class="text-xs sm:text-sm text-white/60 mb-1">
-                  Success Rate
-                </div>
-                <div class="text-sm font-medium text-green-400">
-                  {{ day.successRate.toFixed(1) }}%
-                </div>
-              </div>
-              <div>
-                <div class="text-xs sm:text-sm text-white/60 mb-1">Errors</div>
-                <div class="text-sm font-medium text-red-400">
-                  {{ day.errors }}
-                </div>
-              </div>
-            </div>
-            <div class="mt-2">
-              <div class="h-2 rounded-full bg-white/10">
-                <div
-                  class="h-2 rounded-full bg-gradient-to-r from-primary to-green-500 transition-all"
-                  [style.width.%]="day.successRate"
-                ></div>
-              </div>
-            </div>
-          </div>
+          }
         </div>
       </div>
+      }
 
-      <!-- Activity Tab -->
-      <div *ngIf="activeTab() === 'activity'" class="space-y-4">
-        <h3 class="text-base sm:text-xl font-medium text-white mb-4">
-          Recent Activity
+      @case ('activity') {
+      <div class="space-y-4">
+        <h3 class="eh-section-heading">
+          <lucide-icon [name]="sectionIcons.recentActivity" [size]="18"></lucide-icon>
+          <span>{{ copy.recentActivity }}</span>
         </h3>
         <div class="space-y-2">
-          <div
-            *ngFor="let activity of status()!.recentActivity"
-            class="rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-primary/50 hover:bg-white/10"
-          >
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <span
-                  class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
-                  [class]="getMethodColor(activity.method)"
-                >
-                  {{ activity.method }}
-                </span>
-                <span class="text-sm font-medium text-white">{{
-                  activity.endpoint
-                }}</span>
-                <span
-                  class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
-                  [class]="getStatusBadgeColor(activity.status)"
-                >
-                  {{ activity.status }}
-                </span>
-              </div>
-              <div
-                class="flex items-center gap-4 text-xs sm:text-sm text-white/60"
-              >
-                <span>{{ activity.responseTime }}ms</span>
-                <span>{{ formatTimeAgo(activity.timestamp) }}</span>
+          @for (activity of current.recentActivity; track $index) {
+            <div class="eh-panel transition-all hover:border-primary/50 hover:bg-white/10">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap items-center gap-3">
+                  <span class="eh-badge font-mono" [ngClass]="badgeTone[methodTone(activity.method)]">
+                    {{ activity.method }}
+                  </span>
+                  <span class="break-all text-sm font-medium text-white">{{ activity.endpoint }}</span>
+                  <span class="eh-badge" [ngClass]="badgeTone[httpStatusTone(activity.status)]">
+                    {{ activity.status }}
+                  </span>
+                </div>
+                <div class="flex items-center gap-4 text-xs sm:text-sm text-white/60">
+                  <span class="flex items-center gap-1.5">
+                    <lucide-icon name="timer" [size]="14"></lucide-icon>
+                    {{ activity.responseTime }}ms
+                  </span>
+                  <span class="flex items-center gap-1.5">
+                    <lucide-icon name="clock" [size]="14"></lucide-icon>
+                    {{ formatTimeAgo(activity.timestamp) }}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          }
         </div>
       </div>
-    </div>
+      }
+      }
+    </section>
     }
   </div>
 </div>

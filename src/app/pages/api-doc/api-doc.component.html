@@ -8,266 +8,253 @@
     [icon]="pageMeta.icon"
   >
     @if (apiDoc(); as doc) {
-      <div
-        class="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2"
-      >
-        <span class="text-xs text-white/60">{{ copy.versionPill }}</span>
-        <span class="text-sm font-medium text-white">{{
-          doc.info.version
-        }}</span>
-      </div>
+      <span class="eh-badge eh-badge-sky">
+        <lucide-icon [name]="sectionIcons.version" [size]="12"></lucide-icon>
+        {{ copy.versionPill }} {{ doc.info.version }}
+      </span>
     }
   </app-page-header>
 
   <div class="eh-content-stack">
     @if (error() && !apiDoc()) {
-      <div class="rounded-lg border border-red-500/30 bg-red-500/10 p-4">
-        <p class="text-sm text-red-400">{{ error() }}</p>
+      <div
+        class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-2 sm:p-4"
+        role="alert"
+      >
+        <p class="flex items-center gap-2 text-sm text-rose-300">
+          <lucide-icon name="octagon-alert" [size]="16"></lucide-icon>
+          {{ error() }}
+        </p>
         <button
+          ehAction
+          type="button"
+          class="eh-action-btn eh-action-btn-outline"
+          icon="rotate-ccw"
+          [pending]="loading()"
+          pendingLabel="Retrying…"
           (click)="loadApiDocumentation()"
-          class="mt-2 rounded-lg bg-red-500/20 px-4 py-2 text-sm text-red-400 transition-colors hover:bg-red-500/30"
         >
-          Retry
+          <span>{{ copy.retry }}</span>
         </button>
       </div>
     }
 
     @if (apiDoc(); as doc) {
-    <!-- API Info Card -->
-    <div
-      class="rounded-2xl border border-white/10 bg-white/5 p-2 sm:p-4 backdrop-blur-md"
-    >
-      <h2 class="mb-4 text-xl font-medium text-white">
-        {{ doc.info.title }}
+    <section class="eh-section-card">
+      <h2 class="eh-section-heading">
+        <lucide-icon [name]="sectionIcons.info" [size]="18"></lucide-icon>
+        <span>{{ doc.info.title }}</span>
       </h2>
       <p class="mb-4 text-sm text-white/70">
         {{ doc.info.description }}
       </p>
       <div class="flex flex-wrap items-center gap-4">
         <div class="flex items-center gap-2">
-          <span class="text-xs text-white/60">{{ copy.baseUrl }}</span>
+          <span class="flex items-center gap-1.5 text-xs text-white/60">
+            <lucide-icon [name]="sectionIcons.baseUrl" [size]="14"></lucide-icon>
+            {{ copy.baseUrl }}
+          </span>
           <code class="rounded bg-white/10 px-2 py-1 text-xs text-white">{{
             doc.info.baseUrl
           }}</code>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-xs text-white/60">{{ copy.version }}</span>
-          <span class="text-sm font-medium text-white">{{
-            doc.info.version
-          }}</span>
+          <span class="flex items-center gap-1.5 text-xs text-white/60">
+            <lucide-icon [name]="sectionIcons.version" [size]="14"></lucide-icon>
+            {{ copy.version }}
+          </span>
+          <span class="text-sm font-medium text-white">{{ doc.info.version }}</span>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Tabs for HTTP Methods -->
-    <div
-      class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
-    >
-      <div class="mb-6 flex gap-2 border-b border-white/10">
+    <section class="eh-section-card">
+      <div class="mb-6 flex flex-wrap gap-2 border-b border-white/10">
         @for (method of methodTabs; track method) {
           <button
             type="button"
             (click)="setActiveTab(method)"
             [class]="activeTab() === method ? tabActiveClass : tabIdleClass"
+            [attr.aria-pressed]="activeTab() === method"
           >
+            <lucide-icon [name]="methodIcons[method]" [size]="14"></lucide-icon>
             {{ method }}
           </button>
         }
       </div>
 
-      <!-- Category Filter -->
       <div class="mb-6 flex flex-wrap gap-2">
         <button
           type="button"
           (click)="setActiveCategory(null)"
           [class]="activeCategory() === null ? chipActiveClass : chipIdleClass"
+          [attr.aria-pressed]="activeCategory() === null"
         >
+          <lucide-icon [name]="sectionIcons.allCategories" [size]="12"></lucide-icon>
           {{ copy.allCategories }}
         </button>
         @for (category of categories(); track category) {
           <button
             type="button"
             (click)="setActiveCategory(category)"
-            [class]="
-              activeCategory() === category ? chipActiveClass : chipIdleClass
-            "
+            [class]="activeCategory() === category ? chipActiveClass : chipIdleClass"
+            [attr.aria-pressed]="activeCategory() === category"
           >
+            <lucide-icon [name]="categoryMeta(category).icon" [size]="12"></lucide-icon>
             {{ category }}
           </button>
         }
       </div>
 
-      <!-- Endpoints List -->
       <div class="space-y-4">
-        <div
-          *ngFor="let endpoint of filteredEndpoints()"
-          class="rounded-xl border border-white/10 bg-white/5 p-2 sm:p-4 transition-all hover:border-white/20 hover:bg-white/10"
-        >
-          <!-- Endpoint Header -->
-          <div
-            class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
-          >
-            <div class="flex-1">
-              <div class="mb-2 flex items-center gap-3">
-                <span
-                  class="inline-flex rounded border px-2 py-1 text-xs font-medium"
-                  [class]="getMethodColor(endpoint.method)"
-                >
-                  {{ endpoint.method }}
-                </span>
-                <span
-                  class="inline-flex rounded-full px-2 py-1 text-xs font-medium"
-                  [class]="getCategoryColor(endpoint.category)"
-                >
-                  {{ endpoint.category }}
-                </span>
-              </div>
-              <h3 class="mb-2 text-base sm:text-xl font-medium text-white">
-                {{ endpoint.path }}
-              </h3>
-              <p class="text-sm text-white/70">{{ endpoint.description }}</p>
-            </div>
-            <button
-              (click)="copyToClipboard(endpoint.url)"
-              class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/60 transition-colors hover:border-white/20 hover:bg-white/10 hover:text-white"
-              title="Copy URL"
-            >
-              {{ copy.copyUrl }}
-            </button>
-          </div>
-
-          <!-- URL -->
-          <div class="mb-4 rounded-lg bg-white/5 p-3">
-            <code class="text-sm text-white">{{ endpoint.url }}</code>
-          </div>
-
-          <!-- Parameters -->
-          <div
-            *ngIf="endpoint.parameters && endpoint.parameters.length > 0"
-            class="mb-4"
-          >
-            <h4 class="mb-2 text-sm font-medium text-white">Parameters</h4>
-            <div class="space-y-2">
-              <div
-                *ngFor="let param of endpoint.parameters"
-                class="rounded-lg border border-white/10 bg-white/5 p-3"
-              >
-                <div class="flex items-center gap-2">
-                  <code class="text-sm font-medium text-white">{{
-                    param.name
-                  }}</code>
-                  <span
-                    class="rounded px-1.5 py-0.5 text-xs"
-                    [class]="
-                      param.required
-                        ? 'bg-red-500/20 text-red-400'
-                        : 'bg-gray-500/20 text-gray-400'
-                    "
-                  >
-                    {{ param.type }}
+        @for (endpoint of filteredEndpoints(); track $index) {
+          @let category = categoryMeta(endpoint.category);
+          <div class="eh-panel transition-all hover:border-white/20 hover:bg-white/10">
+            <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div class="min-w-0 flex-1">
+                <div class="mb-2 flex flex-wrap items-center gap-2">
+                  <span class="eh-badge font-mono" [ngClass]="badgeTone[methodTone(endpoint.method)]">
+                    <lucide-icon [name]="methodIcon(endpoint.method)" [size]="12"></lucide-icon>
+                    {{ endpoint.method }}
                   </span>
-                  <span
-                    *ngIf="param.required"
-                    class="rounded bg-red-500/20 px-1.5 py-0.5 text-xs text-red-400"
-                  >
-                    Required
+                  <span class="eh-badge" [ngClass]="badgeTone[category.tone]">
+                    <lucide-icon [name]="category.icon" [size]="12"></lucide-icon>
+                    {{ endpoint.category }}
                   </span>
                 </div>
-                <p class="text-xs text-white/60">
-                  {{ param.description }}
-                </p>
+                <h3 class="mb-2 break-all text-base font-medium text-white sm:text-xl">
+                  {{ endpoint.path }}
+                </h3>
+                <p class="text-sm text-white/70">{{ endpoint.description }}</p>
               </div>
-            </div>
-          </div>
-
-          <!-- Request Body -->
-          <div *ngIf="endpoint.requestBody" class="mb-4">
-            <h4 class="mb-2 text-sm font-medium text-white">Request Body</h4>
-            <div class="rounded-lg border border-white/10 bg-white/5 p-3">
-              <div class="mb-2">
-                <span class="text-xs text-white/60">Content-Type:</span>
-                <code class="ml-2 text-xs text-white">{{
-                  endpoint.requestBody.contentType
-                }}</code>
-              </div>
-              <div>
-                <span class="text-xs text-white/60">Schema:</span>
-                <code class="ml-2 text-xs text-white">{{
-                  formatSchema(endpoint.requestBody.schema)
-                }}</code>
-              </div>
-            </div>
-          </div>
-
-          <!-- Response -->
-          <div class="mb-4">
-            <h4 class="mb-2 text-sm font-medium text-white">Response</h4>
-            <div
-              class="rounded-lg border border-green-500/30 bg-green-500/10 p-3"
-            >
-              <div class="mb-2">
-                <span class="text-xs text-white/60">Status:</span>
-                <span
-                  class="ml-2 rounded bg-green-500/20 px-2 py-0.5 text-xs font-medium text-green-400"
-                >
-                  {{ endpoint.response.status }}
-                </span>
-              </div>
-              <div>
-                <span class="text-xs text-white/60">Body:</span>
-                <code class="ml-2 text-xs text-white">{{
-                  formatSchema(endpoint.response.body)
-                }}</code>
-              </div>
-            </div>
-          </div>
-
-          <!-- Error Responses -->
-          <div
-            *ngIf="
-              endpoint.errorResponses && endpoint.errorResponses.length > 0
-            "
-          >
-            <h4 class="mb-2 text-sm font-medium text-white">Error Responses</h4>
-            <div class="space-y-2">
-              <div
-                *ngFor="let error of endpoint.errorResponses"
-                class="rounded-lg border border-red-500/30 bg-red-500/10 p-3"
+              <button
+                ehAction
+                type="button"
+                class="eh-action-btn eh-action-btn-outline shrink-0 self-start"
+                icon="copy"
+                [iconSize]="14"
+                [attr.aria-label]="copy.copyUrl + ' ' + endpoint.url"
+                (click)="copyToClipboard(endpoint.url)"
               >
-                <div class="mb-2">
+                <span>{{ copy.copyUrl }}</span>
+              </button>
+            </div>
+
+            <div class="mb-4 rounded-lg bg-white/5 p-3">
+              <code class="break-all text-sm text-white">{{ endpoint.url }}</code>
+            </div>
+
+            @if (endpoint.parameters?.length) {
+              <div class="mb-4">
+                <h4 class="mb-2 flex items-center gap-2 text-sm font-medium text-white">
+                  <lucide-icon [name]="sectionIcons.parameters" [size]="14"></lucide-icon>
+                  {{ copy.parameters }}
+                </h4>
+                <div class="space-y-2">
+                  @for (param of endpoint.parameters; track param.name) {
+                    <div class="rounded-lg border border-white/10 bg-white/5 p-3">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <code class="text-sm font-medium text-white">{{ param.name }}</code>
+                        <span class="eh-badge eh-badge-neutral font-mono">{{ param.type }}</span>
+                        @if (param.required) {
+                          <span class="eh-badge eh-badge-rose">
+                            <lucide-icon name="circle-alert" [size]="12"></lucide-icon>
+                            {{ copy.required }}
+                          </span>
+                        } @else {
+                          <span class="eh-badge eh-badge-slate">{{ copy.optional }}</span>
+                        }
+                      </div>
+                      <p class="mt-1 text-xs text-white/60">{{ param.description }}</p>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (endpoint.requestBody) {
+              <div class="mb-4">
+                <h4 class="mb-2 flex items-center gap-2 text-sm font-medium text-white">
+                  <lucide-icon [name]="sectionIcons.requestBody" [size]="14"></lucide-icon>
+                  {{ copy.requestBody }}
+                </h4>
+                <div class="rounded-lg border border-white/10 bg-white/5 p-3">
+                  <div class="mb-2">
+                    <span class="text-xs text-white/60">Content-Type:</span>
+                    <code class="ml-2 text-xs text-white">{{ endpoint.requestBody.contentType }}</code>
+                  </div>
+                  <div>
+                    <span class="text-xs text-white/60">Schema:</span>
+                    <code class="ml-2 break-all text-xs text-white">{{
+                      formatSchema(endpoint.requestBody.schema)
+                    }}</code>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <div class="mb-4">
+              <h4 class="mb-2 flex items-center gap-2 text-sm font-medium text-white">
+                <lucide-icon [name]="sectionIcons.response" [size]="14"></lucide-icon>
+                {{ copy.response }}
+              </h4>
+              <div class="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3">
+                <div class="mb-2 flex items-center gap-2">
                   <span class="text-xs text-white/60">Status:</span>
-                  <span
-                    class="ml-2 rounded bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-400"
-                  >
-                    {{ error.status }}
+                  <span class="eh-badge" [ngClass]="badgeTone[httpStatusTone(endpoint.response.status)]">
+                    {{ endpoint.response.status }}
                   </span>
                 </div>
                 <div>
                   <span class="text-xs text-white/60">Body:</span>
-                  <code class="ml-2 text-xs text-white">{{
-                    formatSchema(error.body)
+                  <code class="ml-2 break-all text-xs text-white">{{
+                    formatSchema(endpoint.response.body)
                   }}</code>
-                </div>
-                <div *ngIf="errorMessage(error.body) as message" class="mt-1">
-                  <span class="text-xs text-white/60">Message:</span>
-                  <code class="ml-2 text-xs text-white">{{ message }}</code>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Empty State -->
-        <div
-          *ngIf="filteredEndpoints().length === 0"
-          class="rounded-lg border border-dashed border-white/20 bg-white/5 p-8 text-center"
-        >
-          <p class="text-sm text-white/60">
-            No endpoints found for the selected method and category.
-          </p>
-        </div>
+            @if (endpoint.errorResponses?.length) {
+              <div>
+                <h4 class="mb-2 flex items-center gap-2 text-sm font-medium text-white">
+                  <lucide-icon [name]="sectionIcons.errors" [size]="14"></lucide-icon>
+                  {{ copy.errorResponses }}
+                </h4>
+                <div class="space-y-2">
+                  @for (failure of endpoint.errorResponses; track $index) {
+                    <div class="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3">
+                      <div class="mb-2 flex items-center gap-2">
+                        <span class="text-xs text-white/60">Status:</span>
+                        <span class="eh-badge" [ngClass]="badgeTone[httpStatusTone(failure.status)]">
+                          {{ failure.status }}
+                        </span>
+                      </div>
+                      <div>
+                        <span class="text-xs text-white/60">Body:</span>
+                        <code class="ml-2 break-all text-xs text-white">{{ formatSchema(failure.body) }}</code>
+                      </div>
+                      @if (errorMessage(failure.body); as message) {
+                        <div class="mt-1">
+                          <span class="text-xs text-white/60">Message:</span>
+                          <code class="ml-2 text-xs text-white">{{ message }}</code>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @empty {
+          <div class="rounded-lg border border-dashed border-white/20 bg-white/5 p-8 text-center">
+            <p class="flex items-center justify-center gap-2 text-sm text-white/60">
+              <lucide-icon [name]="sectionIcons.empty" [size]="16"></lucide-icon>
+              {{ copy.empty }}
+            </p>
+          </div>
+        }
       </div>
-    </div>
+    </section>
     }
   </div>
 </div>

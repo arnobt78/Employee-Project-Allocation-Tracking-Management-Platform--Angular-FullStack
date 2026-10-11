@@ -8,25 +8,25 @@
     [icon]="pageMeta.icon"
   >
     <button
-      ubButton
-      size="sm"
-      variant="secondary"
-      class="eh-btn-icon border border-white/20 bg-white/5 hover:bg-white/10"
+      ehAction
+      type="button"
+      class="eh-action-btn eh-action-btn-outline"
+      icon="download"
+      [iconSize]="16"
       (click)="exportToCSV()"
       [disabled]="loading() || !insights()"
     >
-      <lucide-icon name="download" [size]="16"></lucide-icon>
       <span>Export CSV</span>
     </button>
     <button
-      ubButton
-      size="sm"
-      variant="secondary"
-      class="eh-btn-icon border border-white/20 bg-white/5 hover:bg-white/10"
+      ehAction
+      type="button"
+      class="eh-action-btn eh-action-btn-outline"
+      icon="file-down"
+      [iconSize]="16"
       (click)="exportToPDF()"
       [disabled]="loading() || !insights()"
     >
-      <lucide-icon name="file-down" [size]="16"></lucide-icon>
       <span>Export PDF</span>
     </button>
   </app-page-header>
@@ -41,10 +41,14 @@
       class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
     >
       <div>
-        <label class="mb-2 block text-xs sm:text-sm text-white/60">
-          {{ filterLabels.dateRange }}
-        </label>
+        <app-field-label
+          [text]="filterLabels.dateRange"
+          [icon]="filterIcons.dateRange"
+          forId="insights-date-range"
+          [aboveControl]="true"
+        ></app-field-label>
         <app-select-menu
+          triggerId="insights-date-range"
           formControlName="dateRange"
           [options]="dateRangeOptions"
           [clearable]="false"
@@ -52,29 +56,47 @@
           (selectionChange)="onFilterChange()"
         ></app-select-menu>
       </div>
-      <div *ngIf="filterForm.get('dateRange')?.value === 'custom'">
-        <label class="mb-2 block text-xs sm:text-sm text-white/60"> Start Date </label>
-        <input
-          type="date"
-          formControlName="startDate"
-          (change)="onFilterChange()"
-          class="eh-native-date w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-        />
-      </div>
-      <div *ngIf="filterForm.get('dateRange')?.value === 'custom'">
-        <label class="mb-2 block text-xs sm:text-sm text-white/60"> End Date </label>
-        <input
-          type="date"
-          formControlName="endDate"
-          (change)="onFilterChange()"
-          class="eh-native-date w-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/80 outline-none transition focus:border-primary/60 focus:bg-white/10 focus:text-white"
-        />
-      </div>
+      @if (filterForm.get('dateRange')?.value === 'custom') {
+        <div>
+          <app-field-label
+            [text]="filterLabels.startDate"
+            [icon]="filterIcons.startDate"
+            forId="insights-start-date"
+            [aboveControl]="true"
+          ></app-field-label>
+          <input
+            id="insights-start-date"
+            type="date"
+            formControlName="startDate"
+            (change)="onFilterChange()"
+            class="eh-input eh-native-date"
+          />
+        </div>
+        <div>
+          <app-field-label
+            [text]="filterLabels.endDate"
+            [icon]="filterIcons.endDate"
+            forId="insights-end-date"
+            [aboveControl]="true"
+          ></app-field-label>
+          <input
+            id="insights-end-date"
+            type="date"
+            formControlName="endDate"
+            (change)="onFilterChange()"
+            class="eh-input eh-native-date"
+          />
+        </div>
+      }
       <div>
-        <label class="mb-2 block text-xs sm:text-sm text-white/60">
-          {{ filterLabels.department }}
-        </label>
+        <app-field-label
+          [text]="filterLabels.department"
+          [icon]="filterIcons.department"
+          forId="insights-department"
+          [aboveControl]="true"
+        ></app-field-label>
         <app-select-menu
+          triggerId="insights-department"
           formControlName="department"
           [options]="departmentOptions()"
           [clearable]="false"
@@ -85,486 +107,297 @@
     </form>
   </div>
 
-  <div *ngIf="insights()" class="space-y-6">
-    <div class="flex gap-2 border-b border-white/10">
+  @if (insights(); as data) {
+  <div class="space-y-6">
+    <div class="flex gap-2 overflow-x-auto border-b border-white/10">
       @for (tab of tabs; track tab.id) {
         <button
           type="button"
           (click)="setActiveTab(tab.id)"
-          [ngClass]="{
-            'border-b-2 border-primary text-white': activeTab() === tab.id,
-            'text-white/60': activeTab() !== tab.id,
-          }"
-          class="px-4 py-2 text-sm font-medium transition-colors hover:text-white"
+          [class]="activeTab() === tab.id ? tabActiveClass : tabIdleClass"
+          [attr.aria-pressed]="activeTab() === tab.id"
         >
+          <lucide-icon [name]="tab.icon" [size]="14"></lucide-icon>
           {{ tab.label }}
         </button>
       }
     </div>
 
-    <!-- Overview Tab -->
-    <div *ngIf="activeTab() === 'overview'" class="space-y-6">
-      <!-- Key Metrics Cards -->
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div
-          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-        >
-          <p class="text-sm text-white/45">{{ kpiLabels[0] }}</p>
-          <p
-            class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
-          >
-            {{ insights()?.totalProjectCount ?? projectsSignal().length }}
-          </p>
-        </div>
-        <div
-          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-        >
-          <p class="text-sm text-white/45">{{ kpiLabels[1] }}</p>
-          <p
-            class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
-          >
-            {{
-              (insights()?.filteredEmployeeCount ??
-                insights()?.resourceUtilization?.totalEmployees) ||
-                0
-            }}
-          </p>
-        </div>
-        <div
-          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-        >
-          <p class="text-sm text-white/45">{{ kpiLabels[2] }}</p>
-          <p
-            class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
-          >
-            {{ insights()?.readinessScores?.average || 0 }}%
-          </p>
-        </div>
-        <div
-          class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-        >
-          <p class="text-sm text-white/45">{{ kpiLabels[3] }}</p>
-          <p
-            class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
-          >
-            {{ insights()?.teamCapacity?.utilizationPercentage || 0 }}%
-          </p>
+    @switch (activeTab()) {
+    @case ('overview') {
+    <div class="space-y-6">
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        @for (kpi of overviewKpis(); track kpi.label) {
+          <app-kpi-stat-card
+            [label]="kpi.label"
+            [value]="kpi.value"
+            [icon]="kpi.icon"
+            [tone]="kpi.tone"
+          ></app-kpi-stat-card>
+        }
+      </div>
+
+      <div class="eh-panel">
+        <div class="flex flex-wrap items-center gap-2">
+          @for (chip of breakdownChips(); track chip.key) {
+            <span class="eh-badge" [ngClass]="badgeTone[chip.tone]" [title]="chip.title">
+              <lucide-icon [name]="chip.icon" [size]="12"></lucide-icon>
+              {{ chip.value }} {{ chip.label }}
+            </span>
+          }
         </div>
       </div>
 
-      <!-- Project Breakdown Badges - Full Width Row Below Cards -->
-      <div
-        class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-      >
-        <div class="flex flex-wrap gap-2 items-center">
-          <span
-            class="inline-flex items-center rounded-full bg-cyan-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-cyan-400 border border-cyan-500/30"
-            title="Non-archived projects (used for all calculations below)"
-          >
-            {{ insights()?.filteredProjectCount ?? 0 }} Non-Archived
-          </span>
-          <span
-            *ngIf="(insights()?.archivedProjectCount ?? 0) > 0"
-            class="inline-flex items-center rounded-full bg-gray-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-gray-400 border border-gray-500/30"
-            title="Archived projects (excluded from calculations, display only)"
-          >
-            {{ insights()?.archivedProjectCount ?? 0 }} Archived
-          </span>
-          <span
-            class="inline-flex items-center rounded-full bg-green-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-green-400 border border-green-500/30"
-            title="Projects with active assignments or leads"
-          >
-            {{ insights()?.activeProjectCount ?? 0 }} Active
-          </span>
-          <span
-            class="inline-flex items-center rounded-full bg-slate-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-slate-400 border border-slate-500/30"
-            title="Projects with no active assignments and no lead"
-          >
-            {{ insights()?.inactiveProjectCount ?? 0 }} Inactive
-          </span>
-          <span
-            *ngIf="(insights()?.planningProjectCount ?? 0) > 0"
-            class="inline-flex items-center rounded-full bg-blue-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-blue-400 border border-blue-500/30"
-            title="Projects with lead but no active assignments (planning/startup phase)"
-          >
-            {{ insights()?.planningProjectCount ?? 0 }} Planning
-          </span>
-          <span
-            *ngIf="(insights()?.assignedProjectCount ?? 0) > 0"
-            class="inline-flex items-center rounded-full bg-purple-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-purple-400 border border-purple-500/30"
-            title="Projects with active employee assignments"
-          >
-            {{ insights()?.assignedProjectCount ?? 0 }} Assigned
-          </span>
-          <span
-            *ngIf="(insights()?.nonAssignedProjectCount ?? 0) > 0"
-            class="inline-flex items-center rounded-full bg-orange-500/20 px-2 py-0.5 text-xs sm:text-sm font-medium text-orange-400 border border-orange-500/30"
-            title="Projects with no active employee assignments"
-          >
-            {{ insights()?.nonAssignedProjectCount ?? 0 }} Non-Assigned
-          </span>
-        </div>
-      </div>
-
-      <!-- Project Status Distribution Chart -->
-      <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
-      >
-        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
-          {{ statusTitle }}
+      <section class="eh-section-card">
+        <h2 class="eh-section-heading">
+          <lucide-icon [name]="sectionIcons.status" [size]="18"></lucide-icon>
+          <span>{{ statusTitle }}</span>
         </h2>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <div
-            *ngFor="let item of statusDistribution()"
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-          >
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm text-white/60">{{ item.label }}</p>
-                <p
-                  class="text-xl sm:text-2xl leading-none font-medium text-white"
-                >
-                  {{ item.value }}
-                </p>
-              </div>
-              <div
-                [class]="'h-12 w-12 rounded-full ' + item.color + ' opacity-20'"
-              ></div>
-            </div>
-          </div>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          @for (item of statusDistribution(); track item.key) {
+            <app-kpi-stat-card
+              [label]="item.label"
+              [value]="item.value"
+              [icon]="item.icon"
+              [tone]="item.tone"
+            ></app-kpi-stat-card>
+          }
         </div>
-      </div>
+      </section>
 
-      <!-- Readiness Score Distribution -->
-      <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
-      >
-        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
-          {{ readinessTitle }}
+      <section class="eh-section-card">
+        <h2 class="eh-section-heading">
+          <lucide-icon [name]="sectionIcons.readiness" [size]="18"></lucide-icon>
+          <span>{{ readinessTitle }}</span>
         </h2>
         <div class="space-y-3">
-          <div
-            *ngFor="let dist of insights()?.readinessScores?.distribution || []"
-            class="flex items-center gap-4"
-          >
-            <div class="w-24 text-sm text-white/60">{{ dist.range }}</div>
-            <div class="flex-1">
-              <div class="h-6 rounded-full bg-white/10">
-                <div
-                  class="h-6 rounded-full bg-gradient-to-r from-primary to-purple-500 transition-all"
-                  [style.width.%]="
-                    (dist.count /
-                      (insights()?.filteredProjectCount ||
-                        projectsSignal().length ||
-                        1)) *
-                    100
-                  "
-                ></div>
+          @for (dist of data.readinessScores.distribution || []; track dist.range) {
+            <div class="flex items-center gap-4">
+              <div class="w-24 text-sm text-white/60">{{ dist.range }}</div>
+              <div class="flex-1">
+                <div class="h-6 rounded-full bg-white/10">
+                  <div
+                    class="h-6 rounded-full bg-gradient-to-r from-primary to-purple-500 transition-all"
+                    [style.width.%]="
+                      (dist.count / (data.filteredProjectCount || projectsSignal().length || 1)) * 100
+                    "
+                  ></div>
+                </div>
+              </div>
+              <div class="w-12 text-right text-sm font-medium text-white">
+                {{ dist.count }}
               </div>
             </div>
-            <div class="w-12 text-right text-sm font-medium text-white">
-              {{ dist.count }}
-            </div>
-          </div>
+          }
         </div>
-      </div>
+      </section>
     </div>
+    }
 
-    <!-- Projects Tab -->
-    <div *ngIf="activeTab() === 'projects'" class="space-y-6">
-      <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
-      >
-        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
-          Department Breakdown
+    @case ('projects') {
+    <div class="space-y-6">
+      <section class="eh-section-card">
+        <h2 class="eh-section-heading">
+          <lucide-icon [name]="sectionIcons.departments" [size]="18"></lucide-icon>
+          <span>Department Breakdown</span>
         </h2>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
-              <tr class="border-b border-white/10 text-left">
-                <th class="pb-3 text-xs sm:text-sm text-white/60">
-                  Department
-                </th>
-                <th class="pb-3 text-xs sm:text-sm text-white/60">Employees</th>
-                <th class="pb-3 text-xs sm:text-sm text-white/60">Projects</th>
-                <th class="pb-3 text-xs sm:text-sm text-white/60">
-                  Avg Readiness
-                </th>
+              <tr class="border-b border-white/10 text-left text-xs sm:text-sm text-white/60">
+                <th class="pb-3 font-medium">Department</th>
+                <th class="pb-3 font-medium">Employees</th>
+                <th class="pb-3 font-medium">Projects</th>
+                <th class="pb-3 font-medium">Avg Readiness</th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                *ngFor="let dept of insights()?.departmentBreakdown || []"
-                class="border-b border-white/5"
-              >
-                <td class="py-3 font-medium text-white">
-                  {{ dept.department }}
-                </td>
-                <td class="py-3 text-white/80">{{ dept.employeeCount }}</td>
-                <td class="py-3 text-white/80">{{ dept.projectCount }}</td>
-                <td class="py-3">
-                  <span
-                    class="inline-flex rounded-full bg-primary/20 px-3 py-1 text-xs sm:text-sm text-primary"
-                  >
-                    {{ dept.averageReadiness }}%
-                  </span>
-                </td>
-              </tr>
-              <tr *ngIf="!insights()?.departmentBreakdown?.length">
-                <td colspan="4" class="py-8 text-center text-sm text-white/60">
-                  No department data available for the selected filters.
-                </td>
-              </tr>
+              @for (dept of data.departmentBreakdown || []; track dept.department) {
+                <tr class="border-b border-white/5">
+                  <td class="py-3 font-medium text-white">
+                    <span class="inline-flex items-center gap-2">
+                      <lucide-icon name="building-2" [size]="14" class="text-white/50"></lucide-icon>
+                      {{ dept.department }}
+                    </span>
+                  </td>
+                  <td class="py-3 text-white/80">{{ dept.employeeCount }}</td>
+                  <td class="py-3 text-white/80">{{ dept.projectCount }}</td>
+                  <td class="py-3">
+                    <span class="eh-badge eh-badge-sky">
+                      <lucide-icon name="gauge" [size]="12"></lucide-icon>
+                      {{ dept.averageReadiness }}%
+                    </span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" class="py-8 text-center text-sm text-white/60">
+                    No department data available for the selected filters.
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
 
-      <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
-      >
-        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
-          Project Type Breakdown
+      <section class="eh-section-card">
+        <h2 class="eh-section-heading">
+          <lucide-icon [name]="sectionIcons.projectTypes" [size]="18"></lucide-icon>
+          <span>Project Type Breakdown</span>
         </h2>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div
-            *ngFor="let type of insights()?.projectTypeBreakdown || []"
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-          >
-            <p class="text-sm font-medium text-white">{{ type.type }}</p>
-            <p
-              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          @for (type of data.projectTypeBreakdown || []; track type.type) {
+            <app-kpi-stat-card
+              [label]="type.type"
+              [value]="type.count"
+              [hint]="'Avg Readiness: ' + type.averageReadiness + '%'"
+              icon="layers"
+              tone="violet"
+            ></app-kpi-stat-card>
+          } @empty {
+            <div
+              class="rounded-2xl border border-dashed border-white/20 bg-white/5 px-2 sm:px-4 py-12 text-center sm:col-span-2 lg:col-span-3"
             >
-              {{ type.count }}
-            </p>
-            <p class="mt-2 text-xs sm:text-sm text-white/60">
-              Avg Readiness: {{ type.averageReadiness }}%
-            </p>
-          </div>
+              <p class="text-sm text-white/60">
+                No project type data available for the selected filters.
+              </p>
+            </div>
+          }
         </div>
-        <div
-          *ngIf="!insights()?.projectTypeBreakdown?.length"
-          class="rounded-2xl border border-dashed border-white/20 bg-white/5 px-2 sm:px-4 py-12 text-center"
-        >
-          <p class="text-sm text-white/60">
-            No project type data available for the selected filters.
-          </p>
-        </div>
-      </div>
+      </section>
     </div>
+    }
 
-    <!-- Resources Tab -->
-    <div *ngIf="activeTab() === 'resources'" class="space-y-6">
-      <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
-      >
-        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
-          Resource Utilization
+    @case ('resources') {
+    <div class="space-y-6">
+      <section class="eh-section-card">
+        <h2 class="eh-section-heading">
+          <lucide-icon [name]="sectionIcons.resources" [size]="18"></lucide-icon>
+          <span>Resource Utilization</span>
         </h2>
-        <div class="grid gap-4 sm:grid-cols-2">
-          <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-          >
-            <p class="text-xs sm:text-sm text-white/60">Total Employees</p>
-            <p
-              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
-            >
-              {{ insights()?.resourceUtilization?.totalEmployees || 0 }}
-            </p>
-          </div>
-          <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-          >
-            <p class="text-xs sm:text-sm text-white/60">Active Assignments</p>
-            <p
-              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
-            >
-              {{ insights()?.resourceUtilization?.activeAssignments || 0 }}
-            </p>
-          </div>
-          <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-          >
-            <p class="text-xs sm:text-sm text-white/60">Average Allocation</p>
-            <p
-              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
-            >
-              {{ insights()?.resourceUtilization?.averageAllocation || 0 }}%
-            </p>
-          </div>
-          <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-          >
-            <p class="text-xs sm:text-sm text-white/60">Available Resources</p>
-            <p
-              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
-            >
-              {{ insights()?.resourceUtilization?.availableCount || 0 }}
-            </p>
-          </div>
+        <div class="grid gap-3 sm:grid-cols-2">
+          @for (kpi of resourceKpis(); track kpi.label) {
+            <app-kpi-stat-card
+              [label]="kpi.label"
+              [value]="kpi.value"
+              [icon]="kpi.icon"
+              [tone]="kpi.tone"
+            ></app-kpi-stat-card>
+          }
         </div>
-      </div>
+      </section>
 
-      <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
-      >
-        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
-          Team Capacity
+      <section class="eh-section-card">
+        <h2 class="eh-section-heading">
+          <lucide-icon [name]="sectionIcons.capacity" [size]="18"></lucide-icon>
+          <span>Team Capacity</span>
         </h2>
         <div class="space-y-4">
           <div>
             <div class="mb-2 flex items-center justify-between text-sm">
-              <span class="text-white/60">Utilization</span>
+              <span class="eh-read-label">
+                <lucide-icon name="percent" [size]="14"></lucide-icon>
+                <span>Utilization</span>
+              </span>
               <span class="font-medium text-white">
-                {{ insights()?.teamCapacity?.utilizationPercentage || 0 }}%
+                {{ data.teamCapacity.utilizationPercentage || 0 }}%
               </span>
             </div>
             <div class="h-4 rounded-full bg-white/10">
               <div
                 class="h-4 rounded-full bg-gradient-to-r from-primary to-purple-500 transition-all"
-                [style.width.%]="
-                  insights()?.teamCapacity?.utilizationPercentage || 0
-                "
+                [style.width.%]="data.teamCapacity.utilizationPercentage || 0"
               ></div>
             </div>
           </div>
           <div class="grid gap-4 sm:grid-cols-3">
             <div>
-              <p class="text-xs sm:text-sm text-white/60">Total Capacity</p>
-              <p
-                class="text-xl sm:text-2xl leading-none font-medium text-white"
-              >
-                {{ insights()?.teamCapacity?.totalCapacity || 0 }}%
+              <p class="eh-read-label">
+                <lucide-icon name="gauge" [size]="14"></lucide-icon>
+                <span>Total Capacity</span>
+              </p>
+              <p class="mt-1 text-xl sm:text-2xl leading-none font-medium text-white">
+                {{ data.teamCapacity.totalCapacity || 0 }}%
               </p>
             </div>
             <div>
-              <p class="text-xs sm:text-sm text-white/60">Utilized</p>
-              <p
-                class="text-xl sm:text-2xl leading-none font-medium text-white"
-              >
-                {{ insights()?.teamCapacity?.utilizedCapacity || 0 }}%
+              <p class="eh-read-label">
+                <lucide-icon name="activity" [size]="14"></lucide-icon>
+                <span>Utilized</span>
+              </p>
+              <p class="mt-1 text-xl sm:text-2xl leading-none font-medium text-white">
+                {{ data.teamCapacity.utilizedCapacity || 0 }}%
               </p>
             </div>
             <div>
-              <p class="text-xs sm:text-sm text-white/60">Available</p>
-              <p
-                class="text-xl sm:text-2xl leading-none font-medium text-white"
-              >
-                {{ insights()?.teamCapacity?.availableCapacity || 0 }}%
+              <p class="eh-read-label">
+                <lucide-icon name="circle-check" [size]="14"></lucide-icon>
+                <span>Available</span>
+              </p>
+              <p class="mt-1 text-xl sm:text-2xl leading-none font-medium text-white">
+                {{ data.teamCapacity.availableCapacity || 0 }}%
               </p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
+    }
 
-    <!-- Financials Tab -->
-    <div *ngIf="activeTab() === 'financials'" class="space-y-6">
-      <div
-        class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
-      >
-        <h2 class="mb-4 text-base sm:text-xl font-medium text-white">
-          Budget Metrics
+    @case ('financials') {
+    <div class="space-y-6">
+      <section class="eh-section-card">
+        <h2 class="eh-section-heading">
+          <lucide-icon [name]="sectionIcons.budget" [size]="18"></lucide-icon>
+          <span>Budget Metrics</span>
         </h2>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-          >
-            <p class="text-xs sm:text-sm text-white/60">Total Budget</p>
-            <p
-              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
-            >
-              ${{
-                insights()?.budgetMetrics?.totalBudget || 0 | number: "1.0-0"
-              }}
-            </p>
-          </div>
-          <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-          >
-            <p class="text-xs sm:text-sm text-white/60">Allocated</p>
-            <p
-              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
-            >
-              ${{
-                insights()?.budgetMetrics?.allocatedBudget || 0
-                  | number: "1.0-0"
-              }}
-            </p>
-          </div>
-          <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-          >
-            <p class="text-xs sm:text-sm text-white/60">Spent</p>
-            <p
-              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
-            >
-              ${{
-                insights()?.budgetMetrics?.spentBudget || 0 | number: "1.0-0"
-              }}
-            </p>
-          </div>
-          <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md"
-          >
-            <p class="text-xs sm:text-sm text-white/60">Remaining</p>
-            <p
-              class="mt-2 text-xl sm:text-2xl leading-none font-medium text-white"
-            >
-              ${{
-                insights()?.budgetMetrics?.remainingBudget || 0
-                  | number: "1.0-0"
-              }}
-            </p>
-          </div>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          @for (kpi of budgetKpis(); track kpi.label) {
+            <app-kpi-stat-card
+              [label]="kpi.label"
+              [value]="kpi.value"
+              [icon]="kpi.icon"
+              [tone]="kpi.tone"
+            ></app-kpi-stat-card>
+          }
         </div>
-      </div>
+      </section>
 
-      <!-- Budget Management Status Info -->
-      <div
-        class="rounded-[28px] border border-blue-500/20 bg-blue-500/5 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
+      <section
+        class="rounded-[28px] border border-sky-500/20 bg-sky-500/5 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
       >
         <div class="flex items-start gap-4">
-          <div class="flex-shrink-0">
-            <svg
-              class="h-6 w-6 text-blue-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
+          <lucide-icon
+            [name]="sectionIcons.budgetStatus"
+            [size]="22"
+            class="mt-0.5 text-sky-300"
+          ></lucide-icon>
           <div class="flex-1">
-            <h3 class="mb-2 text-sm font-medium text-blue-300">
+            <h3 class="mb-2 text-sm font-medium text-sky-200">
               Budget Management Status
             </h3>
             <div class="space-y-2 text-sm text-white/70">
               <p>
                 Currently, budget and finance-related management features are
-                properly defined and implemented as follows:
+                defined and implemented as follows:
               </p>
-              <ul class="ml-4 list-disc space-y-1">
-                <li>
-                  <span class="font-medium text-green-400">✓</span> Budget data
-                  is stored in seed data and database
+              <ul class="space-y-1.5">
+                <li class="flex items-start gap-2">
+                  <lucide-icon name="circle-check" [size]="16" class="mt-0.5 text-emerald-300"></lucide-icon>
+                  <span>Budget data is stored in seed data and the database</span>
                 </li>
-                <li>
-                  <span class="font-medium text-green-400">✓</span> Budget data
-                  is returned via API endpoints
+                <li class="flex items-start gap-2">
+                  <lucide-icon name="circle-check" [size]="16" class="mt-0.5 text-emerald-300"></lucide-icon>
+                  <span>Budget data is returned via API endpoints</span>
                 </li>
-                <li>
-                  <span class="font-medium text-green-400">✓</span> Budget
-                  metrics are calculated dynamically from database
+                <li class="flex items-start gap-2">
+                  <lucide-icon name="circle-check" [size]="16" class="mt-0.5 text-emerald-300"></lucide-icon>
+                  <span>Budget metrics are calculated dynamically from the database</span>
                 </li>
-                <li>
-                  <span class="font-medium text-yellow-400">○</span> Budget
-                  editing/input from frontend UI is not yet implemented
+                <li class="flex items-start gap-2">
+                  <lucide-icon name="circle-dashed" [size]="16" class="mt-0.5 text-amber-300"></lucide-icon>
+                  <span>Budget editing from the frontend UI is not yet implemented</span>
                 </li>
               </ul>
               <p class="mt-2 text-xs sm:text-sm text-white/50">
@@ -575,9 +408,12 @@
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
+    }
+    }
   </div>
+  }
   </div>
 </div>
 }

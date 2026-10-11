@@ -1,5 +1,14 @@
 # Changelog — Agile V project memory
 
+## 2026-10-11 — GATE-0025 avatars, Title Case labels, unassigned date, page consistency
+
+- Robohash avatars beside every employee/client name on project detail, Project Team, timeline leads and reminder owners
+- One Title Case formatter and one status map; status pills (`.eh-badge`) with icons everywhere ("In Review", "On Hold")
+- Deactivating an assignment records the unassigned date; Project Team shows the date, "Still Assigned" or "Not Recorded"
+- Timeline/Gantt/Calendar: status pills instead of raw text, lead avatars, icons on Start/End/Duration/client, Lucide instead of emoji/SVG
+- Business Insights, API Status, API Doc on shared KPI cards, badges, action buttons and toasts, with matching skeletons
+- Node 24.21: lint PASS; API 85/85; unit 138/138; build PASS; browser sweep PASS
+
 ## 2026-10-11 — GATE-0024 project detail UI consistency
 
 - Project detail uses shared labels (Lucide icon + required `*`), 44 px inputs (`eh-input`), `eh-action-btn` buttons with icons and pending labels

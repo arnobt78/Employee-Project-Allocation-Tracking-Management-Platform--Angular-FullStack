@@ -62,14 +62,14 @@ export const PRIVATE_PAGE_META: Record<string, PrivatePageMeta> = {
     listRowVariant: 'project',
   },
   '/new-project': {
-    title: 'Untitled project',
+    title: 'Untitled Project',
     subtitle: PROJECT_DETAIL_SUBTITLE,
     icon: 'folder-kanban',
     skeleton: 'project-detail',
     projectMode: 'create',
   },
   '/update-project': {
-    title: 'Project setup',
+    title: 'Project Setup',
     subtitle: PROJECT_DETAIL_SUBTITLE,
     icon: 'pencil',
     skeleton: 'project-detail',

@@ -43,6 +43,7 @@ import {
 } from '@/app/lib/list-query';
 import { MutationTracker, PendingSet } from '@/app/lib/mutation-tracker';
 import { removeBy, upsertBy } from '@/app/lib/list-ops';
+import { employeeAvatar } from '@/app/lib/media/employee-avatar';
 
 const SAVE_KEY = 'save';
 const deleteKey = (employeeId: number) => `delete:${employeeId}`;
@@ -69,6 +70,7 @@ const deleteKey = (employeeId: number) => `delete:${employeeId}`;
 })
 export class EmployeeComponent implements OnInit {
   readonly pageMeta = PRIVATE_PAGE_META['/employee'];
+  readonly avatarFor = employeeAvatar;
 
   @ViewChild('createPanel') createPanel?: ElementRef<HTMLElement>;
 

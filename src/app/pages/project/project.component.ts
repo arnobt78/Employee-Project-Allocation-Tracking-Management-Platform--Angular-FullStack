@@ -31,6 +31,8 @@ import {
 } from '@/app/lib/list-query';
 import { MutationTracker, PendingSet } from '@/app/lib/mutation-tracker';
 import { removeBy } from '@/app/lib/list-ops';
+import { titleCaseLabel } from '@/app/lib/format/labels';
+import { BADGE_TONE_CLASS, projectStatusMeta } from '@/app/lib/status/project-status';
 
 const IN_FLIGHT_STATUSES = new Set([
   'approved',
@@ -335,68 +337,11 @@ export class ProjectComponent implements OnInit {
     return `${start} – ${this.formattedDate(project.endDate)}`;
   }
 
-  displayStatus(project: IProject): string {
-    const raw = (project.status || project.approvalStatus || '').trim();
-    if (!raw) {
-      return 'Unknown';
-    }
-    return this.formatStatusLabel(raw);
-  }
+  readonly statusMeta = projectStatusMeta;
+  readonly badgeTone = BADGE_TONE_CLASS;
 
   displayHealth(project: IProject): string {
-    const raw = (project.health ?? '').trim();
-    if (!raw) {
-      return '—';
-    }
-    return this.toTitleCase(raw);
-  }
-
-  statusIcon(status: string | undefined): string {
-    const key = (status || '').toLowerCase().replace(/[\s-]+/g, '_');
-    if (key.includes('active') || key === 'approved') return 'zap';
-    if (key.includes('review')) return 'git-pull-request';
-    if (key.includes('hold') || key.includes('pause')) return 'pause-circle';
-    if (key.includes('draft') || key.includes('plan')) return 'pencil';
-    if (key.includes('archiv')) return 'archive';
-    if (key.includes('complete') || key.includes('done')) return 'check';
-    if (key.includes('reject') || key.includes('cancel')) return 'x';
-    return 'circle-dot';
-  }
-
-  statusBadgeClasses(status: string | undefined): string {
-    const key = (status || '').toLowerCase().replace(/[\s-]+/g, '_');
-    if (key.includes('active') || key === 'approved') {
-      return 'border-emerald-400/30 bg-emerald-500/10 text-emerald-200';
-    }
-    if (key.includes('review')) {
-      return 'border-amber-400/30 bg-amber-500/10 text-amber-100';
-    }
-    if (key.includes('hold') || key.includes('pause')) {
-      return 'border-slate-400/30 bg-slate-500/15 text-slate-100';
-    }
-    if (key.includes('draft') || key.includes('plan')) {
-      return 'border-violet-400/30 bg-violet-500/10 text-violet-100';
-    }
-    if (key.includes('archiv')) {
-      return 'border-white/20 bg-white/10 text-white/70';
-    }
-    if (key.includes('complete') || key.includes('done')) {
-      return 'border-sky-400/30 bg-sky-500/10 text-sky-200';
-    }
-    if (key.includes('reject') || key.includes('cancel')) {
-      return 'border-rose-400/30 bg-rose-500/10 text-rose-200';
-    }
-    return 'border-sky-400/30 bg-sky-500/10 text-sky-200';
-  }
-
-  private formatStatusLabel(status: string): string {
-    return status.replace(/_/g, ' ').trim();
-  }
-
-  private toTitleCase(value: string): string {
-    return this.formatStatusLabel(value)
-      .toLowerCase()
-      .replace(/\b\w/g, (c) => c.toUpperCase());
+    return titleCaseLabel(project.health) || '—';
   }
 
   private normalizedStatus(project: IProject): string {
@@ -418,8 +363,8 @@ export class ProjectComponent implements OnInit {
       seen.add(key);
       options.push({
         value: raw,
-        label: this.toTitleCase(raw),
-        icon: this.statusIcon(raw),
+        label: titleCaseLabel(raw),
+        icon: projectStatusMeta(raw).icon,
       });
     }
     return options.sort((a, b) => a.label.localeCompare(b.label));

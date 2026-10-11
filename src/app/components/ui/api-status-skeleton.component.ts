@@ -1,14 +1,17 @@
 import { Component } from '@angular/core';
 import {
   API_STATUS_COPY,
-  API_STATUS_DATA_LABELS,
+  API_STATUS_DATA_CARDS,
   API_STATUS_DELIVERY_SKELETON_ROWS,
   API_STATUS_METRIC_CARDS,
+  API_STATUS_SECTION_ICONS,
   API_STATUS_TABS,
   API_STATUS_TAB_ACTIVE_CLASS,
   API_STATUS_TAB_IDLE_CLASS,
 } from '@/app/constants/api-status';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
+import { AppIconComponent } from './app-icon.component';
+import { KpiStatCardComponent } from './kpi-stat-card.component';
 import { PageHeaderComponent } from './page-header.component';
 import { TextStubComponent } from './text-stub.component';
 import { DeliveryRowSkeletonComponent } from './delivery-row-skeleton.component';
@@ -21,7 +24,13 @@ import { DeliveryRowSkeletonComponent } from './delivery-row-skeleton.component'
 @Component({
   selector: 'app-api-status-skeleton',
   standalone: true,
-  imports: [PageHeaderComponent, TextStubComponent, DeliveryRowSkeletonComponent],
+  imports: [
+    AppIconComponent,
+    KpiStatCardComponent,
+    PageHeaderComponent,
+    TextStubComponent,
+    DeliveryRowSkeletonComponent,
+  ],
   host: { class: 'block' },
   template: `
     <div class="text-white/85" data-testid="api-status-skeleton" aria-busy="true">
@@ -30,29 +39,24 @@ import { DeliveryRowSkeletonComponent } from './delivery-row-skeleton.component'
         [subtitle]="meta.subtitle"
         [icon]="meta.icon"
       >
-        <button
-          type="button"
-          disabled
-          class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 disabled:opacity-50"
-        >
-          {{ copy.refreshing }}
+        <button type="button" disabled class="eh-action-btn eh-action-btn-outline">
+          <lucide-icon name="loader-circle" [size]="16" class="animate-spin"></lucide-icon>
+          <span>{{ copy.refreshing }}</span>
         </button>
       </app-page-header>
 
       <div class="eh-content-stack">
-        <div
-          class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md sm:p-4"
-        >
-          <div class="flex items-center justify-between">
+        <section class="eh-section-card">
+          <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 class="mb-2 text-base font-medium text-white sm:text-xl">
-                {{ copy.overallStatus }}
+              <h2 class="eh-section-heading !mb-2">
+                <lucide-icon [name]="icons.overallStatus" [size]="18"></lucide-icon>
+                <span>{{ copy.overallStatus }}</span>
               </h2>
-              <div class="flex items-center gap-3">
-                <app-text-stub
-                  class="inline-flex w-28 rounded-full border border-white/10 px-3 py-1 text-sm"
-                ></app-text-stub>
-                <span class="text-sm text-white/60">
+              <div class="flex flex-wrap items-center gap-3">
+                <span class="eh-badge eh-badge-neutral w-28 animate-pulse">&nbsp;</span>
+                <span class="flex items-center gap-1.5 text-sm text-white/60">
+                  <lucide-icon name="clock" [size]="14"></lucide-icon>
                   {{ copy.lastUpdated }}
                   <span
                     class="inline-block h-3 w-24 animate-pulse rounded-full bg-white/10 align-middle"
@@ -66,41 +70,32 @@ import { DeliveryRowSkeletonComponent } from './delivery-row-skeleton.component'
                 class="ml-auto block w-16 text-xl font-medium leading-none sm:text-2xl"
                 bar="inset-y-0 right-0 my-auto h-5 w-16 rounded-full sm:h-6"
               ></app-text-stub>
-              <div class="text-xs text-white/60 sm:text-sm">
+              <div class="mt-1 flex items-center justify-end gap-1.5 text-xs text-white/60 sm:text-sm">
+                <lucide-icon name="percent" [size]="14"></lucide-icon>
                 {{ copy.successRate }}
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           @for (card of metricCards; track card.label) {
-            <div class="rounded-xl border border-white/10 bg-white/5 p-4">
-              <div class="mb-2 text-sm text-white/60">{{ card.label }}</div>
-              <app-text-stub
-                class="block text-xl font-medium leading-none sm:text-2xl"
-                bar="inset-y-0 left-0 my-auto h-5 w-16 rounded-full sm:h-6"
-              ></app-text-stub>
-              <div class="mt-2 text-xs sm:text-sm" [class]="card.captionClass">
-                @if (card.caption) {
-                  {{ card.caption }}
-                } @else {
-                  <span
-                    class="inline-block h-3 w-16 animate-pulse rounded-full bg-white/10 align-middle"
-                    aria-hidden="true"
-                  ></span>
-                }
-              </div>
-            </div>
+            <app-kpi-stat-card
+              [label]="card.label"
+              value=""
+              [hint]="card.hint ?? 'Loading…'"
+              [icon]="card.icon"
+              [tone]="card.tone"
+              [loading]="true"
+            ></app-kpi-stat-card>
           }
         </div>
 
-        <div
-          class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md sm:p-4"
-        >
+        <section class="eh-section-card">
           <div class="mb-6 flex flex-wrap gap-2 border-b border-white/10">
             @for (tab of tabs; track tab.id; let first = $first) {
               <span [class]="first ? activeTabClass : idleTabClass">
+                <lucide-icon [name]="tab.icon" [size]="14"></lucide-icon>
                 {{ tab.label }}
               </span>
             }
@@ -108,19 +103,19 @@ import { DeliveryRowSkeletonComponent } from './delivery-row-skeleton.component'
 
           <div class="space-y-6">
             <div>
-              <h3 class="mb-4 text-base font-medium text-white sm:text-xl">
-                {{ copy.systemHealth }}
+              <h3 class="eh-section-heading">
+                <lucide-icon [name]="icons.systemHealth" [size]="18"></lucide-icon>
+                <span>{{ copy.systemHealth }}</span>
               </h3>
               <div class="grid gap-4 sm:grid-cols-2">
                 @for (service of healthCards; track service.title) {
-                  <div class="rounded-xl border border-white/10 bg-white/5 p-4">
-                    <div class="mb-2 flex items-center justify-between">
-                      <span class="text-sm font-medium text-white">{{
-                        service.title
-                      }}</span>
-                      <app-text-stub
-                        class="inline-flex w-20 rounded-full border border-white/10 px-2 py-0.5 text-xs"
-                      ></app-text-stub>
+                  <div class="eh-panel">
+                    <div class="mb-2 flex items-center justify-between gap-2">
+                      <span class="flex items-center gap-2 text-sm font-medium text-white">
+                        <lucide-icon [name]="service.icon" [size]="16"></lucide-icon>
+                        {{ service.title }}
+                      </span>
+                      <span class="eh-badge eh-badge-neutral w-24 animate-pulse">&nbsp;</span>
                     </div>
                     @for (line of service.lines; track line) {
                       <div class="text-xs text-white/60 sm:text-sm">
@@ -137,25 +132,27 @@ import { DeliveryRowSkeletonComponent } from './delivery-row-skeleton.component'
             </div>
 
             <div>
-              <h3 class="mb-4 text-base font-medium text-white sm:text-xl">
-                {{ copy.dataStatistics }}
+              <h3 class="eh-section-heading">
+                <lucide-icon [name]="icons.dataStatistics" [size]="18"></lucide-icon>
+                <span>{{ copy.dataStatistics }}</span>
               </h3>
-              <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                @for (label of dataLabels; track label) {
-                  <div class="rounded-xl border border-white/10 bg-white/5 p-4">
-                    <div class="mb-2 text-sm text-white/60">{{ label }}</div>
-                    <app-text-stub
-                      class="block text-xl font-medium leading-none sm:text-2xl"
-                      bar="inset-y-0 left-0 my-auto h-5 w-12 rounded-full sm:h-6"
-                    ></app-text-stub>
-                  </div>
+              <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                @for (card of dataCards; track card.label) {
+                  <app-kpi-stat-card
+                    [label]="card.label"
+                    value=""
+                    [icon]="card.icon"
+                    [tone]="card.tone"
+                    [loading]="true"
+                  ></app-kpi-stat-card>
                 }
               </div>
             </div>
 
             <div>
-              <h3 class="mb-4 text-base font-medium text-white sm:text-xl">
-                {{ copy.deliveries }}
+              <h3 class="eh-section-heading">
+                <lucide-icon [name]="icons.deliveries" [size]="18"></lucide-icon>
+                <span>{{ copy.deliveries }}</span>
               </h3>
               <div class="space-y-2">
                 @for (row of deliveryRows; track row) {
@@ -164,7 +161,7 @@ import { DeliveryRowSkeletonComponent } from './delivery-row-skeleton.component'
               </div>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   `,
@@ -172,19 +169,22 @@ import { DeliveryRowSkeletonComponent } from './delivery-row-skeleton.component'
 export class ApiStatusSkeletonComponent {
   readonly meta = PRIVATE_PAGE_META['/api-status'];
   readonly copy = API_STATUS_COPY;
+  readonly icons = API_STATUS_SECTION_ICONS;
   readonly tabs = API_STATUS_TABS;
   readonly activeTabClass = API_STATUS_TAB_ACTIVE_CLASS;
   readonly idleTabClass = API_STATUS_TAB_IDLE_CLASS;
   readonly metricCards = API_STATUS_METRIC_CARDS;
-  readonly dataLabels = API_STATUS_DATA_LABELS;
+  readonly dataCards = API_STATUS_DATA_CARDS;
   readonly deliveryRows = API_STATUS_DELIVERY_SKELETON_ROWS;
   readonly healthCards = [
     {
       title: API_STATUS_COPY.database,
+      icon: API_STATUS_SECTION_ICONS.database,
       lines: [API_STATUS_COPY.responseTime, API_STATUS_COPY.connected],
     },
     {
       title: API_STATUS_COPY.apiService,
+      icon: API_STATUS_SECTION_ICONS.apiService,
       lines: [API_STATUS_COPY.uptime, API_STATUS_COPY.avgResponse],
     },
   ];

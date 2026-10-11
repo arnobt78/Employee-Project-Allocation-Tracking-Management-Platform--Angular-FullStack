@@ -1,23 +1,25 @@
+import type { KpiStatTone } from '@/app/components/ui/kpi-stat-card.component';
+
 /** Static API Status copy shared by the live page and its loading mirror. */
 export type ApiStatusTabId = 'overview' | 'endpoints' | 'performance' | 'activity';
 
-export const API_STATUS_TABS: readonly { id: ApiStatusTabId; label: string }[] = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'endpoints', label: 'Endpoints' },
-  { id: 'performance', label: 'Performance' },
-  { id: 'activity', label: 'Activity' },
+export const API_STATUS_TABS: readonly { id: ApiStatusTabId; label: string; icon: string }[] = [
+  { id: 'overview', label: 'Overview', icon: 'layout-dashboard' },
+  { id: 'endpoints', label: 'Endpoints', icon: 'server' },
+  { id: 'performance', label: 'Performance', icon: 'gauge' },
+  { id: 'activity', label: 'Activity', icon: 'activity' },
 ];
 
 export const API_STATUS_TAB_ACTIVE_CLASS =
-  'border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary';
+  'inline-flex items-center gap-2 border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary';
 export const API_STATUS_TAB_IDLE_CLASS =
-  'px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white';
+  'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white';
 
 export const API_STATUS_COPY = {
   refresh: 'Refresh',
-  refreshing: 'Refreshing...',
+  refreshing: 'Refreshing…',
   overallStatus: 'Overall Status',
-  lastUpdated: 'Last updated:',
+  lastUpdated: 'Last Updated:',
   successRate: 'Success Rate',
   systemHealth: 'System Health',
   database: 'Database',
@@ -27,6 +29,9 @@ export const API_STATUS_COPY = {
   uptime: 'Uptime:',
   avgResponse: 'Avg Response:',
   dataStatistics: 'Data Statistics',
+  endpointHealth: 'Endpoint Health by Category',
+  performanceHistory: 'Performance History (Last 7 Days)',
+  recentActivity: 'Recent Activity',
   refreshFailed: "Couldn't refresh. Showing data from",
   retry: 'Retry',
   deliveries: 'Recent Email Deliveries',
@@ -34,20 +39,41 @@ export const API_STATUS_COPY = {
   deliveriesFailed: "Couldn't load email deliveries.",
 } as const;
 
+export const API_STATUS_SECTION_ICONS = {
+  overallStatus: 'activity',
+  systemHealth: 'shield-check',
+  database: 'database',
+  apiService: 'server',
+  dataStatistics: 'chart-column',
+  deliveries: 'mail',
+  endpointHealth: 'server',
+  performanceHistory: 'chart-line',
+  recentActivity: 'activity',
+} as const;
+
 /** Skeleton rows shown while the delivery log loads. */
 export const API_STATUS_DELIVERY_SKELETON_ROWS = [0, 1, 2] as const;
 
-/** Metric cards: label + static caption (`null` caption is data-driven). */
-export const API_STATUS_METRIC_CARDS = [
-  { label: 'Total Endpoints', caption: null, captionClass: 'text-green-400' },
-  { label: 'Avg Response Time', caption: 'Last 24 hours', captionClass: 'text-white/60' },
-  { label: 'Total Requests', caption: 'Last 7 days', captionClass: 'text-white/60' },
-  { label: 'Error Rate', caption: 'Requires attention', captionClass: 'text-red-400' },
-] as const;
+/** Metric cards; a `null` hint is data-driven (active endpoint count). */
+export const API_STATUS_METRIC_CARDS: ReadonlyArray<{
+  label: string;
+  icon: string;
+  tone: KpiStatTone;
+  hint: string | null;
+}> = [
+  { label: 'Total Endpoints', icon: 'server', tone: 'sky', hint: null },
+  { label: 'Avg Response Time', icon: 'timer', tone: 'violet', hint: 'Last 24 Hours' },
+  { label: 'Total Requests', icon: 'chart-line', tone: 'emerald', hint: 'Last 7 Days' },
+  { label: 'Error Rate', icon: 'triangle-alert', tone: 'rose', hint: 'Requires Attention' },
+];
 
-export const API_STATUS_DATA_LABELS = [
-  'Employees',
-  'Projects',
-  'Assignments',
-  'Departments',
-] as const;
+export const API_STATUS_DATA_CARDS: ReadonlyArray<{
+  label: string;
+  icon: string;
+  tone: KpiStatTone;
+}> = [
+  { label: 'Employees', icon: 'users', tone: 'emerald' },
+  { label: 'Projects', icon: 'folder-kanban', tone: 'sky' },
+  { label: 'Assignments', icon: 'briefcase', tone: 'violet' },
+  { label: 'Departments', icon: 'building-2', tone: 'amber' },
+];

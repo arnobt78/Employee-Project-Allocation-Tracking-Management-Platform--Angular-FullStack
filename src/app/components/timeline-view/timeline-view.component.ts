@@ -1,6 +1,16 @@
-import { Component, Input, computed } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AppIconComponent } from '@/app/components/ui/app-icon.component';
+import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
+import { employeeAvatar, type AvatarView } from '@/app/lib/media/employee-avatar';
+import {
+  BADGE_TONE_CLASS,
+  STATUS_TONE_BORDER,
+  STATUS_TONE_FILL,
+  projectStatusMeta,
+  type StatusMeta,
+} from '@/app/lib/status/project-status';
 
 export interface IProjectTimeline {
   projectId: number;
@@ -11,123 +21,99 @@ export interface IProjectTimeline {
   status: string;
   leadName: string;
   leadDepartment: string;
+  leadEmail?: string;
+  leadAvatarUrl?: string | null;
 }
+
+interface TimelineRow {
+  project: IProjectTimeline;
+  status: StatusMeta;
+  fill: string;
+  border: string;
+  lead: AvatarView | null;
+  position: number;
+  width: number;
+  duration: string;
+}
+
+const DAY_MS = 1000 * 60 * 60 * 24;
 
 @Component({
   selector: 'app-timeline-view',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AppIconComponent, UserAvatarComponent],
   templateUrl: './timeline-view.component.html',
   styleUrls: ['./timeline-view.component.css'],
 })
 export class TimelineViewComponent {
-  @Input() projects: IProjectTimeline[] = [];
-
-  readonly sortedProjects = computed(() => {
-    return [...this.projects].sort((a, b) => {
-      const dateA = new Date(a.startDate).getTime();
-      const dateB = new Date(b.startDate).getTime();
-      return dateA - dateB;
-    });
-  });
+  readonly projects = input<IProjectTimeline[]>([]);
+  readonly badgeTone = BADGE_TONE_CLASS;
 
   readonly dateRange = computed(() => {
-    if (this.projects.length === 0) {
+    const projects = this.projects();
+    if (projects.length === 0) {
       return { min: new Date(), max: new Date() };
     }
-
-    const dates = this.projects
-      .map((p) => [
-        new Date(p.startDate),
-        p.endDate ? new Date(p.endDate) : new Date(),
-      ])
-      .flat();
-
-    const min = new Date(Math.min(...dates.map((d) => d.getTime())));
-    const max = new Date(Math.max(...dates.map((d) => d.getTime())));
-
-    return { min, max };
+    const times = projects.flatMap((p) => [
+      new Date(p.startDate).getTime(),
+      p.endDate ? new Date(p.endDate).getTime() : Date.now(),
+    ]);
+    return { min: new Date(Math.min(...times)), max: new Date(Math.max(...times)) };
   });
 
-  getProjectDuration(project: IProjectTimeline): number {
-    const start = new Date(project.startDate);
-    const end = project.endDate
-      ? new Date(project.endDate)
-      : new Date();
-    return Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  /** One pass per data change; the template never recomputes positions or colours. */
+  readonly rows = computed<TimelineRow[]>(() => {
+    const { min, max } = this.dateRange();
+    const totalDays = (max.getTime() - min.getTime()) / DAY_MS;
+    return [...this.projects()]
+      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+      .map((project) => {
+        const status = projectStatusMeta(project.status);
+        const position = this.position(project, min, totalDays);
+        const width =
+          totalDays > 0
+            ? Math.min((Math.max(0, this.durationDays(project)) / totalDays) * 100, 100 - position)
+            : 0;
+        return {
+          project,
+          status,
+          fill: STATUS_TONE_FILL[status.tone],
+          border: STATUS_TONE_BORDER[status.tone],
+          lead: project.leadName
+            ? employeeAvatar({
+                employeeName: project.leadName,
+                emailId: project.leadEmail || null,
+                avatarUrl: project.leadAvatarUrl ?? null,
+              })
+            : null,
+          position,
+          width,
+          duration: this.durationLabel(project),
+        };
+      });
+  });
+
+  private position(project: IProjectTimeline, min: Date, totalDays: number): number {
+    if (totalDays <= 0) return 0;
+    const daysFromStart = (new Date(project.startDate).getTime() - min.getTime()) / DAY_MS;
+    return Math.max(0, Math.min(100, (daysFromStart / totalDays) * 100));
   }
 
-  getDurationDisplay(project: IProjectTimeline): string {
+  private durationDays(project: IProjectTimeline): number {
+    const end = project.endDate ? new Date(project.endDate) : new Date();
+    return Math.ceil((end.getTime() - new Date(project.startDate).getTime()) / DAY_MS);
+  }
+
+  private durationLabel(project: IProjectTimeline): string {
     const start = new Date(project.startDate);
-    const now = new Date();
-    // Reset time to midnight for accurate day comparison
+    const today = new Date();
     start.setHours(0, 0, 0, 0);
-    now.setHours(0, 0, 0, 0);
-    
-    const daysUntilStart = Math.ceil((start.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    
-    // If project hasn't started yet (start date is in the future)
+    today.setHours(0, 0, 0, 0);
+    const daysUntilStart = Math.ceil((start.getTime() - today.getTime()) / DAY_MS);
     if (daysUntilStart > 0) {
       return `Starts in ${daysUntilStart} day${daysUntilStart !== 1 ? 's' : ''}`;
     }
-    
-    // If project has started, show duration
-    const duration = this.getProjectDuration(project);
-    if (duration < 0) {
-      // This shouldn't happen, but handle edge case
-      return `Starts in ${Math.abs(duration)} day${Math.abs(duration) !== 1 ? 's' : ''}`;
-    }
+    const duration = Math.max(0, this.durationDays(project));
     return `${duration} day${duration !== 1 ? 's' : ''}`;
   }
-
-  getProjectPosition(project: IProjectTimeline): number {
-    const range = this.dateRange();
-    const totalDays =
-      (range.max.getTime() - range.min.getTime()) / (1000 * 60 * 60 * 24);
-    
-    if (totalDays <= 0) return 0;
-    
-    const projectStart = new Date(project.startDate);
-    const daysFromStart =
-      (projectStart.getTime() - range.min.getTime()) / (1000 * 60 * 60 * 24);
-    const position = (daysFromStart / totalDays) * 100;
-    
-    // Clamp between 0 and 100
-    return Math.max(0, Math.min(100, position));
-  }
-
-  getProjectWidth(project: IProjectTimeline): number {
-    const range = this.dateRange();
-    const totalDays =
-      (range.max.getTime() - range.min.getTime()) / (1000 * 60 * 60 * 24);
-    
-    if (totalDays <= 0) return 0;
-    
-    const duration = Math.max(0, this.getProjectDuration(project));
-    const width = (duration / totalDays) * 100;
-    
-    // Ensure width doesn't exceed available space
-    const position = this.getProjectPosition(project);
-    return Math.min(width, 100 - position);
-  }
-
-  getStatusColor(status: string): string {
-    switch (status?.toLowerCase()) {
-      case 'approved':
-      case 'completed':
-        return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'in_progress':
-      case 'in_review':
-        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-      case 'on_hold':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      case 'cancelled':
-      case 'rejected':
-        return 'bg-red-500/20 text-red-400 border-red-500/30';
-      case 'draft':
-      default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-    }
-  }
 }
-

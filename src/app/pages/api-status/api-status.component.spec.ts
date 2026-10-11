@@ -13,6 +13,7 @@ import { NEVER, of, throwError } from 'rxjs';
 import { ApiStatusComponent } from './api-status.component';
 import { MasterService } from '../../service/master.service';
 import { IApiStatus, INotificationLogEntry } from '../../model/interface/master';
+import { ToastService } from '@/app/components/ui/toast.service';
 
 describe('ApiStatusComponent', () => {
   let fixture: ComponentFixture<ApiStatusComponent>;
@@ -101,6 +102,19 @@ describe('ApiStatusComponent', () => {
     fixture.destroy();
   });
 
+  it('toasts a failed manual refresh but keeps the background load silent', () => {
+    spyOn(master, 'peekApiStatus').and.returnValue(status);
+    spyOn(master, 'getApiStatus').and.returnValue(throwError(() => new Error('down')));
+    spyOn(console, 'error');
+    const toastError = spyOn(TestBed.inject(ToastService), 'error');
+    create();
+    expect(toastError).not.toHaveBeenCalled();
+
+    fixture.componentInstance.loadApiStatus(true);
+    expect(toastError).toHaveBeenCalledTimes(1);
+    fixture.destroy();
+  });
+
   it('cold failure: retry shows the skeleton, then data with no error', () => {
     spyOn(master, 'peekApiStatus').and.returnValue(null);
     const getSpy = spyOn(master, 'getApiStatus').and.returnValue(
@@ -170,7 +184,7 @@ describe('ApiStatusComponent', () => {
       spyOn(master, 'getNotificationLog').and.returnValue(of([failed]));
       const el = create();
       const row = deliveries(el).querySelector('[data-delivery-status="failed"]');
-      expect(row?.textContent).toContain('Assignment created');
+      expect(row?.textContent).toContain('Assignment Created');
       expect(row?.textContent).toContain('Assignment #7001');
       expect(row?.textContent).toContain('3 recipients');
       expect(row?.textContent).toContain('SMTP down');
