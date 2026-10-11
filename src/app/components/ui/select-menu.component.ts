@@ -127,6 +127,10 @@ class SelectMenuPanelComponent {
       #trigger
       type="button"
       class="eh-select-trigger"
+      [attr.id]="triggerId || null"
+      [attr.aria-labelledby]="
+        triggerId ? triggerId + '-label ' + triggerId : null
+      "
       [attr.aria-expanded]="isOpen()"
       aria-haspopup="listbox"
       [disabled]="disabled"
@@ -191,6 +195,8 @@ export class SelectMenuComponent
 
   @Input() options: SelectMenuOption[] = [];
   @Input() placeholder = 'Select An Option';
+  /** Trigger id; pair with `app-field-label [forId]` so the label names the control. */
+  @Input() triggerId = '';
   /** Lucide icon on the left when empty (e.g. `users` on login). */
   @Input() emptyIcon = '';
   @Input() disabled = false;

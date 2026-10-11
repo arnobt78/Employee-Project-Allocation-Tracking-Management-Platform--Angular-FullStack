@@ -36,7 +36,6 @@ import {
   SectionId } from '../../model/interface/master';
 import { Employee } from '../../model/class/Employee';
 import { ToastService } from '@/app/components/ui/toast.service';
-import { UbButtonDirective } from '@/app/components/ui/button';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Observable, startWith } from 'rxjs';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
@@ -44,6 +43,7 @@ import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component
 import { ActionButtonComponent } from '@/app/components/ui/action-button.component';
 import { MutationTracker, PendingSet } from '@/app/lib/mutation-tracker';
 import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
+import { FieldLabelComponent } from '@/app/components/ui/field-label.component';
 import {
   SelectMenuComponent,
   SelectMenuOption,
@@ -53,7 +53,9 @@ import { ProjectHeaderMetaComponent } from '@/app/components/ui/project-header-m
 import {
   PROJECT_CONTENT_HELPER_COPY,
   PROJECT_CREATE_SECTION_VALUES,
+  PROJECT_DETAIL_FIELD_ICONS,
   PROJECT_DETAIL_FOOTER_COPY,
+  PROJECT_DETAIL_SECTION_ICONS,
   PROJECT_DETAIL_SECTION_LABELS,
   PROJECT_DETAIL_SUBTITLE,
   PROJECT_OVERVIEW_FIELD_LABELS,
@@ -72,6 +74,46 @@ const APPROVAL_PENDING_LABELS: Record<ApprovalAction, string> = {
   reject: 'Rejecting…',
   reset: 'Resetting…',
 };
+
+type ConfirmedApprovalAction = Exclude<ApprovalAction, 'request'>;
+
+const APPROVAL_CONFIRM_COPY: Record<
+  ConfirmedApprovalAction,
+  {
+    title: string;
+    description: string;
+    confirmLabel: string;
+    icon: string;
+    destructive: boolean;
+  }
+> = {
+  approve: {
+    title: 'Approve This Project?',
+    description:
+      'The project moves to Approved and the approval is logged in the audit trail.',
+    confirmLabel: 'Approve',
+    icon: 'circle-check',
+    destructive: false,
+  },
+  reject: {
+    title: 'Reject This Project?',
+    description:
+      'The project moves to Rejected and your comment is recorded as the reason.',
+    confirmLabel: 'Reject',
+    icon: 'x',
+    destructive: true,
+  },
+  reset: {
+    title: 'Reset Approval?',
+    description:
+      'The approval status returns to Draft. The history stays in the audit trail.',
+    confirmLabel: 'Reset To Draft',
+    icon: 'rotate-ccw',
+    destructive: true,
+  },
+};
+
+type SaveScope = 'section' | 'all';
 
 const PENDING = {
   save: 'save',
@@ -143,10 +185,10 @@ const REVIEWER_SEVERITIES = [
     AppIconComponent,
     CommonModule,
     ReactiveFormsModule,
-    UbButtonDirective,
     SelectMenuComponent,
     AlertDialogComponent,
     ActionButtonComponent,
+    FieldLabelComponent,
     PageHeaderComponent,
     ProjectDetailSkeletonComponent,
     ProjectHeaderMetaComponent,
@@ -239,6 +281,8 @@ export class ProjectFormComponent implements OnInit {
   readonly readinessTasks = readinessTaskDefinitions;
   readonly subtitle = PROJECT_DETAIL_SUBTITLE;
   readonly sectionLabels = PROJECT_DETAIL_SECTION_LABELS;
+  readonly sectionIcons = PROJECT_DETAIL_SECTION_ICONS;
+  readonly fieldIcons = PROJECT_DETAIL_FIELD_ICONS;
   readonly fieldLabels = READINESS_FIELD_LABELS;
   readonly checklistCopy = READINESS_CHECKLIST_COPY;
   readonly footerCopy = PROJECT_DETAIL_FOOTER_COPY;
@@ -346,6 +390,15 @@ export class ProjectFormComponent implements OnInit {
   readonly reviewerCommentProcessing = computed(() =>
     this.pending.some((key) => key === PENDING.comment || key.startsWith('resolve:'))
   );
+  readonly isAddingComment = computed(() => this.pending.has(PENDING.comment));
+
+  isApprovalPending(action: ApprovalAction): boolean {
+    return this.pending.has(PENDING.approval(action));
+  }
+
+  isResolvePending(commentId: string): boolean {
+    return this.pending.has(PENDING.resolve(commentId));
+  }
 
   private readonly collaboratorAssignmentProfileSignal =
     signal<IResourceProfile | null>(null);
@@ -392,6 +445,20 @@ export class ProjectFormComponent implements OnInit {
   readonly isSaving = computed(() => this.pending.has(PENDING.save));
   readonly isDeleting = computed(() => this.pending.has(PENDING.delete));
   readonly pendingDelete = signal<boolean>(false);
+  readonly pendingSave = signal<SaveScope | null>(null);
+  readonly pendingApproval = signal<ConfirmedApprovalAction | null>(null);
+  readonly approvalConfirmCopy = computed(() => {
+    const action = this.pendingApproval();
+    return action ? APPROVAL_CONFIRM_COPY[action] : null;
+  });
+  readonly approvalBusyLabel = computed(() => {
+    const action = this.pendingApproval();
+    return action ? APPROVAL_PENDING_LABELS[action] : 'Working…';
+  });
+  readonly isApprovalConfirmBusy = computed(() => {
+    const action = this.pendingApproval();
+    return action ? this.pending.has(PENDING.approval(action)) : false;
+  });
 
   readonly progress = computed(() => {
     this.formChangeSignal();
@@ -439,37 +506,41 @@ export class ProjectFormComponent implements OnInit {
             aiDraftSource: 'manual' });
         }
       });
-    this.activatedRoute.params.subscribe((params) => {
-      const idParam = params['id'];
-      const parsedId =
-        idParam !== undefined && idParam !== null ? Number(idParam) : 0;
-      const id = Number.isFinite(parsedId) ? parsedId : 0;
+    this.activatedRoute.params
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        const idParam = params['id'];
+        const parsedId =
+          idParam !== undefined && idParam !== null ? Number(idParam) : 0;
+        const id = Number.isFinite(parsedId) ? parsedId : 0;
+        this.closeTransientUi();
 
-      if (id > 0) {
-        this.modeSignal.set('edit');
-        this.editingSection.set(null);
-        this.fetchProject(id);
-      } else {
-        this.projectRequestToken++;
-        this.modeSignal.set('create');
-        this.isLoadingSignal.set(false);
-        this.editingSection.set('overview');
-        this.projectForm.patchValue({
-          startDate: this.todayString() });
-        this.resetReadinessForm();
-        this.resetApprovalForms();
-        this.resourceInsightsSignal.set(null);
-        this.applyOverviewToForms(null);
-        this.contentfulBrief.set(null);
-        this.contentfulError.set(null);
-        this.contentfulPanelOpen.set(false);
-        this.aiDraft.set(null);
-        this.aiError.set(null);
-        this.aiPanelOpen.set(false);
-        this.overviewMetadataSignal.set(null);
-        this.cmsReferencesSignal.set([]);
-      }
-    });
+        if (id > 0) {
+          this.modeSignal.set('edit');
+          this.editingSection.set(null);
+          this.fetchProject(id);
+        } else {
+          this.projectRequestToken++;
+          this.modeSignal.set('create');
+          this.isLoadingSignal.set(false);
+          this.editingSection.set('overview');
+          this.projectForm.patchValue({
+            startDate: this.todayString(),
+          });
+          this.resetReadinessForm();
+          this.resetApprovalForms();
+          this.resourceInsightsSignal.set(null);
+          this.applyOverviewToForms(null);
+          this.contentfulBrief.set(null);
+          this.contentfulError.set(null);
+          this.contentfulPanelOpen.set(false);
+          this.aiDraft.set(null);
+          this.aiError.set(null);
+          this.aiPanelOpen.set(false);
+          this.overviewMetadataSignal.set(null);
+          this.cmsReferencesSignal.set([]);
+        }
+      });
   }
 
   toggleSection(section: SectionId) {
@@ -523,40 +594,87 @@ export class ProjectFormComponent implements OnInit {
     this.editingSection.set(null);
   }
 
-  saveSection(_section: SectionId) {
-    this.submitProject(() => {
-      this.toast.success({
-        title: 'Project saved',
-        description: this.isEditMode()
-          ? 'Updates applied to the project.'
-          : 'A new project has been created.' });
-      this.editingSection.set(null);
-      if (!this.isEditMode()) {
-        this.modeSignal.set('edit');
-      }
-    });
+  saveSection() {
+    this.requestSave('section');
   }
 
   saveAllChanges() {
+    this.requestSave('all');
+  }
+
+  /** Existing projects confirm before overwriting; new projects save straight away. */
+  private requestSave(scope: SaveScope) {
+    if (!this.ensureFormValid() || this.isSaving()) {
+      return;
+    }
+    if (this.isEditMode()) {
+      this.pendingSave.set(scope);
+      return;
+    }
+    this.runSave(scope);
+  }
+
+  confirmSave() {
+    const scope = this.pendingSave();
+    if (!scope || this.isSaving()) {
+      return;
+    }
+    if (!this.ensureFormValid()) {
+      this.pendingSave.set(null);
+      return;
+    }
+    this.runSave(scope);
+  }
+
+  dismissSave() {
+    if (this.isSaving()) {
+      return;
+    }
+    this.pendingSave.set(null);
+  }
+
+  saveDialogTitle(): string {
+    const name = this.projectForm.controls['projectName'].value?.trim();
+    return name ? `Save Changes To ${name}?` : 'Save Project Changes?';
+  }
+
+  private runSave(scope: SaveScope) {
+    const wasEdit = this.isEditMode();
     this.submitProject(() => {
+      this.pendingSave.set(null);
       this.toast.success({
-        title: this.isEditMode() ? 'Project updated' : 'Project created',
-        description: this.isEditMode()
-          ? 'All changes have been saved.'
-          : 'A new project has been created.' });
+        title: wasEdit
+          ? scope === 'all'
+            ? 'Project updated'
+            : 'Project saved'
+          : 'Project created',
+        description: wasEdit
+          ? scope === 'all'
+            ? 'All changes have been saved.'
+            : 'Updates applied to the project.'
+          : 'A new project has been created.',
+      });
       this.editingSection.set(null);
-      if (!this.isEditMode()) {
+      if (!wasEdit) {
         this.modeSignal.set('edit');
       }
     });
   }
 
+  private ensureFormValid(): boolean {
+    if (this.projectForm.valid) {
+      return true;
+    }
+    this.projectForm.markAllAsTouched();
+    this.toast.error({
+      title: 'Incomplete details',
+      description: 'Please resolve validation warnings before continuing.',
+    });
+    return false;
+  }
+
   submitProject(onSuccess?: () => void) {
-    if (this.projectForm.invalid) {
-      this.projectForm.markAllAsTouched();
-      this.toast.error({
-        title: 'Incomplete details',
-        description: 'Please resolve validation warnings before continuing.' });
+    if (!this.ensureFormValid()) {
       return;
     }
     const readinessChecklist = this.buildReadinessPayload();
@@ -736,7 +854,8 @@ export class ProjectFormComponent implements OnInit {
       this.projectForm.controls['leadByEmpId'].setValue(candidate.employeeId);
       this.toast.success({
         title: 'Lead selected',
-        description: `${candidate.employeeName} has been assigned as the project lead. Save to confirm.` });
+        description: `${candidate.employeeName} is selected as the project lead. Save to confirm.`,
+      });
     });
   }
 
@@ -781,6 +900,14 @@ export class ProjectFormComponent implements OnInit {
       { emitEvent: false }
     );
     this.collaboratorAssignmentForm.markAsPristine();
+  }
+
+  /** The component is reused across `/update-project/:id`, so dialogs must not carry over to another project. */
+  private closeTransientUi() {
+    this.pendingSave.set(null);
+    this.pendingApproval.set(null);
+    this.pendingDelete.set(false);
+    this.cancelCollaboratorAssignment();
   }
 
   cancelCollaboratorAssignment() {
@@ -879,7 +1006,9 @@ export class ProjectFormComponent implements OnInit {
         entryId: value.entryId?.trim() || undefined,
         contentType: value.contentType?.trim() || undefined,
         slug: value.slug?.trim() || undefined,
-        preview: value.preview ?? false })
+        preview: value.preview ?? false,
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (brief) => {
           this.contentfulLoading.set(false);
@@ -994,27 +1123,33 @@ export class ProjectFormComponent implements OnInit {
     const request = this.buildOverviewGenerationPayload();
     this.aiProcessing.set(true);
     this.aiError.set(null);
-    this.masterService.generateOverviewDraft(request).subscribe({
-      next: (draft) => {
-        this.aiProcessing.set(false);
-        this.aiDraft.set(draft);
-        this.aiPanelOpen.set(true);
-        this.toast.success({
-          title: 'AI draft ready',
-          description: `Overview generated with ${draft.source.toUpperCase()}.` });
-      },
-      error: (error) => {
-        this.aiProcessing.set(false);
-        const message =
-          error?.error?.message ??
-          error?.message ??
-          'Unable to generate overview draft.';
-        this.aiError.set(message);
-        this.toast.error({
-          title: 'Generation failed',
-          description: message });
-        console.error('[AI] overview generation failed', error);
-      } });
+    this.masterService
+      .generateOverviewDraft(request)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (draft) => {
+          this.aiProcessing.set(false);
+          this.aiDraft.set(draft);
+          this.aiPanelOpen.set(true);
+          this.toast.success({
+            title: 'AI draft ready',
+            description: `Overview generated with ${draft.source.toUpperCase()}.`,
+          });
+        },
+        error: (error) => {
+          this.aiProcessing.set(false);
+          const message =
+            error?.error?.message ??
+            error?.message ??
+            'Unable to generate overview draft.';
+          this.aiError.set(message);
+          this.toast.error({
+            title: 'Generation failed',
+            description: message,
+          });
+          console.error('[AI] overview generation failed', error);
+        },
+      });
   }
 
   applyAiDraft(draft: IAiOverviewDraft | null | undefined) {
@@ -1113,15 +1248,54 @@ export class ProjectFormComponent implements OnInit {
   }
 
   approveProjectAction() {
-    this.performApprovalAction('approve');
+    this.requestApprovalConfirm('approve');
   }
 
   rejectProjectAction() {
-    this.performApprovalAction('reject');
+    this.requestApprovalConfirm('reject');
   }
 
   resetProjectApprovalAction() {
-    this.performApprovalAction('reset');
+    this.requestApprovalConfirm('reset');
+  }
+
+  confirmApprovalAction() {
+    const action = this.pendingApproval();
+    if (action) {
+      this.performApprovalAction(action);
+    }
+  }
+
+  dismissApprovalConfirm() {
+    if (this.isApprovalConfirmBusy()) {
+      return;
+    }
+    this.pendingApproval.set(null);
+  }
+
+  private requestApprovalConfirm(action: ConfirmedApprovalAction) {
+    if (this.approvalProcessing() || !this.canRunApprovalAction(action)) {
+      return;
+    }
+    this.pendingApproval.set(action);
+  }
+
+  private canRunApprovalAction(action: ApprovalAction): boolean {
+    if (!this.currentProjectSignal()?.projectId) {
+      this.toast.error({
+        title: 'Project not saved',
+        description: 'Save the project before managing approvals.',
+      });
+      return false;
+    }
+    if (action === 'reject' && !this.buildApprovalPayload().comment) {
+      this.toast.error({
+        title: 'Provide a reason',
+        description: 'Please include a short note explaining the rejection.',
+      });
+      return false;
+    }
+    return true;
   }
 
   submitReviewerComment() {
@@ -1204,24 +1378,13 @@ export class ProjectFormComponent implements OnInit {
 
   private performApprovalAction(action: ApprovalAction) {
     const project = this.currentProjectSignal();
-    if (!project?.projectId) {
-      this.toast.error({
-        title: 'Project not saved',
-        description: 'Save the project before managing approvals.' });
+    if (!project?.projectId || !this.canRunApprovalAction(action)) {
       return;
     }
-
-    const payload = this.buildApprovalPayload();
-    if (action === 'reject' && !payload.comment) {
-      this.toast.error({
-        title: 'Provide a reason',
-        description: 'Please include a short note explaining the rejection.' });
-      return;
-    }
-
     if (this.approvalProcessing()) {
       return;
     }
+    const payload = this.buildApprovalPayload();
     let request$: Observable<IProject>;
     let successTitle = '';
     switch (action) {
@@ -1259,6 +1422,7 @@ export class ProjectFormComponent implements OnInit {
       destroyRef: this.destroyRef,
       key: PENDING.approval(action),
       onSuccess: (updatedProject) => {
+        this.pendingApproval.set(null);
         this.applyMutationResult(this.cloneProject(updatedProject));
         this.approvalForm.patchValue({ comment: '' }, { emitEvent: false });
         if (action === 'reset') {
@@ -1336,35 +1500,44 @@ export class ProjectFormComponent implements OnInit {
     } else {
       this.isLoadingSignal.set(true);
     }
-    this.masterService.getProjectById(id).subscribe({
-      next: (project) => {
-        if (requestToken !== this.projectRequestToken) {
-          return;
-        }
-        if (cached && !this.formsPristine()) {
-          this.currentProjectSignal.set(this.cloneProject(project));
-          return;
-        }
-        this.hydrateProject(project, { loadInsights: !cached });
-      },
-      error: () => {
-        if (requestToken !== this.projectRequestToken || cached) {
-          return;
-        }
-        this.isLoadingSignal.set(false);
-        this.toast.error({
-          title: 'Load failed',
-          description: 'Unable to load project details. Please retry.' });
-        this.router.navigate(['/projects']);
-      } });
+    this.masterService
+      .getProjectById(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (project) => {
+          if (requestToken !== this.projectRequestToken) {
+            return;
+          }
+          if (cached && !this.formsPristine()) {
+            this.currentProjectSignal.set(this.cloneProject(project));
+            return;
+          }
+          this.hydrateProject(project, { loadInsights: !cached });
+        },
+        error: () => {
+          if (requestToken !== this.projectRequestToken || cached) {
+            return;
+          }
+          this.isLoadingSignal.set(false);
+          this.toast.error({
+            title: 'Load failed',
+            description: 'Unable to load project details. Please retry.',
+          });
+          this.router.navigate(['/projects']);
+        },
+      });
   }
 
   private loadEmployees() {
-    this.masterService.getAllEmp().subscribe({
-      next: (employees) => {
-        this.employeesSignal.set(employees ?? []);
-        this.applyDefaultApprovalActor();
-      } });
+    this.masterService
+      .getAllEmp()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (employees) => {
+          this.employeesSignal.set(employees ?? []);
+          this.applyDefaultApprovalActor();
+        },
+      });
   }
 
   private loadResourceInsights(projectId: number) {
@@ -1800,21 +1973,27 @@ export class ProjectFormComponent implements OnInit {
       return;
     }
     const requestToken = ++this.projectRequestToken;
-    this.masterService.getProjectById(projectId).subscribe({
-      next: (project) => {
-        if (requestToken === this.projectRequestToken) {
-          this.hydrateProject(project);
-        }
-      },
-      error: (error) => {
-        this.toast.error({
-          title: 'Refresh failed',
-          description:
-            'Unable to refresh the project data at the moment. Try again shortly.' });
-        console.error('[Approval] refreshProjectSnapshot failed', {
-          projectId,
-          error });
-      } });
+    this.masterService
+      .getProjectById(projectId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (project) => {
+          if (requestToken === this.projectRequestToken) {
+            this.hydrateProject(project);
+          }
+        },
+        error: (error) => {
+          this.toast.error({
+            title: 'Refresh failed',
+            description:
+              'Unable to refresh the project data at the moment. Try again shortly.',
+          });
+          console.error('[Approval] refreshProjectSnapshot failed', {
+            projectId,
+            error,
+          });
+        },
+      });
   }
 
   private resetReadinessForm() {

@@ -2,7 +2,9 @@ import { Component, Input } from '@angular/core';
 import {
   PROJECT_CONTENT_HELPER_COPY,
   PROJECT_CREATE_SECTION_VALUES,
+  PROJECT_DETAIL_FIELD_ICONS,
   PROJECT_DETAIL_FOOTER_COPY,
+  PROJECT_DETAIL_SECTION_ICONS,
   PROJECT_DETAIL_SECTION_LABELS,
   PROJECT_DETAIL_SECTION_ORDER,
   PROJECT_DETAIL_SUBTITLE,
@@ -13,7 +15,7 @@ import {
 } from '@/app/constants/project-detail';
 import { ProjectDetailMode } from '@/app/constants/private-page-meta';
 import { AppIconComponent } from './app-icon.component';
-import { UbButtonDirective } from './button';
+import { FieldLabelComponent } from './field-label.component';
 import { PageHeaderComponent } from './page-header.component';
 import { ProjectHeaderMetaComponent } from './project-header-meta.component';
 import { TextStubComponent } from './text-stub.component';
@@ -29,7 +31,7 @@ import { TextStubComponent } from './text-stub.component';
   standalone: true,
   imports: [
     AppIconComponent,
-    UbButtonDirective,
+    FieldLabelComponent,
     PageHeaderComponent,
     ProjectHeaderMetaComponent,
     TextStubComponent,
@@ -46,11 +48,9 @@ import { TextStubComponent } from './text-stub.component';
         [titlePending]="mode === 'edit'"
         [subtitle]="subtitle"
         [icon]="mode === 'edit' ? 'pencil' : 'folder-kanban'"
+        actionsAlign="end"
       >
-        <app-project-header-meta
-          [modeLabel]="mode === 'edit' ? 'Editing' : 'Draft'"
-          [progress]="null"
-        ></app-project-header-meta>
+        <app-project-header-meta [progress]="null"></app-project-header-meta>
       </app-page-header>
 
       <div class="eh-content-stack">
@@ -95,7 +95,7 @@ import { TextStubComponent } from './text-stub.component';
                 >
                   <div class="space-y-1">
                     <div class="flex flex-wrap items-center gap-2">
-                      <span class="text-sm font-medium text-white">
+                      <span class="text-sm font-medium text-white sm:text-base">
                         {{ task.title }}
                       </span>
                       <span
@@ -120,11 +120,13 @@ import { TextStubComponent } from './text-stub.component';
                 </div>
 
                 <div class="grid gap-3 md:grid-cols-3">
-                  @for (label of fieldRow; track label) {
-                    <div class="flex flex-col gap-1">
-                      <span class="text-xs text-white/50 sm:text-sm">{{
-                        label
-                      }}</span>
+                  @for (field of fieldRow; track field.label) {
+                    <div>
+                      <app-field-label
+                        [text]="field.label"
+                        [icon]="field.icon"
+                        [aboveControl]="true"
+                      ></app-field-label>
                       <div
                         class="h-11 animate-pulse rounded-2xl border border-white/15 bg-white/5"
                         aria-hidden="true"
@@ -133,11 +135,13 @@ import { TextStubComponent } from './text-stub.component';
                   }
                 </div>
                 <div>
-                  <span class="text-xs text-white/50 sm:text-sm">{{
-                    fieldLabels.notes
-                  }}</span>
+                  <app-field-label
+                    [text]="fieldLabels.notes"
+                    [icon]="fieldIcons.notes"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <span
-                    class="inline-block h-[58px] w-full animate-pulse rounded-2xl border border-white/15 bg-white/5"
+                    class="block h-[66px] w-full animate-pulse rounded-2xl border border-white/15 bg-white/5"
                     aria-hidden="true"
                   ></span>
                 </div>
@@ -155,9 +159,15 @@ import { TextStubComponent } from './text-stub.component';
                 class="flex w-full items-center justify-between gap-4 px-2 py-2 text-left text-sm text-white/80 sm:px-4 sm:py-4"
               >
                 <div class="flex flex-col gap-1">
-                  <span class="text-sm font-medium text-white/55">{{
-                    sectionLabels[section]
-                  }}</span>
+                  <span
+                    class="eh-btn-icon justify-start text-sm font-medium text-white/55"
+                  >
+                    <lucide-icon
+                      [name]="sectionIcons[section]"
+                      [size]="14"
+                    ></lucide-icon>
+                    <span>{{ sectionLabels[section] }}</span>
+                  </span>
                   @if (mode === 'create') {
                     <span class="text-base font-medium text-white">
                       {{ createValues[section] }}
@@ -170,10 +180,15 @@ import { TextStubComponent } from './text-stub.component';
                   }
                 </div>
                 <span
-                  class="text-xs text-white/40 sm:text-sm"
+                  class="eh-btn-icon shrink-0 text-xs text-white/40 sm:text-sm"
                   [class.text-white]="first"
                 >
-                  {{ first ? 'Hide' : 'Expand' }}
+                  <span>{{ first ? 'Hide' : 'Expand' }}</span>
+                  <lucide-icon
+                    name="chevron-down"
+                    [size]="14"
+                    [class.rotate-180]="first"
+                  ></lucide-icon>
                 </span>
               </div>
               @if (first) {
@@ -184,12 +199,14 @@ import { TextStubComponent } from './text-stub.component';
                     <div class="grid gap-4 md:grid-cols-2">
                       @for (field of createFields; track field.label) {
                         <div>
-                          <span class="text-xs text-white/50 sm:text-sm">{{
-                            field.label
-                          }}</span>
+                          <app-field-label
+                            [text]="field.label"
+                            [icon]="field.icon"
+                            [required]="field.required"
+                            [aboveControl]="true"
+                          ></app-field-label>
                           <span
-                            class="block w-full animate-pulse rounded-2xl border border-white/15 bg-white/5"
-                            [style.height.px]="field.height"
+                            class="block h-11 w-full animate-pulse rounded-2xl border border-white/15 bg-white/5"
                             aria-hidden="true"
                           ></span>
                         </div>
@@ -198,11 +215,13 @@ import { TextStubComponent } from './text-stub.component';
                     <div class="mt-6 grid gap-4 md:grid-cols-2">
                       @for (area of createAreas; track area.label) {
                         <div [class]="area.wide ? 'md:col-span-2' : ''">
-                          <span class="text-xs text-white/50 sm:text-sm">{{
-                            area.label
-                          }}</span>
+                          <app-field-label
+                            [text]="area.label"
+                            [icon]="area.icon"
+                            [aboveControl]="true"
+                          ></app-field-label>
                           <span
-                            class="inline-block w-full animate-pulse rounded-2xl border border-white/15 bg-white/5"
+                            class="block w-full animate-pulse rounded-2xl border border-white/15 bg-white/5"
                             [style.height.px]="area.height"
                             aria-hidden="true"
                           ></span>
@@ -223,15 +242,22 @@ import { TextStubComponent } from './text-stub.component';
                         disabled
                         class="eh-action-btn eh-action-btn-primary"
                       >
-                        <lucide-icon name="plus" [size]="16"></lucide-icon>
+                        <lucide-icon name="plus" [size]="14"></lucide-icon>
                         <span>Create Project</span>
                       </button>
                     </div>
                   } @else {
-                    <div class="grid gap-4 md:grid-cols-2" aria-hidden="true">
-                      @for (cell of [1, 2, 3, 4]; track cell) {
+                    <div
+                      class="grid gap-4 sm:grid-cols-2 md:grid-cols-3"
+                      aria-hidden="true"
+                    >
+                      @for (cell of [1, 2, 3]; track cell; let last = $last) {
                         <div
-                          class="h-[70px] animate-pulse rounded-2xl border border-white/10 bg-white/5"
+                          [class]="
+                            last
+                              ? 'h-[70px] animate-pulse rounded-2xl border border-white/10 bg-white/5 sm:col-span-2 md:col-span-1'
+                              : 'h-[70px] animate-pulse rounded-2xl border border-white/10 bg-white/5'
+                          "
                         ></div>
                       }
                     </div>
@@ -243,44 +269,49 @@ import { TextStubComponent } from './text-stub.component';
                         aria-hidden="true"
                       ></div>
                     }
-                    <div class="mt-6 flex justify-end" aria-hidden="true">
-                      <div
-                        class="h-[34px] w-32 animate-pulse rounded-xl bg-white/10"
-                      ></div>
+                    <div class="mt-6 flex justify-end">
+                      <button
+                        type="button"
+                        disabled
+                        class="eh-action-btn eh-action-btn-outline"
+                      >
+                        <lucide-icon name="pencil" [size]="14"></lucide-icon>
+                        <span>Edit Project Overview</span>
+                      </button>
                     </div>
                   }
                   <div
                     class="mt-8 rounded-2xl border border-white/15 bg-white/5 px-2 py-2 sm:px-4 sm:py-4"
                   >
                     <div
-                      class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+                      class="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between"
                     >
-                      <div>
-                        <p class="text-xs text-white/45 sm:text-sm">
-                          {{ contentHelper.title }}
+                      <div class="min-w-0 flex-1">
+                        <p class="eh-read-label">
+                          <lucide-icon name="sparkles" [size]="14"></lucide-icon>
+                          <span>{{ contentHelper.title }}</span>
                         </p>
                         <p class="text-sm text-white/65">
                           {{ contentHelper.description }}
                         </p>
                       </div>
-                      <div class="flex flex-wrap gap-2">
+                      <div class="flex flex-wrap gap-2 xl:shrink-0 xl:justify-end">
                         <button
                           type="button"
                           disabled
-                          class="rounded-xl border border-white/20 px-3 py-2 text-xs text-white/70"
+                          class="eh-action-btn eh-action-btn-outline"
                         >
-                          {{ contentHelper.fetchContentful }}
+                          <lucide-icon name="download" [size]="14"></lucide-icon>
+                          <span>{{ contentHelper.fetchContentful }}</span>
                         </button>
                         <button
                           type="button"
-                          ubButton
-                          size="sm"
                           disabled
-                          class="gap-1 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-[0_20px_45px_rgba(251,191,36,0.35)]"
+                          class="eh-action-btn eh-action-btn-primary"
                         >
                           <lucide-icon
                             name="wand-sparkles"
-                            [size]="16"
+                            [size]="14"
                           ></lucide-icon>
                           <span>{{ contentHelper.generateAiDraft }}</span>
                         </button>
@@ -297,19 +328,33 @@ import { TextStubComponent } from './text-stub.component';
           class="flex flex-col gap-4 rounded-[24px] border border-white/10 bg-white/5/70 px-2 py-2 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-4"
         >
           <div class="space-y-1 text-xs text-white/60 sm:text-sm">
-            <p>{{ footerCopy.autosave }}</p>
+            <p class="flex items-start gap-1.5">
+              <lucide-icon
+                name="info"
+                [size]="14"
+                class="mt-0.5 shrink-0 text-white/50 sm:mt-[3px]"
+              ></lucide-icon>
+              <span>{{ footerCopy.autosave }}</span>
+            </p>
             @if (mode === 'edit') {
-              <p class="text-white/50">{{ footerCopy.archive }}</p>
+              <p class="flex items-start gap-1.5 text-white/50">
+                <lucide-icon
+                  name="archive"
+                  [size]="14"
+                  class="mt-0.5 shrink-0 sm:mt-[3px]"
+                ></lucide-icon>
+                <span>{{ footerCopy.archive }}</span>
+              </p>
             }
           </div>
-          <div class="flex flex-wrap items-center gap-3">
+          <div class="flex flex-wrap items-center gap-3 sm:shrink-0">
             @if (mode === 'edit') {
               <button
                 type="button"
                 disabled
-                class="eh-btn-icon rounded-xl border border-rose-400/40 bg-rose-500/15 px-4 py-2 text-xs text-rose-100 opacity-60 sm:text-sm"
+                class="eh-action-btn eh-action-btn-danger"
               >
-                <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+                <lucide-icon name="archive" [size]="14"></lucide-icon>
                 <span>Archive Project</span>
               </button>
             }
@@ -320,7 +365,7 @@ import { TextStubComponent } from './text-stub.component';
             >
               <lucide-icon
                 [name]="mode === 'edit' ? 'save' : 'plus'"
-                [size]="16"
+                [size]="14"
               ></lucide-icon>
               <span>{{
                 mode === 'edit' ? 'Save All Changes' : 'Create Project'
@@ -339,31 +384,69 @@ export class ProjectDetailSkeletonComponent {
   readonly tasks = READINESS_TASK_DEFINITIONS;
   readonly checklistCopy = READINESS_CHECKLIST_COPY;
   readonly fieldLabels = READINESS_FIELD_LABELS;
+  readonly fieldIcons = PROJECT_DETAIL_FIELD_ICONS;
   readonly fieldRow = [
-    READINESS_FIELD_LABELS.status,
-    READINESS_FIELD_LABELS.owner,
-    READINESS_FIELD_LABELS.dueDate,
+    { label: READINESS_FIELD_LABELS.status, icon: PROJECT_DETAIL_FIELD_ICONS.status },
+    { label: READINESS_FIELD_LABELS.owner, icon: PROJECT_DETAIL_FIELD_ICONS.owner },
+    { label: READINESS_FIELD_LABELS.dueDate, icon: PROJECT_DETAIL_FIELD_ICONS.dueDate },
   ];
   readonly sections = PROJECT_DETAIL_SECTION_ORDER;
   readonly sectionLabels = PROJECT_DETAIL_SECTION_LABELS;
+  readonly sectionIcons = PROJECT_DETAIL_SECTION_ICONS;
   readonly footerCopy = PROJECT_DETAIL_FOOTER_COPY;
   readonly contentHelper = PROJECT_CONTENT_HELPER_COPY;
   readonly createValues = PROJECT_CREATE_SECTION_VALUES;
-  /** Create-mode overview inputs; the date input and select-menu row renders 2px taller. */
+  /** Create-mode overview inputs (all h-11, matching .eh-input and the select trigger). */
   readonly createFields = [
-    { label: PROJECT_OVERVIEW_FIELD_LABELS.projectName, height: 46 },
-    { label: PROJECT_OVERVIEW_FIELD_LABELS.clientName, height: 46 },
-    { label: PROJECT_OVERVIEW_FIELD_LABELS.startDate, height: 48 },
-    { label: PROJECT_OVERVIEW_FIELD_LABELS.health, height: 48 },
+    {
+      label: PROJECT_OVERVIEW_FIELD_LABELS.projectName,
+      icon: PROJECT_DETAIL_FIELD_ICONS.projectName,
+      required: true,
+    },
+    {
+      label: PROJECT_OVERVIEW_FIELD_LABELS.clientName,
+      icon: PROJECT_DETAIL_FIELD_ICONS.clientName,
+      required: true,
+    },
+    {
+      label: PROJECT_OVERVIEW_FIELD_LABELS.startDate,
+      icon: PROJECT_DETAIL_FIELD_ICONS.startDate,
+      required: true,
+    },
+    {
+      label: PROJECT_OVERVIEW_FIELD_LABELS.health,
+      icon: PROJECT_DETAIL_FIELD_ICONS.health,
+      required: false,
+    },
   ];
-  /** Create-mode overview textareas (rows=4 / rows=3). */
+  /** Create-mode overview textareas (rows=4 / rows=3 with .eh-textarea). */
   readonly createAreas = [
-    { label: PROJECT_OVERVIEW_FIELD_LABELS.summary, height: 106, wide: true },
-    { label: PROJECT_OVERVIEW_FIELD_LABELS.objectives, height: 106, wide: false },
-    { label: PROJECT_OVERVIEW_FIELD_LABELS.successCriteria, height: 106, wide: false },
-    { label: PROJECT_OVERVIEW_FIELD_LABELS.stakeholderNotes, height: 86, wide: true },
+    {
+      label: PROJECT_OVERVIEW_FIELD_LABELS.summary,
+      icon: PROJECT_DETAIL_FIELD_ICONS.summary,
+      height: 106,
+      wide: true,
+    },
+    {
+      label: PROJECT_OVERVIEW_FIELD_LABELS.objectives,
+      icon: PROJECT_DETAIL_FIELD_ICONS.objectives,
+      height: 106,
+      wide: false,
+    },
+    {
+      label: PROJECT_OVERVIEW_FIELD_LABELS.successCriteria,
+      icon: PROJECT_DETAIL_FIELD_ICONS.successCriteria,
+      height: 106,
+      wide: false,
+    },
+    {
+      label: PROJECT_OVERVIEW_FIELD_LABELS.stakeholderNotes,
+      icon: PROJECT_DETAIL_FIELD_ICONS.stakeholderNotes,
+      height: 86,
+      wide: true,
+    },
   ];
-  /** Overview preview cards (summary, objectives, success criteria, notes, stakeholders). */
+  /** Overview preview cards (summary, objectives, success criteria, notes). */
   readonly overviewBlocks = [
     { marginTop: 24, height: 82 },
     { marginTop: 16, height: 130 },

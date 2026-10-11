@@ -1,5 +1,14 @@
 # Changelog — Agile V project memory
 
+## 2026-10-11 — GATE-0024 project detail UI consistency
+
+- Project detail uses shared labels (Lucide icon + required `*`), 44 px inputs (`eh-input`), `eh-action-btn` buttons with icons and pending labels
+- Mode badge removed; readiness bar on the subtitle line; Overview/Contact read tiles in a responsive 3-column row
+- Confirmation dialogs for save (edit), approve, reject, reset and archive; dialogs close when switching project
+- Select menus are named by their field labels for screen readers
+- Contentful lookup: 404/400 passed through, other failures generic 502 without the upstream body
+- Node 24.21: lint PASS; API 84/84; unit 119/119; build PASS; browser sweep PASS
+
 ## 2026-10-10 — GATE-0023 API input validation
 
 - Malformed JSON → 400 (was 500 + Sentry); non-integer ids → 400

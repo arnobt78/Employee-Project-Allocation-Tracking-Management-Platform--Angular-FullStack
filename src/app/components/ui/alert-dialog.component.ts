@@ -69,11 +69,10 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
               ></lucide-icon>
               <span>{{ busyLabel }}</span>
             } @else {
-              @if (variant === 'destructive') {
-                <lucide-icon name="trash-2" [size]="16"></lucide-icon>
-              } @else {
-                <lucide-icon name="save" [size]="16"></lucide-icon>
-              }
+              <lucide-icon
+                [name]="confirmIcon || (variant === 'destructive' ? 'trash-2' : 'save')"
+                [size]="16"
+              ></lucide-icon>
               <span>{{ confirmLabel }}</span>
             }
           </button>
@@ -95,6 +94,8 @@ export class AlertDialogComponent implements OnChanges, OnDestroy {
   @Input() confirmLabel = 'Confirm';
   @Input() cancelLabel = 'Cancel';
   @Input() variant: 'default' | 'destructive' = 'default';
+  /** Lucide icon for the confirm button; defaults to trash-2 (destructive) or save. */
+  @Input() confirmIcon = '';
   @Input() busy = false;
   @Input() busyLabel = 'Working...';
 

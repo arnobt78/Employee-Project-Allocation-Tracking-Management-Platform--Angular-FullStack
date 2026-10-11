@@ -12,6 +12,7 @@ import { AppIconComponent } from './app-icon.component';
       class="flex items-center gap-1.5 text-xs font-medium text-white/70 sm:text-sm"
       [ngClass]="{ 'mb-1.5': aboveControl }"
       [attr.for]="forId || null"
+      [attr.id]="forId ? forId + '-label' : null"
     >
       @if (icon) {
         <lucide-icon

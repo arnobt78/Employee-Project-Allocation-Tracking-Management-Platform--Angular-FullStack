@@ -10,7 +10,8 @@ import { TextStubComponent } from './text-stub.component';
   host: { class: 'block' },
   template: `
     <div
-      class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+      class="flex flex-col gap-4 sm:flex-row sm:justify-between"
+      [ngClass]="actionsAlign === 'end' ? 'sm:items-end' : 'sm:items-center'"
       data-testid="page-header"
     >
       <div class="flex items-start gap-3">
@@ -51,4 +52,9 @@ export class PageHeaderComponent {
   @Input() icon = '';
   /** Render a title-height stub while a data-driven title (e.g. project name) loads. */
   @Input() titlePending = false;
+  /**
+   * `end` bottom-aligns projected actions with the subtitle's last line.
+   * Not named `align`: that static attribute stays on the host and Chrome maps it to `text-align`.
+   */
+  @Input() actionsAlign: 'center' | 'end' = 'center';
 }

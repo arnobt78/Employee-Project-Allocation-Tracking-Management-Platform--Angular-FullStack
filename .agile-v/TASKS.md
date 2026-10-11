@@ -186,6 +186,17 @@
 | TASK-0081 | Remove CC/BCC promotion: no deliverable To → nothing sent, `skipped`, 0 recipients | REQ-0145 | DONE | DEC-0039 amended |
 | TASK-0082 | API docs list CRUD 400/404 responses (`errorResponse` helper); `/api-doc` shows error messages; tests (75 API, 106 unit) | REQ-0147 | DONE | Docs test guards drift |
 
+## Wave — GATE-0024 project detail UI consistency (2026-10-11)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0083 | Header: drop mode badge, compact readiness block aligned with subtitle (header meta + skeleton mirror) | REQ-0149 | DONE | `page-header` `actionsAlign` input (a host `align` attribute right-aligned text) |
+| TASK-0084 | Shared field styling: `eh-input` (h-11, matches select trigger), `app-field-label` with icons + `*` on every field | REQ-0148 | DONE | `eh-input`/`eh-textarea`/`eh-read-label`; select triggers named by their labels (`triggerId`) |
+| TASK-0085 | Readiness checklist + Project Overview (titles, 3-col read grid, edit form, Content Helper buttons) | REQ-0148, REQ-0149 | DONE | Content Helper stacks below `xl` so buttons never squeeze the copy |
+| TASK-0086 | Leadership, Client Contact, Approval Process, footer: same buttons, labels, confirmations, pending labels | REQ-0148 | DONE | Save (edit), approve/reject/reset, archive dialogs; dialogs close on route change |
+| TASK-0087 | Tests, browser regression, skeleton parity | REQ-0148, REQ-0149 | DONE | Unit 119, API 84 |
+| TASK-0088 | Contentful errors: 404/400 passthrough, generic 502, entry id URL-encoded, Sentry capture | REQ-0150 | DONE | Found during browser sweep (raw upstream JSON in a 500) |
+
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)

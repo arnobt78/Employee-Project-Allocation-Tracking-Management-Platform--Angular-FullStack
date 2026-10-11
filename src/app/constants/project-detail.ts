@@ -65,6 +65,45 @@ export const PROJECT_DETAIL_SECTION_LABELS: Record<SectionId, string> = {
   approval: 'Approval Process',
 };
 
+export const PROJECT_DETAIL_SECTION_ICONS: Record<SectionId, string> = {
+  overview: 'folder-kanban',
+  team: 'shield-user',
+  contact: 'contact',
+  approval: 'shield-check',
+};
+
+/** Lucide icon shown beside each field label (shared by edit forms and read tiles). */
+export const PROJECT_DETAIL_FIELD_ICONS = {
+  status: 'circle-dot',
+  owner: 'user',
+  dueDate: 'calendar',
+  notes: 'file-text',
+  projectName: 'folder-kanban',
+  clientName: 'building-2',
+  startDate: 'calendar-days',
+  health: 'activity',
+  summary: 'file-text',
+  objectives: 'target',
+  successCriteria: 'circle-check',
+  stakeholderNotes: 'users',
+  lead: 'shield-user',
+  contactPerson: 'contact',
+  contactNo: 'phone',
+  emailId: 'mail',
+  role: 'briefcase',
+  allocation: 'chart-column',
+  assignedDate: 'calendar',
+  actor: 'user',
+  externalApprover: 'id-card',
+  comment: 'message-square-plus',
+  section: 'list-checks',
+  severity: 'triangle-alert',
+  reviewer: 'user',
+  entryId: 'hash',
+  contentType: 'tag',
+  slug: 'link',
+} as const;
+
 export const PROJECT_DETAIL_FOOTER_COPY = {
   autosave:
     'Changes are auto-populated into the preview cards as you type. Remember to save a section after editing.',

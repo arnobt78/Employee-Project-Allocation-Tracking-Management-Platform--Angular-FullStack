@@ -187,6 +187,15 @@
     @apply box-border h-11 w-full rounded-2xl border border-white/15 bg-white/5 px-4 text-sm font-normal leading-none text-white/85 outline-none backdrop-blur-md transition placeholder:text-white/40 focus:border-amber-400/60 focus:bg-white/10 focus:text-white disabled:cursor-not-allowed disabled:opacity-60;
   }
 
+  /* Form inputs on CRUD pages: same 44px box as .eh-select-trigger so fields in a row line up */
+  .eh-input {
+    @apply box-border h-11 w-full rounded-2xl border border-white/15 bg-white/5 px-4 text-sm text-white/85 outline-none transition placeholder:text-white/40 focus:border-indigo-400/60 focus:bg-white/10 focus:text-white disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .eh-textarea {
+    @apply box-border w-full resize-none rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/85 outline-none transition placeholder:text-white/40 focus:border-indigo-400/60 focus:bg-white/10 focus:text-white disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
   .eh-select-trigger {
     @apply box-border flex h-11 w-full items-center justify-between gap-1 overflow-hidden rounded-2xl border border-white/15 bg-white/5 px-4 text-left text-sm font-normal leading-none text-white/85 outline-none backdrop-blur-md transition focus:border-amber-400/60 focus:bg-white/10 focus:text-white disabled:cursor-not-allowed disabled:opacity-60;
   }
@@ -194,6 +203,11 @@
   /* Icon + label buttons: single gap token */
   .eh-btn-icon {
     @apply inline-flex items-center justify-center gap-1.5;
+  }
+
+  /* Read-only tile caption: icon + label, matches app-field-label spacing */
+  .eh-read-label {
+    @apply flex items-center gap-1.5 text-xs text-white/45 sm:text-sm;
   }
 
   /* Shared list/card action height — Edit/Delete are the source of truth */

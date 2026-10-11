@@ -11,7 +11,8 @@
 | CP-0017 | Human-Action | GATE-0016 | `c1-gate16-prod-ui-soak-2026-09-22` | **RESOLVED** | 2026-09-22 | Soak findings (blank boot, list mirrors, SelectMenu, form skeleton) implemented as GATE-0017 |
 | CP-0018 | Human-Decision | GATE-0017 | `c1-gate17-complete-2026-09-23` | **RESOLVED** | 2026-09-23 | Boot CSS, skeleton params, SelectMenu clamp, form checklist=5, Project Team People KPI |
 | CP-0019 | Human-Action | GATE-0017 | `c1-gate17-prod-ui-soak-2026-09-23` | **PENDING** | 2026-09-23 | Soak ongoing; list density+chevron shipped; further prod feedback welcome |
-| CP-0020 | Human-Action | GATE-0018 | `c1-gate18-project-detail-intake-2026-09-26` | **PENDING** | 2026-09-26 | Await project-detail polish guide; no detail coding until approved |
+| CP-0020 | Human-Action | GATE-0018 | `c1-gate18-project-detail-intake-2026-09-26` | **RESOLVED** | 2026-09-26 | Guide received 2026-10-11 (screenshots + 8 points) → GATE-0024 |
+| CP-0022 | Human-Decision | GATE-0024 | `c1-gate24-detail-ui-2026-10-11` | **RESOLVED** | 2026-10-11 | Plan approved; implemented + verified + committed |
 | CP-0021 | Human-Decision | GATE-0018 | `c1-gate18-skeleton-parity-2026-10-10` | **RESOLVED** | 2026-10-10 | Plan approved; implemented + verified + committed |
 
 ## Resume rules

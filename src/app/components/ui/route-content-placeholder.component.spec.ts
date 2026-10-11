@@ -22,8 +22,10 @@ describe('RouteContentPlaceholderComponent', () => {
     const el = render('/update-project/7');
     expect(el.querySelector('[data-testid="project-detail-skeleton"]')).toBeTruthy();
     expect(el.querySelector('[data-testid="page-header-title-pending"]')).toBeTruthy();
-    expect(el.textContent).toContain('Editing');
+    expect(el.querySelector('[data-testid="project-header-readiness"]')).toBeTruthy();
+    expect(el.textContent).not.toContain('Editing');
     expect(el.textContent).toContain('Readiness Checklist');
+    expect(el.textContent).toContain('Archive Project');
   });
 
   it('renders the project detail mirror in draft mode for new projects', () => {

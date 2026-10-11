@@ -6,9 +6,9 @@
       [title]="projectTitle()"
       [subtitle]="subtitle"
       [icon]="isEditMode() ? 'pencil' : 'folder-kanban'"
+      actionsAlign="end"
     >
       <app-project-header-meta
-        [modeLabel]="isEditMode() ? 'Editing' : 'Draft'"
         [progress]="progress()"
       ></app-project-header-meta>
     </app-page-header>
@@ -55,7 +55,7 @@
             >
               <div class="space-y-1">
                 <div class="flex flex-wrap items-center gap-2">
-                  <span class="text-sm font-medium text-white">
+                  <span class="text-sm font-medium text-white sm:text-base">
                     {{ task.title }}
                   </span>
                   <span
@@ -82,22 +82,30 @@
             </div>
 
             <div class="grid gap-3 md:grid-cols-3">
-              <div class="flex flex-col gap-1">
-                <label class="text-xs sm:text-sm text-white/50">{{
-                  fieldLabels.status
-                }}</label>
+              <div>
+                <app-field-label
+                  [text]="fieldLabels.status"
+                  [icon]="fieldIcons.status"
+                  [forId]="'readiness-' + task.id + '-status'"
+                  [aboveControl]="true"
+                ></app-field-label>
                 <app-select-menu
+                  [triggerId]="'readiness-' + task.id + '-status'"
                   formControlName="status"
                   [options]="readinessStatusOptions"
                   [clearable]="false"
                   placeholder="Select Status"
                 ></app-select-menu>
               </div>
-              <div class="flex flex-col gap-1">
-                <label class="text-xs sm:text-sm text-white/50">{{
-                  fieldLabels.owner
-                }}</label>
+              <div>
+                <app-field-label
+                  [text]="fieldLabels.owner"
+                  [icon]="fieldIcons.owner"
+                  [forId]="'readiness-' + task.id + '-owner'"
+                  [aboveControl]="true"
+                ></app-field-label>
                 <app-select-menu
+                  [triggerId]="'readiness-' + task.id + '-owner'"
                   formControlName="ownerId"
                   [options]="employeeSelectOptions()"
                   [clearable]="false"
@@ -105,26 +113,34 @@
                   placeholder="Unassigned"
                 ></app-select-menu>
               </div>
-              <div class="flex flex-col gap-1">
-                <label class="text-xs sm:text-sm text-white/50">{{
-                  fieldLabels.dueDate
-                }}</label>
+              <div>
+                <app-field-label
+                  [text]="fieldLabels.dueDate"
+                  [icon]="fieldIcons.dueDate"
+                  [forId]="'readiness-' + task.id + '-due'"
+                  [aboveControl]="true"
+                ></app-field-label>
                 <input
+                  [id]="'readiness-' + task.id + '-due'"
                   type="date"
                   formControlName="dueDate"
-                  class="eh-native-date rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                  class="eh-input eh-native-date"
                 />
               </div>
             </div>
             <div>
-              <label class="text-xs sm:text-sm text-white/50">{{
-                fieldLabels.notes
-              }}</label>
+              <app-field-label
+                [text]="fieldLabels.notes"
+                [icon]="fieldIcons.notes"
+                [forId]="'readiness-' + task.id + '-notes'"
+                [aboveControl]="true"
+              ></app-field-label>
               <textarea
+                [id]="'readiness-' + task.id + '-notes'"
                 rows="2"
                 formControlName="notes"
                 placeholder="Add context, blockers, or next steps"
-                class="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                class="eh-textarea"
               ></textarea>
             </div>
           </div>
@@ -139,21 +155,36 @@
           <button
             type="button"
             class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
+            [attr.aria-expanded]="expandedSection() === 'overview'"
             (click)="toggleSection('overview')"
           >
             <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium text-white/55">{{
-                sectionLabels.overview
-              }}</span>
+              <span
+                class="eh-btn-icon justify-start text-sm font-medium text-white/55"
+              >
+                <lucide-icon
+                  [name]="sectionIcons.overview"
+                  [size]="14"
+                ></lucide-icon>
+                <span>{{ sectionLabels.overview }}</span>
+              </span>
               <span class="text-base font-medium text-white">
                 {{ displayValue("projectName") }}
               </span>
             </div>
             <span
-              class="text-xs sm:text-sm text-white/40 transition"
+              class="eh-btn-icon shrink-0 text-xs sm:text-sm text-white/40 transition"
               [class.text-white]="expandedSection() === 'overview'"
             >
-              {{ expandedSection() === "overview" ? "Hide" : "Expand" }}
+              <span>{{
+                expandedSection() === "overview" ? "Hide" : "Expand"
+              }}</span>
+              <lucide-icon
+                name="chevron-down"
+                [size]="14"
+                class="transition-transform"
+                [class.rotate-180]="expandedSection() === 'overview'"
+              ></lucide-icon>
             </span>
           </button>
           <div
@@ -165,70 +196,79 @@
             >
               <div class="grid gap-4 md:grid-cols-2">
                 <div>
-                  <label
-                    for="projectName"
-                    class="text-xs sm:text-sm text-white/50"
-                    >{{ overviewLabels.projectName }}</label
-                  >
+                  <app-field-label
+                    [text]="overviewLabels.projectName"
+                    [icon]="fieldIcons.projectName"
+                    forId="projectName"
+                    [required]="true"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <input
                     id="projectName"
                     type="text"
                     formControlName="projectName"
                     placeholder="Northern Lights Revamp"
-                    class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    class="eh-input"
                   />
                   <p
                     *ngIf="controlInvalid('projectName')"
-                    class="text-xs text-rose-300"
+                    class="mt-1 text-xs text-rose-300"
                   >
                     Provide a project name of at least three characters.
                   </p>
                 </div>
                 <div>
-                  <label
-                    for="clientName"
-                    class="text-xs sm:text-sm text-white/50"
-                    >{{ overviewLabels.clientName }}</label
-                  >
+                  <app-field-label
+                    [text]="overviewLabels.clientName"
+                    [icon]="fieldIcons.clientName"
+                    forId="clientName"
+                    [required]="true"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <input
                     id="clientName"
                     type="text"
                     formControlName="clientName"
                     placeholder="Northern Lights Inc."
-                    class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    class="eh-input"
                   />
                   <p
                     *ngIf="controlInvalid('clientName')"
-                    class="text-xs text-rose-300"
+                    class="mt-1 text-xs text-rose-300"
                   >
-                    Client Name is required.
+                    Provide a client name of at least three characters.
                   </p>
                 </div>
                 <div>
-                  <label
-                    for="startDate"
-                    class="text-xs sm:text-sm text-white/50"
-                    >{{ overviewLabels.startDate }}</label
-                  >
+                  <app-field-label
+                    [text]="overviewLabels.startDate"
+                    [icon]="fieldIcons.startDate"
+                    forId="startDate"
+                    [required]="true"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <input
                     id="startDate"
                     type="date"
                     formControlName="startDate"
-                    class="eh-native-date input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    class="eh-input eh-native-date"
                   />
                   <p
                     *ngIf="controlInvalid('startDate')"
-                    class="text-xs text-rose-300"
+                    class="mt-1 text-xs text-rose-300"
                   >
                     Choose a start date for the initiative.
                   </p>
                 </div>
                 <div>
-                  <label for="health" class="text-xs sm:text-sm text-white/50"
-                    >{{ overviewLabels.health }}</label
-                  >
+                  <app-field-label
+                    [text]="overviewLabels.health"
+                    [icon]="fieldIcons.health"
+                    forId="health"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <app-select-menu
-                    id="health"
+                    triggerId="health"
                     formControlName="health"
                     [options]="healthSelectOptions"
                     placeholder="Select health"
@@ -241,69 +281,76 @@
                 [formGroup]="overviewDetailsForm"
               >
                 <div class="md:col-span-2">
-                  <label
-                    for="overview-summary"
-                    class="text-xs sm:text-sm text-white/50"
-                    >{{ overviewLabels.summary }}</label
-                  >
+                  <app-field-label
+                    [text]="overviewLabels.summary"
+                    [icon]="fieldIcons.summary"
+                    forId="overview-summary"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <textarea
                     id="overview-summary"
                     rows="4"
                     formControlName="summary"
                     placeholder="High-level narrative for stakeholders."
-                    class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    class="eh-textarea"
                   ></textarea>
                 </div>
                 <div>
-                  <label
-                    for="overview-objectives"
-                    class="text-xs sm:text-sm text-white/50"
-                    >{{ overviewLabels.objectives }}</label
-                  >
+                  <app-field-label
+                    [text]="overviewLabels.objectives"
+                    [icon]="fieldIcons.objectives"
+                    forId="overview-objectives"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <textarea
                     id="overview-objectives"
                     rows="4"
                     formControlName="objectives"
                     placeholder="One objective per line."
-                    class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    class="eh-textarea"
                   ></textarea>
                 </div>
                 <div>
-                  <label
-                    for="overview-success"
-                    class="text-xs sm:text-sm text-white/50"
-                    >{{ overviewLabels.successCriteria }}</label
-                  >
+                  <app-field-label
+                    [text]="overviewLabels.successCriteria"
+                    [icon]="fieldIcons.successCriteria"
+                    forId="overview-success"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <textarea
                     id="overview-success"
                     rows="4"
                     formControlName="successCriteria"
                     placeholder="Define how we will measure success."
-                    class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    class="eh-textarea"
                   ></textarea>
                 </div>
                 <div class="md:col-span-2">
-                  <label
-                    for="overview-notes"
-                    class="text-xs sm:text-sm text-white/50"
-                    >{{ overviewLabels.stakeholderNotes }}</label
-                  >
+                  <app-field-label
+                    [text]="overviewLabels.stakeholderNotes"
+                    [icon]="fieldIcons.stakeholderNotes"
+                    forId="overview-notes"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <textarea
                     id="overview-notes"
                     rows="3"
                     formControlName="stakeholderNotes"
                     placeholder="Approvals, constraints, or reminders to keep the team aligned."
-                    class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    class="eh-textarea"
                   ></textarea>
                 </div>
               </div>
               <div class="mt-6 flex justify-end gap-3">
                 <button
+                  ehAction
                   type="button"
                   class="eh-action-btn eh-action-btn-outline"
+                  icon="x"
+                  [iconSize]="14"
+                  [disabled]="isSaving()"
                   (click)="cancelEdit()"
                 >
-                  <lucide-icon name="x" [size]="14"></lucide-icon>
                   <span>Cancel</span>
                 </button>
                 <button
@@ -311,10 +358,10 @@
                   type="button"
                   class="eh-action-btn eh-action-btn-primary"
                   [icon]="isEditMode() ? 'save' : 'plus'"
-                  [iconSize]="16"
+                  [iconSize]="14"
                   [pending]="isSaving()"
                   [pendingLabel]="isEditMode() ? 'Saving…' : 'Creating project…'"
-                  (click)="saveSection('overview')"
+                  (click)="saveSection()"
                 >
                   <span>{{
                     isEditMode() ? "Save Changes" : "Create Project"
@@ -323,27 +370,48 @@
               </div>
             </ng-container>
             <ng-template #overviewView>
-              <div class="grid gap-4 md:grid-cols-2">
+              <div
+                class="grid gap-4 sm:grid-cols-2 md:grid-cols-3"
+                data-testid="overview-read-grid"
+              >
                 <div
-                  class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                  class="h-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">Client</p>
+                  <p class="eh-read-label">
+                    <lucide-icon
+                      [name]="fieldIcons.clientName"
+                      [size]="14"
+                    ></lucide-icon>
+                    <span>Client</span>
+                  </p>
                   <p class="text-base font-medium text-white">
                     {{ displayValue("clientName") }}
                   </p>
                 </div>
                 <div
-                  class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                  class="h-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">Kick-Off</p>
+                  <p class="eh-read-label">
+                    <lucide-icon
+                      [name]="fieldIcons.startDate"
+                      [size]="14"
+                    ></lucide-icon>
+                    <span>Kick-Off</span>
+                  </p>
                   <p class="text-base font-medium text-white">
                     {{ displayValue("startDate") }}
                   </p>
                 </div>
                 <div
-                  class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                  class="h-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 sm:col-span-2 md:col-span-1"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">Health</p>
+                  <p class="eh-read-label">
+                    <lucide-icon
+                      [name]="fieldIcons.health"
+                      [size]="14"
+                    ></lucide-icon>
+                    <span>Health</span>
+                  </p>
                   <p class="text-base font-medium text-white">
                     {{ displayValue("health") }}
                   </p>
@@ -354,7 +422,13 @@
                   *ngIf="overview.summary"
                   class="mt-6 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">Summary</p>
+                  <p class="eh-read-label">
+                    <lucide-icon
+                      [name]="fieldIcons.summary"
+                      [size]="14"
+                    ></lucide-icon>
+                    <span>Summary</span>
+                  </p>
                   <p class="mt-2 text-sm text-white/80">
                     {{ overview.summary }}
                   </p>
@@ -363,7 +437,13 @@
                   *ngIf="overview.objectives.length"
                   class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">Objectives</p>
+                  <p class="eh-read-label">
+                    <lucide-icon
+                      [name]="fieldIcons.objectives"
+                      [size]="14"
+                    ></lucide-icon>
+                    <span>Objectives</span>
+                  </p>
                   <ul
                     class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
                   >
@@ -376,8 +456,9 @@
                   *ngIf="overview.successCriteria.length"
                   class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">
-                    Success Criteria
+                  <p class="eh-read-label">
+                    <lucide-icon [name]="fieldIcons.successCriteria" [size]="14"></lucide-icon>
+                    <span>Success Criteria</span>
                   </p>
                   <ul
                     class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
@@ -394,8 +475,9 @@
                   "
                   class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">
-                    Stakeholder Notes
+                  <p class="eh-read-label">
+                    <lucide-icon [name]="fieldIcons.stakeholderNotes" [size]="14"></lucide-icon>
+                    <span>Stakeholder Notes</span>
                   </p>
                   <p class="mt-2 text-sm text-white/80">
                     {{ overview.stakeholderNotes }}
@@ -421,11 +503,14 @@
               </ng-container>
               <div class="mt-6 flex justify-end">
                 <button
+                  ehAction
                   type="button"
-                  class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                  class="eh-action-btn eh-action-btn-outline"
+                  icon="pencil"
+                  [iconSize]="14"
                   (click)="startEdit('overview')"
                 >
-                  Edit Project Overview
+                  <span>Edit Project Overview</span>
                 </button>
               </div>
             </ng-template>
@@ -433,74 +518,80 @@
               class="mt-8 rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
             >
               <div
-                class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"
+                class="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between"
               >
-                <div>
-                  <p class="text-xs sm:text-sm text-white/45">
-                    {{ contentHelperCopy.title }}
+                <div class="min-w-0 flex-1">
+                  <p class="eh-read-label">
+                    <lucide-icon name="sparkles" [size]="14"></lucide-icon>
+                    <span>{{ contentHelperCopy.title }}</span>
                   </p>
                   <p class="text-sm text-white/65">
                     {{ contentHelperCopy.description }}
                   </p>
                 </div>
-                <div class="flex flex-wrap gap-2">
+                <div class="flex flex-wrap gap-2 xl:shrink-0 xl:justify-end">
                   <button
+                    ehAction
                     type="button"
-                    class="rounded-xl border border-white/20 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                    class="eh-action-btn eh-action-btn-outline"
+                    [icon]="contentfulPanelOpen() ? 'x' : 'download'"
+                    [iconSize]="14"
+                    [attr.aria-expanded]="contentfulPanelOpen()"
                     (click)="toggleContentfulPanel()"
                   >
-                    {{
+                    <span>{{
                       contentfulPanelOpen()
-                        ? "Hide Contentful form"
+                        ? "Hide Contentful Form"
                         : contentHelperCopy.fetchContentful
-                    }}
+                    }}</span>
                   </button>
                   <button
+                    ehAction
                     type="button"
-                    ubButton
-                    size="sm"
-                    class="gap-1 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-[0_20px_45px_rgba(251,191,36,0.35)]"
-                    [disabled]="aiProcessing()"
+                    class="eh-action-btn eh-action-btn-primary"
+                    icon="wand-sparkles"
+                    [iconSize]="14"
+                    [pending]="aiProcessing()"
+                    pendingLabel="Generating…"
                     (click)="generateOverviewDraft()"
                   >
-                    @if (aiProcessing()) {
-                      <lucide-icon
-                        name="loader-circle"
-                        [size]="16"
-                        class="animate-spin"
-                      ></lucide-icon>
-                      <span>Generating...</span>
-                    } @else {
-                      <lucide-icon
-                        name="wand-sparkles"
-                        [size]="16"
-                      ></lucide-icon>
-                      <span>{{ contentHelperCopy.generateAiDraft }}</span>
-                    }
+                    <span>{{ contentHelperCopy.generateAiDraft }}</span>
                   </button>
                   <button
                     *ngIf="aiDraft()"
+                    ehAction
                     type="button"
-                    class="rounded-xl border border-white/20 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                    class="eh-action-btn eh-action-btn-outline"
+                    [icon]="aiPanelOpen() ? 'chevron-down' : 'chevron-right'"
+                    [iconSize]="14"
+                    [attr.aria-expanded]="aiPanelOpen()"
                     (click)="toggleAiPanel()"
                   >
-                    {{ aiPanelOpen() ? "Hide AI draft" : "Show AI draft" }}
+                    <span>{{
+                      aiPanelOpen() ? "Hide AI Draft" : "Show AI Draft"
+                    }}</span>
                   </button>
                   <button
                     *ngIf="contentfulBrief()"
+                    ehAction
                     type="button"
-                    class="rounded-xl border border-white/20 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                    class="eh-action-btn eh-action-btn-outline"
+                    icon="eraser"
+                    [iconSize]="14"
                     (click)="clearContentfulBrief()"
                   >
-                    Clear Contentful Result
+                    <span>Clear Contentful Result</span>
                   </button>
                   <button
                     *ngIf="aiDraft()"
+                    ehAction
                     type="button"
-                    class="rounded-xl border border-white/20 px-3 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                    class="eh-action-btn eh-action-btn-outline"
+                    icon="eraser"
+                    [iconSize]="14"
                     (click)="clearAiDraft()"
                   >
-                    Clear AI Draft
+                    <span>Clear AI Draft</span>
                   </button>
                 </div>
               </div>
@@ -510,47 +601,50 @@
                 (ngSubmit)="loadContentfulBrief()"
                 class="mt-5 space-y-4"
               >
-                <div class="grid gap-4 lg:grid-cols-3">
-                  <div class="lg:col-span-1">
-                    <label
-                      for="contentful-entry"
-                      class="text-xs sm:text-sm text-white/50"
-                      >Entry ID</label
-                    >
+                <div class="grid gap-4 md:grid-cols-3">
+                  <div>
+                    <app-field-label
+                      text="Entry ID"
+                      [icon]="fieldIcons.entryId"
+                      forId="contentful-entry"
+                      [aboveControl]="true"
+                    ></app-field-label>
                     <input
                       id="contentful-entry"
                       type="text"
                       formControlName="entryId"
                       placeholder="e.g. 3xDzG2wC5V4tC5uqr"
-                      class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                      class="eh-input"
                     />
                   </div>
-                  <div class="lg:col-span-1">
-                    <label
-                      for="contentful-type"
-                      class="text-xs sm:text-sm text-white/50"
-                      >Content Type</label
-                    >
+                  <div>
+                    <app-field-label
+                      text="Content Type"
+                      [icon]="fieldIcons.contentType"
+                      forId="contentful-type"
+                      [aboveControl]="true"
+                    ></app-field-label>
                     <input
                       id="contentful-type"
                       type="text"
                       formControlName="contentType"
                       placeholder="Optional Contentful type ID"
-                      class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                      class="eh-input"
                     />
                   </div>
-                  <div class="lg:col-span-1">
-                    <label
-                      for="contentful-slug"
-                      class="text-xs sm:text-sm text-white/50"
-                      >Slug</label
-                    >
+                  <div>
+                    <app-field-label
+                      text="Slug"
+                      [icon]="fieldIcons.slug"
+                      forId="contentful-slug"
+                      [aboveControl]="true"
+                    ></app-field-label>
                     <input
                       id="contentful-slug"
                       type="text"
                       formControlName="slug"
                       placeholder="Optional slug"
-                      class="w-full rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/85 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                      class="eh-input"
                     />
                   </div>
                 </div>
@@ -568,23 +662,15 @@
                     Preview token
                   </label>
                   <button
+                    ehAction
                     type="submit"
-                    ubButton
-                    size="sm"
-                    class="w-full gap-1 sm:w-auto bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
-                    [disabled]="contentfulLoading()"
+                    class="eh-action-btn eh-action-btn-primary w-full sm:w-auto"
+                    icon="download"
+                    [iconSize]="14"
+                    [pending]="contentfulLoading()"
+                    pendingLabel="Fetching…"
                   >
-                    @if (contentfulLoading()) {
-                      <lucide-icon
-                        name="loader-circle"
-                        [size]="16"
-                        class="animate-spin"
-                      ></lucide-icon>
-                      <span>Fetching...</span>
-                    } @else {
-                      <lucide-icon name="download" [size]="16"></lucide-icon>
-                      <span>Fetch Brief</span>
-                    }
+                    <span>Fetch Brief</span>
                   </button>
                 </div>
               </form>
@@ -615,7 +701,10 @@
                     *ngIf="ov.summary"
                     class="mt-4 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                   >
-                    <p class="text-xs sm:text-sm text-white/45">Summary</p>
+                    <p class="eh-read-label">
+                    <lucide-icon [name]="fieldIcons.summary" [size]="14"></lucide-icon>
+                    <span>Summary</span>
+                  </p>
                     <p class="mt-2 text-sm text-white/80">
                       {{ ov.summary }}
                     </p>
@@ -624,7 +713,10 @@
                     *ngIf="ov.objectives.length"
                     class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                   >
-                    <p class="text-xs sm:text-sm text-white/45">Objectives</p>
+                    <p class="eh-read-label">
+                    <lucide-icon [name]="fieldIcons.objectives" [size]="14"></lucide-icon>
+                    <span>Objectives</span>
+                  </p>
                     <ul
                       class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
                     >
@@ -637,8 +729,9 @@
                     *ngIf="ov.successCriteria.length"
                     class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                   >
-                    <p class="text-xs sm:text-sm text-white/45">
-                      Success Criteria
+                    <p class="eh-read-label">
+                      <lucide-icon [name]="fieldIcons.successCriteria" [size]="14"></lucide-icon>
+                      <span>Success Criteria</span>
                     </p>
                     <ul
                       class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
@@ -652,8 +745,9 @@
                     *ngIf="ov.stakeholderNotes"
                     class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                   >
-                    <p class="text-xs sm:text-sm text-white/45">
-                      Stakeholder Notes
+                    <p class="eh-read-label">
+                      <lucide-icon [name]="fieldIcons.stakeholderNotes" [size]="14"></lucide-icon>
+                      <span>Stakeholder Notes</span>
                     </p>
                     <p class="mt-2 text-sm text-white/80">
                       {{ ov.stakeholderNotes }}
@@ -662,20 +756,23 @@
                 </ng-container>
                 <div class="mt-4 flex justify-end gap-3">
                   <button
+                    ehAction
                     type="button"
-                    class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                    class="eh-action-btn eh-action-btn-outline"
+                    icon="x"
+                    [iconSize]="14"
                     (click)="clearContentfulBrief()"
                   >
-                    Dismiss
+                    <span>Dismiss</span>
                   </button>
                   <button
+                    ehAction
                     type="button"
-                    ubButton
-                    size="sm"
-                    class="gap-1 bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)]"
+                    class="eh-action-btn eh-action-btn-primary"
+                    icon="check"
+                    [iconSize]="14"
                     (click)="applyContentfulOverview(brief)"
                   >
-                    <lucide-icon name="check" [size]="16"></lucide-icon>
                     <span>Apply To Overview</span>
                   </button>
                 </div>
@@ -701,7 +798,10 @@
                   *ngIf="ai.overview.summary"
                   class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">Summary</p>
+                  <p class="eh-read-label">
+                    <lucide-icon [name]="fieldIcons.summary" [size]="14"></lucide-icon>
+                    <span>Summary</span>
+                  </p>
                   <p class="mt-2 text-sm text-white/80">
                     {{ ai.overview.summary }}
                   </p>
@@ -710,7 +810,10 @@
                   *ngIf="ai.overview.objectives.length"
                   class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">Objectives</p>
+                  <p class="eh-read-label">
+                    <lucide-icon [name]="fieldIcons.objectives" [size]="14"></lucide-icon>
+                    <span>Objectives</span>
+                  </p>
                   <ul
                     class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
                   >
@@ -723,8 +826,9 @@
                   *ngIf="ai.overview.successCriteria.length"
                   class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">
-                    Success Criteria
+                  <p class="eh-read-label">
+                    <lucide-icon [name]="fieldIcons.successCriteria" [size]="14"></lucide-icon>
+                    <span>Success Criteria</span>
                   </p>
                   <ul
                     class="mt-2 list-inside list-disc space-y-1 text-sm text-white/80"
@@ -738,8 +842,9 @@
                   *ngIf="ai.overview.stakeholderNotes"
                   class="mt-2 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">
-                    Stakeholder Notes
+                  <p class="eh-read-label">
+                    <lucide-icon [name]="fieldIcons.stakeholderNotes" [size]="14"></lucide-icon>
+                    <span>Stakeholder Notes</span>
                   </p>
                   <p class="mt-2 text-sm text-white/80">
                     {{ ai.overview.stakeholderNotes }}
@@ -747,20 +852,23 @@
                 </div>
                 <div class="mt-4 flex justify-end gap-3">
                   <button
+                    ehAction
                     type="button"
-                    class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                    class="eh-action-btn eh-action-btn-outline"
+                    icon="x"
+                    [iconSize]="14"
                     (click)="clearAiDraft()"
                   >
-                    Dismiss
+                    <span>Dismiss</span>
                   </button>
                   <button
+                    ehAction
                     type="button"
-                    ubButton
-                    size="sm"
-                    class="gap-1 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
+                    class="eh-action-btn eh-action-btn-primary"
+                    icon="check"
+                    [iconSize]="14"
                     (click)="applyAiDraft(ai)"
                   >
-                    <lucide-icon name="check" [size]="16"></lucide-icon>
                     <span>Apply AI Draft</span>
                   </button>
                 </div>
@@ -779,21 +887,34 @@
           <button
             type="button"
             class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
+            [attr.aria-expanded]="expandedSection() === 'team'"
             (click)="toggleSection('team')"
           >
             <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium text-white/55">{{
-                sectionLabels.team
-              }}</span>
+              <span
+                class="eh-btn-icon justify-start text-sm font-medium text-white/55"
+              >
+                <lucide-icon
+                  [name]="sectionIcons.team"
+                  [size]="14"
+                ></lucide-icon>
+                <span>{{ sectionLabels.team }}</span>
+              </span>
               <span class="text-base font-medium text-white">
                 {{ displayValue("leadByEmpId") }}
               </span>
             </div>
             <span
-              class="text-xs sm:text-sm text-white/40 transition"
+              class="eh-btn-icon shrink-0 text-xs sm:text-sm text-white/40 transition"
               [class.text-white]="expandedSection() === 'team'"
             >
-              {{ expandedSection() === "team" ? "Hide" : "Expand" }}
+              <span>{{ expandedSection() === "team" ? "Hide" : "Expand" }}</span>
+              <lucide-icon
+                name="chevron-down"
+                [size]="14"
+                class="transition-transform"
+                [class.rotate-180]="expandedSection() === 'team'"
+              ></lucide-icon>
             </span>
           </button>
           <div
@@ -803,15 +924,15 @@
             <ng-container *ngIf="editingSection() === 'team'; else teamView">
               <div class="grid gap-4 md:grid-cols-2">
                 <div class="md:col-span-2">
-                  <label
-                    for="leadByEmpId"
-                    class="text-xs sm:text-sm text-white/50"
-                    >Project Lead</label
-                  >
+                  <app-field-label
+                    text="Project Lead"
+                    [icon]="fieldIcons.lead"
+                    forId="leadByEmpId"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <app-select-menu
-                    id="leadByEmpId"
+                    triggerId="leadByEmpId"
                     formControlName="leadByEmpId"
-                    class=""
                     [options]="employeeSelectOptions()"
                     [clearable]="false"
                     [numeric]="true"
@@ -821,11 +942,14 @@
               </div>
               <div class="mt-6 flex justify-end gap-3">
                 <button
+                  ehAction
                   type="button"
                   class="eh-action-btn eh-action-btn-outline"
+                  icon="x"
+                  [iconSize]="14"
+                  [disabled]="isSaving()"
                   (click)="cancelEdit()"
                 >
-                  <lucide-icon name="x" [size]="14"></lucide-icon>
                   <span>Cancel</span>
                 </button>
                 <button
@@ -833,10 +957,10 @@
                   type="button"
                   class="eh-action-btn eh-action-btn-primary"
                   icon="save"
-                  [iconSize]="16"
+                  [iconSize]="14"
                   [pending]="isSaving()"
                   pendingLabel="Saving…"
-                  (click)="saveSection('team')"
+                  (click)="saveSection()"
                 >
                   <span>Save Assignment</span>
                 </button>
@@ -846,18 +970,24 @@
               <div
                 class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
               >
-                <p class="text-xs sm:text-sm text-white/45">Project Lead</p>
+                <p class="eh-read-label">
+                  <lucide-icon [name]="fieldIcons.lead" [size]="14"></lucide-icon>
+                  <span>Project Lead</span>
+                </p>
                 <p class="text-base font-medium text-white">
                   {{ displayValue("leadByEmpId") }}
                 </p>
               </div>
               <div class="mt-6 flex justify-end">
                 <button
+                  ehAction
                   type="button"
-                  class="rounded-xl border border-white/20 px-4 py-2 text-xs text-white/70 transition hover:border-white/40 hover:text-white"
+                  class="eh-action-btn eh-action-btn-outline"
+                  icon="pencil"
+                  [iconSize]="14"
                   (click)="startEdit('team')"
                 >
-                  Edit Lead
+                  <span>Edit Lead</span>
                 </button>
               </div>
             </ng-template>
@@ -870,8 +1000,9 @@
                     class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
                   >
                     <div>
-                      <p class="text-xs sm:text-sm text-white/50">
-                        Resource Snapshot
+                      <p class="eh-read-label">
+                        <lucide-icon name="chart-column" [size]="14"></lucide-icon>
+                        <span>Resource Snapshot</span>
                       </p>
                       <p class="text-sm text-white/65">
                         Live allocation signals across the portfolio.
@@ -888,8 +1019,9 @@
                       <div
                         class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                       >
-                        <p class="text-xs sm:text-sm text-white/45">
-                          Team Size
+                        <p class="eh-read-label">
+                          <lucide-icon name="users" [size]="14"></lucide-icon>
+                          <span>Team Size</span>
                         </p>
                         <p class="text-2xl font-medium text-white">
                           {{ metrics.teamSize }}
@@ -901,8 +1033,9 @@
                       <div
                         class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                       >
-                        <p class="text-xs sm:text-sm text-white/45">
-                          Bench Ready
+                        <p class="eh-read-label">
+                          <lucide-icon name="user-plus" [size]="14"></lucide-icon>
+                          <span>Bench Ready</span>
                         </p>
                         <p class="text-2xl font-medium text-white">
                           {{ metrics.benchCount }}
@@ -914,8 +1047,9 @@
                       <div
                         class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                       >
-                        <p class="text-xs sm:text-sm text-white/45">
-                          Overbooked
+                        <p class="eh-read-label">
+                          <lucide-icon name="triangle-alert" [size]="14"></lucide-icon>
+                          <span>Overbooked</span>
                         </p>
                         <p class="text-2xl font-medium text-white">
                           {{ metrics.overbookedCount }}
@@ -927,8 +1061,9 @@
                       <div
                         class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                       >
-                        <p class="text-xs sm:text-sm text-white/45">
-                          Active Assignments
+                        <p class="eh-read-label">
+                          <lucide-icon name="briefcase" [size]="14"></lucide-icon>
+                          <span>Active Assignments</span>
                         </p>
                         <p class="text-2xl font-medium text-white">
                           {{ metrics.activeAssignmentCount }}
@@ -940,8 +1075,9 @@
                       <div
                         class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                       >
-                        <p class="text-xs sm:text-sm text-white/45">
-                          Avg Allocation
+                        <p class="eh-read-label">
+                          <lucide-icon name="activity" [size]="14"></lucide-icon>
+                          <span>Avg Allocation</span>
                         </p>
                         <p class="text-2xl font-medium text-white">
                           {{ formatPercent(metrics.averageAllocation) }}
@@ -961,8 +1097,9 @@
                   >
                     <div class="flex items-start justify-between gap-4">
                       <div>
-                        <p class="text-xs sm:text-sm text-white/50">
-                          Current Lead
+                        <p class="eh-read-label">
+                          <lucide-icon name="shield-user" [size]="14"></lucide-icon>
+                          <span>Current Lead</span>
                         </p>
                         <p class="text-base sm:text-xl font-medium text-white">
                           {{ lead.employeeName }}
@@ -987,8 +1124,9 @@
                       <div
                         class="rounded-xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                       >
-                        <p class="text-xs sm:text-sm text-white/45">
-                          Availability
+                        <p class="eh-read-label">
+                          <lucide-icon name="clock" [size]="14"></lucide-icon>
+                          <span>Availability</span>
                         </p>
                         <p class="text-sm text-white">
                           {{ availabilitySummary(lead) }}
@@ -997,8 +1135,9 @@
                       <div
                         class="rounded-xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                       >
-                        <p class="text-xs sm:text-sm text-white/45">
-                          Fit Score
+                        <p class="eh-read-label">
+                          <lucide-icon name="target" [size]="14"></lucide-icon>
+                          <span>Fit Score</span>
                         </p>
                         <p class="text-sm text-white">
                           {{ formatScore(lead.fitScore) }}
@@ -1012,8 +1151,9 @@
                       </div>
                     </div>
                     <div *ngIf="lead.activeAssignments.length" class="mt-4">
-                      <p class="text-xs sm:text-sm text-white/45">
-                        Active Projects
+                      <p class="eh-read-label">
+                        <lucide-icon name="folder-kanban" [size]="14"></lucide-icon>
+                        <span>Active Projects</span>
                       </p>
                       <ul class="mt-2 space-y-2 text-sm text-white/75">
                         <li
@@ -1051,8 +1191,9 @@
                     class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
                   >
                     <div class="flex flex-col gap-2">
-                      <p class="text-xs sm:text-sm text-white/50">
-                        Suggested Project Leads
+                      <p class="eh-read-label">
+                        <lucide-icon name="sparkles" [size]="14"></lucide-icon>
+                        <span>Suggested Project Leads</span>
                       </p>
                       <p class="text-sm text-white/65">
                         People with leadership signals and room to step in.
@@ -1115,16 +1256,13 @@
                         </p>
                         <div class="mt-2 flex justify-end">
                           <button
+                            ehAction
                             type="button"
-                            ubButton
-                            size="sm"
-                            class="bg-gradient-to-r from-indigo-500 via-sky-500 to-blue-500 text-white shadow-[0_15px_40px_rgba(56,189,248,0.35)]"
+                            class="eh-action-btn eh-action-btn-primary"
+                            icon="user-plus"
+                            [iconSize]="14"
                             (click)="applyRecommendedLead(candidate)"
                           >
-                            <lucide-icon
-                              name="user-plus"
-                              [size]="16"
-                            ></lucide-icon>
                             <span>Assign as Lead</span>
                           </button>
                         </div>
@@ -1147,8 +1285,9 @@
                       class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between"
                     >
                       <div>
-                        <p class="text-xs sm:text-sm text-white/50">
-                          Current Project Allocations
+                        <p class="eh-read-label">
+                          <lucide-icon name="users" [size]="14"></lucide-icon>
+                          <span>Current Project Allocations</span>
                         </p>
                         <p class="text-sm text-white/65">
                           Who is attached to this initiative today.
@@ -1232,8 +1371,9 @@
                     class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-2 sm:py-4"
                   >
                     <div class="flex flex-col gap-2">
-                      <p class="text-xs sm:text-sm text-white/50">
-                        Recommended Project Collaborators
+                      <p class="eh-read-label">
+                        <lucide-icon name="user-round-plus" [size]="14"></lucide-icon>
+                        <span>Recommended Project Collaborators</span>
                       </p>
                       <p class="text-sm text-white/65">
                         People with availability and adjacent skills to
@@ -1301,16 +1441,28 @@
                         </p>
                         <div class="mt-2 flex justify-end">
                           <button
+                            ehAction
                             type="button"
-                            class="rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white"
-                            (click)="startCollaboratorAssignment(collaborator)"
-                          >
-                            {{
+                            class="eh-action-btn eh-action-btn-outline"
+                            [icon]="
                               collaboratorAssignmentProfile()?.employeeId ===
                               collaborator.employeeId
-                                ? "Close panel"
-                                : "Add to team"
-                            }}
+                                ? 'x'
+                                : 'user-round-plus'
+                            "
+                            [iconSize]="14"
+                            [attr.aria-expanded]="
+                              collaboratorAssignmentProfile()?.employeeId ===
+                              collaborator.employeeId
+                            "
+                            (click)="startCollaboratorAssignment(collaborator)"
+                          >
+                            <span>{{
+                              collaboratorAssignmentProfile()?.employeeId ===
+                              collaborator.employeeId
+                                ? "Close Panel"
+                                : "Add to Team"
+                            }}</span>
                           </button>
                         </div>
                         <form
@@ -1324,32 +1476,35 @@
                         >
                           <div class="grid gap-3 sm:grid-cols-3">
                             <div class="sm:col-span-1">
-                              <label
-                                for="collab-role"
-                                class="text-xs sm:text-sm text-white/50"
-                                >Role</label
-                              >
+                              <app-field-label
+                                text="Role"
+                                [icon]="fieldIcons.role"
+                                forId="collab-role"
+                                [aboveControl]="true"
+                              ></app-field-label>
                               <input
                                 id="collab-role"
                                 type="text"
                                 formControlName="role"
-                                class="w-full rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+                                class="eh-input"
                                 placeholder="Contributor"
                               />
                             </div>
                             <div>
-                              <label
-                                for="collab-allocation"
-                                class="text-xs sm:text-sm text-white/50"
-                                >Allocation (%)</label
-                              >
+                              <app-field-label
+                                text="Allocation (%)"
+                                [icon]="fieldIcons.allocation"
+                                forId="collab-allocation"
+                                [required]="true"
+                                [aboveControl]="true"
+                              ></app-field-label>
                               <input
                                 id="collab-allocation"
                                 type="number"
                                 min="1"
                                 max="200"
                                 formControlName="allocationPct"
-                                class="w-full rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+                                class="eh-input"
                               />
                               <p
                                 *ngIf="
@@ -1363,32 +1518,36 @@
                                       'allocationPct'
                                     ]?.touched)
                                 "
-                                class="text-xs text-rose-300"
+                                class="mt-1 text-xs text-rose-300"
                               >
                                 Enter a value between 1 and 200.
                               </p>
                             </div>
                             <div>
-                              <label
-                                for="collab-date"
-                                class="text-xs sm:text-sm text-white/50"
-                                >Assigned Date</label
-                              >
+                              <app-field-label
+                                text="Assigned Date"
+                                [icon]="fieldIcons.assignedDate"
+                                forId="collab-date"
+                                [aboveControl]="true"
+                              ></app-field-label>
                               <input
                                 id="collab-date"
                                 type="date"
                                 formControlName="assignedDate"
-                                class="eh-native-date w-full rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/85 outline-none transition focus:border-indigo-400/60 focus:bg-white/10 focus:text-white"
+                                class="eh-input eh-native-date"
                               />
                             </div>
                           </div>
                           <div class="flex justify-end gap-3">
                             <button
+                              ehAction
                               type="button"
                               class="eh-action-btn eh-action-btn-outline"
+                              icon="x"
+                              [iconSize]="14"
+                              [disabled]="collaboratorAssignmentProcessing()"
                               (click)="cancelCollaboratorAssignment()"
                             >
-                              <lucide-icon name="x" [size]="14"></lucide-icon>
                               <span>Cancel</span>
                             </button>
                             <button
@@ -1396,6 +1555,7 @@
                               type="submit"
                               class="eh-action-btn eh-action-btn-primary"
                               icon="plus"
+                              [iconSize]="14"
                               [pending]="collaboratorAssignmentProcessing()"
                               pendingLabel="Assigning…"
                             >
@@ -1425,21 +1585,36 @@
           <button
             type="button"
             class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
+            [attr.aria-expanded]="expandedSection() === 'contact'"
             (click)="toggleSection('contact')"
           >
             <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium text-white/55">{{
-                sectionLabels.contact
-              }}</span>
+              <span
+                class="eh-btn-icon justify-start text-sm font-medium text-white/55"
+              >
+                <lucide-icon
+                  [name]="sectionIcons.contact"
+                  [size]="14"
+                ></lucide-icon>
+                <span>{{ sectionLabels.contact }}</span>
+              </span>
               <span class="text-base font-medium text-white">
                 {{ displayValue("contactPerson") }}
               </span>
             </div>
             <span
-              class="text-xs sm:text-sm text-white/40 transition"
+              class="eh-btn-icon shrink-0 text-xs sm:text-sm text-white/40 transition"
               [class.text-white]="expandedSection() === 'contact'"
             >
-              {{ expandedSection() === "contact" ? "Hide" : "Expand" }}
+              <span>{{
+                expandedSection() === "contact" ? "Hide" : "Expand"
+              }}</span>
+              <lucide-icon
+                name="chevron-down"
+                [size]="14"
+                class="transition-transform"
+                [class.rotate-180]="expandedSection() === 'contact'"
+              ></lucide-icon>
             </span>
           </button>
           <div
@@ -1451,54 +1626,59 @@
             >
               <div class="grid gap-4 md:grid-cols-2">
                 <div>
-                  <label
-                    for="contactPerson"
-                    class="text-xs sm:text-sm text-white/50"
-                    >Primary Contact</label
-                  >
+                  <app-field-label
+                    text="Primary Contact"
+                    [icon]="fieldIcons.contactPerson"
+                    forId="contactPerson"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <input
                     id="contactPerson"
                     type="text"
                     formControlName="contactPerson"
                     placeholder="Avery Chen"
-                    class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    class="eh-input"
                   />
                 </div>
                 <div>
-                  <label
-                    for="contactNo"
-                    class="text-xs sm:text-sm text-white/50"
-                    >Contact Number</label
-                  >
+                  <app-field-label
+                    text="Contact Number"
+                    [icon]="fieldIcons.contactNo"
+                    forId="contactNo"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <input
                     id="contactNo"
-                    type="text"
+                    type="tel"
                     formControlName="contactNo"
                     placeholder="+1 (555) 123-7890"
-                    class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    class="eh-input"
                   />
                   <p
                     *ngIf="controlInvalid('contactNo')"
-                    class="text-xs sm:text-sm text-rose-300"
+                    class="mt-1 text-xs text-rose-300"
                   >
                     Use digits, parentheses, spaces, or dashes for the phone
                     number.
                   </p>
                 </div>
                 <div class="md:col-span-2">
-                  <label for="emailId" class="text-xs sm:text-sm text-white/50"
-                    >Contact Email</label
-                  >
+                  <app-field-label
+                    text="Contact Email"
+                    [icon]="fieldIcons.emailId"
+                    forId="emailId"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <input
                     id="emailId"
                     type="email"
                     formControlName="emailId"
                     placeholder="avery.chen@northernlights.com"
-                    class="input rounded-2xl border border-white/15 bg-white/5 px-2 sm:px-4 py-3 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    class="eh-input"
                   />
                   <p
                     *ngIf="controlInvalid('emailId')"
-                    class="text-xs sm:text-sm text-rose-300"
+                    class="mt-1 text-xs text-rose-300"
                   >
                     Provide a valid email address.
                   </p>
@@ -1506,11 +1686,14 @@
               </div>
               <div class="mt-6 flex justify-end gap-3">
                 <button
+                  ehAction
                   type="button"
                   class="eh-action-btn eh-action-btn-outline"
+                  icon="x"
+                  [iconSize]="14"
+                  [disabled]="isSaving()"
                   (click)="cancelEdit()"
                 >
-                  <lucide-icon name="x" [size]="14"></lucide-icon>
                   <span>Cancel</span>
                 </button>
                 <button
@@ -1518,51 +1701,61 @@
                   type="button"
                   class="eh-action-btn eh-action-btn-primary"
                   icon="save"
-                  [iconSize]="16"
+                  [iconSize]="14"
                   [pending]="isSaving()"
                   pendingLabel="Saving…"
-                  (click)="saveSection('contact')"
+                  (click)="saveSection()"
                 >
                   <span>Save Contact</span>
                 </button>
               </div>
             </ng-container>
             <ng-template #contactView>
-              <div class="grid gap-4 md:grid-cols-2">
+              <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                 <div
-                  class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                  class="h-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">
-                    Primary Contact
+                  <p class="eh-read-label">
+                    <lucide-icon [name]="fieldIcons.contactPerson" [size]="14"></lucide-icon>
+                    <span>Primary Contact</span>
                   </p>
                   <p class="text-base font-medium text-white">
                     {{ displayValue("contactPerson") }}
                   </p>
                 </div>
                 <div
-                  class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
+                  class="h-full rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">Phone</p>
+                  <p class="eh-read-label">
+                    <lucide-icon [name]="fieldIcons.contactNo" [size]="14"></lucide-icon>
+                    <span>Phone</span>
+                  </p>
                   <p class="text-base font-medium text-white">
                     {{ displayValue("contactNo") }}
                   </p>
                 </div>
                 <div
-                  class="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 md:col-span-2"
+                  class="h-full min-w-0 rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-4 py-3 sm:col-span-2 md:col-span-1"
                 >
-                  <p class="text-xs sm:text-sm text-white/45">Email</p>
-                  <p class="text-base font-medium text-white">
+                  <p class="eh-read-label">
+                    <lucide-icon [name]="fieldIcons.emailId" [size]="14"></lucide-icon>
+                    <span>Email</span>
+                  </p>
+                  <p class="break-words text-base font-medium text-white">
                     {{ displayValue("emailId") }}
                   </p>
                 </div>
               </div>
               <div class="mt-6 flex justify-end">
                 <button
+                  ehAction
                   type="button"
-                  class="rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm text-white/70 transition hover:border-white/40 hover:text-white"
+                  class="eh-action-btn eh-action-btn-outline"
+                  icon="pencil"
+                  [iconSize]="14"
                   (click)="startEdit('contact')"
                 >
-                  Edit Contact
+                  <span>Edit Contact</span>
                 </button>
               </div>
             </ng-template>
@@ -1576,21 +1769,36 @@
           <button
             type="button"
             class="flex w-full items-center justify-between gap-4 px-2 sm:px-4 py-2 sm:py-4 text-left text-sm text-white/80 transition hover:bg-white/5"
+            [attr.aria-expanded]="expandedSection() === 'approval'"
             (click)="toggleSection('approval')"
           >
             <div class="flex flex-col gap-1">
-              <span class="text-sm font-medium text-white/55">{{
-                sectionLabels.approval
-              }}</span>
+              <span
+                class="eh-btn-icon justify-start text-sm font-medium text-white/55"
+              >
+                <lucide-icon
+                  [name]="sectionIcons.approval"
+                  [size]="14"
+                ></lucide-icon>
+                <span>{{ sectionLabels.approval }}</span>
+              </span>
               <span class="text-base font-medium text-white">
                 {{ approvalStatusLabel(approvalStatus()) }}
               </span>
             </div>
             <span
-              class="text-xs sm:text-sm text-white/40 transition"
+              class="eh-btn-icon shrink-0 text-xs sm:text-sm text-white/40 transition"
               [class.text-white]="expandedSection() === 'approval'"
             >
-              {{ expandedSection() === "approval" ? "Hide" : "Expand" }}
+              <span>{{
+                expandedSection() === "approval" ? "Hide" : "Expand"
+              }}</span>
+              <lucide-icon
+                name="chevron-down"
+                [size]="14"
+                class="transition-transform"
+                [class.rotate-180]="expandedSection() === 'approval'"
+              ></lucide-icon>
             </span>
           </button>
           <div
@@ -1602,9 +1810,10 @@
                 class="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/80"
               >
                 <div class="flex items-center gap-3">
-                  <span class="text-xs sm:text-sm text-white/50"
-                    >Current Status</span
-                  >
+                  <span class="eh-read-label">
+                    <lucide-icon name="circle-dot" [size]="14"></lucide-icon>
+                    <span>Current Status</span>
+                  </span>
                   <span
                     class="inline-flex items-center rounded-full px-3 py-1 text-xs sm:text-sm font-medium"
                     [ngClass]="approvalStatusBadgeClass(approvalStatus())"
@@ -1625,14 +1834,12 @@
                 <div class="flex flex-wrap gap-2">
                   <button
                     *ngIf="canRequestApproval()"
-                    type="button"
-                    ubButton
-                    size="sm"
-                    class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
                     ehAction
-                    icon="sparkles"
-                    [iconSize]="16"
-                    [pending]="pending.has('approval:request')"
+                    type="button"
+                    class="eh-action-btn eh-action-btn-primary"
+                    icon="send"
+                    [iconSize]="14"
+                    [pending]="isApprovalPending('request')"
                     [pendingLabel]="approvalPendingLabels.request"
                     [disabled]="
                       approvalProcessing() || !currentProject()?.projectId
@@ -1643,14 +1850,12 @@
                   </button>
                   <button
                     *ngIf="canApprove()"
-                    type="button"
-                    ubButton
-                    size="sm"
-                    class="bg-gradient-to-r from-emerald-500 via-green-500 to-lime-500 text-white shadow-[0_20px_45px_rgba(34,197,94,0.35)]"
                     ehAction
-                    icon="check"
-                    [iconSize]="16"
-                    [pending]="pending.has('approval:approve')"
+                    type="button"
+                    class="eh-action-btn eh-action-btn-primary"
+                    icon="circle-check"
+                    [iconSize]="14"
+                    [pending]="isApprovalPending('approve')"
                     [pendingLabel]="approvalPendingLabels.approve"
                     [disabled]="approvalProcessing()"
                     (click)="approveProjectAction()"
@@ -1659,14 +1864,12 @@
                   </button>
                   <button
                     *ngIf="canReject()"
-                    type="button"
-                    ubButton
-                    size="sm"
-                    class="bg-gradient-to-r from-rose-500 via-red-500 to-orange-500 text-white shadow-[0_20px_45px_rgba(244,63,94,0.35)]"
                     ehAction
+                    type="button"
+                    class="eh-action-btn eh-action-btn-danger"
                     icon="x"
-                    [iconSize]="16"
-                    [pending]="pending.has('approval:reject')"
+                    [iconSize]="14"
+                    [pending]="isApprovalPending('reject')"
                     [pendingLabel]="approvalPendingLabels.reject"
                     [disabled]="approvalProcessing()"
                     (click)="rejectProjectAction()"
@@ -1675,15 +1878,12 @@
                   </button>
                   <button
                     *ngIf="canResetApproval()"
-                    type="button"
-                    ubButton
-                    size="sm"
-                    variant="outline"
-                    class="border-white/20 bg-white/10 text-white/80 hover:border-white/40 hover:text-white"
                     ehAction
+                    type="button"
+                    class="eh-action-btn eh-action-btn-outline"
                     icon="rotate-ccw"
-                    [iconSize]="16"
-                    [pending]="pending.has('approval:reset')"
+                    [iconSize]="14"
+                    [pending]="isApprovalPending('reset')"
                     [pendingLabel]="approvalPendingLabels.reset"
                     [disabled]="approvalProcessing()"
                     (click)="resetProjectApprovalAction()"
@@ -1705,11 +1905,15 @@
                   (submit)="$event.preventDefault()"
                 >
                   <div class="grid gap-3 md:grid-cols-2">
-                    <div class="flex flex-col gap-1">
-                      <label class="text-xs sm:text-sm text-white/50"
-                        >Actor (Employee)</label
-                      >
+                    <div>
+                      <app-field-label
+                        text="Actor (Employee)"
+                        [icon]="fieldIcons.actor"
+                        forId="approval-actor-id"
+                        [aboveControl]="true"
+                      ></app-field-label>
                       <app-select-menu
+                        triggerId="approval-actor-id"
                         formControlName="actorId"
                         [options]="employeeSelectOptions()"
                         [clearable]="false"
@@ -1717,27 +1921,35 @@
                         placeholder="Unassigned"
                       ></app-select-menu>
                     </div>
-                    <div class="flex flex-col gap-1">
-                      <label class="text-xs sm:text-sm text-white/50"
-                        >External Approver</label
-                      >
+                    <div>
+                      <app-field-label
+                        text="External Approver"
+                        [icon]="fieldIcons.externalApprover"
+                        forId="approval-actor-name"
+                        [aboveControl]="true"
+                      ></app-field-label>
                       <input
+                        id="approval-actor-name"
                         type="text"
                         formControlName="actorName"
                         placeholder="Reviewer name"
-                        class="rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                        class="eh-input"
                       />
                     </div>
                   </div>
-                  <div class="flex flex-col gap-1">
-                    <label class="text-xs sm:text-sm text-white/50"
-                      >Comment / Rationale</label
-                    >
+                  <div>
+                    <app-field-label
+                      text="Comment / Rationale"
+                      [icon]="fieldIcons.comment"
+                      forId="approval-comment"
+                      [aboveControl]="true"
+                    ></app-field-label>
                     <textarea
+                      id="approval-comment"
                       rows="3"
                       formControlName="comment"
                       placeholder="Add a short note for the audit trail"
-                      class="rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                      class="eh-textarea"
                     ></textarea>
                   </div>
                 </form>
@@ -1748,7 +1960,10 @@
               <div
                 class="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4"
               >
-                <h3 class="text-sm font-medium text-white">Status History</h3>
+                <h3 class="eh-btn-icon justify-start text-sm font-medium text-white">
+                  <lucide-icon name="clock" [size]="14"></lucide-icon>
+                  <span>Status History</span>
+                </h3>
                 <ng-container *ngIf="approvalHistory().length; else noHistory">
                   <div
                     *ngFor="let entry of approvalHistory()"
@@ -1790,8 +2005,9 @@
               <div
                 class="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4"
               >
-                <h3 class="text-sm font-medium text-white">
-                  Approval Timeline
+                <h3 class="eh-btn-icon justify-start text-sm font-medium text-white">
+                  <lucide-icon name="calendar-range" [size]="14"></lucide-icon>
+                  <span>Approval Timeline</span>
                 </h3>
                 <ng-container
                   *ngIf="approvalTimeline().length; else noTimeline"
@@ -1833,8 +2049,9 @@
               class="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4"
             >
               <div class="flex items-center justify-between">
-                <h3 class="text-sm font-medium text-white">
-                  Reviewer Comments
+                <h3 class="eh-btn-icon justify-start text-sm font-medium text-white">
+                  <lucide-icon name="message-square-plus" [size]="14"></lucide-icon>
+                  <span>Reviewer Comments</span>
                 </h3>
                 <span class="text-xs sm:text-sm text-white/50">
                   {{ reviewerComments().length }} total
@@ -1845,33 +2062,46 @@
                 (ngSubmit)="submitReviewerComment()"
                 class="grid gap-3 md:grid-cols-2"
               >
-                <div class="flex flex-col gap-1">
-                  <label class="text-xs sm:text-sm text-white/50"
-                    >Reviewer Section</label
-                  >
+                <div>
+                  <app-field-label
+                    text="Reviewer Section"
+                    [icon]="fieldIcons.section"
+                    [required]="true"
+                    forId="reviewer-section"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <app-select-menu
+                    triggerId="reviewer-section"
                     formControlName="section"
                     [options]="reviewerSectionOptions"
                     [clearable]="false"
                     placeholder="Select Section"
                   ></app-select-menu>
                 </div>
-                <div class="flex flex-col gap-1">
-                  <label class="text-xs sm:text-sm text-white/50"
-                    >Reviewer Severity</label
-                  >
+                <div>
+                  <app-field-label
+                    text="Reviewer Severity"
+                    [icon]="fieldIcons.severity"
+                    forId="reviewer-severity"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <app-select-menu
+                    triggerId="reviewer-severity"
                     formControlName="severity"
                     [options]="reviewerSeveritySelectOptions"
                     [clearable]="false"
                     placeholder="Select Severity"
                   ></app-select-menu>
                 </div>
-                <div class="flex flex-col gap-1">
-                  <label class="text-xs sm:text-sm text-white/50"
-                    >Reviewer (Employee)</label
-                  >
+                <div>
+                  <app-field-label
+                    text="Reviewer (Employee)"
+                    [icon]="fieldIcons.reviewer"
+                    forId="reviewer-id"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <app-select-menu
+                    triggerId="reviewer-id"
                     formControlName="reviewerId"
                     [options]="employeeSelectOptions()"
                     [clearable]="false"
@@ -1879,47 +2109,54 @@
                     placeholder="External"
                   ></app-select-menu>
                 </div>
-                <div class="flex flex-col gap-1">
-                  <label class="text-xs sm:text-sm text-white/50"
-                    >Reviewer Name</label
-                  >
+                <div>
+                  <app-field-label
+                    text="Reviewer Name"
+                    [icon]="fieldIcons.externalApprover"
+                    forId="reviewer-name"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <input
+                    id="reviewer-name"
                     type="text"
                     formControlName="reviewerName"
                     placeholder="External reviewer name"
-                    class="rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    class="eh-input"
                   />
                 </div>
-                <div class="md:col-span-2 flex flex-col gap-1">
-                  <label class="text-xs sm:text-sm text-white/50"
-                    >Comment (Optional)</label
-                  >
+                <div class="md:col-span-2">
+                  <app-field-label
+                    text="Comment"
+                    [icon]="fieldIcons.comment"
+                    forId="reviewer-comment"
+                    [required]="true"
+                    [aboveControl]="true"
+                  ></app-field-label>
                   <textarea
+                    id="reviewer-comment"
                     rows="3"
                     formControlName="comment"
                     placeholder="Notes, outstanding tasks, or blockers"
-                    class="rounded-2xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/90 outline-none transition focus:border-sky-400/60 focus:bg-white/10 focus:text-white"
+                    class="eh-textarea"
                   ></textarea>
                   <p
                     *ngIf="
                       reviewerCommentForm.controls['comment'].invalid &&
                       reviewerCommentForm.controls['comment'].touched
                     "
-                    class="text-xs text-rose-300"
+                    class="mt-1 text-xs text-rose-300"
                   >
                     Please provide a comment (minimum three characters).
                   </p>
                 </div>
                 <div class="md:col-span-2 flex justify-end">
                   <button
-                    type="submit"
-                    ubButton
-                    size="sm"
-                    class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-[0_20px_45px_rgba(14,116,244,0.35)]"
                     ehAction
+                    type="submit"
+                    class="eh-action-btn eh-action-btn-primary"
                     icon="message-square-plus"
-                    [iconSize]="16"
-                    [pending]="pending.has('comment')"
+                    [iconSize]="14"
+                    [pending]="isAddingComment()"
                     pendingLabel="Posting…"
                     [disabled]="
                       reviewerCommentProcessing() ||
@@ -1975,19 +2212,23 @@
                         {{ comment.resolved ? "Resolved" : "Open" }}
                       </span>
                     </div>
-                    <button
-                      ehAction
-                      type="button"
-                      class="inline-flex items-center gap-1.5 text-xs sm:text-sm text-white/70 transition hover:text-white disabled:opacity-60"
-                      [pending]="pending.has('resolve:' + comment.id)"
-                      pendingLabel="Updating…"
-                      [disabled]="reviewerCommentProcessing()"
-                      (click)="toggleReviewerCommentResolved(comment)"
-                    >
-                      {{
-                        comment.resolved ? "Reopen comment" : "Mark as resolved"
-                      }}
-                    </button>
+                    <div class="flex justify-end">
+                      <button
+                        ehAction
+                        type="button"
+                        class="eh-action-btn eh-action-btn-outline"
+                        [icon]="comment.resolved ? 'rotate-ccw' : 'circle-check'"
+                        [iconSize]="14"
+                        [pending]="isResolvePending(comment.id)"
+                        pendingLabel="Updating…"
+                        [disabled]="reviewerCommentProcessing()"
+                        (click)="toggleReviewerCommentResolved(comment)"
+                      >
+                        <span>{{
+                          comment.resolved ? "Reopen Comment" : "Mark as Resolved"
+                        }}</span>
+                      </button>
+                    </div>
                   </div>
                 </ng-container>
                 <ng-template #noComments>
@@ -2005,19 +2246,36 @@
         class="flex flex-col gap-4 rounded-[24px] border border-white/10 bg-white/5/70 px-2 sm:px-4 py-2 sm:py-4 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between"
       >
         <div class="space-y-1 text-xs sm:text-sm text-white/60">
-          <p>{{ footerCopy.autosave }}</p>
-          <p *ngIf="isEditMode()" class="text-white/50">
-            {{ footerCopy.archive }}
+          <p class="flex items-start gap-1.5">
+            <lucide-icon
+              name="info"
+              [size]="14"
+              class="mt-0.5 shrink-0 text-white/50 sm:mt-[3px]"
+            ></lucide-icon>
+            <span>{{ footerCopy.autosave }}</span>
+          </p>
+          <p *ngIf="isEditMode()" class="flex items-start gap-1.5 text-white/50">
+            <lucide-icon
+              name="archive"
+              [size]="14"
+              class="mt-0.5 shrink-0 sm:mt-[3px]"
+            ></lucide-icon>
+            <span>{{ footerCopy.archive }}</span>
           </p>
         </div>
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3 sm:shrink-0">
           @if (isEditMode()) {
             <button
+              ehAction
               type="button"
-              class="eh-btn-icon rounded-xl border border-rose-400/40 bg-rose-500/15 px-4 py-2 text-xs sm:text-sm text-rose-100 transition hover:border-rose-300/60 hover:bg-rose-500/25 hover:text-rose-50"
+              class="eh-action-btn eh-action-btn-danger"
+              icon="archive"
+              [iconSize]="14"
+              [pending]="isDeleting()"
+              pendingLabel="Archiving…"
+              [disabled]="isSaving()"
               (click)="requestDelete()"
             >
-              <lucide-icon name="trash-2" [size]="16"></lucide-icon>
               <span>Archive Project</span>
             </button>
           }
@@ -2026,7 +2284,7 @@
             type="button"
             class="eh-action-btn eh-action-btn-primary"
             [icon]="isEditMode() ? 'save' : 'plus'"
-            [iconSize]="16"
+            [iconSize]="14"
             [pending]="isSaving()"
             [pendingLabel]="isEditMode() ? 'Saving…' : 'Creating project…'"
             (click)="saveAllChanges()"
@@ -2044,11 +2302,36 @@
 <app-alert-dialog
   [open]="pendingDelete()"
   title="Archive This Project?"
-  description="The project will be removed from your dashboards but you can recreate it later if needed. Assignments linked to this project will remain untouched."
+  description="The project and its team assignments will be removed from the workspace. This action cannot be undone."
   confirmLabel="Archive Project"
+  confirmIcon="archive"
   variant="destructive"
   [busy]="isDeleting()"
-  busyLabel="Deleting…"
+  busyLabel="Archiving…"
   (confirmed)="confirmDelete()"
   (cancelled)="dismissDelete()"
+></app-alert-dialog>
+
+<app-alert-dialog
+  [open]="pendingSave() !== null"
+  [title]="saveDialogTitle()"
+  description="Confirm saving these project changes. Every view of this project refreshes when the update completes."
+  confirmLabel="Save Changes"
+  [busy]="isSaving()"
+  busyLabel="Saving…"
+  (confirmed)="confirmSave()"
+  (cancelled)="dismissSave()"
+></app-alert-dialog>
+
+<app-alert-dialog
+  [open]="approvalConfirmCopy() !== null"
+  [title]="approvalConfirmCopy()?.title ?? ''"
+  [description]="approvalConfirmCopy()?.description ?? ''"
+  [confirmLabel]="approvalConfirmCopy()?.confirmLabel ?? 'Confirm'"
+  [confirmIcon]="approvalConfirmCopy()?.icon ?? ''"
+  [variant]="approvalConfirmCopy()?.destructive ? 'destructive' : 'default'"
+  [busy]="isApprovalConfirmBusy()"
+  [busyLabel]="approvalBusyLabel()"
+  (confirmed)="confirmApprovalAction()"
+  (cancelled)="dismissApprovalConfirm()"
 ></app-alert-dialog>

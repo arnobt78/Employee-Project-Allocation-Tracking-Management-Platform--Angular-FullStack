@@ -1945,17 +1945,9 @@ function buildApiDocumentation(request) {
             body: "ContentfulBrief",
           },
           errorResponses: [
-            {
-              status: 400,
-              body: {
-                result: false,
-                message: "Provide entryId or contentType parameter.",
-              },
-            },
-            {
-              status: 500,
-              body: { result: false, message: "Contentful error" },
-            },
+            errorResponse(400, "Provide entryId or contentType parameter."),
+            errorResponse(404, "Contentful entry not found."),
+            errorResponse(502, "Contentful is unavailable right now. Try again later."),
           ],
           category: "Content",
         },
@@ -2691,11 +2683,20 @@ export async function handleEmployeeManagementRequest(request, response) {
             });
             return sendJson(response, 200, brief, statusCodeRef);
           } catch (error) {
+            if (error?.expose) {
+              return sendJson(
+                response,
+                error.status,
+                createApiResponse(false, error.message),
+                statusCodeRef
+              );
+            }
             console.error("[Contentful] fetch failed", error);
+            captureApiException(error, { action, method });
             return sendJson(
               response,
-              500,
-              createApiResponse(false, error?.message || "Contentful error"),
+              502,
+              createApiResponse(false, "Contentful is unavailable right now. Try again later."),
               statusCodeRef
             );
           }

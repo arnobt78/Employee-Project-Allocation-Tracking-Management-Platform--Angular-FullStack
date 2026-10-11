@@ -1,15 +1,24 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0023 API input validation shipped on top of GATE-0022; prod soak next  
-**Gate:** GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **PENDING**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** Committed locally (not pushed). Node 24.21: lint PASS, API tests 75/75, unit 106/106, production build PASS, A–Z browser sweep PASS.  
-**Updated:** 2026-10-10  
-**resume_token:** `c1-gate23-prod-soak-2026-10-10`
+**Phase / Stage:** Stage 4 — GATE-0024 project detail UI consistency shipped; prod soak next  
+**Gate:** GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
+**Status:** GATE-0024 committed locally (not pushed); `origin/main` at `f868ecc`. Node 24.21: lint PASS, API tests 84/84, unit 119/119, production build PASS, browser sweep of `/update-project/5030` PASS.  
+**Updated:** 2026-10-11  
+**resume_token:** `c1-gate24-prod-soak-2026-10-11`
 
 ---
 
 ## Resume Point
+
+**Completed (GATE-0024, TASK-0083–0088):**
+
+- Project detail uses the shared primitives: `app-field-label` with Lucide icons (`PROJECT_DETAIL_FIELD_ICONS` / `PROJECT_DETAIL_SECTION_ICONS`) and `*` on required fields; `eh-input` / `eh-textarea` / `eh-read-label` in `styles.css` (every input 44 px, same as `app-select-menu`); every button is `ehAction` + `eh-action-btn` with an icon and pending label.
+- Header: mode badge removed; readiness bar on one line, bottom-aligned with the subtitle (`page-header` `actionsAlign="end"`). Overview and Client Contact read tiles: 1 / 2 / 3 columns (`sm` / `md`). Content Helper stacks below `xl`.
+- Confirmation dialogs: save (edit mode only; create saves directly), approve, reject (comment required first), reset, archive (`app-alert-dialog` `confirmIcon`). Dialog closes on success, stays open on error, cannot be dismissed while busy, and closes when the route switches project.
+- `app-select-menu` `triggerId` + `app-field-label` `forId` → trigger named "label + value" (`aria-labelledby`).
+- Contentful: upstream 404 → 404, 400/422 → 400, other → generic 502 + Sentry; no upstream body exposed; entry id URL-encoded; no DB bootstrap on this route.
+- Skeleton mirrors the new layout (labels, icons, 44 px fields, buttons, footer).
 
 **Completed (GATE-0023, TASK-0079–0082):**
 
@@ -57,14 +66,14 @@
 
 **Blockers:** none. Push/deploy needs human approval (GATE-0002). `prisma db push` already applied to the configured DB (`NotificationLog`).
 
-**Next exact action:** Human pushes + prod soak (auth/CRUD latency on Vercel, instant logout, pending labels, deliveries panel, failure toast). Optionally set `SESSION_CACHE_TTL_SECONDS` in Vercel env. Then CP-0020 project-detail polish guide.
+**Next exact action:** Human pushes GATE-0024 + prod soak of the project detail page (every section's edit/save, approval request → approve/reject → reset, archive, Contentful + AI helpers) and CRUD across Employees / Projects / Project Team. Note: dev saw one-off 40–77 s approval writes during a MongoDB latency spike (same endpoint ~2 s otherwise); watch for it on Vercel.
 
 **Resume prompt:**
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
-Resume resume_token c1-gate23-prod-soak-2026-10-10.
-GATE-0023 (API input validation), GATE-0022 (email skip + CRUD API tests), GATE-0021 and GATE-0020 committed locally. Await push/prod soak feedback, then CP-0020 detail-polish guide.
+Resume resume_token c1-gate24-prod-soak-2026-10-11.
+GATE-0024 (project detail UI consistency + Contentful error mapping) committed locally on top of GATE-0023. Await push/prod soak feedback.
 ```
 
 ---

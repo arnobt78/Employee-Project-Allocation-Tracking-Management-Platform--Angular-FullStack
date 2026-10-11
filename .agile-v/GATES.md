@@ -16,6 +16,7 @@
 | GATE-0021 | Server auth automated test suite | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat; verifier PASS WITH WARNINGS (fixed); security PASS; commit-ready 2026-10-10 |
 | GATE-0022 | Test-domain email skip + CRUD API tests (Node 24) | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat; verifier PASS WITH WARNINGS (fixed); security PASS; commit-ready 2026-10-10 |
 | GATE-0023 | API input validation (edit existence, bad JSON, integer ids), no CC promotion, API docs errors | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat; verifier PASS WITH WARNINGS (fixed); security PASS; commit-ready 2026-10-10 |
+| GATE-0024 | Project detail UI consistency with shared components (CP-0020 guide received) | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat 2026-10-11; verifier PASS WITH WARNINGS (all fixed); Contentful 404/400/502 mapping; commit-ready 2026-10-11 |
 
 ## GATE-0001 decision record
 

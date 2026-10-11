@@ -1,5 +1,20 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-11 — GATE-0024 project detail UI consistency
+
+**Node:** v24.21.0 via fnm
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 119/119 (save/approve/reject/reset/archive confirmations, route change closes dialogs, select labelling, header alignment) |
+| `npm run test:api` | **PASS** | 84/84 (new Contentful 9: 404/400/502 mapping at repository + HTTP level, no upstream body, id encoding) |
+| `npm run build` | **PASS** | No warnings |
+| Browser (`/update-project/5030`, 956–1024 px) | **PASS** | Skeleton matches live page; readiness row bottom = subtitle bottom; all fields 44 px; Overview/Contact tiles 3 × 70 px; save dialog → PUT 200 + toast; Contentful 404 toast; AI draft toast; lead assign/cancel; Add to Team form; request → approve (dialog) → reset (dialog); reject without comment blocked; archive/save dialogs cancel; 0 failed API calls |
+| Independent verifier | **PASS WITH WARNINGS (fixed)** | Dialogs on route change, `takeUntilDestroyed` on reads, select labels, unused icon key, typed pending keys, handler-level Contentful tests, 502 no longer covers DB errors → all fixed |
+
+One dev request saw `RequestApproval` 77 s / `ApproveProject` 40 s while `GetProjectResources` also stalled 11 s (remote DB latency); the same calls then took 1.8–2.3 s over HTTP and 5.3 s cold in a fresh process.
+
 ## Session 2026-10-10 — GATE-0023 API input validation
 
 **Node:** v24.21.0 via fnm

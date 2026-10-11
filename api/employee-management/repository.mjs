@@ -493,6 +493,12 @@ async function fetchContentful(path, { preview = false, query = {} } = {}) {
   });
   if (!response.ok) {
     const text = await response.text();
+    if (response.status === 404) {
+      throw clientError(404, "Contentful entry not found.");
+    }
+    if (response.status === 400 || response.status === 422) {
+      throw clientError(400, "Contentful rejected the query. Check the content type and slug.");
+    }
     throw new Error(`Contentful request failed (${response.status}): ${text}`);
   }
   return response.json();
@@ -3169,14 +3175,13 @@ export async function fetchContentfulBrief({
   slug,
   preview = false,
 }) {
-  await ensureBootstrapData();
   if (!entryId && !contentType) {
     throw new Error("Either entryId or contentType must be provided.");
   }
 
   let entry;
   if (entryId) {
-    const data = await fetchContentful(`/entries/${entryId}`, {
+    const data = await fetchContentful(`/entries/${encodeURIComponent(entryId)}`, {
       preview,
       query: { include: "2" },
     });
@@ -3206,7 +3211,7 @@ export async function fetchContentfulBrief({
   }
 
   if (!entry) {
-    throw new Error("Contentful entry not found.");
+    throw clientError(404, "Contentful entry not found.");
   }
 
   return buildContentfulBrief(entry);
