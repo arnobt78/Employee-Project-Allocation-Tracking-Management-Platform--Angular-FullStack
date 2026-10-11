@@ -26,7 +26,7 @@ import { AppIconComponent } from './app-icon.component';
         class="flex items-center gap-1.5 text-xs sm:text-sm leading-5 text-white/70"
         data-testid="project-header-readiness"
       >
-        <span class="shrink-0">Readiness Level</span>
+        <span class="shrink-0">Readiness</span>
         <div class="h-1.5 min-w-0 flex-1 rounded-full bg-white/10">
           @if (progress !== null) {
             <div
@@ -34,7 +34,9 @@ import { AppIconComponent } from './app-icon.component';
               [style.width.%]="progress"
             ></div>
           } @else {
-            <div class="h-1.5 w-full animate-pulse rounded-full bg-white/5"></div>
+            <div
+              class="h-1.5 w-full animate-pulse rounded-full bg-white/5"
+            ></div>
           }
         </div>
         @if (progress === null) {
@@ -43,7 +45,9 @@ import { AppIconComponent } from './app-icon.component';
             aria-hidden="true"
           ></span>
         } @else {
-          <span class="w-9 shrink-0 text-right font-medium text-white">{{ progress }}%</span>
+          <span class="w-9 shrink-0 text-right font-medium text-white"
+            >{{ progress }}%</span
+          >
         }
       </div>
     </div>
