@@ -2921,7 +2921,7 @@ export async function handleEmployeeManagementRequest(request, response) {
             const project = await setProjectArchived(
               projectId,
               action === "ArchiveProject",
-              session?.user ?? {}
+              session.user
             );
             return sendJson(response, 200, project, statusCodeRef);
           } catch (error) {

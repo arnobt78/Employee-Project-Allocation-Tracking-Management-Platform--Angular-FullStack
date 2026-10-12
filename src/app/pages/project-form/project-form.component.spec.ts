@@ -324,6 +324,209 @@ describe('ProjectFormComponent', () => {
       expect(navigate).not.toHaveBeenCalled();
     });
 
+    it('confirms an approval request before calling the API', () => {
+      spyOn(master, 'peekProject').and.returnValue({
+        project: { ...project, approvalStatus: 'draft' },
+        fresh: true,
+      });
+      const request$ = new Subject<IProject>();
+      const request = spyOn(master, 'requestProjectApproval').and.returnValue(request$);
+      create();
+
+      component.requestApprovalAction();
+      expect(component.pendingApproval()).toBe('request');
+      expect(component.approvalConfirmCopy()?.confirmLabel).toBe('Request Approval');
+      expect(request).not.toHaveBeenCalled();
+
+      component.confirmApprovalAction();
+      expect(request).toHaveBeenCalledTimes(1);
+      expect(component.approvalBusyLabel()).toBe('Requesting…');
+      request$.next({ ...project, approvalStatus: 'in_review' });
+      expect(component.pendingApproval()).toBeNull();
+    });
+
+    it('restores an archived project only after confirmation and keeps the dialog on failure', () => {
+      spyOn(master, 'peekProject').and.returnValue({
+        project: { ...project, archivedAt: '2026-07-10T00:00:00.000Z' },
+        fresh: true,
+      });
+      const restore$ = new Subject<IProject>();
+      const restore = spyOn(master, 'setProjectArchived').and.returnValue(restore$);
+      create();
+
+      component.requestRestore();
+      expect(component.detailConfirmCopy()?.title).toBe('Restore Aurora Web Revamp?');
+      expect(restore).not.toHaveBeenCalled();
+
+      component.confirmDetailAction();
+      expect(restore).toHaveBeenCalledOnceWith(7, false);
+      expect(component.isDetailConfirmBusy()).toBeTrue();
+      component.dismissDetailConfirm();
+      expect(component.pendingConfirm()).not.toBeNull();
+
+      restore$.error(new Error('boom'));
+      expect(component.pendingConfirm()).toEqual({ kind: 'restore' });
+      expect(component.isDetailConfirmBusy()).toBeFalse();
+
+      const retry$ = new Subject<IProject>();
+      restore.and.returnValue(retry$);
+      component.confirmDetailAction();
+      retry$.next({ ...project, archivedAt: undefined });
+      expect(component.pendingConfirm()).toBeNull();
+      expect(component.isArchived()).toBeFalse();
+    });
+
+    it('confirms a new team assignment with the person and allocation', () => {
+      spyOn(master, 'peekProject').and.returnValue({ project, fresh: true });
+      const assign$ = new Subject<unknown>();
+      const assign = spyOn(master, 'saveProjectEmp').and.returnValue(assign$ as never);
+      create();
+
+      component.startCollaboratorAssignment({
+        employeeId: 3,
+        employeeName: 'Liam Patel',
+        role: 'Developer',
+      } as never);
+      component.collaboratorAssignmentForm.patchValue({ allocationPct: 40 });
+      component.submitCollaboratorAssignment();
+      expect(component.detailConfirmCopy()?.title).toBe('Add Liam Patel To The Team?');
+      expect(component.detailConfirmCopy()?.description).toContain('40%');
+      expect(assign).not.toHaveBeenCalled();
+
+      component.confirmDetailAction();
+      expect(assign).toHaveBeenCalledTimes(1);
+      expect(assign.calls.mostRecent().args[0]).toEqual(
+        jasmine.objectContaining({ projectId: 7, empId: 3, allocationPct: 40 })
+      );
+      assign$.next({});
+      expect(component.pendingConfirm()).toBeNull();
+      expect(component.collaboratorAssignmentProfile()).toBeNull();
+    });
+
+    it('keeps the assignment dialog open on failure and closes it if the form turns invalid', () => {
+      spyOn(master, 'peekProject').and.returnValue({ project, fresh: true });
+      const assign$ = new Subject<unknown>();
+      const assign = spyOn(master, 'saveProjectEmp').and.returnValue(assign$ as never);
+      create();
+      component.startCollaboratorAssignment({ employeeId: 3, employeeName: 'Liam Patel' } as never);
+
+      component.submitCollaboratorAssignment();
+      component.confirmDetailAction();
+      assign$.error(new Error('boom'));
+      expect(component.pendingConfirm()?.kind).toBe('assign');
+
+      component.collaboratorAssignmentForm.patchValue({ allocationPct: null });
+      assign.calls.reset();
+      component.confirmDetailAction();
+      expect(assign).not.toHaveBeenCalled();
+      expect(component.pendingConfirm()).toBeNull();
+    });
+
+    it('closes the restore dialog without a request if the project is already active', () => {
+      spyOn(master, 'peekProject').and.returnValue({
+        project: { ...project, archivedAt: '2026-07-10T00:00:00.000Z' },
+        fresh: true,
+      });
+      const restore = spyOn(master, 'setProjectArchived').and.returnValue(NEVER);
+      create();
+      component.requestRestore();
+      (component as unknown as { currentProjectSignal: { set(p: IProject): void } })
+        .currentProjectSignal.set({ ...project });
+
+      component.confirmDetailAction();
+      expect(restore).not.toHaveBeenCalled();
+      expect(component.pendingConfirm()).toBeNull();
+    });
+
+    it('ignores a restore that finishes after switching to another project', () => {
+      spyOn(master, 'peekProject').and.callFake((id: number) => ({
+        project: { ...project, projectId: id, archivedAt: '2026-07-10T00:00:00.000Z' },
+        fresh: true,
+      }));
+      const restore$ = new Subject<IProject>();
+      spyOn(master, 'setProjectArchived').and.returnValue(restore$);
+      create();
+      component.requestRestore();
+      component.confirmDetailAction();
+
+      params$.next({ id: '8' });
+      component.reviewerCommentForm.patchValue({ comment: 'Please add milestones' });
+      component.submitReviewerComment();
+      restore$.next({ ...project, archivedAt: undefined });
+      expect(component.pendingConfirm()).toEqual({ kind: 'comment' });
+      expect(component.currentProject()?.projectId).toBe(8);
+      expect(component.isArchived()).toBeTrue();
+    });
+
+    it('keeps the comment dialog open when posting fails', () => {
+      spyOn(master, 'peekProject').and.returnValue({ project, fresh: true });
+      const comment$ = new Subject<IProject>();
+      spyOn(master, 'addReviewerComment').and.returnValue(comment$);
+      create();
+      component.reviewerCommentForm.patchValue({ comment: 'Please add milestones' });
+      component.submitReviewerComment();
+      component.confirmDetailAction();
+      comment$.error(new Error('boom'));
+      expect(component.pendingConfirm()).toEqual({ kind: 'comment' });
+      expect(component.reviewerCommentForm.controls.comment.value).toBe('Please add milestones');
+    });
+
+    it('confirms before posting a reviewer comment and ignores an invalid form', () => {
+      spyOn(master, 'peekProject').and.returnValue({ project, fresh: true });
+      const comment$ = new Subject<IProject>();
+      const add = spyOn(master, 'addReviewerComment').and.returnValue(comment$);
+      create();
+
+      component.submitReviewerComment();
+      expect(component.pendingConfirm()).toBeNull();
+
+      component.reviewerCommentForm.patchValue({ comment: 'Please add milestones' });
+      component.submitReviewerComment();
+      expect(component.pendingConfirm()).toEqual({ kind: 'comment' });
+      expect(add).not.toHaveBeenCalled();
+
+      component.confirmDetailAction();
+      expect(add).toHaveBeenCalledTimes(1);
+      comment$.next(project);
+      expect(component.pendingConfirm()).toBeNull();
+      expect(component.reviewerCommentForm.controls.comment.value).toBe('');
+    });
+
+    it('confirms resolving a comment and closes if it changed meanwhile', () => {
+      const comment = { id: 'c1', comment: 'Fix scope', resolved: false } as never;
+      spyOn(master, 'peekProject').and.returnValue({
+        project: { ...project, reviewerComments: [comment] },
+        fresh: true,
+      });
+      const resolve$ = new Subject<IProject>();
+      const resolve = spyOn(master, 'resolveReviewerComment').and.returnValue(resolve$);
+      create();
+
+      component.toggleReviewerCommentResolved(comment);
+      expect(component.detailConfirmCopy()?.confirmLabel).toBe('Mark as Resolved');
+      component.confirmDetailAction();
+      expect(resolve).toHaveBeenCalledOnceWith(7, 'c1', jasmine.objectContaining({ resolved: true }));
+      resolve$.next({ ...project, reviewerComments: [{ ...(comment as object), resolved: true }] } as IProject);
+      expect(component.pendingConfirm()).toBeNull();
+
+      resolve.calls.reset();
+      component.toggleReviewerCommentResolved(comment);
+      component.confirmDetailAction();
+      expect(resolve).not.toHaveBeenCalled();
+      expect(component.pendingConfirm()).toBeNull();
+    });
+
+    it('closes the action dialog when the route switches to another project', () => {
+      spyOn(master, 'peekProject').and.returnValue({ project, fresh: true });
+      create();
+      component.reviewerCommentForm.patchValue({ comment: 'Please add milestones' });
+      component.submitReviewerComment();
+      expect(component.pendingConfirm()).not.toBeNull();
+
+      params$.next({ id: '8' });
+      expect(component.pendingConfirm()).toBeNull();
+    });
+
     it('names each select trigger with its field label', () => {
       spyOn(master, 'peekProject').and.returnValue({ project, fresh: true });
       const el = create();

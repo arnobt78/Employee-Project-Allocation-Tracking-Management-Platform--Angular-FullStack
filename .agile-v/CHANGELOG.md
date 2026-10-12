@@ -1,5 +1,11 @@
 # Changelog — Agile V project memory
 
+## 2026-10-12 — GATE-0027 project detail confirmations
+
+- Request Approval, Restore Project, Add Assignment, Add Comment and Resolve/Reopen comment now ask for confirmation (spinner, toast, dialog stays open on failure)
+- Projects without overview content no longer crash the detail page preview
+- Node 24.21: lint PASS; API 97/97; unit 158/158; build PASS; browser sweep of every route PASS
+
 ## 2026-10-12 — GATE-0026 archive vs delete, clean reseed, lead sync, tiles, counts
 
 - Archive and Restore are real (no longer a delete); Delete Permanently removes the project and all its assignments and verifies none remain

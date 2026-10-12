@@ -220,6 +220,14 @@
 | TASK-0100 | Timeline Lead caption, readiness %, team size (`readinessScore`, `teamSize` in schedule) | REQ-0159 | DONE | Timeline spec |
 | TASK-0101 | `projectCounts` / `projectCountsLabel` on Dashboard, Projects, Project Team, Insights | REQ-0160 | DONE | Unit 148 |
 
+## Wave — GATE-0027 project detail confirmations (2026-10-12)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0102 | Confirm dialogs for Request Approval, Restore, Add Assignment, Add Comment, Resolve/Reopen (`pendingConfirm`, `PROJECT_DETAIL_CONFIRM_COPY`) + specs | REQ-0161 | DONE | Unit 158 |
+| TASK-0103 | `normalizeProjectOverview` so empty overviews return arrays | REQ-0162 | DONE | Found in browser sweep; API test |
+| TASK-0104 | Review-flag clarity: `session.user`; API test for non-duplicate lead-assignment errors | REQ-0158 | DONE | API 97 |
+
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)

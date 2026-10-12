@@ -113,6 +113,59 @@ export const PROJECT_DETAIL_FOOTER_COPY = {
     'This project is archived and hidden from Timeline, Calendar, Insights and capacity. Restore it to edit its team again.',
 } as const;
 
+export interface ProjectDetailConfirmCopy {
+  title: string;
+  description: string;
+  confirmLabel: string;
+  icon: string;
+  busyLabel: string;
+}
+
+export const PROJECT_DETAIL_CONFIRM_COPY = {
+  restore: (projectName: string): ProjectDetailConfirmCopy => ({
+    title: `Restore ${projectName}?`,
+    description:
+      'The project and its team return to the Active tab, Timeline, Calendar, Insights and capacity.',
+    confirmLabel: 'Restore Project',
+    icon: 'archive-restore',
+    busyLabel: 'Restoring…',
+  }),
+  assign: (
+    employeeName: string,
+    projectName: string,
+    allocationPct: number
+  ): ProjectDetailConfirmCopy => ({
+    title: `Add ${employeeName} To The Team?`,
+    description: `${employeeName} is assigned to ${projectName} at ${allocationPct}% allocation. Their capacity and the Project Team list update right away.`,
+    confirmLabel: 'Add Assignment',
+    icon: 'plus',
+    busyLabel: 'Assigning…',
+  }),
+  comment: (projectName: string): ProjectDetailConfirmCopy => ({
+    title: 'Post Reviewer Comment?',
+    description: `The comment is added to ${projectName}'s review log and stays in the audit trail.`,
+    confirmLabel: 'Add Comment',
+    icon: 'message-square-plus',
+    busyLabel: 'Posting…',
+  }),
+  resolve: (resolved: boolean): ProjectDetailConfirmCopy =>
+    resolved
+      ? {
+          title: 'Reopen This Comment?',
+          description: 'The comment is marked Open again and needs follow-up.',
+          confirmLabel: 'Reopen Comment',
+          icon: 'rotate-ccw',
+          busyLabel: 'Updating…',
+        }
+      : {
+          title: 'Mark This Comment As Resolved?',
+          description: 'The comment is marked Resolved. You can reopen it later.',
+          confirmLabel: 'Mark as Resolved',
+          icon: 'circle-check',
+          busyLabel: 'Updating…',
+        },
+} as const;
+
 export const PROJECT_OVERVIEW_FIELD_LABELS = {
   projectName: 'Project Name',
   clientName: 'Client Name',

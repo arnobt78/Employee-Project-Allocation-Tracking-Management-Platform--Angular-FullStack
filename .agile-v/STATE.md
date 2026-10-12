@@ -1,15 +1,21 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0026 archive vs delete, reseed, lead sync, tiles, counts committed locally; prod soak next  
-**Gate:** GATE-0026 **COMPLETE**; GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** GATE-0026 committed locally (not pushed); `origin/main` at `d95a6c9` (GATE-0025). Node 24.21: lint PASS, API tests 95/95, unit 148/148, production build PASS, Playwright browser sweep PASS (0 console errors after login). Database (shared by local and prod) wiped and reseeded with the new demo set; only `admin` remains as a user.  
+**Phase / Stage:** Stage 4 — GATE-0027 project detail confirmations committed locally on top of GATE-0026; push + prod soak next  
+**Gate:** GATE-0027 **COMPLETE**; GATE-0026 **COMPLETE**; GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
+**Status:** GATE-0026 and GATE-0027 committed locally (not pushed); `origin/main` at `d95a6c9` (GATE-0025). Node 24.21: lint PASS, API tests 97/97, unit 158/158, production build PASS, Playwright sweep of every route + all detail dialogs PASS (0 console errors after login). Database (shared by local and prod) holds the demo seed; only `admin` remains as a user.  
 **Updated:** 2026-10-12  
-**resume_token:** `c1-gate26-prod-soak-2026-10-12`
+**resume_token:** `c1-gate27-prod-soak-2026-10-12`
 
 ---
 
 ## Resume Point
+
+**Completed (GATE-0027, TASK-0102–0104):**
+
+- Every project-detail mutation now asks first. Request Approval joins the approval dialog (`APPROVAL_CONFIRM_COPY.request`). Restore Project, Add Assignment, Add Comment and Resolve/Reopen comment share one `app-alert-dialog` driven by `pendingConfirm` with copy in `PROJECT_DETAIL_CONFIRM_COPY` (`constants/project-detail.ts`). Validation runs before the dialog; the dialog shows the busy label, can't be dismissed while busy, closes on success, stays open on error, closes on route change, and re-checks before running (stale → closes). Late archive/restore responses for a project the user left no longer touch the open dialog.
+- API: projects saved without overview content return `overview` with `summary`, `objectives`, `successCriteria` (`normalizeProjectOverview`); a `{}` overview crashed the detail page preview (found in the sweep).
+- Review flags were false positives; made explicit: `session.user` in ArchiveProject/RestoreProject, and an API test that only duplicate-key errors are ignored when auto-assigning a lead.
 
 **Completed (GATE-0026, TASK-0095–0101):**
 
@@ -84,17 +90,19 @@
 - `bg-white/2` / `min-h-auto` / `bg-white/5/80` classes generate no CSS (older cards; `.eh-section-card` omits it).
 - Employee edits don't refresh lead names in project list/schedule until TTL.
 - Guest `Session` 401 on the login page console (intentional).
+- Seed employees use `@empowerhub.dev` (not a skipped test domain), so assignment/comment/approval emails on seed projects are really sent to them and to the configured notification address.
+- The shared `archive` pending key blocks Restore on a second project until the first archive/restore request returns.
 
 **Blockers:** none. Push/deploy needs human approval (GATE-0002). `prisma db push` already applied to the configured DB (`NotificationLog`).
 
-**Next exact action:** Human pushes GATE-0026, then prod soak (CP-0025): archive → Archived tab → restore on Projects and project detail; Delete Permanently (dialog shows the assignment count, rows gone from Project Team); change a lead (new Lead row appears); Timeline readiness/team lines; KPI "Projects" matches on Dashboard, Projects, Project Team and Insights. Run `npx prisma db push` on any other database before using it (unique assignment index). Then the GATE-0025 soak (CP-0024): triage each bug / UI-consistency mismatch into a scoped plan for approval. Soak areas: project detail avatars, Project Team unassigned dates (deactivate/reactivate an assignment), Calendar (3 tabs), Insights (4 tabs + CSV export), API Status and API Doc (Copy URL needs a real clipboard). Earlier soak still open: prod soak of the project detail page (every section's edit/save, approval request → approve/reject → reset, archive, Contentful + AI helpers) and CRUD across Employees / Projects / Project Team. Note: dev saw one-off 40–77 s approval writes during a MongoDB latency spike (same endpoint ~2 s otherwise); watch for it on Vercel.
+**Next exact action:** Human pushes GATE-0026 + GATE-0027, then prod soak (CP-0025): every project-detail dialog (request approval, restore, add assignment, add comment, resolve/reopen); archive → Archived tab → restore on Projects and project detail; Delete Permanently (dialog shows the assignment count, rows gone from Project Team); change a lead (new Lead row appears); Timeline readiness/team lines; KPI "Projects" matches on Dashboard, Projects, Project Team and Insights. Run `npx prisma db push` on any other database before using it (unique assignment index). Then the GATE-0025 soak (CP-0024): triage each bug / UI-consistency mismatch into a scoped plan for approval. Soak areas: project detail avatars, Project Team unassigned dates (deactivate/reactivate an assignment), Calendar (3 tabs), Insights (4 tabs + CSV export), API Status and API Doc (Copy URL needs a real clipboard). Earlier soak still open: prod soak of the project detail page (every section's edit/save, approval request → approve/reject → reset, archive, Contentful + AI helpers) and CRUD across Employees / Projects / Project Team. Note: dev saw one-off 40–77 s approval writes during a MongoDB latency spike (same endpoint ~2 s otherwise); watch for it on Vercel.
 
 **Resume prompt:**
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
-Resume resume_token c1-gate26-prod-soak-2026-10-12.
-GATE-0026 (archive vs delete, clean reseed, lead sync, tiles, counts) committed locally on top of GATE-0025 (d95a6c9). Await push + prod soak feedback (CP-0025, CP-0024).
+Resume resume_token c1-gate27-prod-soak-2026-10-12.
+GATE-0026 (archive vs delete, reseed, lead sync, tiles, counts) and GATE-0027 (project detail confirmations, overview shape fix) committed locally on top of GATE-0025 (d95a6c9). Await push + prod soak feedback (CP-0025, CP-0024).
 ```
 
 ---

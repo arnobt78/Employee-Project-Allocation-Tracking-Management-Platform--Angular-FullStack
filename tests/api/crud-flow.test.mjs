@@ -320,6 +320,33 @@ describe("CRUD HTTP flow", () => {
       assert.equal(teamSize(), 1);
     });
 
+    test("a concurrent duplicate lead row is ignored, any other write failure is reported", async () => {
+      const methods = db.prisma.projectEmployee;
+      const originalCreate = methods.create;
+      const failWith = (code) => {
+        methods.create = async () => {
+          throw Object.assign(new Error(`write failed (${code})`), { code });
+        };
+      };
+      try {
+        const project = await createProject();
+
+        failWith("P2002");
+        const duplicate = await put(`UpdateProject/${project.projectId}`, {
+          leadByEmpId: (await createEmployee()).employeeId,
+        });
+        assert.equal(duplicate.status, 200);
+
+        failWith("P2010");
+        const failed = await put(`UpdateProject/${project.projectId}`, {
+          leadByEmpId: (await createEmployee()).employeeId,
+        });
+        assert.equal(failed.status, 500);
+      } finally {
+        methods.create = originalCreate;
+      }
+    });
+
     test("an unknown lead is a 404 and writes nothing", async () => {
       const before = db.tables.project.size;
       const created = await post("CreateProject", { projectName: "Ghost lead", leadByEmpId: 999999 });
@@ -330,6 +357,14 @@ describe("CRUD HTTP flow", () => {
       const updated = await put(`UpdateProject/${project.projectId}`, { leadByEmpId: 999999 });
       assert.equal(updated.status, 404);
       assert.equal(db.tables.project.get(project.projectId).leadByEmpId ?? null, null);
+    });
+
+    test("a project saved without overview content still returns overview arrays", async () => {
+      const project = await createProject();
+      assert.deepEqual(project.overview, { summary: "", objectives: [], successCriteria: [] });
+      const fetched = (await list("GetAllProjects")).find((p) => p.projectId === project.projectId);
+      assert.deepEqual(fetched.overview.objectives, []);
+      assert.deepEqual(fetched.overview.successCriteria, []);
     });
 
     test("missing name is a 400 and unknown ids are 404", async () => {

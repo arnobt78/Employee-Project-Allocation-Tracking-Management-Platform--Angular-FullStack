@@ -1149,6 +1149,17 @@ export async function deleteEmployee(employeeId) {
   return mapEmployee(employee);
 }
 
+/** Projects saved without overview content still return the arrays the client renders. */
+function normalizeProjectOverview(overview) {
+  const value = overview && typeof overview === "object" && !Array.isArray(overview) ? overview : {};
+  return {
+    ...value,
+    summary: typeof value.summary === "string" ? value.summary : "",
+    objectives: sanitizeArray(value.objectives),
+    successCriteria: sanitizeArray(value.successCriteria),
+  };
+}
+
 function mapProject(project, extras = {}) {
   if (!project) {
     return project;
@@ -1181,7 +1192,7 @@ function mapProject(project, extras = {}) {
     employeeName: extras.employeeName ?? project.employeeName ?? "",
     contactTitle: project.contactTitle ?? "",
     contactNotes: project.contactNotes ?? "",
-    overview: project.overview ?? {},
+    overview: normalizeProjectOverview(project.overview),
     scope: project.scope ?? {},
     successMetrics: project.successMetrics ?? [],
     status: project.status ?? approvalStatus,

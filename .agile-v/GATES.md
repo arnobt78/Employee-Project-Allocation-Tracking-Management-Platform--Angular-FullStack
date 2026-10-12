@@ -19,6 +19,7 @@
 | GATE-0024 | Project detail UI consistency with shared components (CP-0020 guide received) | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat 2026-10-11; verifier PASS WITH WARNINGS (all fixed); Contentful 404/400/502 mapping; commit-ready 2026-10-11 |
 | GATE-0025 | Avatars, Title Case labels, unassigned date, page consistency (Timeline, Insights, API Status, API Doc) | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat 2026-10-11; verifier FAIL → fixed (purged emerald badge) + all warnings fixed; browser sweep PASS; commit-ready 2026-10-11 |
 | GATE-0026 | Archive vs Delete, clean reseed, lead sync, Projects tiles, Timeline readiness/team, consistent project counts | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat 2026-10-12; verifier warnings fixed (archived lead change, stale delete count, lead race, counter rewind, `db push` note); browser sweep PASS; commit-ready 2026-10-12 |
+| GATE-0027 | Confirmation on every project-detail mutation, overview shape fix, full regression sweep | Human-Decision | Stage 4 | **COMPLETE** | Plan approved in chat 2026-10-12; verifier PASS WITH WARNINGS (late archive response, spec gaps → fixed); security PASS; browser sweep PASS; commit-ready 2026-10-12 |
 
 ## GATE-0001 decision record
 

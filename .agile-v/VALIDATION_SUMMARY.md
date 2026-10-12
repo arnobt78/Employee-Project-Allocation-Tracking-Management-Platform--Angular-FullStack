@@ -1,5 +1,21 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-12 — GATE-0027 project detail confirmations, full regression
+
+**Node:** v24.21.0 via fnm
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 158/158 (new: request approval, restore incl. failure/retry/stale/late response, assignment incl. failure/stale, comment incl. failure/invalid, resolve incl. stale, route change closes dialog) |
+| `npm run test:api` | **PASS** | 97/97 (new: duplicate-key lead row ignored vs other write error → 500; empty overview returns arrays) |
+| `npm run build` | **PASS** | |
+| Browser sweep (Playwright, dev, admin) | **PASS** | 15 routes incl. every project detail page, Active/Archived tabs, logout + guarded route; restore → archive Beacon via dialogs (counts 5·0 → 4·1); resolve → reopen Helios comment (busy "Updating…", Escape ignored while busy); request approval / comment / assignment dialogs cancel with 0 requests; on a temporary project: add assignment, comment, request approval, delete permanently (1 assignment, no orphan) → all toasts; temporary data removed. Only console error: guest `Session` 401 after logout; 3 avatar image requests aborted by fast navigation |
+| Bug found in sweep | **FIXED** | Detail page threw `reading 'length'` for a project with `overview: {}` → server normalizes overview |
+| Independent verifier | **PASS WITH WARNINGS (fixed)** | Late archive/restore response could close another project's dialog → clears moved after route check; spec gaps added; indentation nit |
+| Security review | **PASS** | No medium+ findings |
+| Sweep side effect | **NOTE** | One assignment on the temporary project picked seed employee Noah Kim by selector mistake; its emails (assignment, comment, approval, delete) went to `@empowerhub.dev` and the configured notification address |
+
 ## Session 2026-10-12 — GATE-0026 archive vs delete, reseed, lead sync, tiles, counts
 
 **Node:** v24.21.0 via fnm

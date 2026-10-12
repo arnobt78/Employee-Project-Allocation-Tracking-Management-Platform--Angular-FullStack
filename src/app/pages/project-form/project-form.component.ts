@@ -62,6 +62,7 @@ import {
   PROJECT_CONTENT_HELPER_COPY,
   PROJECT_CREATE_SECTION_VALUES,
   PROJECT_DETAIL_FIELD_ICONS,
+  PROJECT_DETAIL_CONFIRM_COPY,
   PROJECT_DETAIL_FOOTER_COPY,
   PROJECT_DETAIL_SECTION_ICONS,
   PROJECT_DETAIL_SECTION_LABELS,
@@ -70,6 +71,7 @@ import {
   READINESS_CHECKLIST_COPY,
   READINESS_FIELD_LABELS,
   READINESS_TASK_DEFINITIONS,
+  type ProjectDetailConfirmCopy,
 } from '@/app/constants/project-detail';
 
 const readinessTaskDefinitions = READINESS_TASK_DEFINITIONS;
@@ -83,10 +85,8 @@ const APPROVAL_PENDING_LABELS: Record<ApprovalAction, string> = {
   reset: 'Resetting…',
 };
 
-type ConfirmedApprovalAction = Exclude<ApprovalAction, 'request'>;
-
 const APPROVAL_CONFIRM_COPY: Record<
-  ConfirmedApprovalAction,
+  ApprovalAction,
   {
     title: string;
     description: string;
@@ -95,6 +95,14 @@ const APPROVAL_CONFIRM_COPY: Record<
     destructive: boolean;
   }
 > = {
+  request: {
+    title: 'Request Approval?',
+    description:
+      'The project moves to In Review, reviewers are notified by email, and the request is logged in the audit trail.',
+    confirmLabel: 'Request Approval',
+    icon: 'send',
+    destructive: false,
+  },
   approve: {
     title: 'Approve This Project?',
     description:
@@ -122,6 +130,12 @@ const APPROVAL_CONFIRM_COPY: Record<
 };
 
 type SaveScope = 'section' | 'all';
+
+type DetailConfirm =
+  | { kind: 'restore' }
+  | { kind: 'assign'; employeeName: string; allocationPct: number }
+  | { kind: 'comment' }
+  | { kind: 'resolve'; comment: IReviewerCommentEntry };
 
 const PENDING = {
   save: 'save',
@@ -464,7 +478,7 @@ export class ProjectFormComponent implements OnInit {
   private readonly deleteAssignmentCount = signal<number | null>(null);
   readonly deleteWarning = computed(() => deleteProjectWarning(this.deleteAssignmentCount()));
   readonly pendingSave = signal<SaveScope | null>(null);
-  readonly pendingApproval = signal<ConfirmedApprovalAction | null>(null);
+  readonly pendingApproval = signal<ApprovalAction | null>(null);
   readonly approvalConfirmCopy = computed(() => {
     const action = this.pendingApproval();
     return action ? APPROVAL_CONFIRM_COPY[action] : null;
@@ -476,6 +490,32 @@ export class ProjectFormComponent implements OnInit {
   readonly isApprovalConfirmBusy = computed(() => {
     const action = this.pendingApproval();
     return action ? this.pending.has(PENDING.approval(action)) : false;
+  });
+  readonly pendingConfirm = signal<DetailConfirm | null>(null);
+  readonly detailConfirmCopy = computed<ProjectDetailConfirmCopy | null>(() => {
+    const confirm = this.pendingConfirm();
+    if (!confirm) {
+      return null;
+    }
+    const projectName = this.currentProjectSignal()?.projectName || this.projectTitle();
+    switch (confirm.kind) {
+      case 'restore':
+        return PROJECT_DETAIL_CONFIRM_COPY.restore(projectName);
+      case 'assign':
+        return PROJECT_DETAIL_CONFIRM_COPY.assign(
+          confirm.employeeName,
+          projectName,
+          confirm.allocationPct
+        );
+      case 'comment':
+        return PROJECT_DETAIL_CONFIRM_COPY.comment(projectName);
+      case 'resolve':
+        return PROJECT_DETAIL_CONFIRM_COPY.resolve(Boolean(confirm.comment.resolved));
+    }
+  });
+  readonly isDetailConfirmBusy = computed(() => {
+    const confirm = this.pendingConfirm();
+    return confirm ? this.pending.has(this.detailConfirmKey(confirm)) : false;
   });
 
   readonly progress = computed(() => {
@@ -532,7 +572,7 @@ export class ProjectFormComponent implements OnInit {
           idParam !== undefined && idParam !== null ? Number(idParam) : 0;
         const id = Number.isFinite(parsedId) ? parsedId : 0;
         this.routedProjectId = id;
-      this.closeTransientUi();
+        this.closeTransientUi();
 
         if (id > 0) {
           this.modeSignal.set('edit');
@@ -800,8 +840,57 @@ export class ProjectFormComponent implements OnInit {
     this.changeArchived(true);
   }
 
-  restoreProject() {
-    this.changeArchived(false);
+  requestRestore() {
+    if (!this.isArchived() || this.isArchiving()) {
+      return;
+    }
+    this.pendingConfirm.set({ kind: 'restore' });
+  }
+
+  /** Re-checks each action before it runs; a stale confirmation just closes. */
+  confirmDetailAction() {
+    const confirm = this.pendingConfirm();
+    if (!confirm || this.isDetailConfirmBusy()) {
+      return;
+    }
+    switch (confirm.kind) {
+      case 'restore':
+        if (!this.isArchived()) {
+          this.pendingConfirm.set(null);
+          return;
+        }
+        this.changeArchived(false);
+        return;
+      case 'assign':
+        this.runCollaboratorAssignment();
+        return;
+      case 'comment':
+        this.runReviewerComment();
+        return;
+      case 'resolve':
+        this.runResolveComment(confirm.comment);
+        return;
+    }
+  }
+
+  dismissDetailConfirm() {
+    if (this.isDetailConfirmBusy()) {
+      return;
+    }
+    this.pendingConfirm.set(null);
+  }
+
+  private detailConfirmKey(confirm: DetailConfirm): string {
+    switch (confirm.kind) {
+      case 'restore':
+        return PENDING.archive;
+      case 'assign':
+        return PENDING.assign;
+      case 'comment':
+        return PENDING.comment;
+      case 'resolve':
+        return PENDING.resolve(confirm.comment.id);
+    }
   }
 
   private changeArchived(archived: boolean) {
@@ -815,10 +904,11 @@ export class ProjectFormComponent implements OnInit {
       destroyRef: this.destroyRef,
       key: PENDING.archive,
       onSuccess: (project) => {
-        this.pendingArchive.set(false);
         if (projectId !== this.routedProjectId) {
           return;
         }
+        this.pendingArchive.set(false);
+        this.pendingConfirm.set(null);
         this.currentProjectSignal.set(this.cloneProject(project));
       },
       successToast: archived
@@ -1002,6 +1092,7 @@ export class ProjectFormComponent implements OnInit {
     this.pendingApproval.set(null);
     this.pendingDelete.set(false);
     this.pendingArchive.set(false);
+    this.pendingConfirm.set(null);
     this.cancelCollaboratorAssignment();
   }
 
@@ -1017,22 +1108,37 @@ export class ProjectFormComponent implements OnInit {
   }
 
   submitCollaboratorAssignment() {
+    const payload = this.collaboratorAssignmentPayload(true);
+    const profile = this.collaboratorAssignmentProfileSignal();
+    if (!payload || !profile || this.collaboratorAssignmentProcessing()) {
+      return;
+    }
+    this.pendingConfirm.set({
+      kind: 'assign',
+      employeeName: profile.employeeName,
+      allocationPct: payload.allocationPct,
+    });
+  }
+
+  private collaboratorAssignmentPayload(reportInvalid: boolean) {
     const profile = this.collaboratorAssignmentProfileSignal();
     const project = this.currentProjectSignal();
-    if (!profile || !project?.projectId) {
-      return;
+    if (!profile || !project?.projectId || this.isArchived()) {
+      return null;
     }
 
     if (this.collaboratorAssignmentForm.invalid) {
-      this.collaboratorAssignmentForm.markAllAsTouched();
-      this.toast.error({
-        title: 'Missing details',
-        description: 'Provide role, allocation, and a start date.' });
-      return;
+      if (reportInvalid) {
+        this.collaboratorAssignmentForm.markAllAsTouched();
+        this.toast.error({
+          title: 'Missing details',
+          description: 'Provide role, allocation, and a start date.' });
+      }
+      return null;
     }
 
     const value = this.collaboratorAssignmentForm.getRawValue();
-    const payload = {
+    return {
       projectId: project.projectId,
       empId: profile.employeeId,
       role: (value.role ?? '').trim() || profile.role || 'Contributor',
@@ -1042,22 +1148,33 @@ export class ProjectFormComponent implements OnInit {
           : 0,
       assignedDate: value.assignedDate,
       isActive: 'Y' };
+  }
+
+  private runCollaboratorAssignment() {
+    const payload = this.collaboratorAssignmentPayload(false);
+    const profile = this.collaboratorAssignmentProfileSignal();
+    if (!payload || !profile) {
+      this.pendingConfirm.set(null);
+      return;
+    }
+    const { projectId } = payload;
 
     this.mutations.track(this.masterService.saveProjectEmp(payload), {
       pending: this.pending,
       destroyRef: this.destroyRef,
       key: PENDING.assign,
       onSuccess: () => {
-        if (project.projectId !== this.routedProjectId) {
+        if (projectId !== this.routedProjectId) {
           return;
         }
+        this.pendingConfirm.set(null);
         this.cancelCollaboratorAssignment();
-        this.refreshProjectSnapshot(project.projectId);
-        this.loadResourceInsights(project.projectId);
+        this.refreshProjectSnapshot(projectId);
+        this.loadResourceInsights(projectId);
       },
       onError: (error) => {
         console.error('[Resource] collaborator assignment failed', {
-          projectId: project.projectId,
+          projectId,
           empId: profile.employeeId,
           error });
       },
@@ -1382,7 +1499,7 @@ export class ProjectFormComponent implements OnInit {
   }
 
   requestApprovalAction() {
-    this.performApprovalAction('request');
+    this.requestApprovalConfirm('request');
   }
 
   approveProjectAction() {
@@ -1416,7 +1533,7 @@ export class ProjectFormComponent implements OnInit {
     this.pendingApproval.set(null);
   }
 
-  private requestApprovalConfirm(action: ConfirmedApprovalAction) {
+  private requestApprovalConfirm(action: ApprovalAction) {
     if (this.approvalProcessing() || !this.canRunApprovalAction(action)) {
       return;
     }
@@ -1449,9 +1566,16 @@ export class ProjectFormComponent implements OnInit {
         description: 'Please provide a comment before submitting.' });
       return;
     }
+    if (!this.currentProjectSignal()?.projectId || this.reviewerCommentProcessing()) {
+      return;
+    }
+    this.pendingConfirm.set({ kind: 'comment' });
+  }
 
+  private runReviewerComment() {
     const project = this.currentProjectSignal();
-    if (!project?.projectId) {
+    if (!project?.projectId || this.reviewerCommentForm.invalid) {
+      this.pendingConfirm.set(null);
       return;
     }
 
@@ -1466,6 +1590,7 @@ export class ProjectFormComponent implements OnInit {
           if (!this.applyMutationResult(updatedProject)) {
             return;
           }
+          this.pendingConfirm.set(null);
           this.reviewerCommentForm.reset(
             {
               section: payload.section ?? 'overview',
@@ -1496,8 +1621,17 @@ export class ProjectFormComponent implements OnInit {
   }
 
   toggleReviewerCommentResolved(comment: IReviewerCommentEntry) {
+    if (!this.currentProjectSignal()?.projectId || this.reviewerCommentProcessing()) {
+      return;
+    }
+    this.pendingConfirm.set({ kind: 'resolve', comment });
+  }
+
+  private runResolveComment(comment: IReviewerCommentEntry) {
     const project = this.currentProjectSignal();
-    if (!project?.projectId) {
+    const current = project?.reviewerComments?.find((entry) => entry.id === comment.id);
+    if (!project?.projectId || !current || Boolean(current.resolved) !== Boolean(comment.resolved)) {
+      this.pendingConfirm.set(null);
       return;
     }
 
@@ -1510,7 +1644,11 @@ export class ProjectFormComponent implements OnInit {
         pending: this.pending,
         destroyRef: this.destroyRef,
         key: PENDING.resolve(comment.id),
-        onSuccess: (updatedProject) => this.applyMutationResult(updatedProject),
+        onSuccess: (updatedProject) => {
+          if (this.applyMutationResult(updatedProject)) {
+            this.pendingConfirm.set(null);
+          }
+        },
         successToast: {
           title: comment.resolved ? 'Comment reopened' : 'Comment resolved',
           description: 'Reviewer comment state has been updated.' },

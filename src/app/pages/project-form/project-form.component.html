@@ -32,7 +32,7 @@
             [pending]="isArchiving()"
             pendingLabel="Restoring…"
             [disabled]="isSaving() || isDeleting()"
-            (click)="restoreProject()"
+            (click)="requestRestore()"
           >
             <span>Restore Project</span>
           </button>
@@ -2486,4 +2486,16 @@
   [busyLabel]="approvalBusyLabel()"
   (confirmed)="confirmApprovalAction()"
   (cancelled)="dismissApprovalConfirm()"
+></app-alert-dialog>
+
+<app-alert-dialog
+  [open]="detailConfirmCopy() !== null"
+  [title]="detailConfirmCopy()?.title ?? ''"
+  [description]="detailConfirmCopy()?.description ?? ''"
+  [confirmLabel]="detailConfirmCopy()?.confirmLabel ?? 'Confirm'"
+  [confirmIcon]="detailConfirmCopy()?.icon ?? ''"
+  [busy]="isDetailConfirmBusy()"
+  [busyLabel]="detailConfirmCopy()?.busyLabel ?? 'Working…'"
+  (confirmed)="confirmDetailAction()"
+  (cancelled)="dismissDetailConfirm()"
 ></app-alert-dialog>
