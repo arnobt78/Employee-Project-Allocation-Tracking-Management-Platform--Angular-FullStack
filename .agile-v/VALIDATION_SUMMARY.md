@@ -14,6 +14,9 @@
 | Seed email scan | **PASS** | 0 deliverable addresses in seeded collections |
 | Browser (Playwright, dev, admin) | **PASS** | Comment on seed project 5001 via dialog → toast; delivery logged with 1 recipient (only `NOTIFY_APPROVAL_TO`), seed employee skipped; test comment removed afterwards. Calendar: Tab reaches event chip (focus ring), Enter opens `/update-project/5002`; 0 console errors |
 | Independent verifier | **PASS WITH WARNINGS (fixed)** | Stale README/STATE `prisma db push` and seed notes; TTL conflict → Sentry + hint, transient errors retried, ascending-only index match, exact test assertion |
+| Agent Review flag "conflict prevents retry" | **FALSE POSITIVE** | Intentional: a conflict persists until `npm run db:indexes`, which also creates the TTL index; comment made explicit |
+| Security review | **PASS** | No medium+ findings |
+| Route sweep after reseed (Playwright, admin) | **PASS** | 16 routes incl. Active/Archived tabs and all 5 project details, no skeleton left, "4 Active · 1 Archived"; only guest `Session` 401 and one avatar request aborted by navigation |
 
 ## Session 2026-10-12 — GATE-0027 project detail confirmations, full regression
 

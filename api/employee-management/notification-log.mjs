@@ -45,7 +45,9 @@ let retentionIndex;
 /**
  * `prisma db push` drops indexes Prisma cannot declare, so each instance
  * recreates the TTL index once (a no-op when it already exists). Never rejects;
- * transient failures are retried on the next delivery.
+ * transient failures are retried on the next delivery. Conflicts are not: they
+ * persist until `npm run db:indexes` replaces the old index (which also creates
+ * the TTL one), so retrying would only repeat the same error on every delivery.
  */
 function ensureRetentionIndex() {
   retentionIndex ??= mongoCollection("NotificationLog")
