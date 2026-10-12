@@ -270,6 +270,8 @@ export function createFakeDb() {
   const users = tables.appUser;
   const sessions = tables.session;
   const stats = { aggregateCalls: 0 };
+  /** Native `createIndex` calls; kept across `reset()` like real indexes. */
+  const indexes = [];
   let aggregateGate = null;
 
   const prisma = {
@@ -351,6 +353,14 @@ export function createFakeDb() {
     if (name === "Counter") {
       return { findOneAndUpdate: incrementCounter };
     }
+    if (name === "NotificationLog") {
+      return {
+        async createIndex(key, options) {
+          indexes.push({ collection: name, key, options });
+          return options?.name;
+        },
+      };
+    }
     const modelName = COLLECTION_MODELS[name];
     if (modelName) {
       const model = models[modelName];
@@ -394,6 +404,7 @@ export function createFakeDb() {
     users,
     sessions,
     stats,
+    indexes,
     /**
      * Holds session lookups open after they have read the row, until
      * `release()`. `rowRead` resolves once a lookup has read its row.

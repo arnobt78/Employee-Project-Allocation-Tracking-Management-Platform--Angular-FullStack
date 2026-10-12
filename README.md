@@ -230,7 +230,7 @@ cp .env.example .env
 2. Seed the demo dataset from `prisma/seed-data.ts`: `npm run db:seed`
 3. Seed the demo auth user: `npm run db:seed:auth`
 
-To start from a clean database: `ALLOW_DB_WIPE=1 npm run db:reset:demo`. It prints the target host and database, wipes every domain collection, sessions and notification logs, removes every login except `admin`, then reseeds 5 employees, 4 active projects, 1 archived project and 7 assignments. A non-localhost `DATABASE_URL` also needs `EH_ALLOW_REMOTE_WIPE=1`. After a schema change run `npx prisma db push` so indexes such as the one-assignment-per-employee-per-project rule exist.
+To start from a clean database: `ALLOW_DB_WIPE=1 npm run db:reset:demo`. It prints the target host and database, wipes every domain collection, sessions and notification logs, removes every login except `admin`, then reseeds 5 employees, 4 active projects, 1 archived project and 7 assignments. A non-localhost `DATABASE_URL` also needs `EH_ALLOW_REMOTE_WIPE=1`. Seed employees use `@example.com` addresses, so their notification emails are skipped. After a schema change run `npm run db:push` (Prisma `db push`, then `npm run db:indexes`) so indexes such as the one-assignment-per-employee-per-project rule exist. Email delivery log entries expire after 90 days through a MongoDB TTL index that Prisma cannot declare; `npm run db:indexes` creates it, and the API recreates it if a plain `prisma db push` dropped it.
 
 You **do not** need AI, CMS, email, or Sentry keys to explore CRUD UI. Leave those blank; features that need them simply stay disabled or no-op.
 

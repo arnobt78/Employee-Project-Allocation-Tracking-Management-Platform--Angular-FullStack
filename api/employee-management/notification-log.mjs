@@ -1,3 +1,5 @@
+import { mongoCollection } from "../_lib/mongo-client.mjs";
+import { NOTIFICATION_LOG_TTL_INDEX } from "../_lib/notification-log-retention.mjs";
 import { prisma } from "../_lib/prisma-client.mjs";
 import { captureApiException } from "../_lib/sentry/server.mjs";
 
@@ -36,6 +38,32 @@ function entityFrom(metadata) {
   return { entityType: null, entityId: null };
 }
 
+/** MongoDB IndexOptionsConflict / IndexKeySpecsConflict: an older createdAt index is in the way. */
+const INDEX_CONFLICT_CODES = new Set([85, 86]);
+let retentionIndex;
+
+/**
+ * `prisma db push` drops indexes Prisma cannot declare, so each instance
+ * recreates the TTL index once (a no-op when it already exists). Never rejects;
+ * transient failures are retried on the next delivery.
+ */
+function ensureRetentionIndex() {
+  retentionIndex ??= mongoCollection("NotificationLog")
+    .then((collection) =>
+      collection.createIndex(NOTIFICATION_LOG_TTL_INDEX.key, NOTIFICATION_LOG_TTL_INDEX.options)
+    )
+    .catch((error) => {
+      if (INDEX_CONFLICT_CODES.has(error?.code)) {
+        captureApiException(error, { area: "notification", event: "retention_index" });
+        console.warn("[Notification] Retention index conflict; run `npm run db:indexes`.");
+        return;
+      }
+      retentionIndex = undefined;
+      console.warn("[Notification] Retention index not ensured", { error: error?.message });
+    });
+  return retentionIndex;
+}
+
 /**
  * Persists one delivery outcome. Never throws: logging must not affect the
  * notification flow. Failures are also reported to Sentry.
@@ -52,16 +80,19 @@ export async function recordDelivery({ metadata, to, cc, bcc, status, provider =
   }
 
   try {
-    await prisma.notificationLog.create({
-      data: {
-        event,
-        ...entityFrom(metadata),
-        status,
-        provider,
-        recipientCount: countRecipients(to, cc, bcc),
-        error: message,
-      },
-    });
+    await Promise.all([
+      prisma.notificationLog.create({
+        data: {
+          event,
+          ...entityFrom(metadata),
+          status,
+          provider,
+          recipientCount: countRecipients(to, cc, bcc),
+          error: message,
+        },
+      }),
+      ensureRetentionIndex(),
+    ]);
   } catch (logError) {
     console.error("[Notification] Failed to record delivery", {
       event,

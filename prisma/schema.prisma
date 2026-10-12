@@ -193,7 +193,7 @@ model NotificationLog {
   error          String?
   createdAt      DateTime @default(now())
 
-  @@index([createdAt])
+  // 90-day TTL index on createdAt lives in tools/ensure-indexes.mjs (Prisma cannot declare TTL).
   @@index([status, createdAt])
 }
 

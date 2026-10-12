@@ -228,6 +228,13 @@
 | TASK-0103 | `normalizeProjectOverview` so empty overviews return arrays | REQ-0162 | DONE | Found in browser sweep; API test |
 | TASK-0104 | Review-flag clarity: `session.user`; API test for non-duplicate lead-assignment errors | REQ-0158 | DONE | API 97 |
 
+## Wave — GATE-0028 seed emails, email log retention (2026-10-12)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0105 | Seed employee/lead emails and SOW link → `example.com`; shared DB reseeded | REQ-0163 | DONE | 0 deliverable seed addresses; seed comment logs only `NOTIFY_APPROVAL_TO` |
+| TASK-0106 | 90-day `NotificationLog` TTL: `tools/ensure-indexes.mjs` (`db:indexes`, `db:push`), reset ensures it, API self-heals once per instance | REQ-0164 | DONE | API 98; live index `ttl=7776000` |
+
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)

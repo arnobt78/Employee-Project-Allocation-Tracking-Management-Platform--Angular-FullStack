@@ -1,5 +1,20 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-12 — GATE-0028 seed emails, email log TTL, calendar keyboard
+
+**Node:** v24.21.0 via fnm
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 158/158 |
+| `npm run test:api` | **PASS** | 98/98 (new: deliveries ensure the 90-day TTL index once per instance) |
+| `npm run build` | **PASS** | |
+| `npm run db:push` + `db:reset:demo` (shared DB) | **PASS** | Indexes: `NotificationLog_createdAt_ttl ttl=7776000`, `ProjectEmployee_projectId_empId_key` unique; `db:indexes` rerun → unchanged. Plain `prisma db push` drops the TTL index (verified) → `db:push` script + API self-heal |
+| Seed email scan | **PASS** | 0 deliverable addresses in seeded collections |
+| Browser (Playwright, dev, admin) | **PASS** | Comment on seed project 5001 via dialog → toast; delivery logged with 1 recipient (only `NOTIFY_APPROVAL_TO`), seed employee skipped; test comment removed afterwards. Calendar: Tab reaches event chip (focus ring), Enter opens `/update-project/5002`; 0 console errors |
+| Independent verifier | **PASS WITH WARNINGS (fixed)** | Stale README/STATE `prisma db push` and seed notes; TTL conflict → Sentry + hint, transient errors retried, ascending-only index match, exact test assertion |
+
 ## Session 2026-10-12 — GATE-0027 project detail confirmations, full regression
 
 **Node:** v24.21.0 via fnm

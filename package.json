@@ -19,6 +19,8 @@
     "postinstall": "node tools/generate-env-prod.cjs",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:auth": "node tools/seed-demo-user.mjs",
+    "db:indexes": "node tools/ensure-indexes.mjs",
+    "db:push": "prisma db push && node tools/ensure-indexes.mjs",
     "db:reset:demo": "tsx tools/reset-demo-data.mjs",
     "db:reseed:local": "ALLOW_DB_WIPE=1 tsx tools/reset-demo-data.mjs"
   },

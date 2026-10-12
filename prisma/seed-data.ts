@@ -36,7 +36,7 @@ export const DEPARTMENT_PARENTS = [
     departmentLogo: "engineering.svg",
     description: "Product engineering and platform delivery.",
     leadContact: "Ava Thompson",
-    leadEmail: "ava.thompson@empowerhub.dev",
+    leadEmail: "ava.thompson@example.com",
     leadPhone: "+15550101001",
   },
   {
@@ -45,7 +45,7 @@ export const DEPARTMENT_PARENTS = [
     departmentLogo: "operations.svg",
     description: "Customer support, logistics and service delivery.",
     leadContact: "Noah Kim",
-    leadEmail: "noah.kim@empowerhub.dev",
+    leadEmail: "noah.kim@example.com",
     leadPhone: "+15550101004",
   },
   {
@@ -54,7 +54,7 @@ export const DEPARTMENT_PARENTS = [
     departmentLogo: "hr.svg",
     description: "People operations, recruiting and culture.",
     leadContact: "Mia Garcia",
-    leadEmail: "mia.garcia@empowerhub.dev",
+    leadEmail: "mia.garcia@example.com",
     leadPhone: "+15550101005",
   },
 ];
@@ -94,7 +94,7 @@ const EMPLOYEE_SEEDS: EmployeeSeed[] = [
   {
     employeeId: 1001,
     employeeName: "Ava Thompson",
-    emailId: "ava.thompson@empowerhub.dev",
+    emailId: "ava.thompson@example.com",
     contactNo: "+15550101001",
     deptId: 101,
     role: "Frontend Engineer",
@@ -114,7 +114,7 @@ const EMPLOYEE_SEEDS: EmployeeSeed[] = [
   {
     employeeId: 1002,
     employeeName: "Liam Patel",
-    emailId: "liam.patel@empowerhub.dev",
+    emailId: "liam.patel@example.com",
     contactNo: "+15550101002",
     deptId: 102,
     role: "Backend Engineer",
@@ -134,7 +134,7 @@ const EMPLOYEE_SEEDS: EmployeeSeed[] = [
   {
     employeeId: 1003,
     employeeName: "Sofia Martinez",
-    emailId: "sofia.martinez@empowerhub.dev",
+    emailId: "sofia.martinez@example.com",
     contactNo: "+15550101003",
     deptId: 103,
     role: "QA Engineer",
@@ -154,7 +154,7 @@ const EMPLOYEE_SEEDS: EmployeeSeed[] = [
   {
     employeeId: 1004,
     employeeName: "Noah Kim",
-    emailId: "noah.kim@empowerhub.dev",
+    emailId: "noah.kim@example.com",
     contactNo: "+15550101004",
     deptId: 202,
     role: "Support Operations",
@@ -174,7 +174,7 @@ const EMPLOYEE_SEEDS: EmployeeSeed[] = [
   {
     employeeId: 1005,
     employeeName: "Mia Garcia",
-    emailId: "mia.garcia@empowerhub.dev",
+    emailId: "mia.garcia@example.com",
     contactNo: "+15550101005",
     deptId: 302,
     role: "People Partner",
@@ -544,7 +544,7 @@ export const PROJECTS = PROJECT_SEEDS.map((seed) => {
       {
         id: `doc-${seed.projectId}-1`,
         name: "Statement of Work",
-        url: `https://docs.empowerhub.dev/${seed.projectId}/sow.pdf`,
+        url: `https://docs.example.com/${seed.projectId}/sow.pdf`,
         type: "pdf",
         uploadedAt: `${seed.startDate}T09:00:00.000Z`,
         uploadedBy: seed.leadByEmpId,

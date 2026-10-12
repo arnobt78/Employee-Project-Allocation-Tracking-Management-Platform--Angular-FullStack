@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Wipes every domain collection, reseeds the demo dataset and keeps exactly one
- * login: admin / 112233 (bcrypt). All sessions are revoked.
+ * login: admin / 112233 (bcrypt). All sessions are revoked. Ensures the
+ * NotificationLog TTL index (see ensure-indexes.mjs).
  *
  * Guards: ALLOW_DB_WIPE=1 always; EH_ALLOW_REMOTE_WIPE=1 when DATABASE_URL is not localhost.
  * Usage: ALLOW_DB_WIPE=1 npm run db:reset:demo
@@ -11,6 +12,7 @@ import { MongoClient } from "mongodb";
 import { prisma } from "../api/_lib/prisma-client.mjs";
 import { seedDemoData } from "../prisma/seed.ts";
 import { DEMO_USERNAME, upsertDemoUser } from "./seed-demo-user.mjs";
+import { ensureNotificationLogTtl, NOTIFICATION_LOG_RETENTION_DAYS } from "./ensure-indexes.mjs";
 
 const DOMAIN_COLLECTIONS = [
   "Counter",
@@ -72,6 +74,8 @@ async function main() {
     console.log(`Removed other AppUsers: ${removedUsers}`);
 
     await seedDemoData(db);
+    const ttl = await ensureNotificationLogTtl(db);
+    console.log(`NotificationLog TTL (${NOTIFICATION_LOG_RETENTION_DAYS} days): ${ttl}`);
   } finally {
     await client.close();
   }

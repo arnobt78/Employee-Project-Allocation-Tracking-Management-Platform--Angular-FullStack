@@ -1,5 +1,12 @@
 # Changelog — Agile V project memory
 
+## 2026-10-12 — GATE-0028 seed emails, email log retention
+
+- Seed employees use `@example.com`, so demo actions no longer email them; database reseeded
+- Email delivery log entries expire after 90 days (TTL index kept by `npm run db:push`, the reseed and the API)
+- Calendar event chips confirmed keyboard-reachable (already links)
+- Node 24.21: lint PASS; API 98/98; unit 158/158; build PASS
+
 ## 2026-10-12 — GATE-0027 project detail confirmations
 
 - Request Approval, Restore Project, Add Assignment, Add Comment and Resolve/Reopen comment now ask for confirmation (spinner, toast, dialog stays open on failure)

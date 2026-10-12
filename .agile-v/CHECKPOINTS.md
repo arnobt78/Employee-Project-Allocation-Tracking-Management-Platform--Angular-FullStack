@@ -14,8 +14,9 @@
 | CP-0020 | Human-Action | GATE-0018 | `c1-gate18-project-detail-intake-2026-09-26` | **RESOLVED** | 2026-09-26 | Guide received 2026-10-11 (screenshots + 8 points) → GATE-0024 |
 | CP-0022 | Human-Decision | GATE-0024 | `c1-gate24-detail-ui-2026-10-11` | **RESOLVED** | 2026-10-11 | Plan approved; implemented + verified + committed |
 | CP-0024 | Human-Action | GATE-0025 | `c1-gate25-prod-soak-2026-10-11` | **PENDING** | 2026-10-12 | User testing prod; bugs / UI mismatches to be reported and planned before coding |
-| CP-0025 | Human-Action | GATE-0026, GATE-0027 | `c1-gate27-prod-soak-2026-10-12` | **PENDING** | 2026-10-12 | Committed locally; push + prod soak of archive/restore, delete, lead sync, counts, detail confirmations |
+| CP-0025 | Human-Action | GATE-0026, GATE-0027, GATE-0028 | `c1-gate28-prod-soak-2026-10-12` | **PENDING** | 2026-10-12 | Committed locally; push + prod soak of archive/restore, delete, lead sync, counts, detail confirmations, no seed emails |
 | CP-0026 | Human-Decision | GATE-0027 | `c1-gate27-detail-confirms-2026-10-12` | **RESOLVED** | 2026-10-12 | Plan approved; implemented + verified + committed |
+| CP-0027 | Human-Decision | GATE-0028 | `c1-gate28-seed-ttl-2026-10-12` | **RESOLVED** | 2026-10-12 | Plan approved (full reseed); implemented + verified + committed |
 | CP-0023 | Human-Decision | GATE-0025 | `c1-gate25-ui-polish-2026-10-11` | **RESOLVED** | 2026-10-11 | Plan approved; implemented + verified + committed |
 | CP-0021 | Human-Decision | GATE-0018 | `c1-gate18-skeleton-parity-2026-10-10` | **RESOLVED** | 2026-10-10 | Plan approved; implemented + verified + committed |
 

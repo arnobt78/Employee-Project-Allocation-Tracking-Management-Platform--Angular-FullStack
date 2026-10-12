@@ -1,15 +1,21 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0027 project detail confirmations committed locally on top of GATE-0026; push + prod soak next  
-**Gate:** GATE-0027 **COMPLETE**; GATE-0026 **COMPLETE**; GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** GATE-0026 and GATE-0027 committed locally (not pushed); `origin/main` at `d95a6c9` (GATE-0025). Node 24.21: lint PASS, API tests 97/97, unit 158/158, production build PASS, Playwright sweep of every route + all detail dialogs PASS (0 console errors after login). Database (shared by local and prod) holds the demo seed; only `admin` remains as a user.  
+**Phase / Stage:** Stage 4 — GATE-0028 (seed emails, email log TTL) committed locally on top of GATE-0027 / GATE-0026; push + prod soak next  
+**Gate:** GATE-0028 **COMPLETE**; GATE-0027 **COMPLETE**; GATE-0026 **COMPLETE**; GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
+**Status:** GATE-0026, GATE-0027 and GATE-0028 committed locally (not pushed); `origin/main` at `d95a6c9` (GATE-0025). Node 24.21: lint PASS, API tests 98/98, unit 158/158, production build PASS. Database (shared by local and prod) reseeded with `@example.com` seed employees and has the 90-day `NotificationLog` TTL index; only `admin` remains as a user.  
 **Updated:** 2026-10-12  
-**resume_token:** `c1-gate27-prod-soak-2026-10-12`
+**resume_token:** `c1-gate28-prod-soak-2026-10-12`
 
 ---
 
 ## Resume Point
+
+**Completed (GATE-0028, TASK-0105–0106):**
+
+- Seed employees and department lead emails use `@example.com` (SOW link `docs.example.com`); notifications to them are skipped. Only addresses in `NOTIFY_APPROVAL_TO` (operator-configured, by design) still receive comment/approval emails.
+- `NotificationLog` entries expire after 90 days: TTL index `NotificationLog_createdAt_ttl` (constants in `api/_lib/notification-log-retention.mjs`). Prisma cannot declare TTL and `prisma db push` drops undeclared indexes, so: `@@index([createdAt])` removed from the schema; `tools/ensure-indexes.mjs` (`npm run db:indexes`, idempotent, replaces an old `{createdAt: 1}` index); `npm run db:push` = Prisma push + ensure; `db:reset:demo` ensures it; the API recreates it once per instance on the first delivery (conflict → Sentry + hint, transient error → retried).
+- Calendar event chips were already `<a routerLink>` with `aria-label` and a focus ring; keyboard check confirmed (Tab reaches the chip, Enter opens the project).
 
 **Completed (GATE-0027, TASK-0102–0104):**
 
@@ -83,26 +89,23 @@
 
 - Cross-instance revocation window up to 30 s (RISK-0022, accepted).
 - Fake DB doesn't reject unknown Prisma fields.
-- `NotificationLog` has no retention/TTL (RISK-0018).
 - Project/employee deletes are native driver deletes (no longer a Prisma `$transaction`, RISK-0020 closed): not atomic, but a failed check throws instead of leaving orphans.
 - Prod could not be checked by script (Vercel Security Checkpoint returns 429 to curl); prod uses the same database as local, so the reseed already applies there.
-- Calendar event chips are `div` + `routerLink` (not keyboard-focusable).
 - `bg-white/2` / `min-h-auto` / `bg-white/5/80` classes generate no CSS (older cards; `.eh-section-card` omits it).
 - Employee edits don't refresh lead names in project list/schedule until TTL.
 - Guest `Session` 401 on the login page console (intentional).
-- Seed employees use `@empowerhub.dev` (not a skipped test domain), so assignment/comment/approval emails on seed projects are really sent to them and to the configured notification address.
 - The shared `archive` pending key blocks Restore on a second project until the first archive/restore request returns.
 
-**Blockers:** none. Push/deploy needs human approval (GATE-0002). `prisma db push` already applied to the configured DB (`NotificationLog`).
+**Blockers:** none. Push/deploy needs human approval (GATE-0002). `npm run db:push` already applied to the configured DB (schema + TTL index).
 
-**Next exact action:** Human pushes GATE-0026 + GATE-0027, then prod soak (CP-0025): every project-detail dialog (request approval, restore, add assignment, add comment, resolve/reopen); archive → Archived tab → restore on Projects and project detail; Delete Permanently (dialog shows the assignment count, rows gone from Project Team); change a lead (new Lead row appears); Timeline readiness/team lines; KPI "Projects" matches on Dashboard, Projects, Project Team and Insights. Run `npx prisma db push` on any other database before using it (unique assignment index). Then the GATE-0025 soak (CP-0024): triage each bug / UI-consistency mismatch into a scoped plan for approval. Soak areas: project detail avatars, Project Team unassigned dates (deactivate/reactivate an assignment), Calendar (3 tabs), Insights (4 tabs + CSV export), API Status and API Doc (Copy URL needs a real clipboard). Earlier soak still open: prod soak of the project detail page (every section's edit/save, approval request → approve/reject → reset, archive, Contentful + AI helpers) and CRUD across Employees / Projects / Project Team. Note: dev saw one-off 40–77 s approval writes during a MongoDB latency spike (same endpoint ~2 s otherwise); watch for it on Vercel.
+**Next exact action:** Human pushes GATE-0026 + GATE-0027 + GATE-0028, then prod soak (CP-0025): a comment on a seed project sends no email to seed employees (API Status "Recent Email Deliveries" counts only `NOTIFY_APPROVAL_TO`); every project-detail dialog (request approval, restore, add assignment, add comment, resolve/reopen); archive → Archived tab → restore on Projects and project detail; Delete Permanently (dialog shows the assignment count, rows gone from Project Team); change a lead (new Lead row appears); Timeline readiness/team lines; KPI "Projects" matches on Dashboard, Projects, Project Team and Insights. Run `npm run db:push` on any other database before using it (unique assignment index + TTL). Then the GATE-0025 soak (CP-0024): triage each bug / UI-consistency mismatch into a scoped plan for approval. Soak areas: project detail avatars, Project Team unassigned dates (deactivate/reactivate an assignment), Calendar (3 tabs), Insights (4 tabs + CSV export), API Status and API Doc (Copy URL needs a real clipboard). Earlier soak still open: prod soak of the project detail page (every section's edit/save, approval request → approve/reject → reset, archive, Contentful + AI helpers) and CRUD across Employees / Projects / Project Team. Note: dev saw one-off 40–77 s approval writes during a MongoDB latency spike (same endpoint ~2 s otherwise); watch for it on Vercel.
 
 **Resume prompt:**
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
-Resume resume_token c1-gate27-prod-soak-2026-10-12.
-GATE-0026 (archive vs delete, reseed, lead sync, tiles, counts) and GATE-0027 (project detail confirmations, overview shape fix) committed locally on top of GATE-0025 (d95a6c9). Await push + prod soak feedback (CP-0025, CP-0024).
+Resume resume_token c1-gate28-prod-soak-2026-10-12.
+GATE-0026 (archive vs delete, reseed, lead sync, tiles, counts), GATE-0027 (project detail confirmations, overview shape fix) and GATE-0028 (example.com seed emails, 90-day NotificationLog TTL) committed locally on top of GATE-0025 (d95a6c9). Await push + prod soak feedback (CP-0025, CP-0024).
 ```
 
 ---

@@ -139,6 +139,20 @@ describe("sendNotification", () => {
     assert.doesNotMatch(entry.error, /company\.io/);
   });
 
+  test("deliveries ensure the 90-day TTL index on NotificationLog once per instance", async () => {
+    stubResend();
+    await notify(withResend, { to: [REAL] });
+    await notify(withResend, { to: ["a@example.com"] });
+    await notify(withResend, { to: [REAL] });
+    assert.deepEqual(db.indexes, [
+      {
+        collection: "NotificationLog",
+        key: { createdAt: 1 },
+        options: { name: "NotificationLog_createdAt_ttl", expireAfterSeconds: 90 * 24 * 60 * 60 },
+      },
+    ]);
+  });
+
   test("no provider configured: skipped without any network call", async () => {
     stubResend();
     const result = await notify(withoutProvider, { to: [REAL] });
