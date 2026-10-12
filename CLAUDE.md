@@ -5,9 +5,9 @@
 Project Name: EmpowerHub — Employee & Project Management (employee-management)  
 Description: Angular 20 SPA + Vercel serverless API + Prisma/MongoDB for employees, projects, assignments, dashboards, calendar/Gantt, insights, API docs/status, email notifications, optional Contentful + AI drafting, Sentry tunnel.
 
-Current Status: GATE-0025 committed locally, not pushed (Robohash avatars on every person/client name, Title Case status pills via shared helpers, assignment unassigned date, Timeline/Insights/API Status/API Doc on shared KPI cards, badges, buttons and toasts) on top of GATE-0024 (project detail on shared labels/inputs/buttons/dialogs, Contentful 404/400/502 mapping) and GATE-0023 (input validation); next: prod soak 
+Current Status: GATE-0026 committed locally, not pushed (separate Archive/Restore vs Delete Permanently with Active/Archived tabs, orphan-free native deletes, typed demo seed + guarded `db:reset:demo`, lead auto-assignment + Lead badge, Projects Lead/Contact tiles, Timeline readiness/team size, one "N Active · M Archived" count) on top of GATE-0025 (avatars, Title Case pills, page consistency, pushed); next: push + prod soak 
 Current Agile V Cycle: C1 
-Current Gate: GATE-0025 COMPLETE; PROD SOAK PENDING
+Current Gate: GATE-0026 COMPLETE; PROD SOAK PENDING
 
 ---
 

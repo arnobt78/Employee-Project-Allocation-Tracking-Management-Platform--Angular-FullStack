@@ -30,6 +30,7 @@ import {
   generateOverviewDraft,
   getProjectStakeholderEmails,
   resolveStakeholderEmails,
+  setProjectArchived,
 } from "./repository.mjs";
 import {
   sendNotification,
@@ -2115,6 +2116,7 @@ function buildApiDocumentation(request) {
           },
           errorResponses: [
             errorResponse(400, "projectName is required to create a project"),
+            errorResponse(404, "Lead employee not found"),
             invalidJson,
           ],
           category: "Projects",
@@ -2139,10 +2141,38 @@ function buildApiDocumentation(request) {
             errorResponse(400, "empId must be a positive whole number"),
             errorResponse(404, "Project not found"),
             errorResponse(404, "Employee not found"),
+            errorResponse(409, "Project is archived. Restore it before changing its team"),
+            errorResponse(409, "Employee is already assigned to this project"),
             invalidJson,
           ],
           category: "Assignments",
         },
+        ...["ArchiveProject", "RestoreProject"].map((path) => ({
+          path: `${path}/{id}`,
+          method: "POST",
+          description:
+            path === "ArchiveProject"
+              ? "Archive a project: hidden from schedules, capacity and insights; nothing is deleted"
+              : "Restore an archived project and its assignments",
+          url: `${baseUrl}/${path}/{id}`,
+          parameters: [
+            {
+              name: "id",
+              type: "number",
+              required: true,
+              description: "Project ID",
+            },
+          ],
+          response: {
+            status: 200,
+            body: "Project",
+          },
+          errorResponses: [
+            errorResponse(400, "Invalid project identifier"),
+            errorResponse(404, "Project not found"),
+          ],
+          category: "Projects",
+        })),
         {
           path: "RequestApproval",
           method: "POST",
@@ -2377,6 +2407,7 @@ function buildApiDocumentation(request) {
           errorResponses: [
             errorResponse(400, "Invalid project identifier"),
             errorResponse(404, "Project not found"),
+            errorResponse(404, "Lead employee not found"),
             invalidJson,
           ],
           category: "Projects",
@@ -2409,6 +2440,8 @@ function buildApiDocumentation(request) {
             errorResponse(404, "Project employee not found"),
             errorResponse(404, "Project not found"),
             errorResponse(404, "Employee not found"),
+            errorResponse(409, "Project is archived. Restore it before changing its team"),
+            errorResponse(409, "Employee is already assigned to this project"),
             invalidJson,
           ],
           category: "Assignments",
@@ -2444,7 +2477,7 @@ function buildApiDocumentation(request) {
         {
           path: "DeleteProject/{id}",
           method: "DELETE",
-          description: "Delete a project",
+          description: "Permanently delete a project and all of its assignments",
           url: `${baseUrl}/DeleteProject/{id}`,
           parameters: [
             {
@@ -2459,6 +2492,7 @@ function buildApiDocumentation(request) {
             body: {
               result: true,
               message: "Project deleted successfully",
+              data: { projectId: "number", deletedAssignments: "number" },
             },
           },
           errorResponses: [
@@ -2490,6 +2524,7 @@ function buildApiDocumentation(request) {
           errorResponses: [
             errorResponse(400, "Invalid project employee identifier"),
             errorResponse(404, "Project employee not found"),
+            errorResponse(409, "Project is archived. Restore it before changing its team"),
           ],
           category: "Assignments",
         },
@@ -2541,8 +2576,9 @@ export async function handleEmployeeManagementRequest(request, response) {
   const statusCodeRef = { value: 200 };
   let error = null;
 
+  let session = null;
   if (!isPublicAction(method, action)) {
-    const session = await timed("auth", () => requireAuth(request, response));
+    session = await timed("auth", () => requireAuth(request, response));
     if (!session) {
       statusCodeRef.value = 401;
       if (action !== "GetApiStatus") {
@@ -2869,6 +2905,36 @@ export async function handleEmployeeManagementRequest(request, response) {
           // Send email notification to the assigned employee
           notifyInBackground(() => notifyAssignmentCreated(projectEmployee));
           return sendJson(response, 201, projectEmployee, statusCodeRef);
+        }
+
+        if (action === "ArchiveProject" || action === "RestoreProject") {
+          const projectId = Number(rawId || url.searchParams.get("id"));
+          if (!isRecordId(projectId)) {
+            return sendJson(
+              response,
+              400,
+              createApiResponse(false, "Invalid project identifier"),
+              statusCodeRef
+            );
+          }
+          try {
+            const project = await setProjectArchived(
+              projectId,
+              action === "ArchiveProject",
+              session?.user ?? {}
+            );
+            return sendJson(response, 200, project, statusCodeRef);
+          } catch (error) {
+            if (error?.code === "P2025") {
+              return sendJson(
+                response,
+                404,
+                createApiResponse(false, "Project not found"),
+                statusCodeRef
+              );
+            }
+            throw error;
+          }
         }
 
         if (action === "RequestApproval") {
@@ -3231,7 +3297,10 @@ export async function handleEmployeeManagementRequest(request, response) {
             return sendJson(
               response,
               200,
-              createApiResponse(true, "Project deleted successfully"),
+              createApiResponse(true, "Project deleted successfully", {
+                projectId,
+                deletedAssignments: deleted.deletedAssignments,
+              }),
               statusCodeRef
             );
           } catch (error) {

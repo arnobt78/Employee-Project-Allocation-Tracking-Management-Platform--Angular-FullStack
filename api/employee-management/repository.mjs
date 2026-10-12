@@ -1,5 +1,4 @@
 import { prisma } from "../_lib/prisma-client.mjs";
-import { getStore } from "./store.mjs";
 import { mongoCollection } from "../_lib/mongo-client.mjs";
 import { completeChatWithFallback } from "./ai-providers.mjs";
 import { timed } from "../_lib/timing.mjs";
@@ -12,7 +11,6 @@ const DEFAULT_COUNTER_SEEDS = {
   projectEmployee: 7000,
 };
 
-let bootstrapPromise;
 
 /** Client errors the handler returns with `status` and message instead of a 500. */
 export function clientError(status, message) {
@@ -135,16 +133,6 @@ function formatDate(value) {
   return `${year}-${month}-${day}`;
 }
 
-async function ensureCounterSeed(key, seedValue) {
-  const target = seedValue ?? DEFAULT_COUNTER_SEEDS[key] ?? 1;
-  return prisma.counter.upsert({
-    where: { key },
-    create: { key, value: target },
-    update: {},
-    select: { value: true },
-  });
-}
-
 function getNextSequenceValue(key, startAt) {
   return timed(`counter:${key}`, () => incrementCounter(key, startAt));
 }
@@ -177,235 +165,6 @@ async function incrementCounter(key, startAt) {
     throw new Error(`Failed to increment counter for key ${key}`);
   }
   return value;
-}
-
-async function ensureBootstrapData() {
-  if (!bootstrapPromise) {
-    bootstrapPromise = (async () => {
-      const [parentCount, employeeCount, projectCount, projectEmployeeCount] =
-        await Promise.all([
-          prisma.departmentParent.count(),
-          prisma.employee.count(),
-          prisma.project.count(),
-          prisma.projectEmployee.count(),
-        ]);
-
-      if (
-        parentCount > 0 ||
-        employeeCount > 0 ||
-        projectCount > 0 ||
-        projectEmployeeCount > 0
-      ) {
-        return;
-      }
-
-      const store = await getStore();
-
-      const parentDepartments = store.departments?.parents ?? [];
-      const childDepartments = store.departments?.children ?? [];
-      const employees = store.employees ?? [];
-      const projects = store.projects ?? [];
-      const projectEmployees = store.projectEmployees ?? [];
-      const nextIds = store.nextIds ?? {};
-
-      if (parentDepartments.length > 0) {
-        await prisma.departmentParent.createMany({
-          data: parentDepartments.map((parent) => ({
-            departmentId: parent.departmentId,
-            departmentName: parent.departmentName,
-            departmentLogo: parent.departmentLogo ?? null,
-            description: parent.description ?? null,
-            leadContact: parent.leadContact ?? null,
-            leadEmail: parent.leadEmail ?? null,
-            leadPhone: parent.leadPhone ?? null,
-          })),
-        });
-      }
-
-      if (childDepartments.length > 0) {
-        await prisma.departmentChild.createMany({
-          data: childDepartments.map((child) => ({
-            childDeptId: child.childDeptId,
-            departmentName: child.departmentName,
-            parentDeptId: child.parentDeptId,
-            description: child.description ?? null,
-          })),
-        });
-      }
-
-      if (employees.length > 0) {
-        await prisma.employee.createMany({
-          data: employees.map((employee) => ({
-            employeeId: employee.employeeId,
-            employeeName: employee.employeeName,
-            contactNo: employee.contactNo ?? null,
-            emailId: employee.emailId ?? null,
-            deptId: employee.deptId ?? null,
-            department: employee.department ?? null,
-            password: employee.password ?? null,
-            gender: employee.gender ?? null,
-            role: employee.role ?? null,
-            title: employee.title ?? null,
-            avatarUrl: employee.avatarUrl ?? null,
-            location: employee.location ?? null,
-            timezone: employee.timezone ?? null,
-            employmentType: employee.employmentType ?? null,
-            managerId: employee.managerId ?? null,
-            hireDate: toDate(employee.hireDate) ?? toDate(employee.createdAt),
-            bio: employee.bio ?? null,
-            about: employee.about ?? null,
-            notes: employee.notes ?? null,
-            tags: employee.tags ?? [],
-            skills: employee.skills ?? [],
-            certifications: employee.certifications ?? [],
-            interests: employee.interests ?? [],
-            languages: employee.languages ?? [],
-            socialLinks: employee.socialLinks ?? null,
-            workPreferences: employee.workPreferences ?? null,
-            availability: employee.availability ?? null,
-            preferences: employee.preferences ?? null,
-            performanceSnapshot: employee.performanceSnapshot ?? null,
-            documents: employee.documents ?? null,
-            customFields: employee.customFields ?? null,
-            createdAt: toDate(employee.createdAt) ?? new Date(),
-            updatedAt: new Date(),
-            isActive: employee.isActive !== false,
-            lastActiveAt: toDate(employee.lastActiveAt),
-          })),
-        });
-      }
-
-      if (projects.length > 0) {
-        await prisma.project.createMany({
-          data: projects.map((project) => ({
-            projectId: project.projectId,
-            projectName: project.projectName,
-            clientName: project.clientName ?? null,
-            clientIndustry: project.clientIndustry ?? null,
-            startDate: toDate(project.startDate),
-            endDate: toDate(project.endDate),
-            leadByEmpId: project.leadByEmpId
-              ? Number(project.leadByEmpId)
-              : null,
-            sponsorEmpId: project.sponsorEmpId
-              ? Number(project.sponsorEmpId)
-              : null,
-            contactPerson: project.contactPerson ?? null,
-            contactNo: project.contactNo ?? null,
-            emailId: project.emailId ?? null,
-            contactTitle: project.contactTitle ?? null,
-            contactNotes: project.contactNotes ?? null,
-            overview: project.overview ?? null,
-            scope: project.scope ?? null,
-            successMetrics: project.successMetrics ?? null,
-            status: project.status ?? "active",
-            statusReason: project.statusReason ?? null,
-            statusHistory: project.statusHistory ?? null,
-            timeline: project.timeline ?? null,
-            milestones: project.milestones ?? null,
-            categories: project.categories ?? [],
-            tags: project.tags ?? [],
-            focusAreas: project.focusAreas ?? [],
-            blockers: project.blockers ?? null,
-            risks: project.risks ?? null,
-            riskRegister: project.riskRegister ?? null,
-            budget: project.budget ?? null,
-            financials: project.financials ?? null,
-            resourcesPlan: project.resourcesPlan ?? null,
-            readinessChecklist: project.readinessChecklist ?? null,
-            readinessScore: project.readinessScore ?? null,
-            approvalStatus: project.approvalStatus ?? "draft",
-            approvalRequestedAt: toDate(project.approvalRequestedAt),
-            approvalRequestedBy: project.approvalRequestedBy
-              ? Number(project.approvalRequestedBy)
-              : null,
-            approvalResolvedAt: toDate(project.approvalResolvedAt),
-            approvalResolvedBy: project.approvalResolvedBy
-              ? Number(project.approvalResolvedBy)
-              : null,
-            approvalReason: project.approvalReason ?? null,
-            approvalNotes: project.approvalNotes ?? null,
-            reviewerComments: project.reviewerComments ?? null,
-            progress: project.progress ?? null,
-            health: project.health ?? null,
-            documents: project.documents ?? null,
-            externalLinks: project.externalLinks ?? null,
-            aiGeneratedInsights: project.aiGeneratedInsights ?? null,
-            cmsContentRefs: project.cmsContentRefs ?? null,
-            lastSyncedAt: toDate(project.lastSyncedAt),
-            stageGate: project.stageGate ?? null,
-            governance: project.governance ?? null,
-            communicationPlan: project.communicationPlan ?? null,
-            createdAt: toDate(project.createdAt) ?? new Date(),
-            updatedAt: new Date(),
-            archivedAt: toDate(project.archivedAt),
-          })),
-        });
-      }
-
-      if (projectEmployees.length > 0) {
-        await prisma.projectEmployee.createMany({
-          data: projectEmployees.map((assignment) => ({
-            empProjectId: assignment.empProjectId,
-            projectId: assignment.projectId
-              ? Number(assignment.projectId)
-              : null,
-            empId: assignment.empId ? Number(assignment.empId) : null,
-            assignedDate: toDate(assignment.assignedDate),
-            role: assignment.role ?? null,
-            isActive:
-              assignment.isActive === "Y" ||
-              assignment.isActive === "true" ||
-              assignment.isActive === true,
-            allocationPct: assignment.allocationPct ?? null,
-            billable:
-              typeof assignment.billable === "boolean"
-                ? assignment.billable
-                : assignment.billable === "Y" || assignment.billable === "true",
-            billingRate: assignment.billingRate ?? null,
-            costRate: assignment.costRate ?? null,
-            notes: assignment.notes ?? null,
-            responsibilities: assignment.responsibilities ?? [],
-            skillsApplied: assignment.skillsApplied ?? [],
-            toolsUsed: assignment.toolsUsed ?? [],
-            schedule: assignment.schedule ?? null,
-            contribution: assignment.contribution ?? null,
-            createdAt: toDate(assignment.createdAt) ?? new Date(),
-            updatedAt: new Date(),
-            unassignedAt: toDate(assignment.unassignedAt),
-          })),
-        });
-      }
-
-      await Promise.all(
-        Object.entries(nextIds).map(([key, value]) => {
-          const numericValue = Number(value);
-          if (Number.isNaN(numericValue)) {
-            return Promise.resolve();
-          }
-          return prisma.counter.upsert({
-            where: { key },
-            update: { value: numericValue - 1 },
-            create: { key, value: numericValue - 1 },
-          });
-        })
-      );
-
-      await Promise.all(
-        Object.keys(DEFAULT_COUNTER_SEEDS).map((key) =>
-          ensureCounterSeed(key, DEFAULT_COUNTER_SEEDS[key] - 1)
-        )
-      );
-    })().catch((error) => {
-      console.error(
-        "[employee-management][repository] Failed to bootstrap MongoDB data:",
-        error
-      );
-      throw error;
-    });
-  }
-
-  return bootstrapPromise;
 }
 
 /**
@@ -464,6 +223,32 @@ async function updateWithMongoFallback(prismaModelName, whereField, whereValue, 
   }
 
   return record;
+}
+
+/**
+ * Deletes one project or employee and every assignment pointing at it via the
+ * native driver. Prisma's MongoDB `deleteMany` resolves rows by `_id` first and
+ * silently skips documents whose `_id` is not an ObjectId, which left orphaned
+ * assignments behind. A second sweep catches assignments created while the
+ * delete was running; any survivor is an error, never a silent orphan.
+ */
+async function deleteWithAssignments({ collection, keyField, assignmentField, id }) {
+  const [parents, assignments] = await Promise.all([
+    mongoCollection(collection),
+    mongoCollection("ProjectEmployee"),
+  ]);
+  const filter = { [assignmentField]: id };
+  const first = await assignments.deleteMany(filter);
+  const { deletedCount } = await parents.deleteOne({ [keyField]: id });
+  if (deletedCount === 0) {
+    throw Object.assign(new Error(`${collection} ${id} not found`), { code: "P2025" });
+  }
+  const sweep = await assignments.deleteMany(filter);
+  const remaining = await assignments.countDocuments(filter);
+  if (remaining > 0) {
+    throw new Error(`${remaining} assignment(s) still reference ${keyField} ${id} after delete`);
+  }
+  return first.deletedCount + sweep.deletedCount;
 }
 
 function contentfulBaseUrl(preview = false) {
@@ -1071,14 +856,12 @@ function normalizeReviewerComments(raw) {
 }
 
 export async function listParentDepartments() {
-  await ensureBootstrapData();
   return prisma.departmentParent.findMany({
     orderBy: { departmentId: "asc" },
   });
 }
 
 export async function listChildDepartmentsByParent(parentDeptId) {
-  await ensureBootstrapData();
   return prisma.departmentChild.findMany({
     where: { parentDeptId: Number(parentDeptId) },
     orderBy: { childDeptId: "asc" },
@@ -1142,7 +925,6 @@ function mapEmployee(employee) {
 }
 
 export async function listEmployees() {
-  await ensureBootstrapData();
   const employees = await prisma.employee.findMany({
     orderBy: { employeeId: "asc" },
   });
@@ -1150,8 +932,6 @@ export async function listEmployees() {
 }
 
 export async function createEmployee(payload) {
-  await ensureBootstrapData();
-
   // Validate required fields
   if (!payload.employeeName) {
     throw clientError(400, "employeeName is required to create an employee");
@@ -1208,8 +988,6 @@ export async function createEmployee(payload) {
 }
 
 export async function updateEmployee(employeeId, payload) {
-  await ensureBootstrapData();
-
   const departmentChanged =
     payload.deptId !== undefined || payload.department !== undefined;
   const [existingRecord, departmentName] = await Promise.all([
@@ -1352,7 +1130,6 @@ export async function updateEmployee(employeeId, payload) {
 }
 
 export async function deleteEmployee(employeeId) {
-  await ensureBootstrapData();
   const id = Number(employeeId);
 
   const employee = await prisma.employee.findUnique({
@@ -1362,10 +1139,12 @@ export async function deleteEmployee(employeeId) {
     throw new Error("Employee not found");
   }
 
-  await prisma.$transaction([
-    prisma.projectEmployee.deleteMany({ where: { empId: id } }),
-    prisma.employee.delete({ where: { employeeId: id } }),
-  ]);
+  await deleteWithAssignments({
+    collection: "Employee",
+    keyField: "employeeId",
+    assignmentField: "empId",
+    id,
+  });
 
   return mapEmployee(employee);
 }
@@ -1450,6 +1229,7 @@ function mapProject(project, extras = {}) {
     archivedAt: project.archivedAt
       ? project.archivedAt.toISOString()
       : undefined,
+    archivedBy: project.archivedBy ?? undefined,
   };
 }
 
@@ -1497,7 +1277,6 @@ async function mapProjectWithLeadName(project) {
 }
 
 export async function listProjects() {
-  await ensureBootstrapData();
   const projects = await prisma.project.findMany({
     orderBy: { projectId: "asc" },
   });
@@ -1505,7 +1284,6 @@ export async function listProjects() {
 }
 
 export async function getProject(projectId) {
-  await ensureBootstrapData();
   const project = await prisma.project.findUnique({
     where: { projectId: Number(projectId) },
   });
@@ -1513,7 +1291,6 @@ export async function getProject(projectId) {
 }
 
 export async function getProjectResourceInsights(projectId) {
-  await ensureBootstrapData();
   const numericId = Number(projectId);
   if (!Number.isFinite(numericId) || numericId <= 0) {
     throw new Error("Invalid project identifier");
@@ -1577,15 +1354,20 @@ export async function getProjectResourceInsights(projectId) {
         },
       }),
       prisma.project.findMany({
-        select: { projectId: true, projectName: true },
+        select: { projectId: true, projectName: true, archivedAt: true },
       }),
     ]);
 
-  const projectLookup = new Map(projects.map((item) => [item.projectId, item]));
+  const projectLookup = new Map(
+    projects.filter((item) => !item.archivedAt).map((item) => [item.projectId, item])
+  );
   const employeeLookup = new Map(
     employees.map((employee) => [employee.employeeId, employee])
   );
-  const summaryMap = buildAssignmentSummary(activeAssignments, projectLookup);
+  const liveAssignments = activeAssignments.filter((assignment) =>
+    projectLookup.has(assignment.projectId)
+  );
+  const summaryMap = buildAssignmentSummary(liveAssignments, projectLookup);
 
   const activeProjectAssignments = projectAssignments.filter(
     (assignment) => assignment.isActive !== false
@@ -1748,7 +1530,7 @@ export async function getProjectResourceInsights(projectId) {
     benchCount,
     overbookedCount,
     averageAllocation,
-    activeAssignmentCount: activeAssignments.length,
+    activeAssignmentCount: liveAssignments.length,
     teamSize: teamAssignments.length,
   };
 
@@ -1780,17 +1562,17 @@ export async function getProjectResourceInsights(projectId) {
 }
 
 export async function createProject(payload) {
-  await ensureBootstrapData();
-
   // Validate required fields
   if (!payload.projectName) {
     throw clientError(400, "projectName is required to create a project");
   }
 
+  const leadId = payload.leadByEmpId ? Number(payload.leadByEmpId) : null;
   const [projectId, leadNames] = await Promise.all([
     getNextSequenceValue("project"),
     leadNameByEmployeeId([payload]),
   ]);
+  assertLeadExists(leadId, leadNames);
   const readiness = normalizeReadinessChecklist(payload.readinessChecklist);
   const statusHistory = normalizeStatusHistory(payload.statusHistory);
   const timeline = normalizeTimelineEntries(payload.timeline);
@@ -1828,7 +1610,7 @@ export async function createProject(payload) {
       clientIndustry: payload.clientIndustry ?? null,
       startDate: toDate(payload.startDate),
       endDate: toDate(payload.endDate),
-      leadByEmpId: payload.leadByEmpId ? Number(payload.leadByEmpId) : null,
+      leadByEmpId: leadId,
       sponsorEmpId: payload.sponsorEmpId ? Number(payload.sponsorEmpId) : null,
       contactPerson: payload.contactPerson ?? null,
       contactNo: payload.contactNo ?? null,
@@ -1881,13 +1663,69 @@ export async function createProject(payload) {
       communicationPlan: payload.communicationPlan ?? null,
     },
   });
+  await ensureLeadAssignment(projectId, leadId);
 
   return mapProjectWithLeadNames(record, leadNames);
 }
 
-export async function updateProject(projectId, payload) {
-  await ensureBootstrapData();
+function assertLeadExists(leadId, leadNames) {
+  if (leadId !== null && !leadNames.has(leadId)) {
+    throw clientError(404, "Lead employee not found");
+  }
+}
 
+/**
+ * `leadByEmpId` is the source of truth for who leads a project, and the lead
+ * always holds an active assignment on it: a missing one is created as
+ * "Project Lead" and an inactive one is reactivated. Roles are never renamed.
+ */
+async function ensureLeadAssignment(projectId, leadId) {
+  if (!isRecordId(leadId)) {
+    return;
+  }
+  const existing = await prisma.projectEmployee.findMany({
+    where: { projectId, empId: leadId },
+    orderBy: { empProjectId: "asc" },
+    select: { empProjectId: true, isActive: true },
+  });
+  if (existing.some((assignment) => assignment.isActive)) {
+    return;
+  }
+  if (existing.length > 0) {
+    const empProjectId = existing[0].empProjectId;
+    await updateWithMongoFallback(
+      "projectEmployee",
+      "empProjectId",
+      empProjectId,
+      { isActive: true, unassignedAt: null },
+      () => prisma.projectEmployee.findUnique({ where: { empProjectId } })
+    );
+    return;
+  }
+  const empProjectId = await getNextSequenceValue("projectEmployee");
+  await prisma.projectEmployee
+    .create({
+      data: {
+        empProjectId,
+        projectId,
+        empId: leadId,
+        role: "Project Lead",
+        isActive: true,
+        assignedDate: new Date(),
+        responsibilities: [],
+        skillsApplied: [],
+        toolsUsed: [],
+      },
+    })
+    .catch((error) => {
+      // A concurrent save already assigned the lead; the unique (projectId, empId) index kept one row.
+      if (!isDuplicateKeyError(error)) {
+        throw error;
+      }
+    });
+}
+
+export async function updateProject(projectId, payload) {
   // Verify the record exists before attempting to update
   const existingRecord = await prisma.project.findUnique({
     where: { projectId: Number(projectId) },
@@ -2073,18 +1911,30 @@ export async function updateProject(projectId, payload) {
     return mapProjectWithLeadName(existingRecord);
   }
 
-  const leadByEmpId =
-    "leadByEmpId" in updateData ? updateData.leadByEmpId : existingRecord.leadByEmpId;
-  const [record, leadNames] = await Promise.all([
-    updateWithMongoFallback(
-      "project",
-      "projectId",
-      Number(projectId),
-      updateData,
-      () => prisma.project.findUnique({ where: { projectId: Number(projectId) } })
-    ),
-    leadNameByEmployeeId([{ leadByEmpId }]),
-  ]);
+  const leadProvided = "leadByEmpId" in updateData;
+  const leadByEmpId = leadProvided ? updateData.leadByEmpId : existingRecord.leadByEmpId;
+  const archived = Boolean(existingRecord.archivedAt);
+  if (
+    archived &&
+    leadProvided &&
+    Number(leadByEmpId ?? 0) !== Number(existingRecord.leadByEmpId ?? 0)
+  ) {
+    throw clientError(409, ARCHIVED_TEAM_MESSAGE);
+  }
+  const leadNames = await leadNameByEmployeeId([{ leadByEmpId }]);
+  if (leadProvided) {
+    assertLeadExists(leadByEmpId, leadNames);
+  }
+  const record = await updateWithMongoFallback(
+    "project",
+    "projectId",
+    Number(projectId),
+    updateData,
+    () => prisma.project.findUnique({ where: { projectId: Number(projectId) } })
+  );
+  if (leadProvided && !archived) {
+    await ensureLeadAssignment(record.projectId, leadByEmpId);
+  }
 
   return mapProjectWithLeadNames(record, leadNames);
 }
@@ -2121,7 +1971,6 @@ function buildApprovalTimelineEntry({ status, actorId, actorName, comment }) {
 }
 
 export async function transitionProjectApproval(projectId, action, payload) {
-  await ensureBootstrapData();
   const numericId = Number(projectId);
   if (!numericId) {
     throw new Error("Invalid projectId");
@@ -2263,7 +2112,6 @@ export async function transitionProjectApproval(projectId, action, payload) {
 }
 
 export async function addProjectReviewerComment(projectId, payload) {
-  await ensureBootstrapData();
   const numericId = Number(projectId);
   if (!numericId) {
     throw new Error("Invalid projectId");
@@ -2342,7 +2190,6 @@ export async function resolveProjectReviewerComment(
   commentId,
   payload
 ) {
-  await ensureBootstrapData();
   const numericId = Number(projectId);
   if (!numericId) {
     throw new Error("Invalid projectId");
@@ -2401,12 +2248,11 @@ export async function resolveProjectReviewerComment(
 }
 
 /**
- * Deletes a project and its assignments atomically. Returns the mapped project
+ * Deletes a project and all of its assignments. Returns the mapped project
  * plus the pre-delete assignments so stakeholder recipients can be resolved
  * after the response is sent.
  */
 export async function deleteProject(projectId) {
-  await ensureBootstrapData();
   const id = Number(projectId);
 
   const [project, assignments] = await Promise.all([
@@ -2420,15 +2266,58 @@ export async function deleteProject(projectId) {
     throw new Error("Project not found");
   }
 
-  const [mappedProject] = await Promise.all([
+  const [mappedProject, deletedAssignments] = await Promise.all([
     mapProjectWithLeadName(project),
-    prisma.$transaction([
-      prisma.projectEmployee.deleteMany({ where: { projectId: id } }),
-      prisma.project.delete({ where: { projectId: id } }),
-    ]),
+    deleteWithAssignments({
+      collection: "Project",
+      keyField: "projectId",
+      assignmentField: "projectId",
+      id,
+    }),
   ]);
 
-  return { project: mappedProject, stakeholderSource: project, assignments };
+  return { project: mappedProject, stakeholderSource: project, assignments, deletedAssignments };
+}
+
+/**
+ * Archiving hides a project and its assignments from schedules, capacity and
+ * insights without deleting anything; restoring brings both back unchanged.
+ */
+export async function setProjectArchived(projectId, archived, actor = {}) {
+  const id = Number(projectId);
+  const existing = await prisma.project.findUnique({ where: { projectId: id } });
+  if (!existing) {
+    throw Object.assign(new Error(`Project with projectId ${id} not found`), { code: "P2025" });
+  }
+  if (Boolean(existing.archivedAt) === archived) {
+    return mapProjectWithLeadName(existing);
+  }
+
+  const approvalStatus = normalizeApprovalStatus(existing.approvalStatus);
+  const actorName = actor.displayName ?? actor.username ?? undefined;
+  const statusHistory = [
+    ...normalizeStatusHistory(existing.statusHistory),
+    buildApprovalHistoryEntry({
+      status: approvalStatus,
+      previousStatus: approvalStatus,
+      actorId: null,
+      actorName,
+      comment: archived ? "Project archived" : "Project restored",
+    }),
+  ];
+
+  const record = await updateWithMongoFallback(
+    "project",
+    "projectId",
+    id,
+    {
+      archivedAt: archived ? new Date() : null,
+      archivedBy: archived ? actorName ?? null : null,
+      statusHistory,
+    },
+    () => prisma.project.findUnique({ where: { projectId: id } })
+  );
+  return mapProjectWithLeadName(record);
 }
 
 function mapProjectEmployee(item, projectLookup, employeeLookup) {
@@ -2448,6 +2337,7 @@ function mapProjectEmployee(item, projectLookup, employeeLookup) {
     role: item.role ?? "",
     isActive: item.isActive ? "Y" : "N",
     projectName: project?.projectName ?? "Unknown Project",
+    projectArchivedAt: project?.archivedAt ? project.archivedAt.toISOString() : null,
     employeeName: employee?.employeeName ?? "Unknown Employee",
     employeeAvatarUrl: employee?.avatarUrl ?? null,
     allocationPct: item.allocationPct ?? null,
@@ -2471,7 +2361,7 @@ async function mapAssignmentRecord(record) {
   const [project, employee] = await Promise.all([
     prisma.project.findUnique({
       where: { projectId: record.projectId },
-      select: { projectId: true, projectName: true },
+      select: { projectId: true, projectName: true, archivedAt: true },
     }),
     prisma.employee.findUnique({
       where: { employeeId: record.empId },
@@ -2490,14 +2380,12 @@ async function mapAssignmentRecord(record) {
 }
 
 export async function listProjectEmployees() {
-  await ensureBootstrapData();
-
   const [projectEmployees, projects, employees] = await Promise.all([
     prisma.projectEmployee.findMany({
       orderBy: { empProjectId: "asc" },
     }),
     prisma.project.findMany({
-      select: { projectId: true, projectName: true },
+      select: { projectId: true, projectName: true, archivedAt: true },
     }),
     prisma.employee.findMany({
       select: {
@@ -2516,14 +2404,17 @@ export async function listProjectEmployees() {
     employees.map((employee) => [employee.employeeId, employee])
   );
 
-  return projectEmployees.map((item) =>
-    mapProjectEmployee(item, projectLookup, employeeLookup)
-  );
+  return projectEmployees
+    .filter((item) => projectLookup.has(item.projectId) && employeeLookup.has(item.empId))
+    .map((item) => mapProjectEmployee(item, projectLookup, employeeLookup));
 }
 
+const ARCHIVED_TEAM_MESSAGE = "Project is archived. Restore it before changing its team";
+const DUPLICATE_ASSIGNMENT_MESSAGE = "Employee is already assigned to this project";
+
 /**
- * Throws 400 for a non-integer id and 404 when a referenced project or
- * employee is missing; omitted ids are not checked.
+ * Throws 400 for a non-integer id, 404 when a referenced project or employee
+ * is missing and 409 when the project is archived; omitted ids are not checked.
  */
 async function assertAssignmentTargetsExist({ projectId, empId }) {
   if (projectId !== undefined && !isRecordId(projectId)) {
@@ -2535,7 +2426,10 @@ async function assertAssignmentTargetsExist({ projectId, empId }) {
   const [project, employee] = await Promise.all([
     projectId === undefined
       ? true
-      : prisma.project.findUnique({ where: { projectId }, select: { projectId: true } }),
+      : prisma.project.findUnique({
+          where: { projectId },
+          select: { projectId: true, archivedAt: true },
+        }),
     empId === undefined
       ? true
       : prisma.employee.findUnique({ where: { employeeId: empId }, select: { employeeId: true } }),
@@ -2546,11 +2440,48 @@ async function assertAssignmentTargetsExist({ projectId, empId }) {
   if (!employee) {
     throw clientError(404, "Employee not found");
   }
+  if (project.archivedAt) {
+    throw clientError(409, ARCHIVED_TEAM_MESSAGE);
+  }
+}
+
+/** One assignment per employee per project; `ignoreId` is the row being edited. */
+async function assertNotAlreadyAssigned(projectId, empId, ignoreId) {
+  const clash = await prisma.projectEmployee.findFirst({
+    where: { projectId, empId },
+    select: { empProjectId: true },
+  });
+  if (clash && clash.empProjectId !== ignoreId) {
+    throw clientError(409, DUPLICATE_ASSIGNMENT_MESSAGE);
+  }
+}
+
+async function assertProjectNotArchived(projectId) {
+  const project = await prisma.project.findUnique({
+    where: { projectId },
+    select: { archivedAt: true },
+  });
+  if (project?.archivedAt) {
+    throw clientError(409, ARCHIVED_TEAM_MESSAGE);
+  }
+}
+
+/**
+ * The unique (projectId, empId) index is the last line against concurrent
+ * duplicates: P2002 from Prisma, 11000 from the native update fallback.
+ */
+function isDuplicateKeyError(error) {
+  return error?.code === "P2002" || error?.code === 11000;
+}
+
+function rethrowDuplicateAssignment(error) {
+  if (isDuplicateKeyError(error)) {
+    throw clientError(409, DUPLICATE_ASSIGNMENT_MESSAGE);
+  }
+  throw error;
 }
 
 export async function createProjectEmployee(payload) {
-  await ensureBootstrapData();
-
   // Validate required fields
   if (!payload.projectId) {
     throw clientError(400, "projectId is required to create a project employee assignment");
@@ -2562,8 +2493,9 @@ export async function createProjectEmployee(payload) {
   const projectId = Number(payload.projectId);
   const empId = Number(payload.empId);
   // Existence checks run alongside the id increment; a rejected request only leaves an id gap.
-  const [, empProjectId] = await Promise.all([
+  const [, , empProjectId] = await Promise.all([
     assertAssignmentTargetsExist({ projectId, empId }),
+    assertNotAlreadyAssigned(projectId, empId),
     getNextSequenceValue("projectEmployee"),
   ]);
 
@@ -2592,13 +2524,12 @@ export async function createProjectEmployee(payload) {
       schedule: payload.schedule ?? null,
       contribution: payload.contribution ?? null,
     },
-  });
+  }).catch(rethrowDuplicateAssignment);
 
   return mapAssignmentRecord(record);
 }
 
 export async function updateProjectEmployee(empProjectId, payload) {
-  await ensureBootstrapData();
   const id = Number(empProjectId);
 
   // Build update data object, only including fields that are provided
@@ -2672,43 +2603,42 @@ export async function updateProjectEmployee(empProjectId, payload) {
   const checksTargets = updateData.projectId !== undefined || updateData.empId !== undefined;
   // Deactivating stamps the unassigned date and reactivating clears it, unless the client sent one.
   const tracksUnassigned = updateData.isActive !== undefined && payload.unassignedAt === undefined;
-  if (checksTargets || tracksUnassigned) {
-    // A missing assignment is reported before a missing project/employee.
-    const [existing, targetsError] = await Promise.all([
-      prisma.projectEmployee.findUnique({
-        where: { empProjectId: id },
-        select: { isActive: true, unassignedAt: true },
-      }),
-      checksTargets
-        ? assertAssignmentTargetsExist(updateData).then(
-            () => null,
-            (error) => error
-          )
-        : null,
-    ]);
-    if (!existing) {
-      throw notFound();
-    }
-    if (targetsError) {
-      throw targetsError;
-    }
-    if (tracksUnassigned) {
-      if (!updateData.isActive && existing.isActive) {
-        updateData.unassignedAt = new Date();
-      } else if (updateData.isActive && existing.unassignedAt) {
-        updateData.unassignedAt = null;
-      }
+  // A missing assignment is reported before a missing project/employee.
+  const [existing, targetsError] = await Promise.all([
+    prisma.projectEmployee.findUnique({ where: { empProjectId: id } }),
+    checksTargets
+      ? assertAssignmentTargetsExist(updateData).then(
+          () => null,
+          (error) => error
+        )
+      : null,
+  ]);
+  if (!existing) {
+    throw notFound();
+  }
+  if (targetsError) {
+    throw targetsError;
+  }
+  await Promise.all([
+    updateData.projectId === undefined ? assertProjectNotArchived(existing.projectId) : null,
+    checksTargets
+      ? assertNotAlreadyAssigned(
+          updateData.projectId ?? existing.projectId,
+          updateData.empId ?? existing.empId,
+          id
+        )
+      : null,
+  ]);
+  if (tracksUnassigned) {
+    if (!updateData.isActive && existing.isActive) {
+      updateData.unassignedAt = new Date();
+    } else if (updateData.isActive && existing.unassignedAt) {
+      updateData.unassignedAt = null;
     }
   }
 
   if (Object.keys(updateData).length === 0) {
-    const existingRecord = await prisma.projectEmployee.findUnique({
-      where: { empProjectId: id },
-    });
-    if (!existingRecord) {
-      throw notFound();
-    }
-    return mapAssignmentRecord(existingRecord);
+    return mapAssignmentRecord(existing);
   }
 
   const record = await updateWithMongoFallback(
@@ -2717,13 +2647,11 @@ export async function updateProjectEmployee(empProjectId, payload) {
     id,
     updateData,
     () => prisma.projectEmployee.findUnique({ where: { empProjectId: id } })
-  );
+  ).catch(rethrowDuplicateAssignment);
   return mapAssignmentRecord(record);
 }
 
 export async function deleteProjectEmployee(empProjectId) {
-  await ensureBootstrapData();
-
   // Fetch assignment data before deleting for notification purposes
   const record = await prisma.projectEmployee.findUnique({
     where: { empProjectId: Number(empProjectId) },
@@ -2732,6 +2660,7 @@ export async function deleteProjectEmployee(empProjectId) {
   if (!record) {
     throw new Error("Project employee assignment not found");
   }
+  await assertProjectNotArchived(record.projectId);
 
   const mapped = await mapAssignmentRecord(record);
   await prisma.projectEmployee.delete({
@@ -2741,29 +2670,21 @@ export async function deleteProjectEmployee(empProjectId) {
 }
 
 export async function buildDashboardSnapshot() {
-  await ensureBootstrapData();
-
-  const [
-    totalEmployee,
-    totalProject,
-    activeAssignments,
-    recentProjects,
-    recentEmployees,
-  ] = await Promise.all([
+  const [totalEmployee, projects, activeAssignments, recentEmployees] = await Promise.all([
     prisma.employee.count(),
-    prisma.project.count(),
-    prisma.projectEmployee.count({
-      where: { isActive: true },
-    }),
     prisma.project.findMany({
       orderBy: { startDate: "desc" },
-      take: 5,
       select: {
         projectId: true,
         projectName: true,
         startDate: true,
         status: true,
+        archivedAt: true,
       },
+    }),
+    prisma.projectEmployee.findMany({
+      where: { isActive: true },
+      select: { projectId: true },
     }),
     prisma.employee.findMany({
       orderBy: { createdAt: "desc" },
@@ -2781,11 +2702,17 @@ export async function buildDashboardSnapshot() {
     }),
   ]);
 
+  const liveProjects = projects.filter((project) => !project.archivedAt);
+  const liveProjectIds = new Set(liveProjects.map((project) => project.projectId));
+
   return {
     totalEmployee,
-    totalProject,
-    activeProjectEmployees: activeAssignments,
-    recentProjects: recentProjects.map((project) => ({
+    totalProject: liveProjects.length,
+    archivedProject: projects.length - liveProjects.length,
+    activeProjectEmployees: activeAssignments.filter((assignment) =>
+      liveProjectIds.has(assignment.projectId)
+    ).length,
+    recentProjects: liveProjects.slice(0, 5).map((project) => ({
       projectId: project.projectId,
       projectName: project.projectName,
       startDate: formatDate(project.startDate),
@@ -2805,38 +2732,45 @@ export async function buildDashboardSnapshot() {
 }
 
 export async function buildScheduleData() {
-  await ensureBootstrapData();
-
-  const projects = await prisma.project.findMany({
-    select: {
-      projectId: true,
-      projectName: true,
-      clientName: true,
-      startDate: true,
-      endDate: true,
-      status: true,
-      timeline: true,
-      milestones: true,
-      readinessChecklist: true,
-      leadByEmpId: true,
-      archivedAt: true,
-    },
-    orderBy: { startDate: "asc" },
-  });
+  const [projects, employees, activeAssignments] = await Promise.all([
+    prisma.project.findMany({
+      select: {
+        projectId: true,
+        projectName: true,
+        clientName: true,
+        startDate: true,
+        endDate: true,
+        status: true,
+        timeline: true,
+        milestones: true,
+        readinessChecklist: true,
+        readinessScore: true,
+        leadByEmpId: true,
+        archivedAt: true,
+      },
+      orderBy: { startDate: "asc" },
+    }),
+    prisma.employee.findMany({
+      select: {
+        employeeId: true,
+        employeeName: true,
+        department: true,
+        emailId: true,
+        avatarUrl: true,
+      },
+    }),
+    prisma.projectEmployee.findMany({
+      where: { isActive: true },
+      select: { projectId: true },
+    }),
+  ]);
 
   const activeProjects = projects.filter((project) => !project.archivedAt);
-
-  const employees = await prisma.employee.findMany({
-    select: {
-      employeeId: true,
-      employeeName: true,
-      department: true,
-      emailId: true,
-      avatarUrl: true,
-    },
-  });
-
   const employeeMap = new Map(employees.map((emp) => [emp.employeeId, emp]));
+  const teamSizeByProject = new Map();
+  activeAssignments.forEach(({ projectId }) => {
+    teamSizeByProject.set(projectId, (teamSizeByProject.get(projectId) ?? 0) + 1);
+  });
 
   const milestones = [];
   const dueDates = [];
@@ -2947,6 +2881,11 @@ export async function buildScheduleData() {
         leadDepartment: lead?.department || "",
         leadEmail: lead?.emailId || "",
         leadAvatarUrl: lead?.avatarUrl || null,
+        readinessScore:
+          typeof project.readinessScore === "number"
+            ? project.readinessScore
+            : normalizeReadinessChecklist(project.readinessChecklist).percent,
+        teamSize: teamSizeByProject.get(project.projectId) ?? 0,
       });
     }
   });
@@ -2987,7 +2926,6 @@ export async function buildScheduleData() {
 }
 
 export async function buildApiStatus() {
-  await ensureBootstrapData();
   const startTime = Date.now();
 
   // Import monitoring functions
@@ -3110,7 +3048,6 @@ export async function buildApiStatus() {
 }
 
 export async function getProjectStakeholderEmails(projectId) {
-  await ensureBootstrapData();
   const numericId = Number(projectId);
   if (!numericId) {
     return { to: [], cc: [], bcc: [] };

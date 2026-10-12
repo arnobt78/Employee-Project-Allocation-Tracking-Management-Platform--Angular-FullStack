@@ -139,8 +139,8 @@
             </div>
           </div>
 
-          @if (row.lead; as lead) {
-            <div class="flex items-center gap-3 sm:justify-end">
+          <div class="flex items-center gap-3 sm:justify-end">
+            @if (row.lead; as lead) {
               <app-user-avatar
                 [seed]="lead.seed"
                 [imageUrl]="lead.imageUrl"
@@ -148,22 +148,32 @@
                 [alt]="lead.label"
                 [size]="32"
               ></app-user-avatar>
-              <div class="min-w-0 text-sm sm:text-right">
-                <p class="flex items-center gap-1.5 truncate font-medium text-white/85 sm:justify-end">
-                  <lucide-icon name="shield-user" [size]="14" class="shrink-0 text-white/55"></lucide-icon>
-                  <span class="truncate">{{ lead.label }}</span>
+            }
+            <div class="min-w-0 text-sm sm:text-right">
+              @if (row.lead; as lead) {
+                <p class="text-[11px] font-medium uppercase tracking-wide text-white/45">Lead</p>
+                <p
+                  class="truncate font-medium text-white/85"
+                  [attr.title]="row.project.leadDepartment || null"
+                >
+                  {{ lead.label }}
                 </p>
-                @if (row.project.leadDepartment) {
-                  <p class="truncate text-white/55">{{ row.project.leadDepartment }}</p>
-                }
-              </div>
+              } @else {
+                <span class="eh-badge eh-badge-neutral">
+                  <lucide-icon name="user-x" [size]="12"></lucide-icon>
+                  No Lead
+                </span>
+              }
+              <p class="mt-1 flex items-center gap-1.5 text-xs text-white/60 sm:justify-end">
+                <lucide-icon name="gauge" [size]="12" class="shrink-0"></lucide-icon>
+                {{ row.readiness === null ? "—" : row.readiness + "%" }} Ready
+              </p>
+              <p class="flex items-center gap-1.5 text-xs text-white/60 sm:justify-end">
+                <lucide-icon name="users" [size]="12" class="shrink-0"></lucide-icon>
+                {{ row.teamLabel }}
+              </p>
             </div>
-          } @else {
-            <span class="eh-badge eh-badge-neutral self-start">
-              <lucide-icon name="user-x" [size]="12"></lucide-icon>
-              No Lead
-            </span>
-          }
+          </div>
         </div>
       </div>
     }

@@ -1,5 +1,21 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-12 — GATE-0026 archive vs delete, reseed, lead sync, tiles, counts
+
+**Node:** v24.21.0 via fnm
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 148/148 (new: `project-archive` helpers + delete copy, archive/restore cache move in `MasterService`, timeline readiness/team lines, tab skeleton) |
+| `npm run test:api` | **PASS** | 95/95 (new: delete cascade incl. non-ObjectId `_id`, archive keeps assignments, restore, archived excluded from allocation, archived team 409, archived lead change 409 while rename saves, lead auto-assignment) |
+| `npm run build` | **PASS** | |
+| DB reset (`db:reset:demo`) | **PASS** | Cleared old domain rows, 97 sessions, 138 notification logs, non-admin users; seeded 3 + 7 departments, 5 employees, 5 projects, 7 assignments; `prisma db push` created the unique assignment index |
+| Local API probe | **PASS** | Dashboard 4 projects / 1 archived / 5 active assignments; schedule 4 timelines with `readinessScore` + `teamSize` |
+| Browser sweep (Playwright, dev, admin) | **PASS** | Dashboard, Projects (tabs 4/1, tiles, delete dialog "its 2 team assignments"), archive → restore Mercury (toasts, counts 3·2 → 4·1, `?view=archived`), Project Team (6/1, Lead badges, archived row Restore only), project detail (archived banner, footers, delete count on direct load), Timeline (readiness/team, archived Beacon absent), Insights (Projects 4, chips); 0 console errors after login |
+| Prod | **NOT RUN** | Vercel Security Checkpoint returns 429 to scripted requests; prod shares the reseeded database |
+| Independent verifier | **PASS WITH WARNINGS (fixed)** | Archived lead change, stale delete count on dialog reopen, lead-assignment race (duplicate key), counter rewind on reseed (`$max`), README `db push` note → all fixed |
+
 ## Session 2026-10-11 — GATE-0025 avatars, Title Case labels, unassigned date, page consistency
 
 **Node:** v24.21.0 via fnm

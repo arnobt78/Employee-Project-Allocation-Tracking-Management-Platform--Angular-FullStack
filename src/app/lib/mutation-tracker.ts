@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { DestroyRef, Injectable, inject, signal } from '@angular/core';
 import { Observable, Subscription, finalize } from 'rxjs';
 import { ToastOptions, ToastService } from '../components/ui/toast.service';
@@ -91,8 +92,20 @@ export class MutationTracker {
         if (!destroyed) {
           options.onError?.(error);
         }
-        this.toast.error(options.errorToast);
+        const reason = clientErrorMessage(error);
+        this.toast.error(
+          reason ? { ...options.errorToast, description: reason } : options.errorToast
+        );
       },
     });
   }
+}
+
+/** A 4xx response's `{ message }` explains what to fix (e.g. a 409 conflict); 5xx bodies are not shown. */
+export function clientErrorMessage(error: unknown): string | null {
+  if (!(error instanceof HttpErrorResponse) || error.status < 400 || error.status >= 500) {
+    return null;
+  }
+  const message = (error.error as { message?: unknown } | null)?.message;
+  return typeof message === 'string' && message.trim() ? message.trim() : null;
 }

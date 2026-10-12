@@ -1,15 +1,25 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0025 avatars / Title Case / unassigned date / page consistency committed; prod soak next  
-**Gate:** GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** GATE-0025 committed locally (not pushed); `origin/main` at `2ee0536` (GATE-0024 pushed). Node 24.21: lint PASS, API tests 85/85, unit 138/138, production build PASS (all 7 badge tones in CSS), browser sweep of 9 pages PASS (0 console errors, 0 failed calls).  
-**Updated:** 2026-10-11  
-**resume_token:** `c1-gate25-prod-soak-2026-10-11`
+**Phase / Stage:** Stage 4 — GATE-0026 archive vs delete, reseed, lead sync, tiles, counts committed locally; prod soak next  
+**Gate:** GATE-0026 **COMPLETE**; GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
+**Status:** GATE-0026 committed locally (not pushed); `origin/main` at `d95a6c9` (GATE-0025). Node 24.21: lint PASS, API tests 95/95, unit 148/148, production build PASS, Playwright browser sweep PASS (0 console errors after login). Database (shared by local and prod) wiped and reseeded with the new demo set; only `admin` remains as a user.  
+**Updated:** 2026-10-12  
+**resume_token:** `c1-gate26-prod-soak-2026-10-12`
 
 ---
 
 ## Resume Point
+
+**Completed (GATE-0026, TASK-0095–0101):**
+
+- Orphan root cause: Prisma's MongoDB `deleteMany` resolves rows by `_id` and silently skipped assignments whose `_id` was not an ObjectId (legacy imports). Deletes now go through the native driver (`deleteWithAssignments`); the reseed writes ObjectId `_id`s.
+- Archive and Delete are separate. `POST ArchiveProject/{id}` / `RestoreProject/{id}` set or clear `archivedAt`/`archivedBy` (history entry, nothing deleted). `DeleteProject` deletes assignments then the project with native driver deletes, sweeps again and fails loudly if any assignment still references the project; returns `deletedAssignments`. Archived projects are excluded from schedule, capacity, dashboard and insights aggregates; their team cannot change (409), and their lead cannot change (409) while other edits still save.
+- Projects and Project Team have Active/Archived tabs (`constants/tabs.ts`, `?view=archived` via `bindListQuery`, badge counts, skeleton tab row via `listTabCount`). Archived rows show only Restore. Project detail: archived banner with Restore, footer "Archive Project" + "Delete Permanently", each with an `app-alert-dialog`; the delete dialog states how many assignments will be removed (`deleteProjectWarning`).
+- Shared `lib/status/project-archive.ts`: `isProjectArchived`, `isAssignmentArchived`, `projectCounts`, `projectCountsLabel` ("4 Active · 1 Archived"), delete copy. KPI "Projects" = active count on Projects, Project Team, Dashboard and Insights.
+- Lead sync: create/update gives the new lead an active "Project Lead" assignment if missing (duplicate-key race ignored); Project Team shows a violet "Lead" badge with a crown icon. Unique index `ProjectEmployee(projectId, empId)`.
+- Projects list: Lead tile (avatar, name, lead's employee email) and Client Contact tile (avatar, email, phone); read-only "Email" renamed "Contact Email". Timeline: "Lead" caption, readiness % and team size lines (schedule payload adds `readinessScore`, `teamSize`); `shield-user` removed.
+- Legacy bootstrap removed (`ensureBootstrapData`, `store.mjs`, `data.json`, `dataset/*.json`, `tools/wipe-local-domain.mjs`). New typed `prisma/seed-data.ts` (3 + 7 departments, 5 employees, 5 projects incl. one archived, 7 assignments). `npm run db:reset:demo` / `db:reseed:local` (`tools/reset-demo-data.mjs`) needs `ALLOW_DB_WIPE=1`, plus `EH_ALLOW_REMOTE_WIPE=1` for a non-local host; it never prints credentials and keeps only `admin`.
 
 **Completed (GATE-0025, TASK-0089–0094):**
 
@@ -68,7 +78,8 @@
 - Cross-instance revocation window up to 30 s (RISK-0022, accepted).
 - Fake DB doesn't reject unknown Prisma fields.
 - `NotificationLog` has no retention/TTL (RISK-0018).
-- Prisma `$transaction` deletes need a MongoDB replica set (RISK-0020).
+- Project/employee deletes are native driver deletes (no longer a Prisma `$transaction`, RISK-0020 closed): not atomic, but a failed check throws instead of leaving orphans.
+- Prod could not be checked by script (Vercel Security Checkpoint returns 429 to curl); prod uses the same database as local, so the reseed already applies there.
 - Calendar event chips are `div` + `routerLink` (not keyboard-focusable).
 - `bg-white/2` / `min-h-auto` / `bg-white/5/80` classes generate no CSS (older cards; `.eh-section-card` omits it).
 - Employee edits don't refresh lead names in project list/schedule until TTL.
@@ -76,14 +87,14 @@
 
 **Blockers:** none. Push/deploy needs human approval (GATE-0002). `prisma db push` already applied to the configured DB (`NotificationLog`).
 
-**Next exact action:** Human pushes GATE-0025 + prod soak of project detail avatars, Project Team unassigned dates (deactivate/reactivate an assignment), Calendar (3 tabs), Insights (4 tabs + CSV export), API Status and API Doc (Copy URL needs a real clipboard). Earlier soak still open: prod soak of the project detail page (every section's edit/save, approval request → approve/reject → reset, archive, Contentful + AI helpers) and CRUD across Employees / Projects / Project Team. Note: dev saw one-off 40–77 s approval writes during a MongoDB latency spike (same endpoint ~2 s otherwise); watch for it on Vercel.
+**Next exact action:** Human pushes GATE-0026, then prod soak (CP-0025): archive → Archived tab → restore on Projects and project detail; Delete Permanently (dialog shows the assignment count, rows gone from Project Team); change a lead (new Lead row appears); Timeline readiness/team lines; KPI "Projects" matches on Dashboard, Projects, Project Team and Insights. Run `npx prisma db push` on any other database before using it (unique assignment index). Then the GATE-0025 soak (CP-0024): triage each bug / UI-consistency mismatch into a scoped plan for approval. Soak areas: project detail avatars, Project Team unassigned dates (deactivate/reactivate an assignment), Calendar (3 tabs), Insights (4 tabs + CSV export), API Status and API Doc (Copy URL needs a real clipboard). Earlier soak still open: prod soak of the project detail page (every section's edit/save, approval request → approve/reject → reset, archive, Contentful + AI helpers) and CRUD across Employees / Projects / Project Team. Note: dev saw one-off 40–77 s approval writes during a MongoDB latency spike (same endpoint ~2 s otherwise); watch for it on Vercel.
 
 **Resume prompt:**
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
-Resume resume_token c1-gate25-prod-soak-2026-10-11.
-GATE-0025 (avatars, Title Case labels, unassigned date, page consistency) committed locally on top of GATE-0024. Await push/prod soak feedback.
+Resume resume_token c1-gate26-prod-soak-2026-10-12.
+GATE-0026 (archive vs delete, clean reseed, lead sync, tiles, counts) committed locally on top of GATE-0025 (d95a6c9). Await push + prod soak feedback (CP-0025, CP-0024).
 ```
 
 ---
@@ -93,5 +104,4 @@ GATE-0025 (avatars, Title Case labels, unassigned date, page consistency) commit
 - `?expand=<id>` list deep-links (pagination edge cases; leave lists static)
 - Employee / Project Team dedicated detail routes (optional later; Projects already has detail)
 - Department card → `/employee` deep-link
-- Production / remote DB wipe (explicitly gated)
 - Major migrations: Angular 21+, Prisma 7+, Tailwind 4, ESLint 10

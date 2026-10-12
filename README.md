@@ -189,7 +189,7 @@ employee-management/
 │       ├── ai-providers.mjs       # LLM fallback chain
 │       └── monitoring.mjs         # In-memory API request metrics (not Sentry)
 ├── prisma/                        # schema.prisma + seed
-├── tools/                         # dev-api-server, seed-demo-user, env/sentry scripts
+├── tools/                         # dev-api-server, seed-demo-user, reset-demo-data, env/sentry scripts
 ├── public/                        # favicon, robots.txt, sitemap.xml
 ├── docs/                          # Playbooks, LLM selection, Sentry guide
 ├── .env.example                   # Template (copy to .env)
@@ -227,10 +227,10 @@ cp .env.example .env
 **Minimum for a useful local demo:**
 
 1. Set `DATABASE_URL` to your MongoDB URI
-2. Seed domain data from `dataset/`: `npm run db:seed`
+2. Seed the demo dataset from `prisma/seed-data.ts`: `npm run db:seed`
 3. Seed the demo auth user: `npm run db:seed:auth`
 
-To wipe and reseed a **local** Mongo only: `ALLOW_DB_WIPE=1 npm run db:reseed:local` (refuses non-localhost unless `EH_ALLOW_REMOTE_WIPE=1` / `EH_ALLOW_ATLAS_WIPE=1`).
+To start from a clean database: `ALLOW_DB_WIPE=1 npm run db:reset:demo`. It prints the target host and database, wipes every domain collection, sessions and notification logs, removes every login except `admin`, then reseeds 5 employees, 4 active projects, 1 archived project and 7 assignments. A non-localhost `DATABASE_URL` also needs `EH_ALLOW_REMOTE_WIPE=1`. After a schema change run `npx prisma db push` so indexes such as the one-assignment-per-employee-per-project rule exist.
 
 You **do not** need AI, CMS, email, or Sentry keys to explore CRUD UI. Leave those blank; features that need them simply stay disabled or no-op.
 
@@ -604,10 +604,10 @@ const completion = await completeChatWithFallback(prompt);
 | `npm run lint` / `lint:fix` | ESLint via Angular                                       |
 | `npm test`                  | Karma / Jasmine                                          |
 | `npm run test:api`          | Node 24 `node:test` auth, CRUD and email tests (no DB)   |
-| `npm run db:seed`           | Domain seed from repo `dataset/`                         |
+| `npm run db:seed`           | Upsert the demo dataset from `prisma/seed-data.ts`       |
 | `npm run db:seed:auth`      | Demo `admin` user                                        |
-| `npm run db:wipe:local`     | Clear domain collections (requires `ALLOW_DB_WIPE=1`; localhost only unless override) |
-| `npm run db:reseed:local`   | Wipe → `db:seed` → `db:seed:auth` (local gate as above)  |
+| `npm run db:reset:demo`     | Wipe and reseed; only `admin` remains (requires `ALLOW_DB_WIPE=1`, plus `EH_ALLOW_REMOTE_WIPE=1` off localhost) |
+| `npm run db:reseed:local`   | `db:reset:demo` with `ALLOW_DB_WIPE=1` set (remote gate still applies) |
 
 ---
 

@@ -1,5 +1,15 @@
 # Changelog — Agile V project memory
 
+## 2026-10-12 — GATE-0026 archive vs delete, clean reseed, lead sync, tiles, counts
+
+- Archive and Restore are real (no longer a delete); Delete Permanently removes the project and all its assignments and verifies none remain
+- Active/Archived tabs on Projects and Project Team; archived rows are read-only with Restore; delete dialog shows the assignment count
+- Lead changes add the lead to the team automatically; Project Team "Lead" badge
+- Projects list Lead and Client Contact tiles with avatars; Timeline shows readiness % and team size
+- One project count ("4 Active · 1 Archived") on Dashboard, Projects, Project Team and Insights
+- Legacy JSON bootstrap removed; typed demo seed + guarded `db:reset:demo`; database reseeded, only `admin` kept
+- Node 24.21: lint PASS; API 95/95; unit 148/148; build PASS; browser sweep PASS
+
 ## 2026-10-11 — GATE-0025 avatars, Title Case labels, unassigned date, page consistency
 
 - Robohash avatars beside every employee/client name on project detail, Project Team, timeline leads and reminder owners

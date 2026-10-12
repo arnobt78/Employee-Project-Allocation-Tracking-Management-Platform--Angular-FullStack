@@ -23,6 +23,10 @@ export interface IProjectTimeline {
   leadDepartment: string;
   leadEmail?: string;
   leadAvatarUrl?: string | null;
+  /** Readiness checklist completion, 0–100. */
+  readinessScore?: number | null;
+  /** Active assignments on the project. */
+  teamSize?: number | null;
 }
 
 interface TimelineRow {
@@ -34,6 +38,8 @@ interface TimelineRow {
   position: number;
   width: number;
   duration: string;
+  readiness: number | null;
+  teamLabel: string;
 }
 
 const DAY_MS = 1000 * 60 * 60 * 24;
@@ -89,6 +95,10 @@ export class TimelineViewComponent {
           position,
           width,
           duration: this.durationLabel(project),
+          readiness: Number.isFinite(project.readinessScore)
+            ? Math.round(project.readinessScore as number)
+            : null,
+          teamLabel: this.teamLabel(project.teamSize),
         };
       });
   });
@@ -97,6 +107,11 @@ export class TimelineViewComponent {
     if (totalDays <= 0) return 0;
     const daysFromStart = (new Date(project.startDate).getTime() - min.getTime()) / DAY_MS;
     return Math.max(0, Math.min(100, (daysFromStart / totalDays) * 100));
+  }
+
+  private teamLabel(teamSize: number | null | undefined): string {
+    const count = Number.isFinite(teamSize) ? (teamSize as number) : 0;
+    return `${count} Team ${count === 1 ? 'Member' : 'Members'}`;
   }
 
   private durationDays(project: IProjectTimeline): number {

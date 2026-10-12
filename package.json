@@ -19,8 +19,8 @@
     "postinstall": "node tools/generate-env-prod.cjs",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:auth": "node tools/seed-demo-user.mjs",
-    "db:wipe:local": "node tools/wipe-local-domain.mjs",
-    "db:reseed:local": "ALLOW_DB_WIPE=1 npm run db:wipe:local && npm run db:seed && npm run db:seed:auth"
+    "db:reset:demo": "tsx tools/reset-demo-data.mjs",
+    "db:reseed:local": "ALLOW_DB_WIPE=1 tsx tools/reset-demo-data.mjs"
   },
   "private": true,
   "dependencies": {

@@ -28,6 +28,8 @@ export interface PrivatePageMeta {
   listShowPagination?: boolean;
   /** List row chip density for skeleton mirror. */
   listRowVariant?: ListPageRowVariant;
+  /** Tabs above the list toolbar (Active / Archived). */
+  listTabCount?: number;
   /** Project detail mirror mode (create shows the draft title; edit pends the project name). */
   projectMode?: ProjectDetailMode;
 }
@@ -60,6 +62,7 @@ export const PRIVATE_PAGE_META: Record<string, PrivatePageMeta> = {
     listFilterCount: 2,
     listShowPagination: true,
     listRowVariant: 'project',
+    listTabCount: 2,
   },
   '/new-project': {
     title: 'Untitled Project',
@@ -84,6 +87,7 @@ export const PRIVATE_PAGE_META: Record<string, PrivatePageMeta> = {
     listFilterCount: 3,
     listShowPagination: true,
     listRowVariant: 'assignment',
+    listTabCount: 2,
   },
   '/business-insights': {
     title: 'Business Insights',

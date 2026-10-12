@@ -106,6 +106,8 @@ import {
   Code,
   UserCheck,
   ShieldAlert,
+  ArchiveRestore,
+  Crown,
 } from 'lucide-angular';
 
 const ICON_REGISTRY: Record<string, LucideIconData> = {
@@ -208,6 +210,8 @@ const ICON_REGISTRY: Record<string, LucideIconData> = {
   code: Code,
   'user-check': UserCheck,
   'shield-alert': ShieldAlert,
+  'archive-restore': ArchiveRestore,
+  crown: Crown,
 };
 
 /** Standalone Lucide renderer (lucide-angular's NgModule component is not importable in Angular 20 standalone). */

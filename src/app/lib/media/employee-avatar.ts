@@ -22,3 +22,15 @@ export function employeeAvatar(
   const seed = (person?.emailId || label).trim();
   return { seed, imageUrl: person?.avatarUrl ?? null, label };
 }
+
+/** A project's client contact is not an employee: name plus the contact's own email. */
+export function contactAvatar(
+  contact: { contactPerson?: string | null; emailId?: string | null } | null | undefined
+): AvatarView | null {
+  const name = (contact?.contactPerson ?? '').trim();
+  if (!name) {
+    return null;
+  }
+  const email = (contact?.emailId ?? '').trim();
+  return employeeAvatar({ employeeName: name, emailId: email || null });
+}

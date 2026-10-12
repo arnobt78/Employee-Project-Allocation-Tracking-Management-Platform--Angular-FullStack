@@ -283,6 +283,8 @@ export interface IProjectEmployee {
   role: string;
   isActive: string;
   projectName: string;
+  /** Set when the assignment's project is archived. */
+  projectArchivedAt?: string | null;
   employeeName: string;
   employeeAvatarUrl?: string | null;
   allocationPct?: number;
@@ -356,6 +358,7 @@ export interface IProject {
   createdAt?: string;
   updatedAt?: string;
   archivedAt?: string;
+  archivedBy?: string;
   audit?: IAuditMetadata;
 }
 

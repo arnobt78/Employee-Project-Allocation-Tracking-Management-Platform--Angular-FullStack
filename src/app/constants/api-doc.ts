@@ -1,5 +1,6 @@
 import { ApiHttpMethod } from '@/app/model/interface/master';
 import type { StatusTone } from '@/app/lib/status/project-status';
+import { TAB_ACTIVE_CLASS, TAB_IDLE_CLASS } from './tabs';
 
 /** Static API Documentation copy shared by the live page and its loading mirror. */
 export const API_DOC_METHOD_TABS: readonly ApiHttpMethod[] = [
@@ -16,10 +17,8 @@ export const API_DOC_METHOD_ICONS: Record<ApiHttpMethod, string> = {
   DELETE: 'trash-2',
 };
 
-export const API_DOC_TAB_ACTIVE_CLASS =
-  'inline-flex items-center gap-2 border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary';
-export const API_DOC_TAB_IDLE_CLASS =
-  'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white';
+export const API_DOC_TAB_ACTIVE_CLASS = TAB_ACTIVE_CLASS;
+export const API_DOC_TAB_IDLE_CLASS = TAB_IDLE_CLASS;
 
 export const API_DOC_CHIP_ACTIVE_CLASS =
   'inline-flex items-center gap-1.5 rounded-full border border-primary bg-primary/20 px-3 py-1 text-xs font-medium text-primary';

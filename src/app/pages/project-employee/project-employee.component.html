@@ -6,6 +6,7 @@
   [skeletonKpiCount]="6"
   [skeletonFilterCount]="3"
   [skeletonShowPagination]="true"
+  [skeletonTabCount]="viewTabs.length"
   skeletonRowVariant="assignment"
 >
   @if (showCreatePanel) {
@@ -34,7 +35,11 @@
     listShellKpis
     label="Total Assignments"
     [value]="totalAssignmentsKpi()"
-    hint="All records"
+    [hint]="
+      archivedAssignmentCount()
+        ? 'On active projects · ' + archivedAssignmentCount() + ' archived'
+        : 'On active projects'
+    "
     icon="contact"
     tone="sky"
   ></app-kpi-stat-card>
@@ -57,8 +62,8 @@
   <app-kpi-stat-card
     listShellKpis
     label="Projects"
-    [value]="uniqueProjectsKpi()"
-    hint="Unique projects"
+    [value]="counts().active"
+    [hint]="countsLabel()"
     icon="folder-kanban"
     tone="violet"
   ></app-kpi-stat-card>
@@ -66,7 +71,7 @@
     listShellKpis
     label="People"
     [value]="uniqueEmployeesKpi()"
-    hint="Unique assignees"
+    hint="Unique assignees on active projects"
     icon="users"
     tone="sky"
   ></app-kpi-stat-card>
@@ -78,6 +83,28 @@
     icon="briefcase"
     tone="amber"
   ></app-kpi-stat-card>
+
+  <div listShellToolbar [class]="tabRowClass" role="tablist" aria-label="Assignment views">
+    @for (tab of viewTabs; track tab.id) {
+      <button
+        type="button"
+        role="tab"
+        (click)="setView(tab.id)"
+        [class]="view() === tab.id ? tabActiveClass : tabIdleClass"
+        [attr.aria-selected]="view() === tab.id"
+      >
+        <lucide-icon [name]="tab.icon" [size]="14"></lucide-icon>
+        {{ tab.label }}
+        <span class="eh-badge eh-badge-neutral">
+          {{
+            tab.id === "archived"
+              ? archivedAssignmentCount()
+              : activeAssignments().length
+          }}
+        </span>
+      </button>
+    }
+  </div>
 
   <app-list-toolbar
     listShellToolbar
@@ -347,6 +374,12 @@
             ></app-user-avatar>
             {{ item.employeeName }}
           </span>
+          @if (isLead(item)) {
+            <span class="eh-badge" [ngClass]="badgeTone.violet">
+              <lucide-icon name="crown" [size]="12"></lucide-icon>
+              Lead
+            </span>
+          }
           <span
             *ngIf="item.role"
             class="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs sm:text-sm text-emerald-200"
@@ -366,6 +399,12 @@
             <lucide-icon name="calendar" [size]="12"></lucide-icon>
             Assigned {{ formattedDate(item.assignedDate) }}
           </span>
+          @if (item.projectArchivedAt) {
+            <span class="eh-badge" [ngClass]="badgeTone.slate">
+              <lucide-icon name="archive" [size]="12"></lucide-icon>
+              Project Archived
+            </span>
+          }
         </div>
         <span
           class="shrink-0 text-xs sm:text-sm text-white/40 transition"
@@ -676,25 +715,40 @@
               <app-card-close-button
                 (closed)="closeExpanded()"
               ></app-card-close-button>
-              <button
-                type="button"
-                class="eh-action-btn eh-action-btn-outline"
-                (click)="onEdit(item)"
-              >
-                <lucide-icon name="pencil" [size]="14"></lucide-icon>
-                <span>Edit</span>
-              </button>
-              <button
-                ehAction
-                type="button"
-                icon="trash-2"
-                [pending]="pending.has('delete:' + item.empProjectId)"
-                pendingLabel="Deleting…"
-                class="eh-action-btn eh-action-btn-danger"
-                (click)="onDelete(item.empProjectId)"
-              >
-                <span>Delete</span>
-              </button>
+              @if (item.projectArchivedAt) {
+                <button
+                  ehAction
+                  type="button"
+                  icon="archive-restore"
+                  [pending]="isRestoring(item.projectId)"
+                  pendingLabel="Restoring…"
+                  class="eh-action-btn eh-action-btn-primary"
+                  title="Restore the project to edit this assignment"
+                  (click)="restoreProject(item)"
+                >
+                  <span>Restore Project</span>
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="eh-action-btn eh-action-btn-outline"
+                  (click)="onEdit(item)"
+                >
+                  <lucide-icon name="pencil" [size]="14"></lucide-icon>
+                  <span>Edit</span>
+                </button>
+                <button
+                  ehAction
+                  type="button"
+                  icon="trash-2"
+                  [pending]="pending.has('delete:' + item.empProjectId)"
+                  pendingLabel="Deleting…"
+                  class="eh-action-btn eh-action-btn-danger"
+                  (click)="onDelete(item.empProjectId)"
+                >
+                  <span>Delete</span>
+                </button>
+              }
             </div>
           </div>
         </ng-template>
@@ -705,7 +759,13 @@
       *ngIf="hasLoaded() && !filteredAssignments().length"
       class="rounded-[28px] border border-dashed border-white/15 bg-white/5/60 px-2 sm:px-4 py-12 text-center text-sm text-white/60 backdrop-blur-lg"
     >
-      No assignments match your filters.
+      {{
+        hasActiveFilters()
+          ? "No assignments match your filters."
+          : view() === "archived"
+            ? "No assignments on archived projects."
+            : "No assignments yet."
+      }}
     </div>
   </section>
 </app-list-page-shell>

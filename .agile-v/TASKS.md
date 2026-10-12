@@ -208,6 +208,18 @@
 | TASK-0093 | Timeline/Gantt/Calendar: signal inputs, badges, lead avatars + `shield-user`, Start/End/Duration/client icons, reminders | REQ-0151, REQ-0152, REQ-0154 | DONE | Schedule payload adds `leadEmail`/`leadAvatarUrl` |
 | TASK-0094 | Business Insights, API Status, API Doc + skeletons on shared primitives; toasts (CSV/PDF export, manual refresh failure, Copy URL) | REQ-0154 | DONE | Unit 138 |
 
+## Wave — GATE-0026 archive vs delete, reseed, lead sync, tiles, counts (2026-10-12)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0095 | Orphan root cause (Prisma `deleteMany` skips non-ObjectId `_id`) → native `deleteWithAssignments` + check; `ArchiveProject`/`RestoreProject`; archived excluded from schedule/capacity/aggregates; archived team and lead locked (409) | REQ-0155, REQ-0156 | DONE | API tests 95 |
+| TASK-0096 | Active/Archived tabs on Projects + Project Team (`constants/tabs.ts`, `?view=`), Restore on archived rows, skeleton tab row; detail archived banner + Archive/Delete Permanently dialogs with assignment count | REQ-0156 | DONE | `MasterService.setProjectArchived` moves assignments between views in cache |
+| TASK-0097 | Remove legacy bootstrap/dataset; `prisma/seed-data.ts`; `tools/reset-demo-data.mjs` (guarded); unique assignment index; reseed DB | REQ-0157 | DONE | Only `admin` kept; counters raised with `$max` |
+| TASK-0098 | Lead sync on create/update (duplicate-key race ignored) + Project Team Lead badge | REQ-0158 | DONE | |
+| TASK-0099 | Projects list Lead / Client Contact tiles with avatars; "Contact Email" label | REQ-0159 | DONE | |
+| TASK-0100 | Timeline Lead caption, readiness %, team size (`readinessScore`, `teamSize` in schedule) | REQ-0159 | DONE | Timeline spec |
+| TASK-0101 | `projectCounts` / `projectCountsLabel` on Dashboard, Projects, Project Team, Insights | REQ-0160 | DONE | Unit 148 |
+
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)

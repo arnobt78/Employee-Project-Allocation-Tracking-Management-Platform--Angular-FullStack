@@ -37,7 +37,7 @@
             class="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm"
           >
             <lucide-icon name="folder-kanban" [size]="14"></lucide-icon>
-            {{ dashboardData?.totalProject || 0 }} projects
+            {{ projectCountsLabel }}
           </span>
           <span
             class="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm"
@@ -61,9 +61,9 @@
           tone="sky"
         ></app-kpi-stat-card>
         <app-kpi-stat-card
-          label="Total Projects"
-          [value]="dashboardData?.totalProject ?? 0"
-          hint="Monitor project health and velocity with real-time status."
+          label="Projects"
+          [value]="projectStats?.nonArchived ?? dashboardData?.totalProject ?? 0"
+          [hint]="projectCountsLabel"
           icon="folder-kanban"
           tone="emerald"
         ></app-kpi-stat-card>
@@ -75,13 +75,6 @@
           tone="amber"
         ></app-kpi-stat-card>
         @if (projectStats) {
-          <app-kpi-stat-card
-            label="Non-archived"
-            [value]="projectStats.nonArchived"
-            hint="Included in delivery calculations"
-            icon="folder-open"
-            tone="sky"
-          ></app-kpi-stat-card>
           <app-kpi-stat-card
             label="Active Projects"
             [value]="projectStats.active"
@@ -117,15 +110,13 @@
             icon="link"
             tone="emerald"
           ></app-kpi-stat-card>
-          @if (projectStats.archived > 0) {
-            <app-kpi-stat-card
-              label="Archived"
-              [value]="projectStats.archived"
-              hint="Excluded from active calculations"
-              icon="archive"
-              tone="slate"
-            ></app-kpi-stat-card>
-          }
+          <app-kpi-stat-card
+            label="Archived"
+            [value]="projectStats.archived"
+            hint="Excluded from active calculations; restore from Projects"
+            icon="archive"
+            tone="slate"
+          ></app-kpi-stat-card>
           @if (projectStats.nonAssigned > 0) {
             <app-kpi-stat-card
               label="Unassigned"

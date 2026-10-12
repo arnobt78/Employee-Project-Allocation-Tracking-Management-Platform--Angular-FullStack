@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { ListPageRowVariant } from '@/app/constants/private-page-meta';
+import { TAB_ROW_CLASS } from '@/app/constants/tabs';
 import { ListSkeletonComponent } from './list-skeleton.component';
 
 /**
@@ -34,6 +35,16 @@ import { ListSkeletonComponent } from './list-skeleton.component';
           </article>
         }
       </section>
+      @if (tabs.length) {
+        <div [class]="tabRowClass">
+          @for (tab of tabs; track tab) {
+            <div class="flex items-center gap-2 px-4 py-2">
+              <div class="h-3.5 w-3.5 animate-pulse rounded-full bg-white/10"></div>
+              <div class="h-3.5 w-16 animate-pulse rounded-full bg-white/10"></div>
+            </div>
+          }
+        </div>
+      }
       <section
         class="flex flex-col gap-3 rounded-[28px] border border-white/10 bg-white/5/70 px-2 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-3"
       >
@@ -76,6 +87,13 @@ export class ListPageSkeletonComponent {
     this.filterPills = Array.from({ length: n }, (_, i) => i + 1);
   }
 
+  @Input() set tabCount(value: number) {
+    const n = Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
+    this.tabs = Array.from({ length: n }, (_, i) => i + 1);
+  }
+
+  readonly tabRowClass = TAB_ROW_CLASS;
+  tabs: number[] = [];
   kpiCards = [1, 2, 3, 4, 5, 6];
   filterPills = [1, 2, 3];
 }

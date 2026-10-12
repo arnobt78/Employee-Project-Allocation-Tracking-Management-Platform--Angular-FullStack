@@ -108,7 +108,9 @@ export const PROJECT_DETAIL_FOOTER_COPY = {
   autosave:
     'Changes are auto-populated into the preview cards as you type. Remember to save a section after editing.',
   archive:
-    'Need to archive this project? You can remove it safely from the workspace below.',
+    'Archive keeps the project and its team restorable; Delete Permanently removes both for good.',
+  archived:
+    'This project is archived and hidden from Timeline, Calendar, Insights and capacity. Restore it to edit its team again.',
 } as const;
 
 export const PROJECT_OVERVIEW_FIELD_LABELS = {

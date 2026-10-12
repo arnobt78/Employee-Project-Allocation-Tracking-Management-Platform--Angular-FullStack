@@ -1,4 +1,4 @@
-import { employeeAvatar } from './employee-avatar';
+import { contactAvatar, employeeAvatar } from './employee-avatar';
 
 describe('employeeAvatar', () => {
   it('seeds from email so the robot is stable across pages', () => {
@@ -23,5 +23,21 @@ describe('employeeAvatar', () => {
     expect(employeeAvatar({ employeeName: 'Linus', avatarUrl: 'https://x/a.png' }).imageUrl).toBe(
       'https://x/a.png'
     );
+  });
+});
+
+describe('contactAvatar', () => {
+  it('seeds from the contact email, else the contact name', () => {
+    expect(contactAvatar({ contactPerson: ' Jane Doe ', emailId: 'jane@client.io' })).toEqual({
+      seed: 'jane@client.io',
+      imageUrl: null,
+      label: 'Jane Doe',
+    });
+    expect(contactAvatar({ contactPerson: 'Jane Doe', emailId: ' ' })?.seed).toBe('Jane Doe');
+  });
+
+  it('is null without a contact name', () => {
+    expect(contactAvatar({ contactPerson: '  ', emailId: 'x@y.io' })).toBeNull();
+    expect(contactAvatar(null)).toBeNull();
   });
 });

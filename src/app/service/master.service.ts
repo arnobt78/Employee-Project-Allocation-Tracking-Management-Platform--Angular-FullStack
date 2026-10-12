@@ -329,6 +329,26 @@ export class MasterService {
     );
   }
 
+  /** Archive or restore; the project's assignments follow it between the Active and Archived views. */
+  setProjectArchived(id: number, archived: boolean): Observable<IProject> {
+    const action = archived ? 'ArchiveProject' : 'RestoreProject';
+    return this.http
+      .post<IProject>(this.getProxyUrl(action) + `?id=${id}`, {})
+      .pipe(
+        tap((project) => {
+          const projectArchivedAt = project?.archivedAt ?? null;
+          this.invalidate('project', {
+            projects: (list) => upsertBy(list, 'projectId', project),
+            assignments: (list) =>
+              list.map((item) =>
+                item.projectId === id ? { ...item, projectArchivedAt } : item
+              ),
+          });
+          this.rememberProject(project);
+        })
+      );
+  }
+
   deleteProjectById(id: number): Observable<IApiResponse> {
     const queryUrl = this.getProxyUrl('DeleteProject') + `?id=${id}`;
     return this.http.delete<IApiResponse>(queryUrl).pipe(

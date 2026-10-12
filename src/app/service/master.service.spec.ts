@@ -158,6 +158,29 @@ describe('MasterService', () => {
       http.expectOne((req) => req.url.endsWith('GetAllProjectEmployees')).flush([]);
     });
 
+    it('moves a project and its assignments between views on archive and restore', () => {
+      seedAssignments();
+      service.getAllProjects().subscribe();
+      http.expectOne((req) => req.url.endsWith('GetAllProjects')).flush([project]);
+      const archivedAt = '2026-10-12T00:00:00.000Z';
+
+      service.setProjectArchived(7, true).subscribe();
+      const archive = http.expectOne((req) => req.url.includes('ArchiveProject'));
+      expect(archive.request.method).toBe('POST');
+      expect(archive.request.url).toContain('?id=7');
+      archive.flush({ ...project, archivedAt });
+
+      expect(service.peekProjects()?.[0].archivedAt).toBe(archivedAt);
+      expect(service.peekProjectEmployees()?.[0].projectArchivedAt).toBe(archivedAt);
+      expect(service.peekProject(7)?.project.archivedAt).toBe(archivedAt);
+
+      service.setProjectArchived(7, false).subscribe();
+      http.expectOne((req) => req.url.includes('RestoreProject')).flush({ ...project, archivedAt: undefined });
+
+      expect(service.peekProjects()?.[0].archivedAt).toBeUndefined();
+      expect(service.peekProjectEmployees()?.[0].projectArchivedAt).toBeNull();
+    });
+
     it('prunes assignments and drops lead-name lists after an employee delete', () => {
       seedAssignments();
       service.getAllProjects().subscribe();

@@ -25,10 +25,20 @@ const MODELS = {
     unique: ["projectId"],
     defaults: { status: "draft", approvalStatus: "draft" },
   },
-  projectEmployee: { key: "empProjectId", unique: ["empProjectId"], defaults: { isActive: true } },
+  projectEmployee: {
+    key: "empProjectId",
+    unique: ["empProjectId", ["projectId", "empId"]],
+    defaults: { isActive: true },
+  },
 };
 
-/** Native collection name -> Prisma model, for `updateWithMongoFallback`. */
+/**
+ * Rows flagged with this field mimic documents whose `_id` is not an ObjectId:
+ * real Prisma `deleteMany` silently skips them, the native driver does not.
+ */
+export const LEGACY_ID_FLAG = "legacyStringId";
+
+/** Native collection name -> Prisma model, for `updateWithMongoFallback` and cascade deletes. */
 const COLLECTION_MODELS = {
   Employee: "employee",
   Project: "project",
@@ -128,16 +138,18 @@ function createModel(name, { key, unique, defaults }) {
 
   const findRows = (where) => [...rows.values()].filter((row) => matches(row, where));
 
+  /** Each entry is one field or a compound list of fields. */
   const assertUnique = (candidate, ignore) => {
-    for (const field of unique) {
-      if (candidate[field] === undefined) {
+    for (const entry of unique) {
+      const fields = [entry].flat();
+      if (fields.some((field) => candidate[field] === undefined)) {
         continue;
       }
       const clash = [...rows.values()].find(
-        (row) => row !== ignore && sameValue(row[field], candidate[field])
+        (row) => row !== ignore && fields.every((field) => sameValue(row[field], candidate[field]))
       );
       if (clash) {
-        throw prismaError("P2002", `Unique constraint failed on ${name}.${field}`);
+        throw prismaError("P2002", `Unique constraint failed on ${name}.${fields.join("+")}`);
       }
     }
   };
@@ -216,7 +228,7 @@ function createModel(name, { key, unique, defaults }) {
       return pick(row, select);
     },
     async deleteMany({ where } = {}) {
-      const doomed = findRows(where);
+      const doomed = findRows(where).filter((row) => !row[LEGACY_ID_FLAG]);
       doomed.forEach((row) => rows.delete(row[key]));
       return { count: doomed.length };
     },
@@ -342,13 +354,27 @@ export function createFakeDb() {
     const modelName = COLLECTION_MODELS[name];
     if (modelName) {
       const model = models[modelName];
+      const find = (filter) => [...model.rows.values()].filter((item) => matches(item, filter));
+      const remove = (rows) => {
+        rows.forEach((row) => model.rows.delete(row[MODELS[modelName].key]));
+        return { deletedCount: rows.length };
+      };
       return {
         async updateOne(filter, update) {
-          const [row] = [...model.rows.values()].filter((item) => matches(item, filter));
+          const [row] = find(filter);
           if (row) {
             model.updateRow(row, update.$set ?? {});
           }
           return { matchedCount: row ? 1 : 0, modifiedCount: row ? 1 : 0 };
+        },
+        async deleteOne(filter) {
+          return remove(find(filter).slice(0, 1));
+        },
+        async deleteMany(filter) {
+          return remove(find(filter));
+        },
+        async countDocuments(filter) {
+          return find(filter).length;
         },
       };
     }
@@ -391,7 +417,7 @@ export function createFakeDb() {
       });
       return row;
     },
-    /** Clears every table. The repository seeds domain data only once per process. */
+    /** Clears every table. */
     reset() {
       releaseLookups();
       Object.values(tables).forEach((rows) => rows.clear());

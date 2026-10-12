@@ -133,6 +133,7 @@
             [value]="kpi.value"
             [icon]="kpi.icon"
             [tone]="kpi.tone"
+            [hint]="kpi.label === 'Projects' ? projectCountsLabel() : ''"
           ></app-kpi-stat-card>
         }
       </div>

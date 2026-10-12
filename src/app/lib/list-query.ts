@@ -14,6 +14,7 @@ export interface ListQueryState {
   title: string;
   active: string;
   client: string;
+  view: string;
 }
 
 /** Single normalize path for signal + URL `?q=` (trim + length cap). */
@@ -29,10 +30,11 @@ export function parseListQueryParams(params: ParamMap): ListQueryState {
   const title = normalizeListSearchQuery(params.get('title') ?? '');
   const active = normalizeListSearchQuery(params.get('active') ?? '');
   const client = normalizeListSearchQuery(params.get('client') ?? '');
+  const view = normalizeListSearchQuery(params.get('view') ?? '');
   const rawPage = Number(params.get('page') ?? '1');
   const page =
     Number.isFinite(rawPage) && rawPage >= 1 ? Math.floor(rawPage) : 1;
-  return { q, page, f, role, etype, title, active, client };
+  return { q, page, f, role, etype, title, active, client, view };
 }
 
 export function paginateList<T>(
@@ -56,6 +58,8 @@ export interface ListQueryExtraSignals {
   title?: WritableSignal<string>;
   active?: WritableSignal<string>;
   client?: WritableSignal<string>;
+  /** Active/Archived tab; kept when filters are cleared. */
+  view?: WritableSignal<string>;
 }
 
 export interface ListQueryController {
@@ -74,11 +78,12 @@ type ListQuerySnapshot = {
   title: string;
   active: string;
   client: string;
+  view: string;
 };
 
 /**
  * Sync list search/page/filter signals with URL
- * `?q=&page=&f=&role=&etype=&title=&active=&client=`
+ * `?q=&page=&f=&role=&etype=&title=&active=&client=&view=`
  */
 export function bindListQuery(
   route: ActivatedRoute,
@@ -114,6 +119,7 @@ export function bindListQuery(
       syncSignal(extras?.title, parsed.title);
       syncSignal(extras?.active, parsed.active);
       syncSignal(extras?.client, parsed.client);
+      syncSignal(extras?.view, parsed.view);
     });
 
   const writeUrl = (s: ListQuerySnapshot, nextPage: number) => {
@@ -128,6 +134,7 @@ export function bindListQuery(
         title: normalizeListSearchQuery(s.title) || null,
         active: normalizeListSearchQuery(s.active) || null,
         client: normalizeListSearchQuery(s.client) || null,
+        view: normalizeListSearchQuery(s.view) || null,
       },
       queryParamsHandling: 'merge',
       replaceUrl: true,
@@ -142,6 +149,7 @@ export function bindListQuery(
     title: extras?.title?.() ?? '',
     active: extras?.active?.() ?? '',
     client: extras?.client?.() ?? '',
+    view: extras?.view?.() ?? '',
   });
 
   return {
@@ -178,7 +186,16 @@ export function bindListQuery(
       extras?.client?.set('');
       page.set(1);
       writeUrl(
-        { q: '', f: '', role: '', etype: '', title: '', active: '', client: '' },
+        {
+          q: '',
+          f: '',
+          role: '',
+          etype: '',
+          title: '',
+          active: '',
+          client: '',
+          view: extras?.view?.() ?? '',
+        },
         1
       );
     },

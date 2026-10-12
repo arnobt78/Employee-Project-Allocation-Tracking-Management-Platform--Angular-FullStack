@@ -152,6 +152,7 @@ model Project {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   archivedAt DateTime?
+  archivedBy String?
 
   @@index([leadByEmpId])
   @@index([projectName])
@@ -219,6 +220,7 @@ model ProjectEmployee {
   updatedAt DateTime @updatedAt
   unassignedAt DateTime?
 
+  @@unique([projectId, empId])
   @@index([projectId])
   @@index([empId])
 }

@@ -51,7 +51,12 @@ import {
 import { ProjectDetailSkeletonComponent } from '@/app/components/ui/project-detail-skeleton.component';
 import { ProjectHeaderMetaComponent } from '@/app/components/ui/project-header-meta.component';
 import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
-import { employeeAvatar, type AvatarView } from '@/app/lib/media/employee-avatar';
+import { contactAvatar, employeeAvatar, type AvatarView } from '@/app/lib/media/employee-avatar';
+import {
+  deletedProjectDescription,
+  deleteProjectWarning,
+  isProjectArchived,
+} from '@/app/lib/status/project-archive';
 import { titleCaseLabel } from '@/app/lib/format/labels';
 import {
   PROJECT_CONTENT_HELPER_COPY,
@@ -121,6 +126,7 @@ type SaveScope = 'section' | 'all';
 const PENDING = {
   save: 'save',
   delete: 'delete',
+  archive: 'archive',
   assign: 'assign',
   comment: 'comment',
   approval: (action: ApprovalAction) => `approval:${action}`,
@@ -451,6 +457,12 @@ export class ProjectFormComponent implements OnInit {
   readonly isSaving = computed(() => this.pending.has(PENDING.save));
   readonly isDeleting = computed(() => this.pending.has(PENDING.delete));
   readonly pendingDelete = signal<boolean>(false);
+  readonly isArchiving = computed(() => this.pending.has(PENDING.archive));
+  readonly pendingArchive = signal<boolean>(false);
+  readonly isArchived = computed(() => isProjectArchived(this.currentProjectSignal()));
+  /** Loaded when the delete dialog opens; null until the team list arrives. */
+  private readonly deleteAssignmentCount = signal<number | null>(null);
+  readonly deleteWarning = computed(() => deleteProjectWarning(this.deleteAssignmentCount()));
   readonly pendingSave = signal<SaveScope | null>(null);
   readonly pendingApproval = signal<ConfirmedApprovalAction | null>(null);
   readonly approvalConfirmCopy = computed(() => {
@@ -721,10 +733,23 @@ export class ProjectFormComponent implements OnInit {
   }
 
   requestDelete() {
-    if (!this.isEditMode()) {
+    const projectId = this.currentProjectSignal()?.projectId;
+    if (!this.isEditMode() || !projectId) {
       return;
     }
     this.pendingDelete.set(true);
+    this.deleteAssignmentCount.set(null);
+    this.masterService
+      .getProjectEmp()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (rows) => {
+          if (this.currentProjectSignal()?.projectId === projectId) {
+            this.deleteAssignmentCount.set(rows.filter((row) => row.projectId === projectId).length);
+          }
+        },
+        error: () => undefined,
+      });
   }
 
   confirmDelete() {
@@ -732,6 +757,7 @@ export class ProjectFormComponent implements OnInit {
     if (!projectId) {
       return;
     }
+    const projectName = this.currentProjectSignal()?.projectName || this.projectTitle();
     this.mutations.track(this.masterService.deleteProjectById(projectId), {
       pending: this.pending,
       destroyRef: this.destroyRef,
@@ -745,13 +771,70 @@ export class ProjectFormComponent implements OnInit {
         this.resourceInsightsSignal.set(null);
         this.router.navigate(['/projects']);
       },
-      successToast: {
-        title: 'Project removed',
-        description: 'The project has been archived successfully.',
-      },
+      successToast: (res) => ({
+        title: 'Project deleted',
+        description: deletedProjectDescription(projectName, res),
+      }),
       errorToast: {
         title: 'Delete failed',
-        description: 'Unable to archive the project currently.',
+        description: 'Unable to delete the project right now.',
+      },
+    });
+  }
+
+  requestArchive() {
+    if (!this.isEditMode() || this.isArchived()) {
+      return;
+    }
+    this.pendingArchive.set(true);
+  }
+
+  dismissArchive() {
+    if (this.isArchiving()) {
+      return;
+    }
+    this.pendingArchive.set(false);
+  }
+
+  confirmArchive() {
+    this.changeArchived(true);
+  }
+
+  restoreProject() {
+    this.changeArchived(false);
+  }
+
+  private changeArchived(archived: boolean) {
+    const projectId = this.projectForm.controls['projectId'].value;
+    if (!projectId) {
+      return;
+    }
+    const projectName = this.currentProjectSignal()?.projectName || this.projectTitle();
+    this.mutations.track(this.masterService.setProjectArchived(projectId, archived), {
+      pending: this.pending,
+      destroyRef: this.destroyRef,
+      key: PENDING.archive,
+      onSuccess: (project) => {
+        this.pendingArchive.set(false);
+        if (projectId !== this.routedProjectId) {
+          return;
+        }
+        this.currentProjectSignal.set(this.cloneProject(project));
+      },
+      successToast: archived
+        ? {
+            title: 'Project archived',
+            description: `${projectName} moved to the Archived tab. Restore it any time.`,
+          }
+        : {
+            title: 'Project restored',
+            description: `${projectName} is active again.`,
+          },
+      errorToast: {
+        title: archived ? 'Archive failed' : 'Restore failed',
+        description: archived
+          ? 'Unable to archive the project right now.'
+          : 'Unable to restore the project right now.',
       },
     });
   }
@@ -918,6 +1001,7 @@ export class ProjectFormComponent implements OnInit {
     this.pendingSave.set(null);
     this.pendingApproval.set(null);
     this.pendingDelete.set(false);
+    this.pendingArchive.set(false);
     this.cancelCollaboratorAssignment();
   }
 
@@ -1267,12 +1351,10 @@ export class ProjectFormComponent implements OnInit {
   }
 
   contactAvatar(): AvatarView | null {
-    const name = String(this.projectForm.controls['contactPerson'].value ?? '').trim();
-    if (!name) {
-      return null;
-    }
-    const email = String(this.projectForm.controls['emailId'].value ?? '').trim();
-    return employeeAvatar({ employeeName: name, emailId: email || null });
+    return contactAvatar({
+      contactPerson: String(this.projectForm.controls['contactPerson'].value ?? ''),
+      emailId: String(this.projectForm.controls['emailId'].value ?? ''),
+    });
   }
 
   actorDisplayName(

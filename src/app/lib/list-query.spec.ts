@@ -149,6 +149,28 @@ describe('list-query', () => {
     expect(navArgs[1].queryParams.client).toBeNull();
   });
 
+  it('the view tab is written to ?view= and survives clearFilters', () => {
+    const navigateSpy = jasmine.createSpy('navigate').and.resolveTo(true);
+    const route = { queryParamMap: new Subject().asObservable() } as never;
+    const router = { navigate: navigateSpy } as unknown as Router;
+    const destroyRef = { onDestroy: () => () => undefined } as unknown as DestroyRef;
+    const view = signal('');
+    const ctrl = bindListQuery(route, router, destroyRef, signal('x'), signal(3), signal(''), {
+      view,
+    });
+
+    ctrl.setExtra('view', 'archived');
+    expect(view()).toBe('archived');
+    expect(navigateSpy.calls.mostRecent().args[1].queryParams.view).toBe('archived');
+
+    ctrl.clearFilters();
+    expect(view()).toBe('archived');
+    const params = navigateSpy.calls.mostRecent().args[1].queryParams;
+    expect(params.view).toBe('archived');
+    expect(params.q).toBeNull();
+    expect(parseListQueryParams(convertToParamMap({ view: ' archived ' })).view).toBe('archived');
+  });
+
   it('setFilter and clearFilters sync f and reset page', () => {
     const queryParamMap$ = new Subject();
     const navigateSpy = jasmine.createSpy('navigate').and.resolveTo(true);

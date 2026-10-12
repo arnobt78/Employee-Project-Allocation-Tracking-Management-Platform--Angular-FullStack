@@ -7,8 +7,10 @@ import {
   inject,
 } from '@angular/core';
 import { DatePipe, CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IProject } from '../../model/interface/master';
+import { Employee } from '../../model/class/Employee';
 import { MasterService } from '../../service/master.service';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { AlertDialogComponent } from '@/app/components/ui/alert-dialog.component';
@@ -17,6 +19,7 @@ import { ListPaginationComponent } from '@/app/components/ui/list-pagination.com
 import { ListPageShellComponent } from '@/app/components/ui/list-page-shell.component';
 import { KpiStatCardComponent } from '@/app/components/ui/kpi-stat-card.component';
 import { FieldLabelComponent } from '@/app/components/ui/field-label.component';
+import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
 import {
   ListToolbarComponent,
   ListToolbarMenuFilter,
@@ -25,12 +28,29 @@ import {
 import { SelectMenuOption } from '@/app/components/ui/select-menu.component';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 import {
+  ARCHIVE_VIEW_TABS,
+  TAB_ACTIVE_CLASS,
+  TAB_IDLE_CLASS,
+  TAB_ROW_CLASS,
+  type ArchiveView,
+} from '@/app/constants/tabs';
+import {
   bindListQuery,
   ListQueryController,
   paginateList,
 } from '@/app/lib/list-query';
 import { MutationTracker, PendingSet } from '@/app/lib/mutation-tracker';
-import { removeBy } from '@/app/lib/list-ops';
+import { removeBy, upsertBy } from '@/app/lib/list-ops';
+import { contactAvatar, employeeAvatar, type AvatarView } from '@/app/lib/media/employee-avatar';
+import {
+  deletedProjectDescription,
+  deleteProjectWarning,
+  inArchiveView,
+  isProjectArchived,
+  parseArchiveView,
+  projectCounts,
+  projectCountsLabel,
+} from '@/app/lib/status/project-archive';
 import { titleCaseLabel } from '@/app/lib/format/labels';
 import { BADGE_TONE_CLASS, projectStatusMeta } from '@/app/lib/status/project-status';
 
@@ -59,6 +79,7 @@ const ON_HOLD_STATUSES = new Set(['on_hold', 'on hold', 'paused', 'hold']);
     ListPageShellComponent,
     KpiStatCardComponent,
     FieldLabelComponent,
+    UserAvatarComponent,
     ListToolbarComponent,
   ],
   providers: [DatePipe],
@@ -85,6 +106,26 @@ export class ProjectComponent implements OnInit {
   readonly listPage = signal(1);
   readonly isLoading = signal(this.initialPeek === null);
   readonly hasLoaded = signal(this.initialPeek !== null);
+  private readonly employeesSignal = signal<Employee[]>(this.masterSrv.peekEmployees() ?? []);
+  private readonly employeesById = computed(
+    () => new Map(this.employeesSignal().map((employee) => [employee.employeeId, employee]))
+  );
+
+  readonly viewParam = signal('');
+  readonly view = computed<ArchiveView>(() => parseArchiveView(this.viewParam()));
+  readonly viewTabs = ARCHIVE_VIEW_TABS;
+  readonly tabRowClass = TAB_ROW_CLASS;
+  readonly tabActiveClass = TAB_ACTIVE_CLASS;
+  readonly tabIdleClass = TAB_IDLE_CLASS;
+
+  readonly counts = computed(() => projectCounts(this.projects()));
+  readonly countsLabel = computed(() => projectCountsLabel(this.counts()));
+  private readonly activeProjects = computed(() =>
+    inArchiveView(this.projects(), 'active', isProjectArchived)
+  );
+  private readonly viewProjects = computed(() =>
+    inArchiveView(this.projects(), this.view(), isProjectArchived)
+  );
 
   expandedProjectId: number | null = null;
 
@@ -92,7 +133,7 @@ export class ProjectComponent implements OnInit {
     const term = this.searchTerm().trim().toLowerCase();
     const status = this.filterValue().trim().toLowerCase();
     const client = this.clientFilter().trim().toLowerCase();
-    return this.projects().filter((project) => {
+    return this.viewProjects().filter((project) => {
       if (status && this.normalizedStatus(project) !== status) {
         return false;
       }
@@ -123,7 +164,7 @@ export class ProjectComponent implements OnInit {
       label: 'Status',
       emptyIcon: 'circle-dot',
       value: this.filterValue(),
-      options: this.uniqueStatusOptions(this.projects()),
+      options: this.uniqueStatusOptions(this.viewProjects()),
     },
     {
       id: 'client',
@@ -131,45 +172,36 @@ export class ProjectComponent implements OnInit {
       emptyIcon: 'building-2',
       value: this.clientFilter(),
       options: this.uniqueOptions(
-        this.projects(),
+        this.viewProjects(),
         (p) => p.clientName,
         'building-2'
       ),
     },
   ]);
 
-  readonly kpiTotal = computed(() => this.projects().length);
-
   readonly kpiInFlight = computed(
     () =>
-      this.projects().filter((p) =>
+      this.activeProjects().filter((p) =>
         IN_FLIGHT_STATUSES.has(this.normalizedStatus(p))
       ).length
   );
 
   readonly kpiPlanning = computed(
     () =>
-      this.projects().filter((p) =>
+      this.activeProjects().filter((p) =>
         PLANNING_STATUSES.has(this.normalizedStatus(p))
       ).length
   );
 
   readonly kpiOnHold = computed(
     () =>
-      this.projects().filter((p) =>
+      this.activeProjects().filter((p) =>
         ON_HOLD_STATUSES.has(this.normalizedStatus(p))
       ).length
   );
 
-  readonly kpiArchived = computed(
-    () =>
-      this.projects().filter(
-        (p) => p.archivedAt != null && p.archivedAt !== ''
-      ).length
-  );
-
   readonly kpiClients = computed(() =>
-    this.uniqueCount(this.projects(), (p) => p.clientName)
+    this.uniqueCount(this.activeProjects(), (p) => p.clientName)
   );
 
   readonly hasActiveFilters = computed(
@@ -180,11 +212,20 @@ export class ProjectComponent implements OnInit {
   );
 
   pendingDelete: IProject | null = null;
+  pendingArchive: IProject | null = null;
   readonly pendingDeletes = new PendingSet<number>();
+  /** Loaded when the delete dialog opens; null until the team list arrives. */
+  readonly deleteAssignmentCount = signal<number | null>(null);
+  readonly pendingArchives = new PendingSet<number>();
 
   get isDeleting(): boolean {
     const id = this.pendingDelete?.projectId;
     return id != null && this.pendingDeletes.has(id);
+  }
+
+  get isArchiving(): boolean {
+    const id = this.pendingArchive?.projectId;
+    return id != null && this.pendingArchives.has(id);
   }
 
   ngOnInit(): void {
@@ -197,9 +238,85 @@ export class ProjectComponent implements OnInit {
       this.filterValue,
       {
         client: this.clientFilter,
+        view: this.viewParam,
       }
     );
     this.getProjects();
+    this.masterSrv.warmLists(['assignments']);
+    this.masterSrv.getAllEmp().subscribe({
+      next: (employees) => this.employeesSignal.set(employees ?? []),
+      error: () => undefined,
+    });
+  }
+
+  setView(view: ArchiveView) {
+    this.expandedProjectId = null;
+    this.listQuery.setExtra('view', view === 'archived' ? view : '');
+  }
+
+  leadAvatar(project: IProject): AvatarView | null {
+    if (!project.leadByEmpId) {
+      return null;
+    }
+    const lead = this.employeesById().get(Number(project.leadByEmpId));
+    return employeeAvatar(lead, project.employeeName);
+  }
+
+  /** The lead's email lives on their employee record, never on the project. */
+  leadEmail(project: IProject): string {
+    return this.employeesById().get(Number(project.leadByEmpId))?.emailId ?? '';
+  }
+
+  readonly contactAvatar = contactAvatar;
+
+  onArchive(project: IProject) {
+    this.pendingArchive = project;
+  }
+
+  dismissArchive() {
+    if (!this.isArchiving) {
+      this.pendingArchive = null;
+    }
+  }
+
+  confirmArchive() {
+    const target = this.pendingArchive;
+    if (target?.projectId) {
+      this.changeArchived(target, true);
+    }
+  }
+
+  restore(project: IProject) {
+    this.changeArchived(project, false);
+  }
+
+  private changeArchived(project: IProject, archived: boolean) {
+    const { projectId, projectName } = project;
+    this.mutations.track(this.masterSrv.setProjectArchived(projectId, archived), {
+      pending: this.pendingArchives,
+      destroyRef: this.destroyRef,
+      key: projectId,
+      onSuccess: (saved) => {
+        this.projectsSignal.update((list) => upsertBy(list, 'projectId', saved));
+        this.pendingArchive = null;
+        if (this.expandedProjectId === projectId) {
+          this.expandedProjectId = null;
+        }
+      },
+      successToast: archived
+        ? {
+            title: 'Project archived',
+            description: `${projectName} and its team moved to Archived. Restore it any time.`,
+          }
+        : {
+            title: 'Project restored',
+            description: `${projectName} and its team are active again.`,
+          },
+      errorToast: {
+        title: archived ? 'Archive failed' : 'Restore failed',
+        description: 'Something went wrong. Please try again.',
+      },
+    });
   }
 
   getProjects() {
@@ -260,6 +377,18 @@ export class ProjectComponent implements OnInit {
     const project = this.projects().find((p) => p.projectId === id);
     if (!project) return;
     this.pendingDelete = project;
+    this.deleteAssignmentCount.set(null);
+    this.masterSrv
+      .getProjectEmp()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (rows) => {
+          if (this.pendingDelete?.projectId === id) {
+            this.deleteAssignmentCount.set(rows.filter((row) => row.projectId === id).length);
+          }
+        },
+        error: () => undefined,
+      });
   }
 
   confirmDelete() {
@@ -279,15 +408,19 @@ export class ProjectComponent implements OnInit {
           this.expandedProjectId = null;
         }
       },
-      successToast: {
+      successToast: (res) => ({
         title: 'Project deleted',
-        description: `${projectName} has been removed.`,
-      },
+        description: deletedProjectDescription(projectName, res),
+      }),
       errorToast: {
         title: 'Delete failed',
         description: 'Something went wrong while removing the project.',
       },
     });
+  }
+
+  deleteWarning(): string {
+    return deleteProjectWarning(this.deleteAssignmentCount());
   }
 
   dismissDelete() {

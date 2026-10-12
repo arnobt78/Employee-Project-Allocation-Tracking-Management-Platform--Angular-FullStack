@@ -14,6 +14,30 @@
     </app-page-header>
 
     <div class="eh-content-stack">
+      @if (isArchived()) {
+        <div
+          role="status"
+          class="flex flex-col gap-3 rounded-[24px] border border-slate-400/30 bg-slate-500/10 px-3 py-3 text-sm text-white/75 sm:flex-row sm:items-center sm:justify-between sm:px-4"
+        >
+          <p class="flex items-start gap-2">
+            <lucide-icon name="archive" [size]="16" class="mt-0.5 shrink-0 text-slate-300"></lucide-icon>
+            <span>{{ footerCopy.archived }}</span>
+          </p>
+          <button
+            ehAction
+            type="button"
+            class="eh-action-btn eh-action-btn-outline sm:shrink-0"
+            icon="archive-restore"
+            [iconSize]="14"
+            [pending]="isArchiving()"
+            pendingLabel="Restoring…"
+            [disabled]="isSaving() || isDeleting()"
+            (click)="restoreProject()"
+          >
+            <span>Restore Project</span>
+          </button>
+        </div>
+      }
       <section
         class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
         [formGroup]="readinessForm"
@@ -1520,6 +1544,12 @@
                               collaboratorAssignmentProfile()?.employeeId ===
                               collaborator.employeeId
                             "
+                            [disabled]="isArchived()"
+                            [attr.title]="
+                              isArchived()
+                                ? 'Restore the project to change its team'
+                                : null
+                            "
                             (click)="startCollaboratorAssignment(collaborator)"
                           >
                             <span>{{
@@ -1822,7 +1852,7 @@
                 >
                   <p class="eh-read-label">
                     <lucide-icon [name]="fieldIcons.emailId" [size]="14"></lucide-icon>
-                    <span>Email</span>
+                    <span>Contact Email</span>
                   </p>
                   <p class="break-words text-base font-medium text-white">
                     {{ displayValue("emailId") }}
@@ -2349,7 +2379,7 @@
             ></lucide-icon>
             <span>{{ footerCopy.autosave }}</span>
           </p>
-          <p *ngIf="isEditMode()" class="flex items-start gap-1.5 text-white/50">
+          <p *ngIf="isEditMode() && !isArchived()" class="flex items-start gap-1.5 text-white/50">
             <lucide-icon
               name="archive"
               [size]="14"
@@ -2360,18 +2390,33 @@
         </div>
         <div class="flex flex-wrap items-center gap-3 sm:shrink-0">
           @if (isEditMode()) {
+            @if (!isArchived()) {
+              <button
+                ehAction
+                type="button"
+                class="eh-action-btn eh-action-btn-outline"
+                icon="archive"
+                [iconSize]="14"
+                [pending]="isArchiving()"
+                pendingLabel="Archiving…"
+                [disabled]="isSaving() || isDeleting()"
+                (click)="requestArchive()"
+              >
+                <span>Archive Project</span>
+              </button>
+            }
             <button
               ehAction
               type="button"
               class="eh-action-btn eh-action-btn-danger"
-              icon="archive"
+              icon="trash-2"
               [iconSize]="14"
               [pending]="isDeleting()"
-              pendingLabel="Archiving…"
-              [disabled]="isSaving()"
+              pendingLabel="Deleting…"
+              [disabled]="isSaving() || isArchiving()"
               (click)="requestDelete()"
             >
-              <span>Archive Project</span>
+              <span>Delete Permanently</span>
             </button>
           }
           <button
@@ -2395,14 +2440,26 @@
 }
 
 <app-alert-dialog
-  [open]="pendingDelete()"
+  [open]="pendingArchive()"
   title="Archive This Project?"
-  description="The project and its team assignments will be removed from the workspace. This action cannot be undone."
+  description="The project and its team move to the Archived tab and drop out of Timeline, Calendar, Insights and capacity. Nothing is deleted; restore it any time."
   confirmLabel="Archive Project"
   confirmIcon="archive"
+  [busy]="isArchiving()"
+  busyLabel="Archiving…"
+  (confirmed)="confirmArchive()"
+  (cancelled)="dismissArchive()"
+></app-alert-dialog>
+
+<app-alert-dialog
+  [open]="pendingDelete()"
+  title="Delete This Project Permanently?"
+  [description]="deleteWarning()"
+  confirmLabel="Delete Permanently"
+  confirmIcon="trash-2"
   variant="destructive"
   [busy]="isDeleting()"
-  busyLabel="Archiving…"
+  busyLabel="Deleting…"
   (confirmed)="confirmDelete()"
   (cancelled)="dismissDelete()"
 ></app-alert-dialog>

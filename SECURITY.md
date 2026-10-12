@@ -26,7 +26,7 @@ You should receive an acknowledgement within a few business days. Please allow r
 
 This project is a **portfolio and learning demo**. It uses a seeded demo admin account for sign-in. Treat demo credentials and any sample data as **non-production**. Do not store real personal data or production secrets in a public fork without rotating keys and hardening auth.
 
-Tracked seed files under `dataset/` must use **synthetic** emails, phones, and names only (`@example.com` preferred). Domain wipe/reseed scripts (`db:wipe:local`, `db:reseed:local`) require `ALLOW_DB_WIPE=1` and refuse non-localhost `DATABASE_URL` unless an explicit override is set—never enable those overrides against production.
+The tracked demo dataset (`prisma/seed-data.ts`) must use **synthetic** names, emails and phones only, and never seeds employee passwords. `db:reset:demo` / `db:reseed:local` require `ALLOW_DB_WIPE=1`, refuse a non-localhost `DATABASE_URL` unless `EH_ALLOW_REMOTE_WIPE=1` is also set, print only the target host and database (never credentials), revoke all sessions and keep a single bcrypt-hashed `admin` login. The hosted demo database is demo-only; never point these scripts at a database holding real data.
 
 Optional integrations (AI keys, CMS tokens, email SMTP/Resend, Sentry auth tokens) must stay **server-side** (see `.env.example`). Never commit real `.env` files or put secrets under `NG_APP_*` prefixes.
 

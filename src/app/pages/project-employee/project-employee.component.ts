@@ -54,9 +54,25 @@ import {
   ListQueryController,
   paginateList,
 } from '@/app/lib/list-query';
+import {
+  ARCHIVE_VIEW_TABS,
+  TAB_ACTIVE_CLASS,
+  TAB_IDLE_CLASS,
+  TAB_ROW_CLASS,
+  type ArchiveView,
+} from '@/app/constants/tabs';
+import {
+  inArchiveView,
+  isAssignmentArchived,
+  isProjectArchived,
+  parseArchiveView,
+  projectCounts,
+  projectCountsLabel,
+} from '@/app/lib/status/project-archive';
 
 const SAVE_KEY = 'save';
 const deleteKey = (empProjectId: number) => `delete:${empProjectId}`;
+const restoreKey = (projectId: number) => `restore:${projectId}`;
 
 @Component({
   selector: 'app-project-employee',
@@ -107,7 +123,7 @@ export class ProjectEmployeeComponent implements OnInit {
   readonly employees = this.employeesSignal.asReadonly();
 
   readonly projectOptions = computed<SelectMenuOption[]>(() =>
-    this.projects().map((project) => ({
+    inArchiveView(this.projects(), 'active', isProjectArchived).map((project) => ({
       value: String(project.projectId),
       label: project.projectName,
       icon: 'folder-kanban',
@@ -121,6 +137,28 @@ export class ProjectEmployeeComponent implements OnInit {
       imageSeed: employeeAvatar(employee).seed,
       imageUrl: employee.avatarUrl ?? null,
     }))
+  );
+
+  readonly viewParam = signal('');
+  readonly view = computed<ArchiveView>(() => parseArchiveView(this.viewParam()));
+  readonly viewTabs = ARCHIVE_VIEW_TABS;
+  readonly tabRowClass = TAB_ROW_CLASS;
+  readonly tabActiveClass = TAB_ACTIVE_CLASS;
+  readonly tabIdleClass = TAB_IDLE_CLASS;
+  readonly counts = computed(() => projectCounts(this.projects()));
+  readonly countsLabel = computed(() => projectCountsLabel(this.counts()));
+  private readonly leadByProject = computed(
+    () => new Map(this.projects().map((project) => [project.projectId, project.leadByEmpId]))
+  );
+  /** Assignments split by their project's archive state; archived rows are read-only. */
+  readonly activeAssignments = computed(() =>
+    inArchiveView(this.assignments(), 'active', isAssignmentArchived)
+  );
+  readonly archivedAssignmentCount = computed(
+    () => this.assignments().length - this.activeAssignments().length
+  );
+  private readonly viewAssignments = computed(() =>
+    inArchiveView(this.assignments(), this.view(), isAssignmentArchived)
   );
 
   readonly searchTerm = signal<string>('');
@@ -138,7 +176,7 @@ export class ProjectEmployeeComponent implements OnInit {
       emptyIcon: 'folder-kanban',
       value: this.filterValue(),
       options: this.uniqueOptions(
-        this.assignments(),
+        this.viewAssignments(),
         (item) => item.projectName,
         'folder-kanban'
       ),
@@ -149,7 +187,7 @@ export class ProjectEmployeeComponent implements OnInit {
       emptyIcon: 'briefcase',
       value: this.roleFilter(),
       options: this.uniqueOptions(
-        this.assignments(),
+        this.viewAssignments(),
         (item) => item.role,
         'briefcase'
       ),
@@ -180,7 +218,7 @@ export class ProjectEmployeeComponent implements OnInit {
     const role = this.roleFilter().trim().toLowerCase();
     const activeFilter = this.activeFilter().trim().toLowerCase();
 
-    return this.assignments().filter((item) => {
+    return this.viewAssignments().filter((item) => {
       const active = this.isActive(item.isActive);
 
       if (
@@ -213,29 +251,23 @@ export class ProjectEmployeeComponent implements OnInit {
     paginateList(this.filteredAssignments(), this.listPage())
   );
 
-  readonly totalAssignmentsKpi = computed(() => this.assignments().length);
+  readonly totalAssignmentsKpi = computed(() => this.activeAssignments().length);
   readonly activeAssignmentsKpi = computed(
     () =>
-      this.assignments().filter((item) => this.isActive(item.isActive)).length
+      this.activeAssignments().filter((item) => this.isActive(item.isActive)).length
   );
-  readonly inactiveAssignmentsKpi = computed(() => {
-    const data = this.assignments();
-    return (
-      data.length - data.filter((item) => this.isActive(item.isActive)).length
-    );
-  });
-  readonly uniqueProjectsKpi = computed(() =>
-    this.uniqueCount(this.assignments(), (item) => item.projectName)
+  readonly inactiveAssignmentsKpi = computed(
+    () => this.totalAssignmentsKpi() - this.activeAssignmentsKpi()
   );
   readonly uniqueEmployeesKpi = computed(() =>
-    this.uniqueCount(this.assignments(), (item) =>
+    this.uniqueCount(this.activeAssignments(), (item) =>
       item.empId != null && item.empId !== 0
         ? String(item.empId)
         : item.employeeName
     )
   );
   readonly uniqueRolesKpi = computed(() =>
-    this.uniqueCount(this.assignments(), (item) => item.role)
+    this.uniqueCount(this.activeAssignments(), (item) => item.role)
   );
 
   projectEmployeeForm: FormGroup = this.fb.group({
@@ -279,6 +311,7 @@ export class ProjectEmployeeComponent implements OnInit {
       {
         role: this.roleFilter,
         active: this.activeFilter,
+        view: this.viewParam,
       }
     );
     const projectsSnap = this.masterService.peekProjects();
@@ -364,7 +397,51 @@ export class ProjectEmployeeComponent implements OnInit {
     });
   }
 
+  setView(view: ArchiveView) {
+    this.expandedAssignmentId = null;
+    this.cancelEdit();
+    this.listQuery.setExtra('view', view === 'archived' ? view : '');
+  }
+
+  isLead(item: IProjectEmployee): boolean {
+    const leadId = this.leadByProject().get(item.projectId);
+    return leadId != null && Number(leadId) === Number(item.empId);
+  }
+
+  isRestoring(projectId: number): boolean {
+    return this.pending.has(restoreKey(projectId));
+  }
+
+  /** Restoring unlocks the whole team; the cache patch updates every row of that project. */
+  restoreProject(item: IProjectEmployee) {
+    const { projectId, projectName } = item;
+    this.mutations.track(this.masterService.setProjectArchived(projectId, false), {
+      pending: this.pending,
+      destroyRef: this.destroyRef,
+      key: restoreKey(projectId),
+      onSuccess: (project) => {
+        this.projectsSignal.update((list) => upsertBy(list, 'projectId', project));
+        this.assignmentsSignal.update((list) =>
+          list.map((row) =>
+            row.projectId === projectId ? { ...row, projectArchivedAt: null } : row
+          )
+        );
+      },
+      successToast: {
+        title: 'Project restored',
+        description: `${projectName} and its team are active again.`,
+      },
+      errorToast: {
+        title: 'Restore failed',
+        description: 'Unable to restore the project right now.',
+      },
+    });
+  }
+
   onEdit(projectEmployee: IProjectEmployee) {
+    if (isAssignmentArchived(projectEmployee)) {
+      return;
+    }
     this.showCreatePanel = false;
     this.editingAssignmentId = projectEmployee.empProjectId;
     this.expandedAssignmentId = projectEmployee.empProjectId;
@@ -397,7 +474,7 @@ export class ProjectEmployeeComponent implements OnInit {
     const assignment = this.assignments().find(
       (item) => item.empProjectId === id
     );
-    if (!assignment) {
+    if (!assignment || isAssignmentArchived(assignment)) {
       return;
     }
     this.pendingDelete = assignment;

@@ -1,4 +1,5 @@
 import type { KpiStatTone } from '@/app/components/ui/kpi-stat-card.component';
+import { TAB_ACTIVE_CLASS, TAB_IDLE_CLASS } from './tabs';
 
 /** Static API Status copy shared by the live page and its loading mirror. */
 export type ApiStatusTabId = 'overview' | 'endpoints' | 'performance' | 'activity';
@@ -10,10 +11,8 @@ export const API_STATUS_TABS: readonly { id: ApiStatusTabId; label: string; icon
   { id: 'activity', label: 'Activity', icon: 'activity' },
 ];
 
-export const API_STATUS_TAB_ACTIVE_CLASS =
-  'inline-flex items-center gap-2 border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary';
-export const API_STATUS_TAB_IDLE_CLASS =
-  'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white';
+export const API_STATUS_TAB_ACTIVE_CLASS = TAB_ACTIVE_CLASS;
+export const API_STATUS_TAB_IDLE_CLASS = TAB_IDLE_CLASS;
 
 export const API_STATUS_COPY = {
   refresh: 'Refresh',

@@ -79,6 +79,7 @@ import { ApiStatusSkeletonComponent } from './api-status-skeleton.component';
                     [kpiCount]="meta().listKpiCount ?? 6"
                     [filterCount]="meta().listFilterCount ?? 3"
                     [showPagination]="meta().listShowPagination ?? false"
+                    [tabCount]="meta().listTabCount ?? 0"
                     [rowVariant]="meta().listRowVariant ?? 'default'"
                   ></app-list-page-skeleton>
                 }

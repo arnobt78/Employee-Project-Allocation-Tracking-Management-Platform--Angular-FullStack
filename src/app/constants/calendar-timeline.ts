@@ -1,3 +1,5 @@
+import { TAB_ACTIVE_CLASS, TAB_IDLE_CLASS } from './tabs';
+
 export type CalendarTabId = 'calendar' | 'timeline' | 'gantt';
 
 export const CALENDAR_TABS: ReadonlyArray<{
@@ -10,8 +12,6 @@ export const CALENDAR_TABS: ReadonlyArray<{
   { id: 'gantt', label: 'Gantt View', icon: 'chart-column' },
 ];
 
-export const CALENDAR_TAB_ACTIVE_CLASS =
-  'inline-flex items-center gap-2 border-b-2 border-primary px-4 py-2 text-sm font-medium text-primary';
+export const CALENDAR_TAB_ACTIVE_CLASS = TAB_ACTIVE_CLASS;
 
-export const CALENDAR_TAB_IDLE_CLASS =
-  'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white';
+export const CALENDAR_TAB_IDLE_CLASS = TAB_IDLE_CLASS;

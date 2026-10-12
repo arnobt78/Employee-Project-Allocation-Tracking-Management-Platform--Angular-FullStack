@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { after, before, describe, test } from "node:test";
 import { sessionCookie, startApiServer, unwrap } from "./support/api-server.mjs";
-import { createFakeDb, installFakeDb } from "./support/fake-db.mjs";
+import { LEGACY_ID_FLAG, createFakeDb, installFakeDb } from "./support/fake-db.mjs";
 
 const db = createFakeDb();
 installFakeDb(db);
@@ -82,15 +82,9 @@ describe("CRUD HTTP flow", () => {
 
   after(() => api.close());
 
-  test("seed data is bootstrapped once into an empty database", async () => {
-    const employees = await list("GetAllEmployees");
-    const projects = await list("GetAllProjects");
-    assert.ok(employees.length > 0);
-    assert.ok(projects.length > 0);
-    assert.deepEqual(
-      employees.map((e) => e.employeeId),
-      [...employees.map((e) => e.employeeId)].sort((a, b) => a - b)
-    );
+  test("an empty database stays empty: no legacy data is imported", async () => {
+    assert.deepEqual(await list("GetAllProjects"), []);
+    assert.deepEqual(await list("GetAllProjectEmployees"), []);
   });
 
   describe("employees", () => {
@@ -164,6 +158,178 @@ describe("CRUD HTTP flow", () => {
       assert.equal(db.tables.projectEmployee.has(doomedAssignment.empProjectId), false);
       assert.ok(db.tables.projectEmployee.has(keptAssignment.empProjectId));
       assert.equal((await request(`GetProject/${doomed.projectId}`)).status, 404);
+    });
+
+    test("delete also removes assignments Prisma's deleteMany cannot see and reports the count", async () => {
+      const employee = await createEmployee();
+      const other = await createEmployee();
+      const project = await createProject();
+      const regular = await createAssignment(project.projectId, employee.employeeId);
+      const legacy = await createAssignment(project.projectId, other.employeeId);
+      db.tables.projectEmployee.get(legacy.empProjectId)[LEGACY_ID_FLAG] = true;
+
+      const { status, json } = await del(`DeleteProject/${project.projectId}`);
+      assert.equal(status, 200);
+      assert.equal(json.data.deletedAssignments, 2);
+      assert.equal(db.tables.projectEmployee.has(regular.empProjectId), false);
+      assert.equal(db.tables.projectEmployee.has(legacy.empProjectId), false);
+      const listed = await list("GetAllProjectEmployees");
+      assert.equal(listed.some((item) => item.projectId === project.projectId), false);
+      assert.equal(listed.some((item) => item.projectName === "Unknown Project"), false);
+    });
+
+    test("assignment lists never return rows whose project is gone", async () => {
+      const employee = await createEmployee();
+      const project = await createProject();
+      const assignment = await createAssignment(project.projectId, employee.employeeId);
+      db.tables.project.delete(project.projectId);
+      const listed = await list("GetAllProjectEmployees");
+      assert.equal(listed.some((item) => item.empProjectId === assignment.empProjectId), false);
+    });
+
+    test("archive keeps the project and its assignments; restore brings them back unchanged", async () => {
+      const employee = await createEmployee();
+      const project = await createProject();
+      const assignment = await createAssignment(project.projectId, employee.employeeId, {
+        allocationPct: 60,
+      });
+
+      const archived = await post(`ArchiveProject/${project.projectId}`);
+      assert.equal(archived.status, 200);
+      assert.ok(archived.data.archivedAt);
+      assert.equal(archived.data.archivedBy, "admin user");
+      assert.equal(archived.data.statusHistory.at(-1).comment, "Project archived");
+      assert.ok(db.tables.projectEmployee.has(assignment.empProjectId));
+      const listed = (await list("GetAllProjectEmployees")).find(
+        (item) => item.empProjectId === assignment.empProjectId
+      );
+      assert.ok(listed.projectArchivedAt);
+
+      const schedule = await list("GetSchedule");
+      assert.equal(schedule.projectTimelines.some((p) => p.projectId === project.projectId), false);
+      const dashboard = await list("GetDashboard");
+      assert.ok(dashboard.archivedProject >= 1);
+
+      const restored = await post(`RestoreProject/${project.projectId}`);
+      assert.equal(restored.status, 200);
+      assert.equal(restored.data.archivedAt, undefined);
+      assert.equal(restored.data.statusHistory.at(-1).comment, "Project restored");
+      const stored = db.tables.projectEmployee.get(assignment.empProjectId);
+      assert.equal(stored.allocationPct, 60);
+      assert.equal(stored.isActive, true);
+      const again = await list("GetSchedule");
+      const timeline = again.projectTimelines.find((p) => p.projectId === project.projectId);
+      assert.equal(timeline.teamSize, 1);
+      assert.equal(typeof timeline.readinessScore, "number");
+
+      assert.equal((await post("ArchiveProject/999999")).status, 404);
+      assert.equal((await post("RestoreProject/abc")).status, 400);
+    });
+
+    test("an archived project's team is read-only and its allocation frees capacity", async () => {
+      const employee = await createEmployee();
+      const other = await createEmployee();
+      const archivedProject = await createProject();
+      const liveProject = await createProject();
+      const assignment = await createAssignment(archivedProject.projectId, employee.employeeId, {
+        allocationPct: 70,
+      });
+      await post(`ArchiveProject/${archivedProject.projectId}`);
+
+      const blockedCreate = await post("CreateProjectEmployee", {
+        projectId: archivedProject.projectId,
+        empId: other.employeeId,
+      });
+      assert.equal(blockedCreate.status, 409);
+      assert.equal(blockedCreate.json.message, "Project is archived. Restore it before changing its team");
+      assert.equal((await put(`UpdateProjectEmployee/${assignment.empProjectId}`, { role: "x" })).status, 409);
+      assert.equal((await del(`DeleteProjectEmployee/${assignment.empProjectId}`)).status, 409);
+
+      await createAssignment(liveProject.projectId, employee.employeeId, { allocationPct: 20 });
+      const insights = await request(`GetProjectResources/${liveProject.projectId}`);
+      const member = insights.data.assignments.find(
+        (item) => item.employee.employeeId === employee.employeeId
+      );
+      assert.equal(member.employee.allocation.allocatedPct, 20);
+      assert.equal(
+        member.employee.activeAssignments.some((item) => item.projectId === archivedProject.projectId),
+        false
+      );
+    });
+  });
+
+  describe("project lead", () => {
+    test("creating a project with a lead assigns the lead once", async () => {
+      const lead = await createEmployee({ employeeName: "Lead On Create" });
+      const project = await createProject({ leadByEmpId: lead.employeeId });
+      const rows = [...db.tables.projectEmployee.values()].filter(
+        (row) => row.projectId === project.projectId
+      );
+      assert.equal(rows.length, 1);
+      assert.equal(rows[0].empId, lead.employeeId);
+      assert.equal(rows[0].role, "Project Lead");
+      assert.equal(rows[0].isActive, true);
+    });
+
+    test("changing the lead adds exactly one assignment and keeps the old lead's role", async () => {
+      const first = await createEmployee();
+      const second = await createEmployee();
+      const project = await createProject({ leadByEmpId: first.employeeId });
+      const teamOf = () =>
+        [...db.tables.projectEmployee.values()].filter((row) => row.projectId === project.projectId);
+
+      assert.equal((await put(`UpdateProject/${project.projectId}`, { leadByEmpId: second.employeeId })).status, 200);
+      assert.equal(teamOf().length, 2);
+      assert.equal(teamOf().find((row) => row.empId === first.employeeId).role, "Project Lead");
+      assert.equal(teamOf().find((row) => row.empId === second.employeeId).role, "Project Lead");
+
+      await put(`UpdateProject/${project.projectId}`, { leadByEmpId: second.employeeId });
+      assert.equal(teamOf().length, 2);
+    });
+
+    test("an inactive lead assignment is reactivated instead of duplicated", async () => {
+      const lead = await createEmployee();
+      const project = await createProject();
+      const assignment = await createAssignment(project.projectId, lead.employeeId, { isActive: "N" });
+
+      await put(`UpdateProject/${project.projectId}`, { leadByEmpId: lead.employeeId });
+      const stored = db.tables.projectEmployee.get(assignment.empProjectId);
+      assert.equal(stored.isActive, true);
+      assert.equal(stored.unassignedAt, null);
+      assert.equal(stored.role, "Developer");
+    });
+
+    test("an archived project's lead cannot change, but other edits still save", async () => {
+      const first = await createEmployee();
+      const second = await createEmployee();
+      const project = await createProject({ leadByEmpId: first.employeeId });
+      await post(`ArchiveProject/${project.projectId}`);
+      const teamSize = () =>
+        [...db.tables.projectEmployee.values()].filter((row) => row.projectId === project.projectId).length;
+
+      const changed = await put(`UpdateProject/${project.projectId}`, { leadByEmpId: second.employeeId });
+      assert.equal(changed.status, 409);
+      assert.equal(db.tables.project.get(project.projectId).leadByEmpId, first.employeeId);
+      assert.equal(teamSize(), 1);
+
+      const renamed = await put(`UpdateProject/${project.projectId}`, {
+        projectName: "Renamed while archived",
+        leadByEmpId: first.employeeId,
+      });
+      assert.equal(renamed.status, 200);
+      assert.equal(teamSize(), 1);
+    });
+
+    test("an unknown lead is a 404 and writes nothing", async () => {
+      const before = db.tables.project.size;
+      const created = await post("CreateProject", { projectName: "Ghost lead", leadByEmpId: 999999 });
+      assert.equal(created.status, 404);
+      assert.equal(created.json.message, "Lead employee not found");
+      assert.equal(db.tables.project.size, before);
+      const project = await createProject();
+      const updated = await put(`UpdateProject/${project.projectId}`, { leadByEmpId: 999999 });
+      assert.equal(updated.status, 404);
+      assert.equal(db.tables.project.get(project.projectId).leadByEmpId ?? null, null);
     });
 
     test("missing name is a 400 and unknown ids are 404", async () => {
@@ -250,6 +416,28 @@ describe("CRUD HTTP flow", () => {
         404
       );
       assert.equal(db.tables.projectEmployee.size, before);
+    });
+
+    test("an employee can be assigned to a project only once", async () => {
+      const employee = await createEmployee();
+      const other = await createEmployee();
+      const project = await createProject();
+      const first = await createAssignment(project.projectId, employee.employeeId);
+      const second = await createAssignment(project.projectId, other.employeeId);
+
+      const duplicate = await post("CreateProjectEmployee", {
+        projectId: project.projectId,
+        empId: employee.employeeId,
+      });
+      assert.equal(duplicate.status, 409);
+      assert.equal(duplicate.json.message, "Employee is already assigned to this project");
+      const moved = await put(`UpdateProjectEmployee/${second.empProjectId}`, { empId: employee.employeeId });
+      assert.equal(moved.status, 409);
+      assert.equal(db.tables.projectEmployee.get(second.empProjectId).empId, other.employeeId);
+      assert.equal(
+        (await put(`UpdateProjectEmployee/${first.empProjectId}`, { empId: employee.employeeId })).status,
+        200
+      );
     });
 
     test("unknown assignment ids are 404", async () => {

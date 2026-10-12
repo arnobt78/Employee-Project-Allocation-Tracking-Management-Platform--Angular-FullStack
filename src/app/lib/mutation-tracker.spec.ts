@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { DestroyRef } from '@angular/core';
 import { TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { Subject, throwError } from 'rxjs';
@@ -53,6 +54,24 @@ describe('MutationTracker', () => {
     expect(onError).toHaveBeenCalled();
     expect(pending.has(1)).toBeFalse();
     expect(toast.error).toHaveBeenCalledWith({ title: 'Failed' });
+  });
+
+  it("shows a 4xx response's message but never a 5xx body", () => {
+    const pending = new PendingSet<number>();
+    const conflict = new HttpErrorResponse({
+      status: 409,
+      error: { result: false, message: 'Employee is already assigned to this project' },
+    });
+    const crash = new HttpErrorResponse({ status: 500, error: { message: 'stack trace' } });
+    const errorToast = { title: 'Creation failed', description: 'Unable to create.' };
+
+    tracker.track(throwError(() => conflict), { pending, key: 1, errorToast });
+    tracker.track(throwError(() => crash), { pending, key: 2, errorToast });
+
+    expect(toast.error.calls.argsFor(0)).toEqual([
+      { title: 'Creation failed', description: 'Employee is already assigned to this project' },
+    ]);
+    expect(toast.error.calls.argsFor(1)).toEqual([errorToast]);
   });
 
   it('tracks keys independently and ignores a duplicate submit', () => {

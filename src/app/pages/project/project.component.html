@@ -6,6 +6,7 @@
   [skeletonKpiCount]="6"
   [skeletonFilterCount]="2"
   [skeletonShowPagination]="true"
+  [skeletonTabCount]="viewTabs.length"
   skeletonRowVariant="project"
 >
   <button
@@ -20,9 +21,9 @@
 
   <app-kpi-stat-card
     listShellKpis
-    label="Total Projects"
-    [value]="kpiTotal()"
-    hint="All projects in the workspace"
+    label="Projects"
+    [value]="counts().active"
+    [hint]="countsLabel()"
     icon="folder-kanban"
     tone="sky"
   ></app-kpi-stat-card>
@@ -30,7 +31,7 @@
     listShellKpis
     label="In Flight"
     [value]="kpiInFlight()"
-    hint="Approved, active, or in review"
+    hint="Active projects approved or in review"
     icon="zap"
     tone="emerald"
   ></app-kpi-stat-card>
@@ -53,8 +54,8 @@
   <app-kpi-stat-card
     listShellKpis
     label="Archived"
-    [value]="kpiArchived()"
-    hint="Archived via archive date"
+    [value]="counts().archived"
+    hint="Restorable from the Archived tab"
     icon="archive"
     tone="sky"
   ></app-kpi-stat-card>
@@ -62,10 +63,28 @@
     listShellKpis
     label="Clients"
     [value]="kpiClients()"
-    hint="Unique client names"
+    hint="Unique clients on active projects"
     icon="building-2"
     tone="emerald"
   ></app-kpi-stat-card>
+
+  <div listShellToolbar [class]="tabRowClass" role="tablist" aria-label="Project views">
+    @for (tab of viewTabs; track tab.id) {
+      <button
+        type="button"
+        role="tab"
+        (click)="setView(tab.id)"
+        [class]="view() === tab.id ? tabActiveClass : tabIdleClass"
+        [attr.aria-selected]="view() === tab.id"
+      >
+        <lucide-icon [name]="tab.icon" [size]="14"></lucide-icon>
+        {{ tab.label }}
+        <span class="eh-badge eh-badge-neutral">
+          {{ tab.id === 'archived' ? counts().archived : counts().active }}
+        </span>
+      </button>
+    }
+  </div>
 
   <app-list-toolbar
     listShellToolbar
@@ -120,6 +139,12 @@
               <lucide-icon [name]="status.icon" [size]="12"></lucide-icon>
               {{ status.label }}
             </span>
+            @if (project.archivedAt) {
+              <span class="eh-badge" [ngClass]="badgeTone.slate">
+                <lucide-icon name="archive" [size]="12"></lucide-icon>
+                Archived {{ formattedDate(project.archivedAt) }}
+              </span>
+            }
             <span
               *ngIf="project.clientName"
               class="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs sm:text-sm text-white/70"
@@ -142,6 +167,31 @@
               <lucide-icon name="panel-right" [size]="14"></lucide-icon>
               <span>Details</span>
             </a>
+            @if (view() === 'archived') {
+              <button
+                ehAction
+                type="button"
+                icon="archive-restore"
+                [pending]="pendingArchives.has(project.projectId)"
+                pendingLabel="Restoring…"
+                class="eh-action-btn eh-action-btn-primary"
+                (click)="restore(project)"
+              >
+                <span>Restore</span>
+              </button>
+            } @else {
+              <button
+                ehAction
+                type="button"
+                icon="archive"
+                [pending]="pendingArchives.has(project.projectId)"
+                pendingLabel="Archiving…"
+                class="eh-action-btn eh-action-btn-outline"
+                (click)="onArchive(project)"
+              >
+                <span>Archive</span>
+              </button>
+            }
             <button
               ehAction
               type="button"
@@ -185,33 +235,61 @@
             class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
           >
             <app-field-label text="Lead" icon="user"></app-field-label>
-            <p class="text-base font-medium text-white">
-              {{ project.employeeName || "—" }}
-            </p>
+            @let lead = leadAvatar(project);
+            @if (lead) {
+              <div class="mt-1 flex min-w-0 items-center gap-3">
+                <app-user-avatar
+                  [seed]="lead.seed"
+                  [imageUrl]="lead.imageUrl"
+                  [label]="lead.label"
+                  [alt]="lead.label"
+                  [size]="36"
+                ></app-user-avatar>
+                <div class="min-w-0">
+                  <p class="truncate text-base font-medium text-white">
+                    {{ project.employeeName || lead.label }}
+                  </p>
+                  <p class="flex items-center gap-1.5 truncate text-xs text-white/60">
+                    <lucide-icon name="mail" [size]="12"></lucide-icon>
+                    {{ leadEmail(project) || "—" }}
+                  </p>
+                </div>
+              </div>
+            } @else {
+              <p class="text-base font-medium text-white">—</p>
+            }
           </div>
           <div
             class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
           >
-            <app-field-label text="Contact" icon="contact"></app-field-label>
-            <p class="text-base font-medium text-white">
-              {{ project.contactPerson || "—" }}
-            </p>
-          </div>
-          <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
-          >
-            <app-field-label text="Email" icon="mail"></app-field-label>
-            <p class="truncate text-base font-medium text-white">
-              {{ project.emailId || "—" }}
-            </p>
-          </div>
-          <div
-            class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
-          >
-            <app-field-label text="Phone" icon="phone"></app-field-label>
-            <p class="text-base font-medium text-white">
-              {{ project.contactNo || "—" }}
-            </p>
+            <app-field-label text="Client Contact" icon="contact"></app-field-label>
+            @let contact = contactAvatar(project);
+            @if (contact) {
+              <div class="mt-1 flex min-w-0 items-center gap-3">
+                <app-user-avatar
+                  [seed]="contact.seed"
+                  [imageUrl]="contact.imageUrl"
+                  [label]="contact.label"
+                  [alt]="contact.label"
+                  [size]="36"
+                ></app-user-avatar>
+                <div class="min-w-0">
+                  <p class="truncate text-base font-medium text-white">
+                    {{ contact.label }}
+                  </p>
+                  <p class="flex items-center gap-1.5 truncate text-xs text-white/60">
+                    <lucide-icon name="mail" [size]="12"></lucide-icon>
+                    {{ project.emailId || "—" }}
+                  </p>
+                  <p class="flex items-center gap-1.5 truncate text-xs text-white/60">
+                    <lucide-icon name="phone" [size]="12"></lucide-icon>
+                    {{ project.contactNo || "—" }}
+                  </p>
+                </div>
+              </div>
+            } @else {
+              <p class="text-base font-medium text-white">—</p>
+            }
           </div>
           <div
             class="rounded-2xl border border-white/10 bg-white/5 px-2 py-3 sm:px-4"
@@ -246,7 +324,13 @@
       *ngIf="hasLoaded() && !filteredProjects().length"
       class="rounded-[28px] border border-dashed border-white/15 bg-white/5/60 px-2 py-12 text-center text-sm text-white/60 sm:px-4"
     >
-      No projects match your filters.
+      {{
+        hasActiveFilters()
+          ? "No projects match your filters."
+          : view() === "archived"
+            ? "No archived projects. Archived projects appear here and can be restored."
+            : "No active projects yet."
+      }}
     </div>
   </section>
 </app-list-page-shell>
@@ -258,11 +342,27 @@
       ? 'Delete ' + pendingDelete.projectName + '?'
       : 'Delete Project?'
   "
-  description="This permanently removes the project and its assignments."
-  confirmLabel="Delete Project"
+  [description]="deleteWarning()"
+  confirmLabel="Delete Permanently"
   variant="destructive"
   [busy]="isDeleting"
   busyLabel="Deleting…"
   (confirmed)="confirmDelete()"
   (cancelled)="dismissDelete()"
+></app-alert-dialog>
+
+<app-alert-dialog
+  [open]="!!pendingArchive"
+  [title]="
+    pendingArchive
+      ? 'Archive ' + pendingArchive.projectName + '?'
+      : 'Archive Project?'
+  "
+  description="The project and its team move to the Archived tab and drop out of Timeline, Calendar, Insights and capacity. Nothing is deleted; restore it any time."
+  confirmLabel="Archive Project"
+  confirmIcon="archive"
+  [busy]="isArchiving"
+  busyLabel="Archiving…"
+  (confirmed)="confirmArchive()"
+  (cancelled)="dismissArchive()"
 ></app-alert-dialog>

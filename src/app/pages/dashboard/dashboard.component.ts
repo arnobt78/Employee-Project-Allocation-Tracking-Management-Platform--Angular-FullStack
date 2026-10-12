@@ -19,10 +19,18 @@ import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 import { BADGE_TONE_CLASS, projectStatusMeta } from '@/app/lib/status/project-status';
 import { employeeAvatar } from '@/app/lib/media/employee-avatar';
+import {
+  isAssignmentArchived,
+  isProjectArchived,
+  projectCounts,
+  projectCountsLabel,
+} from '@/app/lib/status/project-archive';
 
 interface DashboardSnapshot {
   totalEmployee: number;
+  /** Non-archived projects. */
   totalProject: number;
+  archivedProject?: number;
   activeProjectEmployees: number;
   recentProjects: IProject[];
   recentEmployee: Employee[];
@@ -73,6 +81,20 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadPageData();
+  }
+
+  /** "N Active · M Archived" from the cached list, else from the dashboard aggregate. */
+  get projectCountsLabel(): string {
+    if (this.projectStats) {
+      return projectCountsLabel({
+        active: this.projectStats.nonArchived,
+        archived: this.projectStats.archived,
+        total: this.projectStats.nonArchived + this.projectStats.archived,
+      });
+    }
+    const active = this.dashboardData?.totalProject ?? 0;
+    const archived = this.dashboardData?.archivedProject ?? 0;
+    return projectCountsLabel({ active, archived, total: active + archived });
   }
 
   get opsSummary(): string {
@@ -267,14 +289,13 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    const archivedProjects = this.projects.filter(
-      (p) => p.archivedAt != null && p.archivedAt !== ''
-    );
-    const nonArchivedProjects = this.projects.filter(
-      (p) => !p.archivedAt || p.archivedAt === ''
+    const counts = projectCounts(this.projects);
+    const nonArchivedProjects = this.projects.filter((p) => !isProjectArchived(p));
+    const liveAssignments = this.projectEmployees.filter(
+      (pe) => !isAssignmentArchived(pe)
     );
 
-    const activeProjectEmployees = this.projectEmployees.filter((pe) =>
+    const activeProjectEmployees = liveAssignments.filter((pe) =>
       this.isActive(pe.isActive)
     );
 
@@ -310,15 +331,13 @@ export class DashboardComponent implements OnInit {
       }
     });
 
-    const activeAssignmentsCount = this.projectEmployees.filter((pe) =>
-      this.isActive(pe.isActive)
-    ).length;
+    const activeAssignmentsCount = activeProjectEmployees.length;
     const inactiveAssignmentsCount =
-      this.projectEmployees.length - activeAssignmentsCount;
+      liveAssignments.length - activeAssignmentsCount;
 
     this.projectStats = {
-      nonArchived: nonArchivedProjects.length,
-      archived: archivedProjects.length,
+      nonArchived: counts.active,
+      archived: counts.archived,
       active: activeProjects.length,
       inactive: inactiveProjects.length,
       planning: planningProjects.length,

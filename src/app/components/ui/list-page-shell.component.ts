@@ -21,6 +21,7 @@ import { ListPageSkeletonComponent } from './list-page-skeleton.component';
             [kpiCount]="skeletonKpiCount"
             [filterCount]="skeletonFilterCount"
             [showPagination]="skeletonShowPagination"
+            [tabCount]="skeletonTabCount"
             [rowVariant]="skeletonRowVariant"
           ></app-list-page-skeleton>
         } @else {
@@ -48,5 +49,7 @@ export class ListPageShellComponent {
   @Input() skeletonKpiCount = 6;
   @Input() skeletonFilterCount = 3;
   @Input() skeletonShowPagination = false;
+  /** Tab row above the toolbar (e.g. Active / Archived); 0 renders none. */
+  @Input() skeletonTabCount = 0;
   @Input() skeletonRowVariant: ListPageRowVariant = 'default';
 }

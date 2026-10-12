@@ -388,3 +388,15 @@ Append-only. Do not rewrite prior entries.
 | Rationale | Seed data uses `example.com`, which Resend rejects (422) and made the deliveries panel show false failures. Emails are worded for the To recipient, so CC'd leads should not receive them alone. Exposing only flagged errors keeps internal messages out of 4xx responses and client mistakes out of Sentry. |
 | Linked | GATE-0022, GATE-0023, TASK-0075–0082, REQ-0145–0147 |
 | Status | DONE |
+
+---
+
+## DEC-0040 — Archive is reversible, delete is permanent; native deletes; typed demo seed
+
+| Field | Value |
+|---|---|
+| Date | 2026-10-12 |
+| Decision | Archive/Restore only set or clear `archivedAt`/`archivedBy`; archived projects keep their assignments but are hidden from schedules, capacity and aggregates and are read-only (409 on team or lead changes). Delete Permanently removes assignments then the project through the native MongoDB driver, sweeps again and throws if any assignment still references it. Demo data lives in `prisma/seed-data.ts`; `tools/reset-demo-data.mjs` is the only wipe path and needs `ALLOW_DB_WIPE=1` (+ `EH_ALLOW_REMOTE_WIPE=1` for non-local hosts). The legacy JSON bootstrap is removed. A unique `(projectId, empId)` index backs the automatic lead assignment. |
+| Rationale | The "Archive" button was deleting. Prisma's MongoDB `deleteMany` skipped assignments with non-ObjectId `_id`s, leaving orphans; the bootstrap re-imported old data into an empty database. Native deletes avoid both the `_id` issue and the replica-set requirement of `$transaction` (RISK-0020 closed). |
+| Linked | GATE-0026, TASK-0095–0101, REQ-0155–0160 |
+| Status | DONE |

@@ -1,5 +1,6 @@
 import type { KpiStatTone } from '@/app/components/ui/kpi-stat-card.component';
 import type { StatusTone } from '@/app/lib/status/project-status';
+import { TAB_ACTIVE_CLASS, TAB_IDLE_CLASS } from './tabs';
 
 export type InsightsTabId = 'overview' | 'projects' | 'resources' | 'financials';
 
@@ -14,11 +15,9 @@ export const INSIGHTS_TABS: ReadonlyArray<{
   { id: 'financials', label: 'Financials', icon: 'wallet' },
 ];
 
-export const INSIGHTS_TAB_ACTIVE_CLASS =
-  'inline-flex items-center gap-2 border-b-2 border-primary px-4 py-2 text-sm font-medium text-white transition-colors';
+export const INSIGHTS_TAB_ACTIVE_CLASS = TAB_ACTIVE_CLASS;
 
-export const INSIGHTS_TAB_IDLE_CLASS =
-  'inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:text-white';
+export const INSIGHTS_TAB_IDLE_CLASS = TAB_IDLE_CLASS;
 
 export const INSIGHTS_FILTER_LABELS = {
   dateRange: 'Date Range',
@@ -46,7 +45,7 @@ export interface InsightsKpi {
 }
 
 export const INSIGHTS_KPIS: readonly InsightsKpi[] = [
-  { label: 'Total Projects', icon: 'folder-kanban', tone: 'sky' },
+  { label: 'Projects', icon: 'folder-kanban', tone: 'sky' },
   { label: 'Total Employees', icon: 'users', tone: 'emerald' },
   { label: 'Avg Readiness', icon: 'gauge', tone: 'violet' },
   { label: 'Resource Utilization', icon: 'percent', tone: 'amber' },
@@ -129,8 +128,8 @@ export const INSIGHTS_BREAKDOWN_CHIPS: ReadonlyArray<{
 }> = [
   {
     key: 'filteredProjectCount',
-    label: 'Non-Archived',
-    title: 'Non-archived projects (used for all calculations below)',
+    label: 'Active',
+    title: 'Active (non-archived) projects, used for all calculations below',
     icon: 'layers',
     tone: 'sky',
     optional: false,
@@ -140,8 +139,8 @@ export const INSIGHTS_BREAKDOWN_CHIPS: ReadonlyArray<{
     label: 'Archived',
     title: 'Archived projects (excluded from calculations, display only)',
     icon: 'archive',
-    tone: 'neutral',
-    optional: true,
+    tone: 'slate',
+    optional: false,
   },
   {
     key: 'activeProjectCount',

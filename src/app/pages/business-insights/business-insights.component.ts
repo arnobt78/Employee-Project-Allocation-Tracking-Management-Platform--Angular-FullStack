@@ -5,6 +5,12 @@ import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup } from '@angular/forms';
+import {
+  isAssignmentArchived,
+  isProjectArchived,
+  projectCounts,
+  projectCountsLabel,
+} from '@/app/lib/status/project-archive';
 import { MasterService } from '../../service/master.service';
 import { IProject, IProjectEmployee } from '../../model/interface/master';
 import { Employee } from '../../model/class/Employee';
@@ -193,10 +199,22 @@ export class BusinessInsightsComponent implements OnInit {
     }));
   });
 
+  readonly projectCounts = computed(() => projectCounts(this.projectsSignal()));
+  /** Follows the active filters once insights are computed, else the raw list. */
+  readonly projectCountsLabel = computed(() => {
+    const insights = this.insights();
+    if (insights?.filteredProjectCount == null) {
+      return projectCountsLabel(this.projectCounts());
+    }
+    const active = insights.filteredProjectCount;
+    const archived = insights.archivedProjectCount ?? 0;
+    return projectCountsLabel({ active, archived, total: active + archived });
+  });
+
   readonly overviewKpis = computed(() => {
     const insights = this.insights();
     return withValues(INSIGHTS_KPIS, [
-      insights?.totalProjectCount ?? this.projectsSignal().length,
+      insights?.filteredProjectCount ?? this.projectCounts().active,
       (insights?.filteredEmployeeCount ?? insights?.resourceUtilization?.totalEmployees) || 0,
       `${insights?.readinessScores?.average || 0}%`,
       `${insights?.teamCapacity?.utilizationPercentage || 0}%`,
@@ -336,23 +354,21 @@ export class BusinessInsightsComponent implements OnInit {
     const filters = this.filterForm.value;
 
     // Step 1: Separate archived projects (excluded from calculations but counted separately)
-    const archivedProjects = projects.filter(
-      (p) => p.archivedAt != null && p.archivedAt !== ''
-    );
-    let filteredProjects = projects.filter(
-      (p) => !p.archivedAt || p.archivedAt === ''
-    );
+    const archivedProjects = projects.filter(isProjectArchived);
+    let filteredProjects = projects.filter((p) => !isProjectArchived(p));
     let filteredEmployees = [...employees];
 
     // Keep ALL assignments (both active and inactive) for proper state calculation
     // We'll filter to active assignments later for utilization calculations
     let allProjectEmployees = [...projectEmployees];
+    // Archived projects' allocation never counts toward utilization.
     let activeProjectEmployees = projectEmployees.filter(
       (pe) =>
-        pe.isActive === 'Y' ||
+        !isAssignmentArchived(pe) &&
+        (pe.isActive === 'Y' ||
         pe.isActive === 'y' ||
         pe.isActive === 'true' ||
-        String(pe.isActive).toLowerCase() === 'true'
+        String(pe.isActive).toLowerCase() === 'true')
     );
 
     // Apply department filter
