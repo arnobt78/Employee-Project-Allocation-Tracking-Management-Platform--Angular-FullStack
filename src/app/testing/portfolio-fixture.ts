@@ -5,13 +5,16 @@ import { MasterService } from '@/app/service/master.service';
 
 const ARCHIVED_AT = '2026-07-10T10:00:00.000Z';
 
-/** Same shape as the demo seed: 4 active projects plus 1 archived, 7 assignments, 5 people. */
+/** Same shape as the demo seed: every status, 7 active projects plus 1 archived, 8 assignments, 5 people. */
 export const FIXTURE_PROJECTS = [
-  { projectId: 5001, projectName: 'Aurora', status: 'active', approvalStatus: 'approved', leadByEmpId: 1001, startDate: '2026-08-03' },
+  { projectId: 5001, projectName: 'Aurora', status: 'in_flight', approvalStatus: 'approved', leadByEmpId: 1001, startDate: '2026-08-03' },
   { projectId: 5002, projectName: 'Helios', status: 'in_review', approvalStatus: 'in_review', leadByEmpId: 1002, startDate: '2026-10-05' },
   { projectId: 5003, projectName: 'Atlas', status: 'on_hold', approvalStatus: 'approved', leadByEmpId: 1003, startDate: '2026-11-02' },
-  { projectId: 5004, projectName: 'Mercury', status: 'planning', approvalStatus: 'draft', leadByEmpId: 1004, startDate: '2026-06-01' },
-  { projectId: 5005, projectName: 'Beacon', status: 'active', approvalStatus: 'approved', leadByEmpId: 1005, startDate: '2026-01-12', archivedAt: ARCHIVED_AT },
+  { projectId: 5004, projectName: 'Mercury', status: 'draft', approvalStatus: 'draft', leadByEmpId: 1004, startDate: '2026-06-01' },
+  { projectId: 5005, projectName: 'Beacon', status: 'completed', approvalStatus: 'approved', leadByEmpId: 1005, startDate: '2026-01-12', archivedAt: ARCHIVED_AT },
+  { projectId: 5006, projectName: 'Comet', status: 'completed', approvalStatus: 'approved', leadByEmpId: 1002, startDate: '2026-02-02' },
+  { projectId: 5007, projectName: 'Nova', status: 'cancelled', approvalStatus: 'approved', leadByEmpId: 1004, startDate: '2026-04-06' },
+  { projectId: 5008, projectName: 'Orion', status: 'rejected', approvalStatus: 'rejected', leadByEmpId: 1001, startDate: '2026-12-07' },
 ] as unknown as IProject[];
 
 export const FIXTURE_EMPLOYEES = [
@@ -30,6 +33,7 @@ export const FIXTURE_ASSIGNMENTS = [
   { empProjectId: 7005, projectId: 5003, empId: 1003, role: 'Project Lead', allocationPct: 40, isActive: 'Y' },
   { empProjectId: 7006, projectId: 5004, empId: 1004, role: 'Project Lead', allocationPct: 60, isActive: 'Y' },
   { empProjectId: 7007, projectId: 5005, empId: 1005, role: 'Project Lead', allocationPct: 50, isActive: 'Y', projectArchivedAt: ARCHIVED_AT },
+  { empProjectId: 7008, projectId: 5006, empId: 1002, role: 'Project Lead', allocationPct: 30, isActive: 'Y', projectStatus: 'completed' },
 ] as unknown as IProjectEmployee[];
 
 /** Warm list caches with the fixture and park every request, so pages render from the peeks. */

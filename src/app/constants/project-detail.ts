@@ -1,4 +1,5 @@
-import type { SectionId } from '@/app/model/interface/master';
+import type { DeliveryStatus, SectionId } from '@/app/model/interface/master';
+import { NO_LEAD_LABEL } from './portfolio-kpis';
 
 export const PROJECT_DETAIL_SUBTITLE =
   'Configure the essentials before rolling the project out to your teams. Organize the information into focused sections, edit inline, and save when you are ready.';
@@ -111,7 +112,45 @@ export const PROJECT_DETAIL_FOOTER_COPY = {
     'Archive keeps the project and its team restorable; Delete Permanently removes both for good.',
   archived:
     'This project is archived and hidden from Timeline, Calendar, Insights and capacity. Restore it to edit its team again.',
+  closed: (statusLabel: string) =>
+    `This project is ${statusLabel}. Its team is locked and no longer counts toward capacity. Reopen it to change the team.`,
+  teamLocked: 'Reopen or restore the project to change its team',
 } as const;
+
+const DELIVERY_CONFIRM: Record<DeliveryStatus, (projectName: string) => ProjectDetailConfirmCopy> = {
+  in_flight: (projectName) => ({
+    title: `Set ${projectName} To In Flight?`,
+    description:
+      'The project counts as in delivery on every page. If it was closed, its team unlocks and counts toward capacity again.',
+    confirmLabel: 'Set In Flight',
+    icon: 'zap',
+    busyLabel: 'Updating…',
+  }),
+  on_hold: (projectName) => ({
+    title: `Put ${projectName} On Hold?`,
+    description:
+      'The project moves to On Hold on every page. Its team keeps its allocation and stays editable.',
+    confirmLabel: 'Put On Hold',
+    icon: 'pause-circle',
+    busyLabel: 'Updating…',
+  }),
+  completed: (projectName) => ({
+    title: `Mark ${projectName} As Completed?`,
+    description:
+      'The project stays listed and on the Timeline, but its team is locked and stops counting toward capacity. You can reopen it later.',
+    confirmLabel: 'Mark Completed',
+    icon: 'circle-check',
+    busyLabel: 'Updating…',
+  }),
+  cancelled: (projectName) => ({
+    title: `Mark ${projectName} As Cancelled?`,
+    description:
+      'The project stays listed for the record, but its team is locked and stops counting toward capacity. You can reopen it later.',
+    confirmLabel: 'Mark Cancelled',
+    icon: 'circle-x',
+    busyLabel: 'Updating…',
+  }),
+};
 
 export interface ProjectDetailConfirmCopy {
   title: string;
@@ -122,6 +161,8 @@ export interface ProjectDetailConfirmCopy {
 }
 
 export const PROJECT_DETAIL_CONFIRM_COPY = {
+  status: (status: DeliveryStatus, projectName: string): ProjectDetailConfirmCopy =>
+    DELIVERY_CONFIRM[status](projectName),
   restore: (projectName: string): ProjectDetailConfirmCopy => ({
     title: `Restore ${projectName}?`,
     description:
@@ -188,7 +229,7 @@ export const PROJECT_CONTENT_HELPER_COPY = {
 /** Section header values a brand-new (empty) project displays. */
 export const PROJECT_CREATE_SECTION_VALUES: Record<SectionId, string> = {
   overview: 'None',
-  team: 'Unassigned',
+  team: NO_LEAD_LABEL,
   contact: 'Not assigned',
   approval: 'Draft',
 };

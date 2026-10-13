@@ -27,6 +27,8 @@ import {
 import {
   assignmentCounts,
   assignmentCountsLabel,
+  closedCount,
+  closedCountsLabel,
   dotJoin,
   peopleLabel,
   projectStatusBuckets,
@@ -121,6 +123,14 @@ export class DashboardComponent implements OnInit {
 
   get employeesHint(): string {
     return this.stats ? workforceCountsLabel(this.stats.workforce) : 'Assigned · Available';
+  }
+
+  get closedTotal(): number {
+    return this.stats ? closedCount(this.stats.status) : 0;
+  }
+
+  get closedHint(): string {
+    return this.stats ? closedCountsLabel(this.stats.status) : this.kpi.closed.hint;
   }
 
   get staffingHint(): string {
@@ -333,6 +343,7 @@ export class DashboardComponent implements OnInit {
       { label: 'Staffed', value: stats.staffing.staffed, color: 'rgba(16, 185, 129, 0.85)' },
       { label: 'Lead Only', value: stats.staffing.leadOnly, color: 'rgba(139, 92, 246, 0.85)' },
       { label: 'Unstaffed', value: stats.staffing.unstaffed, color: 'rgba(148, 163, 184, 0.75)' },
+      { label: 'Closed', value: closedCount(stats.status), color: 'rgba(14, 165, 233, 0.7)' },
       { label: 'Archived', value: stats.projects.archived, color: 'rgba(100, 116, 139, 0.7)' },
     ].filter((s) => s.value > 0);
 

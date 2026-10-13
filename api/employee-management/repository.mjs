@@ -89,6 +89,30 @@ const APPROVAL_STATUSES = new Set([
   "rejected",
 ]);
 
+/** Delivery status of an approved project, kept in `status`; `approvalStatus` keeps the approval workflow. */
+const DELIVERY_LABELS = {
+  in_flight: "In Flight",
+  on_hold: "On Hold",
+  completed: "Completed",
+  cancelled: "Cancelled",
+};
+const DELIVERY_STATUSES = new Set(Object.keys(DELIVERY_LABELS));
+const CLOSED_STATUSES = new Set(["completed", "cancelled"]);
+
+/** Completed and cancelled projects are closed: no capacity, no team changes. */
+function isProjectClosed(project) {
+  return CLOSED_STATUSES.has(String(project?.status ?? "").trim().toLowerCase());
+}
+
+/** A delivery status only applies once approved; otherwise status mirrors the approval step. */
+function initialProjectStatus(approvalStatus, requested) {
+  if (approvalStatus !== "approved") {
+    return approvalStatus;
+  }
+  const status = String(requested ?? "").trim().toLowerCase();
+  return DELIVERY_STATUSES.has(status) ? status : "in_flight";
+}
+
 const APPROVAL_LABELS = {
   draft: "Draft",
   in_review: "In Review",
@@ -1146,6 +1170,16 @@ export async function deleteEmployee(employeeId) {
     id,
   });
 
+  const ledProjects = await prisma.project.findMany({
+    where: { leadByEmpId: id },
+    select: { projectId: true },
+  });
+  for (const { projectId } of ledProjects) {
+    await updateWithMongoFallback("project", "projectId", projectId, { leadByEmpId: null }, () =>
+      prisma.project.findUnique({ where: { projectId } })
+    );
+  }
+
   return mapEmployee(employee);
 }
 
@@ -1365,12 +1399,14 @@ export async function getProjectResourceInsights(projectId) {
         },
       }),
       prisma.project.findMany({
-        select: { projectId: true, projectName: true, archivedAt: true },
+        select: { projectId: true, projectName: true, archivedAt: true, status: true },
       }),
     ]);
 
   const projectLookup = new Map(
-    projects.filter((item) => !item.archivedAt).map((item) => [item.projectId, item])
+    projects
+      .filter((item) => !item.archivedAt && !isProjectClosed(item))
+      .map((item) => [item.projectId, item])
   );
   const employeeLookup = new Map(
     employees.map((employee) => [employee.employeeId, employee])
@@ -1631,7 +1667,7 @@ export async function createProject(payload) {
       overview: payload.overview ?? null,
       scope: payload.scope ?? null,
       successMetrics: payload.successMetrics ?? [],
-      status: payload.status ?? "draft",
+      status: initialProjectStatus(approvalStatus, payload.status),
       statusReason: payload.statusReason ?? null,
       statusHistory,
       timeline,
@@ -1760,20 +1796,9 @@ export async function updateProject(projectId, payload) {
       payload.readinessChecklist
     );
   }
-  if (payload.statusHistory !== undefined) {
-    updateData.statusHistory = normalizeStatusHistory(payload.statusHistory);
-  }
-  if (payload.timeline !== undefined) {
-    updateData.timeline = normalizeTimelineEntries(payload.timeline);
-  }
-  if (payload.reviewerComments !== undefined) {
-    updateData.reviewerComments = normalizeReviewerComments(
-      payload.reviewerComments
-    );
-  }
-  if (payload.approvalStatus !== undefined) {
-    updateData.approvalStatus = normalizeApprovalStatus(payload.approvalStatus);
-  }
+  // Status, approval, history, timeline and reviewer comments are owned by their
+  // own actions; the edit form sends back the whole loaded project, so copies
+  // of them here would overwrite newer changes.
 
   // Update optional fields only if provided
   if (payload.clientName !== undefined) {
@@ -1822,9 +1847,6 @@ export async function updateProject(projectId, payload) {
   if (payload.successMetrics !== undefined) {
     updateData.successMetrics = payload.successMetrics ?? [];
   }
-  if (payload.status !== undefined) {
-    updateData.status = payload.status ?? "draft";
-  }
   if (payload.statusReason !== undefined) {
     updateData.statusReason = payload.statusReason ?? null;
   }
@@ -1864,28 +1886,6 @@ export async function updateProject(projectId, payload) {
         ? payload.readinessScore
         : updateData.readinessChecklist?.percent ?? null;
   }
-  if (payload.approvalRequestedAt !== undefined) {
-    updateData.approvalRequestedAt = toDate(payload.approvalRequestedAt);
-  }
-  if (payload.approvalRequestedBy !== undefined) {
-    updateData.approvalRequestedBy = payload.approvalRequestedBy
-      ? Number(payload.approvalRequestedBy)
-      : null;
-  }
-  if (payload.approvalResolvedAt !== undefined) {
-    updateData.approvalResolvedAt = toDate(payload.approvalResolvedAt);
-  }
-  if (payload.approvalResolvedBy !== undefined) {
-    updateData.approvalResolvedBy = payload.approvalResolvedBy
-      ? Number(payload.approvalResolvedBy)
-      : null;
-  }
-  if (payload.approvalReason !== undefined) {
-    updateData.approvalReason = payload.approvalReason ?? null;
-  }
-  if (payload.approvalNotes !== undefined) {
-    updateData.approvalNotes = payload.approvalNotes ?? {};
-  }
   if (payload.progress !== undefined) {
     updateData.progress = payload.progress ?? null;
   }
@@ -1924,16 +1924,14 @@ export async function updateProject(projectId, payload) {
 
   const leadProvided = "leadByEmpId" in updateData;
   const leadByEmpId = leadProvided ? updateData.leadByEmpId : existingRecord.leadByEmpId;
-  const archived = Boolean(existingRecord.archivedAt);
-  if (
-    archived &&
-    leadProvided &&
-    Number(leadByEmpId ?? 0) !== Number(existingRecord.leadByEmpId ?? 0)
-  ) {
-    throw clientError(409, ARCHIVED_TEAM_MESSAGE);
+  const lockedMessage = teamLockedMessage(existingRecord);
+  const leadChanged =
+    leadProvided && Number(leadByEmpId ?? 0) !== Number(existingRecord.leadByEmpId ?? 0);
+  if (lockedMessage && leadChanged) {
+    throw clientError(409, lockedMessage);
   }
   const leadNames = await leadNameByEmployeeId([{ leadByEmpId }]);
-  if (leadProvided) {
+  if (leadChanged) {
     assertLeadExists(leadByEmpId, leadNames);
   }
   const record = await updateWithMongoFallback(
@@ -1943,7 +1941,7 @@ export async function updateProject(projectId, payload) {
     updateData,
     () => prisma.project.findUnique({ where: { projectId: Number(projectId) } })
   );
-  if (leadProvided && !archived) {
+  if (leadProvided && !lockedMessage && leadNames.has(leadByEmpId)) {
     await ensureLeadAssignment(record.projectId, leadByEmpId);
   }
 
@@ -2091,7 +2089,7 @@ export async function transitionProjectApproval(projectId, action, payload) {
   approvalNotes.lastActorName = actorName ?? null;
 
   const updateData = {
-    status: nextStatus,
+    status: nextStatus === "approved" ? "in_flight" : nextStatus,
     approvalStatus: nextStatus,
     approvalRequestedAt,
     approvalRequestedBy,
@@ -2331,6 +2329,68 @@ export async function setProjectArchived(projectId, archived, actor = {}) {
   return mapProjectWithLeadName(record);
 }
 
+/**
+ * Sets the delivery status of an approved, unarchived project. 400 for an
+ * unknown status, 404 for a missing project, 409 when the project isn't
+ * approved or is archived; an unchanged status is a no-op.
+ */
+export async function setProjectDeliveryStatus(projectId, status, actor = {}) {
+  const id = Number(projectId);
+  const nextStatus = typeof status === "string" ? status.trim().toLowerCase() : "";
+  if (!DELIVERY_STATUSES.has(nextStatus)) {
+    throw clientError(400, `status must be one of: ${[...DELIVERY_STATUSES].join(", ")}`);
+  }
+  const existing = await prisma.project.findUnique({ where: { projectId: id } });
+  if (!existing) {
+    throw clientError(404, "Project not found");
+  }
+  if (existing.archivedAt) {
+    throw clientError(409, "Project is archived. Restore it before changing its status");
+  }
+  if (normalizeApprovalStatus(existing.approvalStatus) !== "approved") {
+    throw clientError(409, "Only approved projects have a delivery status");
+  }
+  const previousStatus = String(existing.status ?? "").trim().toLowerCase();
+  if (previousStatus === nextStatus) {
+    return mapProjectWithLeadName(existing);
+  }
+
+  const actorName = actor.displayName ?? actor.username ?? undefined;
+  const label = DELIVERY_LABELS[nextStatus];
+  const record = await updateWithMongoFallback(
+    "project",
+    "projectId",
+    id,
+    {
+      status: nextStatus,
+      statusHistory: [
+        ...normalizeStatusHistory(existing.statusHistory),
+        buildApprovalHistoryEntry({
+          status: nextStatus,
+          previousStatus,
+          actorId: null,
+          actorName,
+          comment: `Delivery status set to ${label}`,
+        }),
+      ],
+      timeline: [
+        ...normalizeTimelineEntries(existing.timeline),
+        {
+          id: `delivery-${Date.now()}`,
+          label: `${label} Status`,
+          state: "completed",
+          occurredAt: new Date().toISOString(),
+          status: nextStatus,
+          actorId: null,
+          actorName,
+        },
+      ],
+    },
+    () => prisma.project.findUnique({ where: { projectId: id } })
+  );
+  return mapProjectWithLeadName(record);
+}
+
 function mapProjectEmployee(item, projectLookup, employeeLookup) {
   // Safety check: ensure item is not null
   if (!item) {
@@ -2349,6 +2409,7 @@ function mapProjectEmployee(item, projectLookup, employeeLookup) {
     isActive: item.isActive ? "Y" : "N",
     projectName: project?.projectName ?? "Unknown Project",
     projectArchivedAt: project?.archivedAt ? project.archivedAt.toISOString() : null,
+    projectStatus: project?.status ?? null,
     employeeName: employee?.employeeName ?? "Unknown Employee",
     employeeAvatarUrl: employee?.avatarUrl ?? null,
     allocationPct: item.allocationPct ?? null,
@@ -2372,7 +2433,7 @@ async function mapAssignmentRecord(record) {
   const [project, employee] = await Promise.all([
     prisma.project.findUnique({
       where: { projectId: record.projectId },
-      select: { projectId: true, projectName: true, archivedAt: true },
+      select: { projectId: true, projectName: true, archivedAt: true, status: true },
     }),
     prisma.employee.findUnique({
       where: { employeeId: record.empId },
@@ -2396,7 +2457,7 @@ export async function listProjectEmployees() {
       orderBy: { empProjectId: "asc" },
     }),
     prisma.project.findMany({
-      select: { projectId: true, projectName: true, archivedAt: true },
+      select: { projectId: true, projectName: true, archivedAt: true, status: true },
     }),
     prisma.employee.findMany({
       select: {
@@ -2421,11 +2482,22 @@ export async function listProjectEmployees() {
 }
 
 const ARCHIVED_TEAM_MESSAGE = "Project is archived. Restore it before changing its team";
+const CLOSED_TEAM_MESSAGE =
+  "Project is closed. Set it back to In Flight or On Hold before changing its team";
+
+/** Why a project's team and lead can't change right now, or null when they can. */
+function teamLockedMessage(project) {
+  if (project?.archivedAt) {
+    return ARCHIVED_TEAM_MESSAGE;
+  }
+  return isProjectClosed(project) ? CLOSED_TEAM_MESSAGE : null;
+}
+
 const DUPLICATE_ASSIGNMENT_MESSAGE = "Employee is already assigned to this project";
 
 /**
  * Throws 400 for a non-integer id, 404 when a referenced project or employee
- * is missing and 409 when the project is archived; omitted ids are not checked.
+ * is missing and 409 when the project is archived or closed; omitted ids are not checked.
  */
 async function assertAssignmentTargetsExist({ projectId, empId }) {
   if (projectId !== undefined && !isRecordId(projectId)) {
@@ -2439,7 +2511,7 @@ async function assertAssignmentTargetsExist({ projectId, empId }) {
       ? true
       : prisma.project.findUnique({
           where: { projectId },
-          select: { projectId: true, archivedAt: true },
+          select: { projectId: true, archivedAt: true, status: true },
         }),
     empId === undefined
       ? true
@@ -2451,8 +2523,9 @@ async function assertAssignmentTargetsExist({ projectId, empId }) {
   if (!employee) {
     throw clientError(404, "Employee not found");
   }
-  if (project.archivedAt) {
-    throw clientError(409, ARCHIVED_TEAM_MESSAGE);
+  const lockedMessage = teamLockedMessage(project);
+  if (lockedMessage) {
+    throw clientError(409, lockedMessage);
   }
 }
 
@@ -2467,13 +2540,14 @@ async function assertNotAlreadyAssigned(projectId, empId, ignoreId) {
   }
 }
 
-async function assertProjectNotArchived(projectId) {
+async function assertProjectTeamOpen(projectId) {
   const project = await prisma.project.findUnique({
     where: { projectId },
-    select: { archivedAt: true },
+    select: { archivedAt: true, status: true },
   });
-  if (project?.archivedAt) {
-    throw clientError(409, ARCHIVED_TEAM_MESSAGE);
+  const lockedMessage = teamLockedMessage(project);
+  if (lockedMessage) {
+    throw clientError(409, lockedMessage);
   }
 }
 
@@ -2631,7 +2705,7 @@ export async function updateProjectEmployee(empProjectId, payload) {
     throw targetsError;
   }
   await Promise.all([
-    updateData.projectId === undefined ? assertProjectNotArchived(existing.projectId) : null,
+    updateData.projectId !== existing.projectId ? assertProjectTeamOpen(existing.projectId) : null,
     checksTargets
       ? assertNotAlreadyAssigned(
           updateData.projectId ?? existing.projectId,
@@ -2671,7 +2745,7 @@ export async function deleteProjectEmployee(empProjectId) {
   if (!record) {
     throw new Error("Project employee assignment not found");
   }
-  await assertProjectNotArchived(record.projectId);
+  await assertProjectTeamOpen(record.projectId);
 
   const mapped = await mapAssignmentRecord(record);
   await prisma.projectEmployee.delete({
@@ -2714,14 +2788,16 @@ export async function buildDashboardSnapshot() {
   ]);
 
   const liveProjects = projects.filter((project) => !project.archivedAt);
-  const liveProjectIds = new Set(liveProjects.map((project) => project.projectId));
+  const openProjectIds = new Set(
+    liveProjects.filter((project) => !isProjectClosed(project)).map((project) => project.projectId)
+  );
 
   return {
     totalEmployee,
     totalProject: liveProjects.length,
     archivedProject: projects.length - liveProjects.length,
     activeProjectEmployees: activeAssignments.filter((assignment) =>
-      liveProjectIds.has(assignment.projectId)
+      openProjectIds.has(assignment.projectId)
     ).length,
     recentProjects: liveProjects.slice(0, 5).map((project) => ({
       projectId: project.projectId,

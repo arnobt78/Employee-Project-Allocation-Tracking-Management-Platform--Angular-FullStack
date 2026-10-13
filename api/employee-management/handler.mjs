@@ -31,6 +31,7 @@ import {
   getProjectStakeholderEmails,
   resolveStakeholderEmails,
   setProjectArchived,
+  setProjectDeliveryStatus,
 } from "./repository.mjs";
 import {
   sendNotification,
@@ -2142,6 +2143,7 @@ function buildApiDocumentation(request) {
             errorResponse(404, "Project not found"),
             errorResponse(404, "Employee not found"),
             errorResponse(409, "Project is archived. Restore it before changing its team"),
+            errorResponse(409, "Project is closed. Set it back to In Flight or On Hold before changing its team"),
             errorResponse(409, "Employee is already assigned to this project"),
             invalidJson,
           ],
@@ -2173,6 +2175,38 @@ function buildApiDocumentation(request) {
           ],
           category: "Projects",
         })),
+        {
+          path: "SetProjectStatus/{id}",
+          method: "POST",
+          description:
+            "Set the delivery status of an approved project. Completed and cancelled projects are closed: their team is locked and they no longer count toward capacity",
+          url: `${baseUrl}/SetProjectStatus/{id}`,
+          parameters: [
+            {
+              name: "id",
+              type: "number",
+              required: true,
+              description: "Project ID",
+            },
+          ],
+          requestBody: {
+            contentType: "application/json",
+            schema: { status: "in_flight | on_hold | completed | cancelled" },
+          },
+          response: {
+            status: 200,
+            body: "Project",
+          },
+          errorResponses: [
+            errorResponse(400, "Invalid project identifier"),
+            errorResponse(400, "status must be one of: in_flight, on_hold, completed, cancelled"),
+            errorResponse(404, "Project not found"),
+            errorResponse(409, "Project is archived. Restore it before changing its status"),
+            errorResponse(409, "Only approved projects have a delivery status"),
+            invalidJson,
+          ],
+          category: "Projects",
+        },
         {
           path: "RequestApproval",
           method: "POST",
@@ -2441,6 +2475,7 @@ function buildApiDocumentation(request) {
             errorResponse(404, "Project not found"),
             errorResponse(404, "Employee not found"),
             errorResponse(409, "Project is archived. Restore it before changing its team"),
+            errorResponse(409, "Project is closed. Set it back to In Flight or On Hold before changing its team"),
             errorResponse(409, "Employee is already assigned to this project"),
             invalidJson,
           ],
@@ -2525,6 +2560,7 @@ function buildApiDocumentation(request) {
             errorResponse(400, "Invalid project employee identifier"),
             errorResponse(404, "Project employee not found"),
             errorResponse(409, "Project is archived. Restore it before changing its team"),
+            errorResponse(409, "Project is closed. Set it back to In Flight or On Hold before changing its team"),
           ],
           category: "Assignments",
         },
@@ -2935,6 +2971,20 @@ export async function handleEmployeeManagementRequest(request, response) {
             }
             throw error;
           }
+        }
+
+        if (action === "SetProjectStatus") {
+          const projectId = Number(rawId || url.searchParams.get("id"));
+          if (!isRecordId(projectId)) {
+            return sendJson(
+              response,
+              400,
+              createApiResponse(false, "Invalid project identifier"),
+              statusCodeRef
+            );
+          }
+          const project = await setProjectDeliveryStatus(projectId, body?.status, session.user);
+          return sendJson(response, 200, project, statusCodeRef);
         }
 
         if (action === "RequestApproval") {

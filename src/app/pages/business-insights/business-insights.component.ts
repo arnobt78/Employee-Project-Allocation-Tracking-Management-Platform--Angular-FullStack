@@ -15,12 +15,13 @@ import {
 import {
   allocationToPeople,
   isAssignmentActive,
+  isAssignmentClosed,
   isEmployeeActive,
-  normalizedProjectStatus,
   peopleLabel,
-  projectStatusBucket,
+  projectStatusBuckets,
   workforceCounts,
   workforceCountsLabel,
+  type ProjectStatusBuckets,
   type WorkforceCounts,
 } from '@/app/lib/status/portfolio-stats';
 import { MasterService } from '../../service/master.service';
@@ -60,13 +61,7 @@ import { PageHeaderComponent } from '@/app/components/ui/page-header.component';
 import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 
 export interface IBusinessInsights {
-  projectStatusDistribution: {
-    draft: number;
-    in_progress: number;
-    completed: number;
-    on_hold: number;
-    cancelled: number;
-  };
+  projectStatusDistribution: ProjectStatusBuckets;
   resourceUtilization: {
     totalEmployees: number;
     activeAssignments: number;
@@ -407,9 +402,9 @@ export class BusinessInsightsComponent implements OnInit {
     // Keep ALL assignments (both active and inactive) for proper state calculation
     // We'll filter to active assignments later for utilization calculations
     let allProjectEmployees = [...projectEmployees];
-    // Archived projects' allocation never counts toward utilization.
+    // Archived and closed projects' allocation never counts toward utilization.
     let activeProjectEmployees = projectEmployees.filter(
-      (pe) => !isAssignmentArchived(pe) && isAssignmentActive(pe.isActive)
+      (pe) => !isAssignmentArchived(pe) && !isAssignmentClosed(pe) && isAssignmentActive(pe.isActive)
     );
 
     // Apply department filter
@@ -617,8 +612,7 @@ export class BusinessInsightsComponent implements OnInit {
 
     // Calculate insights using filtered data
     const insights: IBusinessInsights = {
-      projectStatusDistribution:
-        this.calculateStatusDistribution(filteredProjects),
+      projectStatusDistribution: projectStatusBuckets(filteredProjects),
       resourceUtilization: this.calculateResourceUtilization(
         filteredProjects,
         filteredEmployees,
@@ -645,32 +639,6 @@ export class BusinessInsightsComponent implements OnInit {
 
     this.insightsSignal.set(insights);
     this.loadingSignal.set(false);
-  }
-
-  private calculateStatusDistribution(projects: IProject[]) {
-    const distribution = {
-      draft: 0,
-      in_progress: 0,
-      completed: 0,
-      on_hold: 0,
-      cancelled: 0 };
-
-    const buckets = { inFlight: 'in_progress', planning: 'draft', onHold: 'on_hold' } as const;
-    projects.forEach((p) => {
-      const bucket = projectStatusBucket(p);
-      const status = normalizedProjectStatus(p);
-      if (bucket) {
-        distribution[buckets[bucket]]++;
-      } else if (/complete|done/.test(status)) {
-        distribution.completed++;
-      } else if (/reject|cancel/.test(status)) {
-        distribution.cancelled++;
-      } else {
-        distribution.draft++;
-      }
-    });
-
-    return distribution;
   }
 
   private calculateResourceUtilization(
@@ -1019,11 +987,9 @@ export class BusinessInsightsComponent implements OnInit {
     // Project Status Distribution
     csvRows.push('Project Status Distribution');
     csvRows.push('Status,Count');
-    Object.entries(insights.projectStatusDistribution).forEach(
-      ([status, count]) => {
-        csvRows.push(`${status},${count}`);
-      }
-    );
+    INSIGHTS_STATUS_ITEMS.forEach(({ key, label }) => {
+      csvRows.push(`${label},${insights.projectStatusDistribution[key]}`);
+    });
     csvRows.push('');
 
     // Resource Utilization

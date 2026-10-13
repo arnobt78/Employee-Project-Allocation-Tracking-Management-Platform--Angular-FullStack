@@ -67,13 +67,15 @@ describe('BusinessInsightsComponent', () => {
     const el = fixture.nativeElement as HTMLElement;
     const cards = kpiCards(el);
 
-    expect(cards['Projects']).toBe('5 | 4 Active · 1 Archived');
+    expect(cards['Projects']).toBe('8 | 7 Active · 1 Archived');
     expect(cards['Total Employees']).toBe('5 | 4 Assigned · 1 Available');
     expect(cards['Resource Utilization']).toBe('44% | 2.2 of 5 people allocated');
-    expect(cards['Avg Readiness']).toBe('0% | Across 0 of 4 active projects');
-    expect(cards['Planning']).toBe('1 | 1 of 4 active');
-    expect(cards['In Flight']).toBe('2 | 2 of 4 active');
-    expect(cards['On Hold']).toBe('1 | 1 of 4 active');
+    expect(cards['Avg Readiness']).toBe('0% | Across 0 of 7 active projects');
+    expect(cards['Planning']).toBe('3 | 3 of 7 active');
+    expect(cards['In Flight']).toBe('1 | 1 of 7 active');
+    expect(cards['On Hold']).toBe('1 | 1 of 7 active');
+    expect(cards['Completed']).toBe('1 | 1 of 7 active');
+    expect(cards['Cancelled']).toBe('1 | 1 of 7 active');
     expect(el.querySelectorAll('.eh-badge').length).toBe(0);
   });
 
@@ -95,7 +97,9 @@ describe('BusinessInsightsComponent', () => {
 
     expect(Array.from(bytes.slice(0, 3))).toEqual([0xef, 0xbb, 0xbf]);
     expect(csv).toContain('Human Resources,1,0,—');
-    expect(csv).toContain('Engineering,2,2,');
+    expect(csv).toContain('Engineering,2,4,');
+    expect(csv).toContain('Completed,1');
+    expect(csv).toContain('Cancelled,1');
   });
 
   it('shows Reset Filters only while a filter is set, and resets to All', () => {

@@ -30,10 +30,10 @@ describe('ProjectComponent', () => {
     fixture.detectChanges();
     const cards = kpiCards(fixture.nativeElement as HTMLElement);
 
-    expect(cards['Projects']).toBe('5 | 4 Active · 1 Archived');
-    expect(cards['In Flight']).toBe('2 | Approved or in review');
-    expect(cards['Planning']).toBe('1 | Draft or planning');
+    expect(cards['Projects']).toBe('8 | 7 Active · 1 Archived');
+    expect(cards['In Flight']).toBe('1 | Approved, in delivery');
+    expect(cards['Planning']).toBe('3 | Draft, in review or rejected');
     expect(cards['On Hold']).toBe('1 | Paused projects');
-    expect(cards['Archived']).toMatch(/^1 \|/);
+    expect(cards['Closed']).toBe('2 | 1 Completed · 1 Cancelled');
   });
 });

@@ -1,4 +1,5 @@
 import type { KpiStatTone } from '@/app/components/ui/kpi-stat-card.component';
+import type { ProjectStatusBucket } from '@/app/lib/status/portfolio-stats';
 import { PORTFOLIO_KPIS, type PortfolioKpi } from './portfolio-kpis';
 import { TAB_ACTIVE_CLASS, TAB_IDLE_CLASS } from './tabs';
 
@@ -90,22 +91,15 @@ export const INSIGHTS_READINESS_RANGES = [
 
 const pick = ({ label, icon, tone }: PortfolioKpi) => ({ label, icon, tone });
 
-export type InsightsStatusKey =
-  | 'draft'
-  | 'in_progress'
-  | 'completed'
-  | 'on_hold'
-  | 'cancelled';
-
 export const INSIGHTS_STATUS_ITEMS: ReadonlyArray<{
-  key: InsightsStatusKey;
+  key: ProjectStatusBucket;
   label: string;
   icon: string;
   tone: KpiStatTone;
 }> = [
-  { key: 'draft', ...pick(PORTFOLIO_KPIS.planning) },
-  { key: 'in_progress', ...pick(PORTFOLIO_KPIS.inFlight) },
-  { key: 'completed', label: 'Completed', icon: 'circle-check', tone: 'sky' },
-  { key: 'on_hold', ...pick(PORTFOLIO_KPIS.onHold) },
-  { key: 'cancelled', label: 'Cancelled', icon: 'circle-x', tone: 'rose' },
+  { key: 'planning', ...pick(PORTFOLIO_KPIS.planning) },
+  { key: 'inFlight', ...pick(PORTFOLIO_KPIS.inFlight) },
+  { key: 'onHold', ...pick(PORTFOLIO_KPIS.onHold) },
+  { key: 'completed', ...pick(PORTFOLIO_KPIS.completed) },
+  { key: 'cancelled', ...pick(PORTFOLIO_KPIS.cancelled) },
 ];

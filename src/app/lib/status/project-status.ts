@@ -13,7 +13,7 @@ export function projectStatusMeta(status: string | null | undefined): StatusMeta
   const key = (status ?? '').trim().toLowerCase().replace(/[\s-]+/g, '_');
   const label = titleCaseLabel(key) || 'Unknown';
   if (key.includes('inactive')) return { label, icon: 'pause-circle', tone: 'slate' };
-  if (key.includes('active') || key === 'approved') return { label, icon: 'zap', tone: 'emerald' };
+  if (key.includes('active') || key === 'approved' || key === 'in_flight') return { label, icon: 'zap', tone: 'emerald' };
   if (key.includes('review')) return { label, icon: 'git-pull-request', tone: 'amber' };
   if (key.includes('hold') || key.includes('pause')) return { label, icon: 'pause-circle', tone: 'slate' };
   if (key.includes('draft') || key.includes('plan')) return { label, icon: 'pencil', tone: 'violet' };
@@ -59,10 +59,10 @@ export const STATUS_TONE_BORDER: Record<StatusTone, string> = {
 
 /** Legend rows for charts coloured by `projectStatusMeta`. */
 export const STATUS_LEGEND: ReadonlyArray<{ tone: StatusTone; label: string }> = [
-  { tone: 'emerald', label: 'Approved / Active' },
-  { tone: 'sky', label: 'In Progress / Completed' },
+  { tone: 'emerald', label: 'Approved / In Flight' },
+  { tone: 'sky', label: 'Completed' },
   { tone: 'amber', label: 'In Review' },
   { tone: 'slate', label: 'On Hold' },
   { tone: 'violet', label: 'Draft / Planning' },
-  { tone: 'rose', label: 'Rejected / Cancelled' },
+  { tone: 'rose', label: 'Cancelled / Rejected' },
 ];

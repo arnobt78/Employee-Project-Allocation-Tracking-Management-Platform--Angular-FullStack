@@ -1,5 +1,19 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-13 — GATE-0030 project delivery status + deleted lead (TASK-0111–0114)
+
+**Node:** v24.21.0 via fnm
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 180/180 (new: closed/locked/delivery helpers and Completed/Cancelled buckets; detail status confirm + cancel reset, closed lock, "No lead"; fixture now has every status) |
+| `npm run test:api` | **PASS** | 104/104 (status cycle + history, 400/404/409, UpdateProject ignores status fields, closed lock incl. moving an assignment away, freed capacity, create derives status, deleted lead cleared and project still saves) |
+| `npm run build` | **PASS** | |
+| `db:reset:demo` (user approved) | **DONE** | 8 projects, 12 assignments, admin only |
+| Browser (Playwright, dev, admin, seed data) 1280 + 390 px | **PASS** | Projects 8/1/3/1/2 ("1 Completed · 1 Cancelled"); Dashboard Staffing 5, Assignments "6 Active · 5 Inactive · 1 Archived"; Aurora set Completed (confirm copy, banner, "Approved · Completed", Edit Lead and Add to Team disabled) then reopened via banner, KPIs back; Project Team closed rows show "Project Completed/Cancelled", Inactive, "Open Project"; temp employee made Orion lead then deleted → API lead null, detail "No lead", Projects list "—", Timeline "No lead"; Orion lead restored to 1001; no horizontal overflow at 390; 0 console errors. Leftovers: Aurora has two extra history entries (Completed, In Flight) and the employee counter is at 1006 |
+| Independent verifier | **PASS WITH WARNINGS (fixed)** | Status menu label not linked (now `app-field-label`); Project Team status filter disagreed with KPI for closed rows; effect reset menu while pending (split effects) and route change didn't reset menu; create accepted any status; moving an assignment off a closed project; "Cancel Project" vs dialog Cancel (now "Mark Cancelled"). Not changed: plan mentioned clearing `employeeName` on lead delete (derived on read, not stored) |
+
 ## Session 2026-10-13 — Insights Reset Filters link (TASK-0110)
 
 **Node:** v24.21.0 via fnm

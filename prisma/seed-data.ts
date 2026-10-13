@@ -229,7 +229,7 @@ interface ProjectSeed {
   sponsorEmpId: number;
   contact: { name: string; email: string; phone: string; title: string };
   status: string;
-  approvalStatus: "draft" | "in_review" | "approved";
+  approvalStatus: "draft" | "in_review" | "approved" | "rejected";
   health: "on_track" | "at_risk" | "off_track";
   progress: number;
   summary: string;
@@ -252,7 +252,7 @@ const PROJECT_SEEDS: ProjectSeed[] = [
     leadByEmpId: 1001,
     sponsorEmpId: 1005,
     contact: { name: "Evelyn Carter", email: "evelyn.carter@northernlights.example", phone: "+15550202001", title: "Director of Digital" },
-    status: "active",
+    status: "in_flight",
     approvalStatus: "approved",
     health: "on_track",
     progress: 45,
@@ -294,7 +294,7 @@ const PROJECT_SEEDS: ProjectSeed[] = [
     leadByEmpId: 1003,
     sponsorEmpId: 1001,
     contact: { name: "Priya Nair", email: "priya.nair@swiftlogistics.example", phone: "+15550202003", title: "Product Owner" },
-    status: "planning",
+    status: "draft",
     approvalStatus: "draft",
     health: "on_track",
     progress: 5,
@@ -348,7 +348,76 @@ const PROJECT_SEEDS: ProjectSeed[] = [
     tags: ["brand", "media"],
     archivedAt: "2026-07-10T10:00:00.000Z",
   },
+  {
+    projectId: 5006,
+    projectName: "Comet Payments Upgrade",
+    clientName: "Orbit Bank",
+    clientIndustry: "Finance",
+    startDate: "2026-02-02",
+    endDate: "2026-08-28",
+    leadByEmpId: 1002,
+    sponsorEmpId: 1005,
+    contact: { name: "Sofia Lindqvist", email: "sofia.lindqvist@orbitbank.example", phone: "+15550202006", title: "Payments Product Lead" },
+    status: "completed",
+    approvalStatus: "approved",
+    health: "on_track",
+    progress: 100,
+    summary: "Move card payments to the new processor with zero downtime.",
+    objectives: ["Migrate all merchants", "Cut processing fees by 15%", "PCI DSS 4.0 sign-off"],
+    readiness: { scopeDefined: "done", budgetApproved: "done", legalReviewed: "done", assetsPrepared: "done", kickoffScheduled: "done" },
+    budgetTotal: 200000,
+    budgetSpent: 191000,
+    tags: ["payments", "finance"],
+  },
+  {
+    projectId: 5007,
+    projectName: "Nova Field Service App",
+    clientName: "Greenline Utilities",
+    clientIndustry: "Utilities",
+    startDate: "2026-04-06",
+    endDate: "2026-11-27",
+    leadByEmpId: 1004,
+    sponsorEmpId: 1001,
+    contact: { name: "Owen Brooks", email: "owen.brooks@greenline.example", phone: "+15550202007", title: "Field Operations Manager" },
+    status: "cancelled",
+    approvalStatus: "approved",
+    health: "off_track",
+    progress: 30,
+    summary: "Field technician app for job dispatch, parts and sign-off.",
+    objectives: ["Same-day dispatch", "Parts lookup offline", "Digital customer sign-off"],
+    readiness: { scopeDefined: "done", budgetApproved: "done", legalReviewed: "done", assetsPrepared: "in_progress", kickoffScheduled: "done" },
+    budgetTotal: 140000,
+    budgetSpent: 42000,
+    tags: ["mobile", "utilities"],
+  },
+  {
+    projectId: 5008,
+    projectName: "Orion Analytics Pilot",
+    clientName: "Vertex Insurance",
+    clientIndustry: "Insurance",
+    startDate: "2026-12-07",
+    endDate: "2027-04-30",
+    leadByEmpId: 1001,
+    sponsorEmpId: 1005,
+    contact: { name: "Grace Liu", email: "grace.liu@vertexinsurance.example", phone: "+15550202008", title: "Chief Data Officer" },
+    status: "rejected",
+    approvalStatus: "rejected",
+    health: "at_risk",
+    progress: 0,
+    summary: "Pilot claims-fraud scoring on a sample of historic claims.",
+    objectives: ["Score 50k historic claims", "Flag precision above 80%", "Board-ready findings"],
+    readiness: { scopeDefined: "in_progress", budgetApproved: "blocked", legalReviewed: "not_started", assetsPrepared: "not_started", kickoffScheduled: "not_started" },
+    budgetTotal: 90000,
+    budgetSpent: 0,
+    tags: ["data", "insurance"],
+  },
 ];
+
+const DELIVERY_LABELS: Record<string, string> = {
+  on_hold: "On Hold",
+  completed: "Completed",
+  cancelled: "Cancelled",
+};
 
 function readinessChecklist(seed: ProjectSeed) {
   const updatedAt = `${seed.startDate}T09:00:00.000Z`;
@@ -404,6 +473,22 @@ function statusHistory(seed: ProjectSeed) {
   if (seed.approvalStatus === "in_review") {
     return [drafted, review];
   }
+  if (seed.approvalStatus === "rejected") {
+    return [
+      drafted,
+      review,
+      {
+        id: `history-${seed.projectId}-3`,
+        status: "rejected",
+        previousStatus: "in_review",
+        changedAt: `${seed.startDate}T17:00:00.000Z`,
+        changedBy: seed.sponsorEmpId,
+        changedByName: employeeName(seed.sponsorEmpId),
+        comment: "Budget not approved for this quarter",
+      },
+    ];
+  }
+  const deliveryLabel = DELIVERY_LABELS[seed.status];
   return [
     drafted,
     review,
@@ -416,6 +501,19 @@ function statusHistory(seed: ProjectSeed) {
       changedByName: employeeName(seed.sponsorEmpId),
       comment: "Approved by sponsor",
     },
+    ...(deliveryLabel
+      ? [
+          {
+            id: `history-${seed.projectId}-delivery`,
+            status: "approved",
+            previousStatus: "approved",
+            changedAt: `${seed.endDate}T09:00:00.000Z`,
+            changedBy: seed.sponsorEmpId,
+            changedByName: employeeName(seed.sponsorEmpId),
+            comment: `Delivery status set to ${deliveryLabel}`,
+          },
+        ]
+      : []),
     ...(seed.archivedAt
       ? [
           {
@@ -436,6 +534,7 @@ export const PROJECTS = PROJECT_SEEDS.map((seed) => {
   const checklist = readinessChecklist(seed);
   const reviewed = seed.approvalStatus !== "draft";
   const approved = seed.approvalStatus === "approved";
+  const rejected = seed.approvalStatus === "rejected";
   return {
     projectId: seed.projectId,
     projectName: seed.projectName,
@@ -464,7 +563,12 @@ export const PROJECTS = PROJECT_SEEDS.map((seed) => {
     },
     successMetrics: seed.objectives,
     status: seed.status,
-    statusReason: seed.status === "on_hold" ? "Waiting on client legal review." : "",
+    statusReason:
+      seed.status === "on_hold"
+        ? "Waiting on client legal review."
+        : seed.status === "cancelled"
+          ? "Client paused the field programme."
+          : "",
     statusHistory: statusHistory(seed),
     timeline: [
       {
@@ -520,9 +624,13 @@ export const PROJECTS = PROJECT_SEEDS.map((seed) => {
     approvalStatus: seed.approvalStatus,
     approvalRequestedAt: reviewed ? new Date(`${seed.startDate}T15:00:00.000Z`) : null,
     approvalRequestedBy: reviewed ? seed.leadByEmpId : null,
-    approvalResolvedAt: approved ? new Date(`${seed.startDate}T17:00:00.000Z`) : null,
-    approvalResolvedBy: approved ? seed.sponsorEmpId : null,
-    approvalReason: approved ? "Business case and budget confirmed." : "",
+    approvalResolvedAt: approved || rejected ? new Date(`${seed.startDate}T17:00:00.000Z`) : null,
+    approvalResolvedBy: approved || rejected ? seed.sponsorEmpId : null,
+    approvalReason: approved
+      ? "Business case and budget confirmed."
+      : rejected
+        ? "Budget not approved for this quarter."
+        : "",
     approvalNotes: {},
     reviewerComments: reviewed
       ? [
@@ -578,6 +686,11 @@ export const ASSIGNMENTS = [
   { empProjectId: 7005, projectId: 5003, empId: 1003, role: "Project Lead", allocationPct: 40, assignedDate: "2026-11-02" },
   { empProjectId: 7006, projectId: 5004, empId: 1004, role: "Project Lead", allocationPct: 60, assignedDate: "2026-06-01" },
   { empProjectId: 7007, projectId: 5005, empId: 1005, role: "Project Lead", allocationPct: 50, assignedDate: "2026-01-12" },
+  { empProjectId: 7008, projectId: 5006, empId: 1002, role: "Project Lead", allocationPct: 40, assignedDate: "2026-02-02" },
+  { empProjectId: 7009, projectId: 5006, empId: 1003, role: "QA Engineer", allocationPct: 30, assignedDate: "2026-02-16" },
+  { empProjectId: 7010, projectId: 5007, empId: 1004, role: "Project Lead", allocationPct: 30, assignedDate: "2026-04-06" },
+  { empProjectId: 7011, projectId: 5007, empId: 1001, role: "Frontend Engineer", allocationPct: 20, assignedDate: "2026-04-13" },
+  { empProjectId: 7012, projectId: 5008, empId: 1001, role: "Project Lead", allocationPct: 20, assignedDate: "2026-12-07" },
 ].map(({ unassignedAt, assignedDate, ...row }) => ({
   ...row,
   assignedDate: new Date(`${assignedDate}T00:00:00.000Z`),

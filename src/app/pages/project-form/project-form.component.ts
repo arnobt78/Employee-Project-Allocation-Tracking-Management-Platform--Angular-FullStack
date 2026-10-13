@@ -3,6 +3,7 @@ import {
   DestroyRef,
   OnInit,
   computed,
+  effect,
   inject,
   signal } from '@angular/core';
 import {
@@ -17,6 +18,7 @@ import { CommonModule } from '@angular/common';
 import { MasterService } from '../../service/master.service';
 import {
   ApprovalStatus,
+  DeliveryStatus,
   IProject,
   IReadinessChecklistItem,
   IReadinessChecklistState,
@@ -57,6 +59,14 @@ import {
   deleteProjectWarning,
   isProjectArchived,
 } from '@/app/lib/status/project-archive';
+import {
+  DELIVERY_STATUS_OPTIONS,
+  deliveryStatusOf,
+  isProjectClosed,
+  isProjectTeamLocked,
+} from '@/app/lib/status/portfolio-stats';
+import { projectStatusMeta } from '@/app/lib/status/project-status';
+import { NO_LEAD_LABEL } from '@/app/constants/portfolio-kpis';
 import { titleCaseLabel } from '@/app/lib/format/labels';
 import {
   PROJECT_CONTENT_HELPER_COPY,
@@ -132,6 +142,7 @@ const APPROVAL_CONFIRM_COPY: Record<
 type SaveScope = 'section' | 'all';
 
 type DetailConfirm =
+  | { kind: 'status'; status: DeliveryStatus }
   | { kind: 'restore' }
   | { kind: 'assign'; employeeName: string; allocationPct: number }
   | { kind: 'comment' }
@@ -141,6 +152,7 @@ const PENDING = {
   save: 'save',
   delete: 'delete',
   archive: 'archive',
+  status: 'status',
   assign: 'assign',
   comment: 'comment',
   approval: (action: ApprovalAction) => `approval:${action}`,
@@ -474,6 +486,34 @@ export class ProjectFormComponent implements OnInit {
   readonly isArchiving = computed(() => this.pending.has(PENDING.archive));
   readonly pendingArchive = signal<boolean>(false);
   readonly isArchived = computed(() => isProjectArchived(this.currentProjectSignal()));
+  readonly isClosed = computed(() => isProjectClosed(this.currentProjectSignal()));
+  /** Archived or closed: the API rejects team and lead changes. */
+  readonly isTeamLocked = computed(() => isProjectTeamLocked(this.currentProjectSignal()));
+  /** Null until the project is approved. */
+  readonly deliveryStatus = computed(() => {
+    const project = this.currentProjectSignal();
+    return project ? deliveryStatusOf(project) : null;
+  });
+  readonly deliveryStatusLabel = computed(() => {
+    const status = this.deliveryStatus();
+    return status ? projectStatusMeta(status).label : '';
+  });
+  readonly canSetDeliveryStatus = computed(
+    () => this.deliveryStatus() !== null && !this.isArchived()
+  );
+  readonly deliveryStatusOptions = [...DELIVERY_STATUS_OPTIONS];
+  readonly deliveryStatusControl = new FormControl<string>('in_flight', { nonNullable: true });
+  readonly isUpdatingStatus = computed(() => this.pending.has(PENDING.status));
+  private readonly syncDeliveryStatusValue = effect(() => {
+    this.deliveryStatusControl.setValue(this.deliveryStatus() ?? 'in_flight', { emitEvent: false });
+  });
+  private readonly syncDeliveryStatusDisabled = effect(() => {
+    if (this.isUpdatingStatus()) {
+      this.deliveryStatusControl.disable({ emitEvent: false });
+    } else {
+      this.deliveryStatusControl.enable({ emitEvent: false });
+    }
+  });
   /** Loaded when the delete dialog opens; null until the team list arrives. */
   private readonly deleteAssignmentCount = signal<number | null>(null);
   readonly deleteWarning = computed(() => deleteProjectWarning(this.deleteAssignmentCount()));
@@ -499,6 +539,8 @@ export class ProjectFormComponent implements OnInit {
     }
     const projectName = this.currentProjectSignal()?.projectName || this.projectTitle();
     switch (confirm.kind) {
+      case 'status':
+        return PROJECT_DETAIL_CONFIRM_COPY.status(confirm.status, projectName);
       case 'restore':
         return PROJECT_DETAIL_CONFIRM_COPY.restore(projectName);
       case 'assign':
@@ -616,7 +658,7 @@ export class ProjectFormComponent implements OnInit {
   }
 
   startEdit(section: SectionId) {
-    if (section === 'approval') {
+    if (section === 'approval' || (section === 'team' && this.isTeamLocked())) {
       return;
     }
     this.expandedSection.set(section);
@@ -854,6 +896,13 @@ export class ProjectFormComponent implements OnInit {
       return;
     }
     switch (confirm.kind) {
+      case 'status':
+        if (!this.canSetDeliveryStatus() || this.deliveryStatus() === confirm.status) {
+          this.dismissStatusConfirm();
+          return;
+        }
+        this.changeDeliveryStatus(confirm.status);
+        return;
       case 'restore':
         if (!this.isArchived()) {
           this.pendingConfirm.set(null);
@@ -877,11 +926,67 @@ export class ProjectFormComponent implements OnInit {
     if (this.isDetailConfirmBusy()) {
       return;
     }
+    this.dismissStatusConfirm();
+  }
+
+  requestDeliveryStatus(value: string) {
+    const status = DELIVERY_STATUS_OPTIONS.find((option) => option.value === value)?.value as
+      | DeliveryStatus
+      | undefined;
+    if (!status || !this.canSetDeliveryStatus() || this.isUpdatingStatus()) {
+      return;
+    }
+    if (status === this.deliveryStatus()) {
+      return;
+    }
+    this.pendingConfirm.set({ kind: 'status', status });
+  }
+
+  /** Reopening a closed project from its banner. */
+  requestReopen() {
+    this.deliveryStatusControl.setValue('in_flight', { emitEvent: false });
+    this.requestDeliveryStatus('in_flight');
+  }
+
+  /** Closing any confirm puts the status menu back on the saved value. */
+  private dismissStatusConfirm() {
     this.pendingConfirm.set(null);
+    this.deliveryStatusControl.setValue(this.deliveryStatus() ?? 'in_flight', { emitEvent: false });
+  }
+
+  private changeDeliveryStatus(status: DeliveryStatus) {
+    const projectId = this.projectForm.controls['projectId'].value;
+    if (!projectId) {
+      return;
+    }
+    const projectName = this.currentProjectSignal()?.projectName || this.projectTitle();
+    const label = projectStatusMeta(status).label;
+    this.mutations.track(this.masterService.setProjectStatus(projectId, status), {
+      pending: this.pending,
+      destroyRef: this.destroyRef,
+      key: PENDING.status,
+      onSuccess: (project) => {
+        if (projectId !== this.routedProjectId) {
+          return;
+        }
+        this.currentProjectSignal.set(this.cloneProject(project));
+        this.dismissStatusConfirm();
+      },
+      successToast: {
+        title: 'Status updated',
+        description: `${projectName} is now ${label}.`,
+      },
+      errorToast: {
+        title: 'Status not changed',
+        description: 'Unable to update the project status right now.',
+      },
+    });
   }
 
   private detailConfirmKey(confirm: DetailConfirm): string {
     switch (confirm.kind) {
+      case 'status':
+        return PENDING.status;
       case 'restore':
         return PENDING.archive;
       case 'assign':
@@ -942,6 +1047,14 @@ export class ProjectFormComponent implements OnInit {
       ?.employeeName;
   }
 
+  /** Falls back to the name the API resolved while the employee list loads; empty when the lead was deleted. */
+  private leadDisplayName(leadByEmpId: number | null | undefined): string | null {
+    if (!leadByEmpId) return null;
+    const project = this.currentProjectSignal();
+    const apiName = project?.leadByEmpId === leadByEmpId ? project.employeeName : null;
+    return this.leadName(leadByEmpId) || apiName || null;
+  }
+
   displayValue(field: FieldKey) {
     const control = this.projectForm.controls[field];
     const value = control.value;
@@ -956,9 +1069,7 @@ export class ProjectFormComponent implements OnInit {
         }
         return new Intl.DateTimeFormat('de-DE').format(date);
       case 'leadByEmpId':
-        return value
-          ? this.leadName(value) ?? `Employee #${value}`
-          : PROJECT_CREATE_SECTION_VALUES.team;
+        return this.leadDisplayName(value) ?? NO_LEAD_LABEL;
       case 'health': {
         return titleCaseLabel(value?.toString()) || 'Not Set';
       }
@@ -1092,7 +1203,7 @@ export class ProjectFormComponent implements OnInit {
     this.pendingApproval.set(null);
     this.pendingDelete.set(false);
     this.pendingArchive.set(false);
-    this.pendingConfirm.set(null);
+    this.dismissStatusConfirm();
     this.cancelCollaboratorAssignment();
   }
 
@@ -1123,7 +1234,7 @@ export class ProjectFormComponent implements OnInit {
   private collaboratorAssignmentPayload(reportInvalid: boolean) {
     const profile = this.collaboratorAssignmentProfileSignal();
     const project = this.currentProjectSignal();
-    if (!profile || !project?.projectId || this.isArchived()) {
+    if (!profile || !project?.projectId || this.isTeamLocked()) {
       return null;
     }
 
@@ -1459,7 +1570,8 @@ export class ProjectFormComponent implements OnInit {
 
   leadAvatar(): AvatarView | null {
     const id = Number(this.projectForm.controls['leadByEmpId'].value);
-    return id ? this.avatarFor(id, this.displayValue('leadByEmpId')) : null;
+    const name = this.leadDisplayName(id);
+    return id && name ? this.avatarFor(id, name) : null;
   }
 
   clientAvatar(): AvatarView | null {

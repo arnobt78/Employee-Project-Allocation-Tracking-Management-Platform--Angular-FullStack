@@ -53,11 +53,11 @@
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
-    [label]="kpi.archived.label"
-    [value]="counts().archived"
-    [hint]="kpi.archived.hint"
-    [icon]="kpi.archived.icon"
-    [tone]="kpi.archived.tone"
+    [label]="kpi.closed.label"
+    [value]="closedProjects()"
+    [hint]="closedLabel()"
+    [icon]="kpi.closed.icon"
+    [tone]="kpi.closed.tone"
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis

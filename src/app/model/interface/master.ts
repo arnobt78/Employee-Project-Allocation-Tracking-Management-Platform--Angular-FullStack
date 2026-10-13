@@ -98,6 +98,9 @@ export interface IReadinessChecklistState {
 
 export type ApprovalStatus = 'draft' | 'in_review' | 'approved' | 'rejected';
 
+/** Delivery status of an approved project, stored in `IProject.status`. */
+export type DeliveryStatus = 'in_flight' | 'on_hold' | 'completed' | 'cancelled';
+
 export interface IApprovalAction {
   actorId?: number;
   actorName?: string;
@@ -285,6 +288,8 @@ export interface IProjectEmployee {
   projectName: string;
   /** Set when the assignment's project is archived. */
   projectArchivedAt?: string | null;
+  /** The project's `status`; completed or cancelled projects lock their team. */
+  projectStatus?: string | null;
   employeeName: string;
   employeeAvatarUrl?: string | null;
   allocationPct?: number;
@@ -321,6 +326,7 @@ export interface IProject {
   overview?: IProjectOverview;
   scope?: Record<string, unknown>;
   successMetrics?: string[];
+  /** A `DeliveryStatus` once approved, otherwise mirrors `approvalStatus`. */
   status?: string;
   statusReason?: string;
   statusHistory?: IStatusHistoryEntry[];

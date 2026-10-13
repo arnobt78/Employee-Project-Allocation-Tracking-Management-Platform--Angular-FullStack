@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { AppIconComponent } from '@/app/components/ui/app-icon.component';
 import { UserAvatarComponent } from '@/app/components/ui/user-avatar.component';
 import { employeeAvatar, type AvatarView } from '@/app/lib/media/employee-avatar';
+import { NO_LEAD_LABEL } from '@/app/constants/portfolio-kpis';
 import {
   BADGE_TONE_CLASS,
   STATUS_TONE_BORDER,
@@ -54,6 +55,7 @@ const DAY_MS = 1000 * 60 * 60 * 24;
 export class TimelineViewComponent {
   readonly projects = input<IProjectTimeline[]>([]);
   readonly badgeTone = BADGE_TONE_CLASS;
+  readonly noLeadLabel = NO_LEAD_LABEL;
 
   readonly dateRange = computed(() => {
     const projects = this.projects();

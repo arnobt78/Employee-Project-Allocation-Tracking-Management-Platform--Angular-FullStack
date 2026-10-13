@@ -383,7 +383,7 @@
             <lucide-icon name="briefcase" [size]="12"></lucide-icon>
             {{ item.role }}
           </span>
-          @let state = assignmentStatus(item.isActive);
+          @let state = assignmentStatus(isRowActive(item));
           <span class="eh-badge" [ngClass]="badgeTone[state.tone]">
             <lucide-icon [name]="state.icon" [size]="12"></lucide-icon>
             {{ state.label }}
@@ -399,6 +399,11 @@
             <span class="eh-badge" [ngClass]="badgeTone.slate">
               <lucide-icon name="archive" [size]="12"></lucide-icon>
               Project Archived
+            </span>
+          } @else if (isClosedRow(item)) {
+            <span class="eh-badge" [ngClass]="badgeTone.sky">
+              <lucide-icon name="circle-check" [size]="12"></lucide-icon>
+              {{ closedRowLabel(item) }}
             </span>
           }
         </div>
@@ -723,6 +728,16 @@
                   (click)="restoreProject(item)"
                 >
                   <span>Restore Project</span>
+                </button>
+              } @else if (isClosedRow(item)) {
+                <button
+                  type="button"
+                  class="eh-action-btn eh-action-btn-primary"
+                  title="Reopen the project to edit this assignment"
+                  (click)="openProject(item.projectId)"
+                >
+                  <lucide-icon name="folder-open" [size]="14"></lucide-icon>
+                  <span>Open Project</span>
                 </button>
               } @else {
                 <button

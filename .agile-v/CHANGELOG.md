@@ -1,5 +1,15 @@
 # Changelog — Agile V project memory
 
+## 2026-10-13 — GATE-0030 project delivery status + deleted lead
+
+- Approved projects get a Delivery Status (In Flight, On Hold, Completed, Cancelled) on the project detail page, with a confirmation; approval (draft, in review, approved, rejected) stays separate
+- Completed and Cancelled projects stay listed but no longer count toward capacity, People or staffing; their team and lead are locked until reopened (banner with "Reopen Project")
+- KPIs: Planning now includes rejected; Insights adds Completed and Cancelled; Projects and Dashboard show "Closed" (Completed + Cancelled) instead of "Archived"
+- Saving the edit form no longer overwrites status, approval or history changed elsewhere
+- Deleting an employee removes them as project lead; such projects show "No lead" / "—" and still save
+- Seed data covers every status; shared demo database reseeded
+- Node 24.21: lint PASS; API 104/104; unit 180/180; build PASS; browser 390 + 1280 px PASS
+
 ## 2026-10-13 — Insights Reset Filters link (GATE-0029 follow-up)
 
 - Insights shows a "Reset Filters" link next to the filters while a date range or department is set; it restores All Time / All Departments

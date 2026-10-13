@@ -56,18 +56,18 @@ describe('DashboardComponent', () => {
     const cards = gridCards();
 
     expect(Object.keys(cards)).toEqual([
-      'Employees', 'Projects', 'People', 'In Flight', 'Planning', 'On Hold', 'Staffing', 'Assignments', 'Archived',
+      'Employees', 'Projects', 'People', 'In Flight', 'Planning', 'On Hold', 'Staffing', 'Assignments', 'Closed',
     ]);
     expect(cards).toEqual({
       Employees: '5 | 4 Assigned · 1 Available',
-      Projects: '5 | 4 Active · 1 Archived',
+      Projects: '8 | 7 Active · 1 Archived',
       People: '4 | Unique assignees on active projects',
-      'In Flight': '2 | Approved or in review',
-      Planning: '1 | Draft or planning',
+      'In Flight': '1 | Approved, in delivery',
+      Planning: '3 | Draft, in review or rejected',
       'On Hold': '1 | Paused projects',
-      Staffing: '4 | 4 Staffed · 0 Lead Only · 0 Unstaffed',
-      Assignments: '7 | 5 Active · 1 Inactive · 1 Archived',
-      Archived: '1 | Restore from Projects',
+      Staffing: '4 | 4 Staffed · 1 Lead Only · 0 Unstaffed',
+      Assignments: '8 | 5 Active · 2 Inactive · 1 Archived',
+      Closed: '2 | 1 Completed · 1 Cancelled',
     });
     expect((fixture.nativeElement as HTMLElement).textContent).toContain(
       '4 people on projects · 5 active assignments'
@@ -94,7 +94,7 @@ describe('DashboardComponent', () => {
 
     expect(fixture.componentInstance.stats).not.toBeNull();
     expect(el.querySelectorAll('[data-testid="dashboard-kpi-grid"] app-text-stub').length).toBe(0);
-    expect(cards['Staffing']).toBe('0 | 0 Staffed · 4 Lead Only · 0 Unstaffed');
+    expect(cards['Staffing']).toBe('0 | 0 Staffed · 5 Lead Only · 0 Unstaffed');
     expect(cards['Employees']).toBe('5 | 0 Assigned · 5 Available');
   });
 });

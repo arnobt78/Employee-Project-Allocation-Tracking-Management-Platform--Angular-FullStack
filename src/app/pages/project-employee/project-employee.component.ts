@@ -73,6 +73,8 @@ import {
   assignmentCounts,
   dotJoin,
   isAssignmentActive,
+  isAssignmentClosed,
+  isProjectClosed,
   uniqueAssignees,
   uniqueCount,
 } from '@/app/lib/status/portfolio-stats';
@@ -130,7 +132,9 @@ export class ProjectEmployeeComponent implements OnInit {
   readonly employees = this.employeesSignal.asReadonly();
 
   readonly projectOptions = computed<SelectMenuOption[]>(() =>
-    inArchiveView(this.projects(), 'active', isProjectArchived).map((project) => ({
+    inArchiveView(this.projects(), 'active', isProjectArchived)
+      .filter((project) => !isProjectClosed(project))
+      .map((project) => ({
       value: String(project.projectId),
       label: project.projectName,
       icon: 'folder-kanban',
@@ -223,7 +227,7 @@ export class ProjectEmployeeComponent implements OnInit {
     const activeFilter = this.activeFilter().trim().toLowerCase();
 
     return this.viewAssignments().filter((item) => {
-      const active = this.isActive(item.isActive);
+      const active = this.isRowActive(item);
 
       if (
         projectFilter &&
@@ -403,6 +407,28 @@ export class ProjectEmployeeComponent implements OnInit {
     return leadId != null && Number(leadId) === Number(item.empId);
   }
 
+  /** Closed (completed or cancelled) projects lock their team until reopened on the project page. */
+  isClosedRow(item: IProjectEmployee): boolean {
+    return !item.projectArchivedAt && isAssignmentClosed(item);
+  }
+
+  /** A row on a closed project counts as inactive, as in the KPIs. */
+  isRowActive(item: IProjectEmployee): boolean {
+    return !this.isClosedRow(item) && this.isActive(item.isActive);
+  }
+
+  closedRowLabel(item: IProjectEmployee): string {
+    return `Project ${projectStatusMeta(item.projectStatus ?? '').label}`;
+  }
+
+  openProject(projectId: number) {
+    this.router.navigate(['/update-project', projectId]);
+  }
+
+  private isRowLocked(item: IProjectEmployee): boolean {
+    return isAssignmentArchived(item) || isAssignmentClosed(item);
+  }
+
   isRestoring(projectId: number): boolean {
     return this.pending.has(restoreKey(projectId));
   }
@@ -434,7 +460,7 @@ export class ProjectEmployeeComponent implements OnInit {
   }
 
   onEdit(projectEmployee: IProjectEmployee) {
-    if (isAssignmentArchived(projectEmployee)) {
+    if (this.isRowLocked(projectEmployee)) {
       return;
     }
     this.showCreatePanel = false;
@@ -469,7 +495,7 @@ export class ProjectEmployeeComponent implements OnInit {
     const assignment = this.assignments().find(
       (item) => item.empProjectId === id
     );
-    if (!assignment || isAssignmentArchived(assignment)) {
+    if (!assignment || this.isRowLocked(assignment)) {
       return;
     }
     this.pendingDelete = assignment;

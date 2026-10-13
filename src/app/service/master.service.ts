@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { EMPTY, Observable, defer, map, of, shareReplay, switchMap, tap } from 'rxjs';
 import {
   IApiResponse,
+  DeliveryStatus,
   IProject,
   IProjectEmployee,
   IProjectResourceInsights,
@@ -349,6 +350,12 @@ export class MasterService {
       );
   }
 
+  setProjectStatus(id: number, status: DeliveryStatus): Observable<IProject> {
+    return this.trackProjectMutation(
+      this.http.post<IProject>(this.getProxyUrl('SetProjectStatus') + `?id=${id}`, { status })
+    );
+  }
+
   deleteProjectById(id: number): Observable<IApiResponse> {
     const queryUrl = this.getProxyUrl('DeleteProject') + `?id=${id}`;
     return this.http.delete<IApiResponse>(queryUrl).pipe(
@@ -602,16 +609,28 @@ export class MasterService {
     );
   }
 
-  /** Every project mutation returns the full document: refresh lists + seed the detail snapshot. */
+  /**
+   * Every project mutation returns the full document: refresh lists + seed the
+   * detail snapshot. Assignment rows carry the project's status (closed
+   * projects lock their team), so they follow it too.
+   */
   private trackProjectMutation(
     request$: Observable<IProject>
   ): Observable<IProject> {
     return request$.pipe(
       tap((project) => {
+        const projectId = project?.projectId;
+        const projectStatus = project?.status ?? null;
         this.invalidate(
           'project',
-          project?.projectId
-            ? { projects: (list) => upsertBy(list, 'projectId', project) }
+          projectId
+            ? {
+                projects: (list) => upsertBy(list, 'projectId', project),
+                assignments: (list) =>
+                  list.map((item) =>
+                    item.projectId === projectId ? { ...item, projectStatus } : item
+                  ),
+              }
             : {}
         );
         this.rememberProject(project);

@@ -45,10 +45,10 @@ describe('ProjectEmployeeComponent', () => {
     warm.detectChanges();
     const cards = kpiCards(warm.nativeElement as HTMLElement);
 
-    expect(cards['Total Assignments']).toBe('7 | 6 On Active Projects · 1 Archived');
+    expect(cards['Total Assignments']).toBe('8 | 7 On Active Projects · 1 Archived');
     expect(cards['Active']).toMatch(/^5 \|/);
-    expect(cards['Inactive']).toMatch(/^1 \|/);
-    expect(cards['Projects']).toBe('5 | 4 Active · 1 Archived');
+    expect(cards['Inactive']).toMatch(/^2 \|/);
+    expect(cards['Projects']).toBe('8 | 7 Active · 1 Archived');
     expect(cards['People']).toBe('4 | Unique assignees on active projects');
   });
 

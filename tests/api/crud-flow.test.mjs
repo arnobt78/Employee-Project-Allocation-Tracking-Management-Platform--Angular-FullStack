@@ -119,6 +119,20 @@ describe("CRUD HTTP flow", () => {
       assert.ok(db.tables.project.has(project.projectId));
     });
 
+    test("deleting a project lead clears the lead and the project still saves", async () => {
+      const lead = await createEmployee();
+      const project = await createProject({ leadByEmpId: lead.employeeId });
+
+      assert.equal((await del(`DeleteEmployee/${lead.employeeId}`)).status, 200);
+      assert.equal(db.tables.project.get(project.projectId).leadByEmpId, null);
+      const saved = await put(`UpdateProject/${project.projectId}`, {
+        projectName: "Saved without lead",
+        leadByEmpId: null,
+      });
+      assert.equal(saved.status, 200);
+      assert.equal(saved.data.employeeName, "");
+    });
+
     test("missing name is a 400, unknown ids are 404, bad ids are 400", async () => {
       assert.equal((await post("CreateEmployee", { emailId: "x@y.io" })).status, 400);
       assert.equal((await put("UpdateEmployee/999999", { employeeName: "x" })).status, 404);
@@ -255,6 +269,127 @@ describe("CRUD HTTP flow", () => {
         member.employee.activeAssignments.some((item) => item.projectId === archivedProject.projectId),
         false
       );
+    });
+  });
+
+  describe("delivery status", () => {
+    async function approvedProject(overrides = {}) {
+      const project = await createProject(overrides);
+      assert.equal((await post("RequestApproval", { projectId: project.projectId })).status, 200);
+      const approved = await post("ApproveProject", { projectId: project.projectId });
+      assert.equal(approved.status, 200);
+      return approved.data;
+    }
+
+    test("approval starts delivery In Flight and every status can be set and recorded", async () => {
+      const project = await approvedProject();
+      assert.equal(project.approvalStatus, "approved");
+      assert.equal(project.status, "in_flight");
+
+      for (const status of ["on_hold", "completed", "cancelled", "in_flight"]) {
+        const result = await post(`SetProjectStatus/${project.projectId}`, { status });
+        assert.equal(result.status, 200, status);
+        assert.equal(result.data.status, status);
+        assert.equal(result.data.approvalStatus, "approved");
+      }
+      const stored = db.tables.project.get(project.projectId);
+      assert.equal(stored.statusHistory.at(-1).comment, "Delivery status set to In Flight");
+      assert.equal(stored.timeline.at(-1).label, "In Flight Status");
+
+      const historyLength = stored.statusHistory.length;
+      const unchanged = await post(`SetProjectStatus/${project.projectId}`, { status: "in_flight" });
+      assert.equal(unchanged.status, 200);
+      assert.equal(db.tables.project.get(project.projectId).statusHistory.length, historyLength);
+    });
+
+    test("bad ids and statuses are 400, unknown projects 404, unapproved or archived 409", async () => {
+      const project = await approvedProject();
+      assert.equal((await post("SetProjectStatus/abc", { status: "completed" })).status, 400);
+      const unknown = await post(`SetProjectStatus/${project.projectId}`, { status: "done" });
+      assert.equal(unknown.status, 400);
+      assert.match(unknown.json.message, /^status must be one of/);
+      assert.equal((await post("SetProjectStatus/999999", { status: "completed" })).status, 404);
+
+      const draft = await createProject();
+      const unapproved = await post(`SetProjectStatus/${draft.projectId}`, { status: "completed" });
+      assert.equal(unapproved.status, 409);
+      assert.equal(unapproved.json.message, "Only approved projects have a delivery status");
+
+      await post(`ArchiveProject/${project.projectId}`);
+      const archived = await post(`SetProjectStatus/${project.projectId}`, { status: "completed" });
+      assert.equal(archived.status, 409);
+      assert.equal(db.tables.project.get(project.projectId).status, "in_flight");
+    });
+
+    test("UpdateProject ignores status, approval and history sent back by the edit form", async () => {
+      const project = await approvedProject();
+      await post(`SetProjectStatus/${project.projectId}`, { status: "on_hold" });
+      const historyLength = db.tables.project.get(project.projectId).statusHistory.length;
+
+      const saved = await put(`UpdateProject/${project.projectId}`, {
+        projectName: "Edited",
+        status: "in_flight",
+        approvalStatus: "draft",
+        statusHistory: [],
+        timeline: [],
+      });
+      assert.equal(saved.status, 200);
+      const stored = db.tables.project.get(project.projectId);
+      assert.equal(stored.projectName, "Edited");
+      assert.equal(stored.status, "on_hold");
+      assert.equal(stored.approvalStatus, "approved");
+      assert.equal(stored.statusHistory.length, historyLength);
+    });
+
+    test("a closed project's team and lead are locked and its allocation frees capacity", async () => {
+      const employee = await createEmployee();
+      const other = await createEmployee();
+      const closed = await approvedProject({ leadByEmpId: employee.employeeId });
+      const live = await approvedProject();
+      const assignment = (await list("GetAllProjectEmployees")).find(
+        (item) => item.projectId === closed.projectId && item.empId === employee.employeeId
+      );
+      await put(`UpdateProjectEmployee/${assignment.empProjectId}`, { allocationPct: 70 });
+      await createAssignment(live.projectId, employee.employeeId, { allocationPct: 20 });
+
+      await post(`SetProjectStatus/${closed.projectId}`, { status: "completed" });
+      const message = "Project is closed. Set it back to In Flight or On Hold before changing its team";
+      const blockedCreate = await post("CreateProjectEmployee", {
+        projectId: closed.projectId,
+        empId: other.employeeId,
+      });
+      assert.equal(blockedCreate.status, 409);
+      assert.equal(blockedCreate.json.message, message);
+      assert.equal((await put(`UpdateProjectEmployee/${assignment.empProjectId}`, { role: "x" })).status, 409);
+      assert.equal((await del(`DeleteProjectEmployee/${assignment.empProjectId}`)).status, 409);
+      const leadChange = await put(`UpdateProject/${closed.projectId}`, { leadByEmpId: other.employeeId });
+      assert.equal(leadChange.status, 409);
+      assert.equal(leadChange.json.message, message);
+
+      const listed = (await list("GetAllProjectEmployees")).find(
+        (item) => item.empProjectId === assignment.empProjectId
+      );
+      assert.equal(listed.projectStatus, "completed");
+      const insights = await request(`GetProjectResources/${live.projectId}`);
+      const member = insights.data.assignments.find(
+        (item) => item.employee.employeeId === employee.employeeId
+      );
+      assert.equal(member.employee.allocation.allocatedPct, 20);
+
+      const moved = await put(`UpdateProjectEmployee/${assignment.empProjectId}`, {
+        projectId: live.projectId,
+      });
+      assert.equal(moved.status, 409);
+      assert.equal(moved.json.message, message);
+
+      await post(`SetProjectStatus/${closed.projectId}`, { status: "in_flight" });
+      await createAssignment(closed.projectId, other.employeeId);
+    });
+
+    test("a new project's status follows its approval step, not the client", async () => {
+      const draft = await createProject({ status: "completed" });
+      assert.equal(draft.status, "draft");
+      assert.equal(draft.approvalStatus, "draft");
     });
   });
 

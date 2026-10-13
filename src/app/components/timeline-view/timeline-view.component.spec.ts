@@ -57,7 +57,7 @@ describe('TimelineViewComponent', () => {
     expect(text).toContain('1 Team Member');
     expect(text).toContain('— Ready');
     expect(text).toContain('3 Team Members');
-    expect(text).toContain('No Lead');
+    expect(text).toContain('No lead');
     expect(fixture.nativeElement.querySelector('lucide-icon[name="gauge"]')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('lucide-icon[name="shield-user"]')).toBeNull();
   });

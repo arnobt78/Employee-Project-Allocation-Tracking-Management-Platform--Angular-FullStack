@@ -1,17 +1,25 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0029 follow-up (Insights Reset Filters link, TASK-0110) committed locally, not pushed; GATE-0029 pushed and redeployed (`origin/main` = `ba6d19d`)  
-**Gate:** GATE-0029 **COMPLETE**; GATE-0028 **COMPLETE**; GATE-0027 **COMPLETE**; GATE-0026 **COMPLETE**; GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** GATE-0029 (REQ-0165–0167, TASK-0107–0109) pushed and redeployed; follow-up TASK-0110 (Reset Filters link) committed locally, not pushed. User checked prod 2026-10-13 (every page + refresh skeletons OK, CRUD soak not yet run). Node 24.21: lint PASS, API tests 98/98, unit 175/175, production build PASS. Database (shared by local and prod) reseeded with `@example.com` seed employees and has the 90-day `NotificationLog` TTL index; only `admin` remains as a user.  
+**Phase / Stage:** Stage 4 — GATE-0030 (project delivery status + deleted lead, TASK-0111–0114) and TASK-0110 committed locally, not pushed; `origin/main` = `ba6d19d`  
+**Gate:** GATE-0030 **COMPLETE (local)**; GATE-0029 **COMPLETE**; GATE-0028 **COMPLETE**; GATE-0027 **COMPLETE**; GATE-0026 **COMPLETE**; GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
+**Status:** GATE-0030 (REQ-0168–0170) committed locally on top of TASK-0110 (Reset Filters, also local); neither pushed. Node 24.21: lint PASS, API tests 104/104, unit 180/180, production build PASS, browser 390 + 1280 px PASS. Shared database reseeded 2026-10-13 with every project status (8 projects, 12 assignments); prod still runs `ba6d19d`, which buckets the new `in_flight` / `completed` / `cancelled` / `rejected` values with the old rules until this is deployed.  
 **Updated:** 2026-10-13  
-**resume_token:** `c1-gate29-reset-filters-2026-10-13`
+**resume_token:** `c1-gate30-delivery-status-2026-10-13`
 
 ---
 
 ## Resume Point
 
-**Next exact task:** push TASK-0110 on user approval, check the Insights Reset Filters link on prod (1280 + 390 px), then run the CRUD prod soak.
+**Next exact task:** push GATE-0030 + TASK-0110 on user approval (prod data is already reseeded for the new statuses), check on prod at 1280 + 390 px (delivery status cycle, Closed card, Reset Filters), then run the CRUD prod soak.
+
+**Completed (GATE-0030, TASK-0111–0114):**
+
+- Status model: `approvalStatus` = draft / in_review / approved / rejected; once approved, `status` = `in_flight` / `on_hold` / `completed` / `cancelled` (`DeliveryStatus`). API `POST SetProjectStatus?id=` (`setProjectDeliveryStatus`): 400 bad status, 404, 409 archived (wins) or not approved, no-op when unchanged, else history "Delivery status set to X" + timeline entry. Approve sets `in_flight`; create derives status from approval (`initialProjectStatus`). `updateProject` no longer writes status, approval fields, history, timeline or reviewer comments (stale form overwrite fixed).
+- Closed (completed/cancelled): `teamLockedMessage` (archived first, then closed) guards assignment create/update/delete (including moving one away) and lead changes (409 "Project is closed…"); excluded from resource insights capacity and dashboard active counts; assignments carry `projectStatus`. Frontend: `portfolio-stats` buckets Planning (draft, in_review, rejected) / In Flight / On Hold / Completed / Cancelled, `isProjectClosed`, `isAssignmentClosed`, `isProjectTeamLocked`, `deliveryStatusOf`, `DELIVERY_STATUS_OPTIONS`, `closedCount`, `closedCountsLabel`; staffing, workforce, people and assignment counts use open projects only. `MasterService.setProjectStatus` via `trackProjectMutation`, which now also patches `projectStatus` on cached assignments.
+- UI: detail "Delivery Status" `app-select-menu` (approved and not archived) → `pendingConfirm` kind `status` (copy `PROJECT_DETAIL_CONFIRM_COPY.status`), closed banner with "Reopen Project", Edit Lead / Add to Team disabled with `footerCopy.teamLocked`; approval header "Approved · <status>". Projects + Dashboard "Closed" card (`PORTFOLIO_KPIS.closed`, "N Completed · M Cancelled") replaces "Archived"; Dashboard staffing chart gains a Closed slice. Project Team: closed projects not in the picker, closed rows show "Project Completed/Cancelled", count and filter as Inactive, "Open Project" instead of Edit/Delete. Insights distribution includes Completed and Cancelled.
+- Deleted lead: `deleteEmployee` clears `leadByEmpId`; lead validated only when changed; `NO_LEAD_LABEL` ("No lead") on detail (no avatar) and Timeline, "—" in Projects list.
+- Seed: Aurora in_flight, Helios in_review, Mercury draft, Atlas on_hold, Beacon completed + archived, Comet completed, Nova cancelled, Orion rejected (`prisma/seed-data.ts`); fixture `portfolio-fixture.ts` mirrors it.
 
 **Completed (GATE-0029 follow-up, TASK-0110):**
 

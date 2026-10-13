@@ -438,6 +438,65 @@ describe('ProjectFormComponent', () => {
       expect(component.pendingConfirm()).toBeNull();
     });
 
+    it('changes the delivery status only after confirmation and resets the menu on cancel', () => {
+      spyOn(master, 'peekProject').and.returnValue({
+        project: { ...project, approvalStatus: 'approved', status: 'in_flight' },
+        fresh: true,
+      });
+      const status$ = new Subject<IProject>();
+      const setStatus = spyOn(master, 'setProjectStatus').and.returnValue(status$);
+      create();
+      expect(component.deliveryStatus()).toBe('in_flight');
+      expect(component.canSetDeliveryStatus()).toBeTrue();
+
+      component.deliveryStatusControl.setValue('completed');
+      component.requestDeliveryStatus('completed');
+      expect(component.detailConfirmCopy()?.title).toBe('Mark Aurora Web Revamp As Completed?');
+      component.dismissDetailConfirm();
+      expect(component.pendingConfirm()).toBeNull();
+      expect(component.deliveryStatusControl.value).toBe('in_flight');
+      expect(setStatus).not.toHaveBeenCalled();
+
+      component.requestDeliveryStatus('completed');
+      component.confirmDetailAction();
+      expect(setStatus).toHaveBeenCalledOnceWith(7, 'completed');
+      status$.next({ ...project, approvalStatus: 'approved', status: 'completed' });
+      expect(component.pendingConfirm()).toBeNull();
+      expect(component.isClosed()).toBeTrue();
+      expect(component.isTeamLocked()).toBeTrue();
+      expect(component.deliveryStatusControl.value).toBe('completed');
+    });
+
+    it('hides the delivery status until approval and locks the team of a closed project', () => {
+      spyOn(master, 'peekProject').and.returnValue({
+        project: { ...project, approvalStatus: 'approved', status: 'cancelled' },
+        fresh: true,
+      });
+      const el = create();
+      expect(el.textContent).toContain('This project is Cancelled.');
+      component.startEdit('team');
+      expect(component.editingSection()).not.toBe('team');
+      component.startCollaboratorAssignment({ employeeId: 3, employeeName: 'Liam Patel' } as never);
+      component.submitCollaboratorAssignment();
+      expect(component.pendingConfirm()).toBeNull();
+
+      (component as unknown as { currentProjectSignal: { set(p: IProject): void } })
+        .currentProjectSignal.set({ ...project, approvalStatus: 'in_review', status: 'in_review' });
+      expect(component.deliveryStatus()).toBeNull();
+      expect(component.canSetDeliveryStatus()).toBeFalse();
+      expect(component.isTeamLocked()).toBeFalse();
+    });
+
+    it('shows "No lead" without an avatar when the lead no longer exists', () => {
+      spyOn(master, 'peekProject').and.returnValue({
+        project: { ...project, leadByEmpId: 106 },
+        fresh: true,
+      });
+      create();
+      expect(component.displayValue('leadByEmpId')).toBe('No lead');
+      expect(component.leadAvatar()).toBeNull();
+    });
+
     it('ignores a restore that finishes after switching to another project', () => {
       spyOn(master, 'peekProject').and.callFake((id: number) => ({
         project: { ...project, projectId: id, archivedAt: '2026-07-10T00:00:00.000Z' },

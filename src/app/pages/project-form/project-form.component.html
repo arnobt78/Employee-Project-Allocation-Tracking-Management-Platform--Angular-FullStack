@@ -37,6 +37,29 @@
             <span>Restore Project</span>
           </button>
         </div>
+      } @else if (isClosed()) {
+        <div
+          role="status"
+          class="flex flex-col gap-3 rounded-[24px] border border-sky-400/30 bg-sky-500/10 px-3 py-3 text-sm text-white/75 sm:flex-row sm:items-center sm:justify-between sm:px-4"
+        >
+          <p class="flex items-start gap-2">
+            <lucide-icon name="circle-check" [size]="16" class="mt-0.5 shrink-0 text-sky-300"></lucide-icon>
+            <span>{{ footerCopy.closed(deliveryStatusLabel()) }}</span>
+          </p>
+          <button
+            ehAction
+            type="button"
+            class="eh-action-btn eh-action-btn-outline sm:shrink-0"
+            icon="rotate-ccw"
+            [iconSize]="14"
+            [pending]="isUpdatingStatus()"
+            pendingLabel="Reopening…"
+            [disabled]="isSaving() || isDeleting()"
+            (click)="requestReopen()"
+          >
+            <span>Reopen Project</span>
+          </button>
+        </div>
       }
       <section
         class="rounded-[28px] border border-white/10 bg-white/5/80 p-2 sm:p-4 shadow-[0_35px_90px_rgba(9,14,33,0.55)] backdrop-blur-md"
@@ -1036,6 +1059,8 @@
                   class="eh-action-btn eh-action-btn-outline"
                   icon="pencil"
                   [iconSize]="14"
+                  [disabled]="isTeamLocked()"
+                  [attr.title]="isTeamLocked() ? footerCopy.teamLocked : null"
                   (click)="startEdit('team')"
                 >
                   <span>Edit Lead</span>
@@ -1544,12 +1569,8 @@
                               collaboratorAssignmentProfile()?.employeeId ===
                               collaborator.employeeId
                             "
-                            [disabled]="isArchived()"
-                            [attr.title]="
-                              isArchived()
-                                ? 'Restore the project to change its team'
-                                : null
-                            "
+                            [disabled]="isTeamLocked()"
+                            [attr.title]="isTeamLocked() ? footerCopy.teamLocked : null"
                             (click)="startCollaboratorAssignment(collaborator)"
                           >
                             <span>{{
@@ -1897,6 +1918,9 @@
               </span>
               <span class="text-base font-medium text-white">
                 {{ approvalStatusLabel(approvalStatus()) }}
+                @if (deliveryStatusLabel()) {
+                  <span class="text-white/55">· {{ deliveryStatusLabel() }}</span>
+                }
               </span>
             </div>
             <span
@@ -1934,6 +1958,24 @@
                     {{ approvalStatusLabel(approvalStatus()) }}
                   </span>
                 </div>
+                @if (canSetDeliveryStatus()) {
+                  <div class="space-y-2">
+                    <app-field-label
+                      text="Delivery Status"
+                      icon="activity"
+                      forId="delivery-status"
+                      [aboveControl]="true"
+                    ></app-field-label>
+                    <app-select-menu
+                      triggerId="delivery-status"
+                      [formControl]="deliveryStatusControl"
+                      [options]="deliveryStatusOptions"
+                      [clearable]="false"
+                      placeholder="Select Status"
+                      (selectionChange)="requestDeliveryStatus($event)"
+                    ></app-select-menu>
+                  </div>
+                }
                 <div class="space-y-1 text-xs sm:text-sm text-white/55">
                   <p *ngIf="currentProject()?.approvalRequestedAt">
                     Requested

@@ -54,6 +54,8 @@ import {
 import { titleCaseLabel } from '@/app/lib/format/labels';
 import { BADGE_TONE_CLASS, projectStatusMeta } from '@/app/lib/status/project-status';
 import {
+  closedCount,
+  closedCountsLabel,
   normalizedProjectStatus,
   projectStatusBuckets,
   uniqueCount,
@@ -175,6 +177,8 @@ export class ProjectComponent implements OnInit {
 
   readonly kpi = PORTFOLIO_KPIS;
   readonly statusBuckets = computed(() => projectStatusBuckets(this.projects()));
+  readonly closedProjects = computed(() => closedCount(this.statusBuckets()));
+  readonly closedLabel = computed(() => closedCountsLabel(this.statusBuckets()));
 
   readonly kpiClients = computed(() =>
     uniqueCount(this.activeProjects(), (p) => p.clientName)
@@ -235,7 +239,7 @@ export class ProjectComponent implements OnInit {
       return null;
     }
     const lead = this.employeesById().get(Number(project.leadByEmpId));
-    return employeeAvatar(lead, project.employeeName);
+    return lead || project.employeeName ? employeeAvatar(lead, project.employeeName) : null;
   }
 
   /** The lead's email lives on their employee record, never on the project. */

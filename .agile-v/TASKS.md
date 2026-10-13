@@ -244,6 +244,15 @@
 | TASK-0109 | Insights: subtitles on all overview KPI cards, remove duplicate chip row, status cards with share-of-total subtitle, capacity in people, "—" for empty departments, equal-height responsive grids | REQ-0167 | DONE | `kpi-stat-card` host `block h-full`; CSV with UTF-8 BOM; browser 390 + 1280 px |
 | TASK-0110 | Shared "Reset Filters" inline link (`app-clear-filters-button`) in list toolbars and on the Insights filter row (shown only while a filter is set; desktop aligned, phone stacked) | REQ-0167 | DONE | Spec for show/reset; browser 390 + 1280 px |
 
+## Wave — GATE-0030 project delivery status + deleted lead (COMPLETE 2026-10-13, committed locally)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0111 | API: `SetProjectStatus` (`setProjectDeliveryStatus`, history + timeline entry, 400/404/409, no-op when unchanged); approve sets `in_flight`; create derives status from approval; `UpdateProject` stops writing status/approval/history | REQ-0168 | DONE | API tests 104/104 |
+| TASK-0112 | API + shared rules: closed projects lock team/lead (`teamLockedMessage`, also when moving an assignment away), excluded from capacity and dashboard counts; `projectStatus` on assignments; `portfolio-stats` buckets Completed/Cancelled, `isProjectClosed`, `isProjectTeamLocked`, `deliveryStatusOf`, `closedCount(sLabel)` | REQ-0169 | DONE | `portfolio-stats.spec` |
+| TASK-0113 | UI: detail Delivery Status menu + confirm, closed banner with Reopen, team/lead locks; Closed card on Projects/Dashboard (+ chart slice); Project Team closed rows read-only ("Open Project", shown inactive, filter agrees); Insights Completed/Cancelled | REQ-0168, REQ-0169 | DONE | Specs + browser 390 + 1280 px |
+| TASK-0114 | Deleted lead: API clears `leadByEmpId`, lead checked only when changed; `NO_LEAD_LABEL` on detail/Timeline, "—" in Projects list; seed covers every status (Comet completed, Nova cancelled, Orion rejected), shared DB reseeded on user approval | REQ-0170 | DONE | Browser: temp employee as Orion lead, deleted, then lead restored |
+
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)
