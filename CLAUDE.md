@@ -5,9 +5,9 @@
 Project Name: EmpowerHub — Employee & Project Management (employee-management)  
 Description: Angular 20 SPA + Vercel serverless API + Prisma/MongoDB for employees, projects, assignments, dashboards, calendar/Gantt, insights, API docs/status, email notifications, optional Contentful + AI drafting, Sentry tunnel.
 
-Current Status: GATE-0030 committed locally, not pushed (project delivery status: approved projects get In Flight / On Hold / Completed / Cancelled via `SetProjectStatus`; closed projects stay listed but lock their team and leave capacity; "Closed" KPI card; deleted lead shows "No lead"; seed covers every status, shared DB reseeded) on top of TASK-0110 (local, shared "Reset Filters" link `app-clear-filters-button`). GATE-0029 pushed, `origin/main` = `ba6d19d` (shared KPI rules in `lib/status/portfolio-stats.ts`: Projects KPI = total + "N Active · M Archived" everywhere, Project Team Total Assignments = all, Dashboard regrouped into Employees/Projects/People/In Flight/Planning/On Hold/Staffing/Assignments/Archived, Insights subtitles on every card, capacity in people, equal card heights) on top of GATE-0026–0028; next: push GATE-0030 + TASK-0110 on approval, prod check, CRUD prod soak 
+Current Status: GATE-0030 pushed, `origin/main` = `ad94ce6`; project paused until new features or Sentry issues (project delivery status: approved projects get In Flight / On Hold / Completed / Cancelled via `SetProjectStatus`; closed projects stay listed but lock their team and leave capacity; "Closed" KPI card; deleted lead shows "No lead"; seed covers every status, shared DB reseeded) plus TASK-0110 (shared "Reset Filters" link `app-clear-filters-button`) and per-project lifecycle pending/busy follow-ups. GATE-0029 (shared KPI rules in `lib/status/portfolio-stats.ts`: Projects KPI = total + "N Active · M Archived" everywhere, Project Team Total Assignments = all, Dashboard regrouped into Employees/Projects/People/In Flight/Planning/On Hold/Staffing/Assignments/Archived, Insights subtitles on every card, capacity in people, equal card heights) on top of GATE-0026–0028; next: none (optional CRUD prod soak) 
 Current Agile V Cycle: C1 
-Current Gate: GATE-0030 COMPLETE (local); PUSH + PROD SOAK PENDING
+Current Gate: GATE-0030 COMPLETE; project paused
 
 ---
 

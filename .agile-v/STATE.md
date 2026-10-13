@@ -1,9 +1,9 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0030 (project delivery status + deleted lead, TASK-0111–0114) and TASK-0110 pushed with the per-project pending follow-up (`origin/main` = `1166a6d`); lifecycle busy + confirm ownership follow-up committed locally, not pushed  
-**Gate:** GATE-0030 **COMPLETE (local)**; GATE-0029 **COMPLETE**; GATE-0028 **COMPLETE**; GATE-0027 **COMPLETE**; GATE-0026 **COMPLETE**; GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** GATE-0030 (REQ-0168–0170) committed locally on top of TASK-0110 (Reset Filters, also local); neither pushed. Node 24.21: lint PASS, API tests 104/104, unit 180/180, production build PASS, browser 390 + 1280 px PASS. Shared database reseeded 2026-10-13 with every project status (8 projects, 12 assignments); prod still runs `ba6d19d`, which buckets the new `in_flight` / `completed` / `cancelled` / `rejected` values with the old rules until this is deployed.  
+**Phase / Stage:** Stage 4 — GATE-0030 (project delivery status + deleted lead, TASK-0111–0114), TASK-0110 and all follow-ups pushed and deployed (`origin/main` = `ad94ce6`); project paused  
+**Gate:** GATE-0030 **COMPLETE**; GATE-0029 **COMPLETE**; GATE-0028 **COMPLETE**; GATE-0027 **COMPLETE**; GATE-0026 **COMPLETE**; GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
+**Status:** GATE-0030 (REQ-0168–0170), TASK-0110 and follow-ups pushed; user checked prod 2026-10-13, no open issues. Node 24.21: lint PASS, API tests 104/104, unit 188/188, production build PASS, browser sweep 13 routes × 1280 + 390 px PASS (0 console/network errors). Shared database seeded 2026-10-13 with every project status (8 projects, 12 assignments). Local `node_modules`, `.angular`, `dist`, `generated` removed to save disk — run `npm install` then `npx prisma generate` before working again.  
 **Updated:** 2026-10-13  
 **resume_token:** `c1-gate30-delivery-status-2026-10-13`
 
@@ -11,7 +11,7 @@
 
 ## Resume Point
 
-**Next exact task:** push the per-project pending follow-up on user approval, user checks prod at 1280 + 390 px (delivery status cycle, Closed card, Reset Filters), then run the CRUD prod soak.
+**Next exact task:** none — project paused. Resume only for new feature requests or Sentry issues (start with `npm install` + `npx prisma generate`). GATE-0017 CRUD prod soak (CP-0019) remains optional.
 
 **Completed (GATE-0030 follow-up):** project detail `PENDING.archive(id)` / `PENDING.status(id)` / `PENDING.delete(id)` keyed by the `routedProjectId` signal (single project-id source; no form id reads), so switching projects mid-save never greys out another project. Status/restore confirms carry their `projectId`; a confirm for another project closes without a request. `isLifecycleBusy` (archive, status, delete) blocks overlapping lifecycle saves on one project (buttons, status menu, guards). Specs lock the Reopen behaviour (menu shows the saved status until the API confirms). Lint PASS, unit 188/188, build PASS, browser mid-save PASS.
 
