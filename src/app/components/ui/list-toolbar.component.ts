@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AppIconComponent } from './app-icon.component';
+import { ClearFiltersButtonComponent } from './clear-filters-button.component';
 import { SelectMenuComponent, SelectMenuOption } from './select-menu.component';
 
 /** @deprecated Prefer ListToolbarMenuFilter + SelectMenu options. */
@@ -26,7 +27,7 @@ export interface ListToolbarMenuFilterChange {
 @Component({
   selector: 'app-list-toolbar',
   standalone: true,
-  imports: [CommonModule, FormsModule, AppIconComponent, SelectMenuComponent],
+  imports: [CommonModule, FormsModule, AppIconComponent, ClearFiltersButtonComponent, SelectMenuComponent],
   host: { class: 'block w-full' },
   template: `
     <section
@@ -54,14 +55,10 @@ export interface ListToolbarMenuFilterChange {
         class="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end"
       >
         @if (hasActiveFilters) {
-          <button
-            type="button"
-            class="inline-flex shrink-0 items-center gap-1.5 self-start text-xs font-medium text-sky-300/90 transition hover:text-sky-200 sm:self-center"
-            (click)="clearFilters.emit()"
-          >
-            <lucide-icon name="x" [size]="14"></lucide-icon>
-            <span>Clear</span>
-          </button>
+          <app-clear-filters-button
+            class="self-start sm:self-center"
+            (cleared)="clearFilters.emit()"
+          ></app-clear-filters-button>
         }
 
         @for (filter of menuFilters; track filter.id) {

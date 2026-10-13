@@ -1,5 +1,18 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-13 — Insights Reset Filters link (TASK-0110)
+
+**Node:** v24.21.0 via fnm
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 175/175 (new: Insights link hidden by default, shown after a department filter, reset restores All and hides it) |
+| `npm run test:api` | not run | no API change |
+| `npm run build` | **PASS** | |
+| Browser (Playwright, dev, admin) 1280 + 390 px | **PASS** | Desktop link centre = dropdown centre (y 246); phone stacked under Department, left-aligned; Custom Range wraps to next row; reset restores "All Departments"; Employees toolbar link appears on search and clears it; 0 console errors |
+| Independent verifier | **PASS WITH WARNINGS (fixed)** | Focus lost when the link unmounts (now returns to Date Range); spec now checks the department label after reset. Not changed: focus style is an underline; Custom Range without dates counts as a filter |
+
 ## Session 2026-10-13 — GATE-0029 consistent KPIs and Insights cards
 
 **Node:** v24.21.0 via fnm

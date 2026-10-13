@@ -1,15 +1,23 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0029 (consistent KPIs, Insights cards) committed locally, not pushed; GATE-0026–0028 pushed (`origin/main` = `4512353`)  
+**Phase / Stage:** Stage 4 — GATE-0029 follow-up (Insights Reset Filters link, TASK-0110) committed locally, not pushed; GATE-0029 pushed and redeployed (`origin/main` = `ba6d19d`)  
 **Gate:** GATE-0029 **COMPLETE**; GATE-0028 **COMPLETE**; GATE-0027 **COMPLETE**; GATE-0026 **COMPLETE**; GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** GATE-0029 (REQ-0165–0167, TASK-0107–0109) committed locally, not pushed; GATE-0026–0028 pushed. User checked prod 2026-10-13 (every page + refresh skeletons OK, CRUD soak not yet run). Node 24.21: lint PASS, API tests 98/98, unit 174/174, production build PASS. Database (shared by local and prod) reseeded with `@example.com` seed employees and has the 90-day `NotificationLog` TTL index; only `admin` remains as a user.  
+**Status:** GATE-0029 (REQ-0165–0167, TASK-0107–0109) pushed and redeployed; follow-up TASK-0110 (Reset Filters link) committed locally, not pushed. User checked prod 2026-10-13 (every page + refresh skeletons OK, CRUD soak not yet run). Node 24.21: lint PASS, API tests 98/98, unit 175/175, production build PASS. Database (shared by local and prod) reseeded with `@example.com` seed employees and has the 90-day `NotificationLog` TTL index; only `admin` remains as a user.  
 **Updated:** 2026-10-13  
-**resume_token:** `c1-gate29-complete-2026-10-13`
+**resume_token:** `c1-gate29-reset-filters-2026-10-13`
 
 ---
 
 ## Resume Point
+
+**Next exact task:** push TASK-0110 on user approval, check the Insights Reset Filters link on prod (1280 + 390 px), then run the CRUD prod soak.
+
+**Completed (GATE-0029 follow-up, TASK-0110):**
+
+- Shared `app-clear-filters-button` (`components/ui/clear-filters-button.component.ts`): inline text link, `rotate-ccw` icon, "Reset Filters", output `cleared`. Replaces the "Clear" button in `list-toolbar` (Employees, Projects, Project Team).
+- Insights: `filtersActive` signal (date range or department not "all"), `resetFilters()` restores defaults, recalculates and returns focus to the Date Range dropdown. The link sits after Department, centred on the dropdown row on desktop, stacked under the dropdowns on phone, wraps to the next row with Custom Range.
+- Department Breakdown showing Employee Success with 0 projects and "—" is expected: it groups active projects by lead department and that department only leads the archived Beacon project. No change.
 
 **Completed (GATE-0029, TASK-0107–0109):**
 

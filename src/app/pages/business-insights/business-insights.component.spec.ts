@@ -98,6 +98,32 @@ describe('BusinessInsightsComponent', () => {
     expect(csv).toContain('Engineering,2,2,');
   });
 
+  it('shows Reset Filters only while a filter is set, and resets to All', () => {
+    warmPortfolioCaches(TestBed.inject(MasterService));
+    const fixture = TestBed.createComponent(BusinessInsightsComponent);
+    fixture.detectChanges();
+    const component = fixture.componentInstance;
+    const el = fixture.nativeElement as HTMLElement;
+    const link = () => el.querySelector('app-clear-filters-button button') as HTMLButtonElement | null;
+
+    expect(link()).toBeNull();
+
+    component.filterForm.patchValue({ department: 'Engineering' });
+    component.onFilterChange();
+    fixture.detectChanges();
+    expect(component.insights()?.workforce.total).toBe(2);
+    expect(link()?.textContent).toContain('Reset Filters');
+
+    link()!.click();
+    fixture.detectChanges();
+    expect(component.filterForm.value).toEqual(
+      jasmine.objectContaining({ dateRange: 'all', department: 'all' })
+    );
+    expect(component.insights()?.workforce.total).toBe(5);
+    expect(link()).toBeNull();
+    expect(el.querySelector('#insights-department')?.textContent).toContain('All Departments');
+  });
+
   it('reports capacity in people and "—" for departments without projects', () => {
     warmPortfolioCaches(TestBed.inject(MasterService));
     const fixture = TestBed.createComponent(BusinessInsightsComponent);

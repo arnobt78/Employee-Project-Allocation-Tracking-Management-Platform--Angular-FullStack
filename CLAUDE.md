@@ -5,7 +5,7 @@
 Project Name: EmpowerHub — Employee & Project Management (employee-management)  
 Description: Angular 20 SPA + Vercel serverless API + Prisma/MongoDB for employees, projects, assignments, dashboards, calendar/Gantt, insights, API docs/status, email notifications, optional Contentful + AI drafting, Sentry tunnel.
 
-Current Status: GATE-0029 committed locally, not pushed (shared KPI rules in `lib/status/portfolio-stats.ts`: Projects KPI = total + "N Active · M Archived" everywhere, Project Team Total Assignments = all, Dashboard regrouped into Employees/Projects/People/In Flight/Planning/On Hold/Staffing/Assignments/Archived, Insights subtitles on every card, capacity in people, equal card heights) on top of GATE-0026–0028 (pushed, `origin/main` = `4512353`); next: push on approval, prod KPI check, CRUD prod soak 
+Current Status: GATE-0029 follow-up TASK-0110 committed locally, not pushed (shared "Reset Filters" link `app-clear-filters-button` in list toolbars and on the Insights filter row). GATE-0029 pushed, `origin/main` = `ba6d19d` (shared KPI rules in `lib/status/portfolio-stats.ts`: Projects KPI = total + "N Active · M Archived" everywhere, Project Team Total Assignments = all, Dashboard regrouped into Employees/Projects/People/In Flight/Planning/On Hold/Staffing/Assignments/Archived, Insights subtitles on every card, capacity in people, equal card heights) on top of GATE-0026–0028; next: push TASK-0110 on approval, prod Reset Filters check, CRUD prod soak 
 Current Agile V Cycle: C1 
 Current Gate: GATE-0029 COMPLETE; PUSH + PROD SOAK PENDING
 

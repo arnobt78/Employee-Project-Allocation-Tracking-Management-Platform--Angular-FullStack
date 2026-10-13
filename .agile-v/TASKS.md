@@ -242,6 +242,7 @@
 | TASK-0107 | `projectCounts` value = total; Projects KPI on Dashboard, Projects, Project Team, Insights; Project Team Total Assignments = all with "On Active Projects · Archived" subtitle | REQ-0165 | DONE | Project/Project Team specs; `project-archive.spec.ts` already covers `total` |
 | TASK-0108 | Shared status buckets in `lib/status/` (move `IN_FLIGHT/PLANNING/ON_HOLD` out of `project.component.ts`); Dashboard KPIs regrouped: Employees, Projects, In Flight, Planning, On Hold, Staffing (Staffed · Lead Only · Unstaffed), Assignments (Active · Inactive · Archived), Archived; hero chips + people count match Project Team | REQ-0166 | DONE | `lib/status/portfolio-stats.ts` + `constants/portfolio-kpis.ts`; Dashboard "People" (same label/number as Project Team); Insights status cards use the same buckets |
 | TASK-0109 | Insights: subtitles on all overview KPI cards, remove duplicate chip row, status cards with share-of-total subtitle, capacity in people, "—" for empty departments, equal-height responsive grids | REQ-0167 | DONE | `kpi-stat-card` host `block h-full`; CSV with UTF-8 BOM; browser 390 + 1280 px |
+| TASK-0110 | Shared "Reset Filters" inline link (`app-clear-filters-button`) in list toolbars and on the Insights filter row (shown only while a filter is set; desktop aligned, phone stacked) | REQ-0167 | DONE | Spec for show/reset; browser 390 + 1280 px |
 
 ---
 

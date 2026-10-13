@@ -46,6 +46,7 @@ import {
   InsightsTabId,
 } from '@/app/constants/business-insights';
 import { ActionButtonComponent } from '@/app/components/ui/action-button.component';
+import { ClearFiltersButtonComponent } from '@/app/components/ui/clear-filters-button.component';
 import { FieldLabelComponent } from '@/app/components/ui/field-label.component';
 import { KpiStatCardComponent } from '@/app/components/ui/kpi-stat-card.component';
 import { ToastService } from '@/app/components/ui/toast.service';
@@ -137,6 +138,7 @@ function withValues(
     FormsModule,
     ReactiveFormsModule,
     ActionButtonComponent,
+    ClearFiltersButtonComponent,
     FieldLabelComponent,
     KpiStatCardComponent,
     InsightsSkeletonComponent,
@@ -190,6 +192,7 @@ export class BusinessInsightsComponent implements OnInit {
   ]);
 
   filterForm: FormGroup;
+  readonly filtersActive = signal(false);
 
   readonly activeTabSignal = signal<InsightsTabId>('overview');
   readonly activeTab = this.activeTabSignal.asReadonly();
@@ -964,7 +967,22 @@ export class BusinessInsightsComponent implements OnInit {
   }
 
   onFilterChange(): void {
+    const { dateRange, department } = this.filterForm.value;
+    this.filtersActive.set(dateRange !== 'all' || department !== 'all');
     this.calculateInsights();
+  }
+
+  resetFilters(): void {
+    this.filterForm.reset({
+      dateRange: 'all',
+      startDate: '',
+      endDate: '',
+      department: 'all',
+      projectType: 'all',
+    });
+    this.onFilterChange();
+    // The link unmounts while focused; keep keyboard focus inside the filter row.
+    document.getElementById('insights-date-range')?.focus();
   }
 
   exportToCSV(): void {

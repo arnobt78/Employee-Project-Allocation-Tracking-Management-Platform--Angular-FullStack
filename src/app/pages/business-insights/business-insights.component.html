@@ -104,6 +104,14 @@
           (selectionChange)="onFilterChange()"
         ></app-select-menu>
       </div>
+      @if (filtersActive()) {
+        <div class="flex sm:items-end">
+          <app-clear-filters-button
+            class="items-center sm:h-11"
+            (cleared)="resetFilters()"
+          ></app-clear-filters-button>
+        </div>
+      }
     </form>
   </div>
 

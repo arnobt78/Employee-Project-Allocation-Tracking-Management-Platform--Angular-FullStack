@@ -1,5 +1,11 @@
 # Changelog — Agile V project memory
 
+## 2026-10-13 — Insights Reset Filters link (GATE-0029 follow-up)
+
+- Insights shows a "Reset Filters" link next to the filters while a date range or department is set; it restores All Time / All Departments
+- Employees, Projects and Project Team toolbars use the same link instead of "Clear"
+- Node 24.21: lint PASS; unit 175/175; build PASS; browser 390 + 1280 px PASS
+
 ## 2026-10-13 — GATE-0029 consistent KPIs and Insights cards
 
 - Every "Projects" card shows the total including archived (5) with "4 Active · 1 Archived"; Project Team "Total Assignments" shows all 7 with "6 On Active Projects · 1 Archived"
