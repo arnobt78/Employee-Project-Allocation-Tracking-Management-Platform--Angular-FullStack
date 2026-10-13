@@ -467,6 +467,84 @@ describe('ProjectFormComponent', () => {
       expect(component.deliveryStatusControl.value).toBe('completed');
     });
 
+    it('keeps the saved status on the menu while reopening until the API confirms', () => {
+      spyOn(master, 'peekProject').and.returnValue({
+        project: { ...project, approvalStatus: 'approved', status: 'completed' },
+        fresh: true,
+      });
+      const status$ = new Subject<IProject>();
+      const setStatus = spyOn(master, 'setProjectStatus').and.returnValue(status$);
+      create();
+
+      component.requestDeliveryStatus('in_flight');
+      expect(component.pendingConfirm()).toEqual({ kind: 'status', status: 'in_flight' });
+      expect(component.deliveryStatusControl.value).toBe('completed');
+      component.dismissDetailConfirm();
+      expect(component.deliveryStatusControl.value).toBe('completed');
+
+      component.requestDeliveryStatus('in_flight');
+      component.confirmDetailAction();
+      fixture.detectChanges();
+      expect(component.deliveryStatusControl.disabled).toBeTrue();
+      status$.error(new Error('boom'));
+      fixture.detectChanges();
+      expect(component.pendingConfirm()).toEqual({ kind: 'status', status: 'in_flight' });
+      expect(component.deliveryStatusControl.value).toBe('completed');
+      expect(component.deliveryStatusControl.disabled).toBeFalse();
+
+      const retry$ = new Subject<IProject>();
+      setStatus.and.returnValue(retry$);
+      component.confirmDetailAction();
+      retry$.next({ ...project, approvalStatus: 'approved', status: 'in_flight' });
+      fixture.detectChanges();
+      expect(component.deliveryStatusControl.value).toBe('in_flight');
+      expect(component.isClosed()).toBeFalse();
+    });
+
+    it('does not carry a status save over to another project', () => {
+      spyOn(master, 'peekProject').and.callFake((id: number) => ({
+        project:
+          id === 7
+            ? { ...project, approvalStatus: 'approved', status: 'in_flight' }
+            : { ...project, projectId: id, approvalStatus: 'approved', status: 'on_hold' },
+        fresh: true,
+      }));
+      const status$ = new Subject<IProject>();
+      spyOn(master, 'setProjectStatus').and.returnValue(status$);
+      create();
+      component.requestDeliveryStatus('completed');
+      component.confirmDetailAction();
+      expect(component.isUpdatingStatus()).toBeTrue();
+
+      params$.next({ id: '8' });
+      fixture.detectChanges();
+      expect(component.currentProject()?.projectId).toBe(8);
+      expect(component.isUpdatingStatus()).toBeFalse();
+      expect(component.deliveryStatusControl.enabled).toBeTrue();
+      expect(component.deliveryStatusControl.value).toBe('on_hold');
+
+      status$.next({ ...project, approvalStatus: 'approved', status: 'completed' });
+      expect(component.deliveryStatus()).toBe('on_hold');
+    });
+
+    it('does not show another project as restoring', () => {
+      spyOn(master, 'peekProject').and.callFake((id: number) => ({
+        project: { ...project, projectId: id, archivedAt: '2026-07-10T00:00:00.000Z' },
+        fresh: true,
+      }));
+      spyOn(master, 'setProjectArchived').and.returnValue(NEVER);
+      create();
+      component.requestRestore();
+      component.confirmDetailAction();
+      expect(component.isArchiving()).toBeTrue();
+
+      params$.next({ id: '8' });
+      expect(component.isArchiving()).toBeFalse();
+      component.requestRestore();
+      expect(component.pendingConfirm()).toEqual({ kind: 'restore' });
+      expect(component.isDetailConfirmBusy()).toBeFalse();
+    });
+
     it('hides the delivery status until approval and locks the team of a closed project', () => {
       spyOn(master, 'peekProject').and.returnValue({
         project: { ...project, approvalStatus: 'approved', status: 'cancelled' },

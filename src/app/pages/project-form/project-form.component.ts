@@ -151,8 +151,8 @@ type DetailConfirm =
 const PENDING = {
   save: 'save',
   delete: 'delete',
-  archive: 'archive',
-  status: 'status',
+  archive: (projectId: number) => `archive:${projectId}`,
+  status: (projectId: number) => `status:${projectId}`,
   assign: 'assign',
   comment: 'comment',
   approval: (action: ApprovalAction) => `approval:${action}`,
@@ -483,7 +483,9 @@ export class ProjectFormComponent implements OnInit {
   readonly isSaving = computed(() => this.pending.has(PENDING.save));
   readonly isDeleting = computed(() => this.pending.has(PENDING.delete));
   readonly pendingDelete = signal<boolean>(false);
-  readonly isArchiving = computed(() => this.pending.has(PENDING.archive));
+  /** Archive and status saves are keyed by project, so another project's save never disables this one. */
+  private readonly currentProjectId = computed(() => this.currentProjectSignal()?.projectId ?? 0);
+  readonly isArchiving = computed(() => this.pending.has(PENDING.archive(this.currentProjectId())));
   readonly pendingArchive = signal<boolean>(false);
   readonly isArchived = computed(() => isProjectArchived(this.currentProjectSignal()));
   readonly isClosed = computed(() => isProjectClosed(this.currentProjectSignal()));
@@ -503,7 +505,7 @@ export class ProjectFormComponent implements OnInit {
   );
   readonly deliveryStatusOptions = [...DELIVERY_STATUS_OPTIONS];
   readonly deliveryStatusControl = new FormControl<string>('in_flight', { nonNullable: true });
-  readonly isUpdatingStatus = computed(() => this.pending.has(PENDING.status));
+  readonly isUpdatingStatus = computed(() => this.pending.has(PENDING.status(this.currentProjectId())));
   private readonly syncDeliveryStatusValue = effect(() => {
     this.deliveryStatusControl.setValue(this.deliveryStatus() ?? 'in_flight', { emitEvent: false });
   });
@@ -958,7 +960,7 @@ export class ProjectFormComponent implements OnInit {
     this.mutations.track(this.masterService.setProjectStatus(projectId, status), {
       pending: this.pending,
       destroyRef: this.destroyRef,
-      key: PENDING.status,
+      key: PENDING.status(projectId),
       onSuccess: (project) => {
         if (projectId !== this.routedProjectId) {
           return;
@@ -980,9 +982,9 @@ export class ProjectFormComponent implements OnInit {
   private detailConfirmKey(confirm: DetailConfirm): string {
     switch (confirm.kind) {
       case 'status':
-        return PENDING.status;
+        return PENDING.status(this.currentProjectId());
       case 'restore':
-        return PENDING.archive;
+        return PENDING.archive(this.currentProjectId());
       case 'assign':
         return PENDING.assign;
       case 'comment':
@@ -1001,7 +1003,7 @@ export class ProjectFormComponent implements OnInit {
     this.mutations.track(this.masterService.setProjectArchived(projectId, archived), {
       pending: this.pending,
       destroyRef: this.destroyRef,
-      key: PENDING.archive,
+      key: PENDING.archive(projectId),
       onSuccess: (project) => {
         if (projectId !== this.routedProjectId) {
           return;

@@ -1,5 +1,18 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-13 — Per-project status / restore pending state (GATE-0030 follow-up)
+
+**Node:** v24.21.0 via fnm
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 183/183 (new: Reopen keeps the saved status on the menu until the API confirms, resets on dismiss/error; status save does not carry over to another project; restore save does not show on another project) |
+| `npm run test:api` | not run | no API change |
+| `npm run build` | **PASS** | |
+| Browser (Playwright, dev, admin) 1280 px | **PASS** | `SetProjectStatus` delayed 4 s: Aurora set On Hold (menu disabled while saving), switched to Atlas mid-save → Atlas menu enabled, own status On Hold, no "Reopening…"; Aurora saved On Hold, then reverted to In Flight; 0 console errors |
+| Independent verifier | **PASS WITH WARNINGS** | No defects. Spec name tidied. Not changed: save methods read the id from the form control (always equal to the current project after hydrate); Archive is not disabled while a status save runs on the same project (pre-existing) |
+
 ## Session 2026-10-13 — GATE-0030 project delivery status + deleted lead (TASK-0111–0114)
 
 **Node:** v24.21.0 via fnm
