@@ -142,15 +142,15 @@ const APPROVAL_CONFIRM_COPY: Record<
 type SaveScope = 'section' | 'all';
 
 type DetailConfirm =
-  | { kind: 'status'; status: DeliveryStatus }
-  | { kind: 'restore' }
+  | { kind: 'status'; projectId: number; status: DeliveryStatus }
+  | { kind: 'restore'; projectId: number }
   | { kind: 'assign'; employeeName: string; allocationPct: number }
   | { kind: 'comment' }
   | { kind: 'resolve'; comment: IReviewerCommentEntry };
 
 const PENDING = {
   save: 'save',
-  delete: 'delete',
+  delete: (projectId: number) => `delete:${projectId}`,
   archive: (projectId: number) => `archive:${projectId}`,
   status: (projectId: number) => `status:${projectId}`,
   assign: 'assign',
@@ -305,7 +305,7 @@ export class ProjectFormComponent implements OnInit {
   private resourceInsightsRequestToken = 0;
   private projectRequestToken = 0;
   /** Project id in the current route; 0 while creating. */
-  private routedProjectId = 0;
+  private readonly routedProjectId = signal(0);
   private readonly resourceInsightsSignal =
     signal<IProjectResourceInsights | null>(null);
   readonly resourceInsights = this.resourceInsightsSignal.asReadonly();
@@ -481,11 +481,10 @@ export class ProjectFormComponent implements OnInit {
   readonly expandedSection = signal<SectionId | null>('overview');
   readonly editingSection = signal<SectionId | null>('overview');
   readonly isSaving = computed(() => this.pending.has(PENDING.save));
-  readonly isDeleting = computed(() => this.pending.has(PENDING.delete));
+  readonly isDeleting = computed(() => this.pending.has(PENDING.delete(this.routedProjectId())));
   readonly pendingDelete = signal<boolean>(false);
-  /** Archive and status saves are keyed by project, so another project's save never disables this one. */
-  private readonly currentProjectId = computed(() => this.currentProjectSignal()?.projectId ?? 0);
-  readonly isArchiving = computed(() => this.pending.has(PENDING.archive(this.currentProjectId())));
+  /** Archive, status and delete saves are keyed by project, so another project's save never disables this one. */
+  readonly isArchiving = computed(() => this.pending.has(PENDING.archive(this.routedProjectId())));
   readonly pendingArchive = signal<boolean>(false);
   readonly isArchived = computed(() => isProjectArchived(this.currentProjectSignal()));
   readonly isClosed = computed(() => isProjectClosed(this.currentProjectSignal()));
@@ -505,12 +504,16 @@ export class ProjectFormComponent implements OnInit {
   );
   readonly deliveryStatusOptions = [...DELIVERY_STATUS_OPTIONS];
   readonly deliveryStatusControl = new FormControl<string>('in_flight', { nonNullable: true });
-  readonly isUpdatingStatus = computed(() => this.pending.has(PENDING.status(this.currentProjectId())));
+  readonly isUpdatingStatus = computed(() => this.pending.has(PENDING.status(this.routedProjectId())));
+  /** Archive, status and delete on one project never run at the same time. */
+  readonly isLifecycleBusy = computed(
+    () => this.isArchiving() || this.isUpdatingStatus() || this.isDeleting()
+  );
   private readonly syncDeliveryStatusValue = effect(() => {
     this.deliveryStatusControl.setValue(this.deliveryStatus() ?? 'in_flight', { emitEvent: false });
   });
   private readonly syncDeliveryStatusDisabled = effect(() => {
-    if (this.isUpdatingStatus()) {
+    if (this.isLifecycleBusy()) {
       this.deliveryStatusControl.disable({ emitEvent: false });
     } else {
       this.deliveryStatusControl.enable({ emitEvent: false });
@@ -615,7 +618,7 @@ export class ProjectFormComponent implements OnInit {
         const parsedId =
           idParam !== undefined && idParam !== null ? Number(idParam) : 0;
         const id = Number.isFinite(parsedId) ? parsedId : 0;
-        this.routedProjectId = id;
+        this.routedProjectId.set(id);
         this.closeTransientUi();
 
         if (id > 0) {
@@ -817,8 +820,8 @@ export class ProjectFormComponent implements OnInit {
   }
 
   requestDelete() {
-    const projectId = this.currentProjectSignal()?.projectId;
-    if (!this.isEditMode() || !projectId) {
+    const projectId = this.routedProjectId();
+    if (!this.isEditMode() || !projectId || this.isLifecycleBusy()) {
       return;
     }
     this.pendingDelete.set(true);
@@ -828,7 +831,7 @@ export class ProjectFormComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (rows) => {
-          if (this.currentProjectSignal()?.projectId === projectId) {
+          if (this.routedProjectId() === projectId) {
             this.deleteAssignmentCount.set(rows.filter((row) => row.projectId === projectId).length);
           }
         },
@@ -837,17 +840,17 @@ export class ProjectFormComponent implements OnInit {
   }
 
   confirmDelete() {
-    const projectId = this.projectForm.controls['projectId'].value;
-    if (!projectId) {
+    const projectId = this.routedProjectId();
+    if (!projectId || this.isLifecycleBusy()) {
       return;
     }
     const projectName = this.currentProjectSignal()?.projectName || this.projectTitle();
     this.mutations.track(this.masterService.deleteProjectById(projectId), {
       pending: this.pending,
       destroyRef: this.destroyRef,
-      key: PENDING.delete,
+      key: PENDING.delete(projectId),
       onSuccess: () => {
-        if (projectId !== this.routedProjectId) {
+        if (projectId !== this.routedProjectId()) {
           return;
         }
         this.pendingDelete.set(false);
@@ -867,7 +870,7 @@ export class ProjectFormComponent implements OnInit {
   }
 
   requestArchive() {
-    if (!this.isEditMode() || this.isArchived()) {
+    if (!this.routedProjectId() || this.isArchived() || this.isLifecycleBusy()) {
       return;
     }
     this.pendingArchive.set(true);
@@ -881,14 +884,21 @@ export class ProjectFormComponent implements OnInit {
   }
 
   confirmArchive() {
-    this.changeArchived(true);
+    if (this.isLifecycleBusy()) {
+      return;
+    }
+    if (!this.routedProjectId() || this.isArchived()) {
+      this.pendingArchive.set(false);
+      return;
+    }
+    this.changeArchived(this.routedProjectId(), true);
   }
 
   requestRestore() {
-    if (!this.isArchived() || this.isArchiving()) {
+    if (!this.routedProjectId() || !this.isArchived() || this.isLifecycleBusy()) {
       return;
     }
-    this.pendingConfirm.set({ kind: 'restore' });
+    this.pendingConfirm.set({ kind: 'restore', projectId: this.routedProjectId() });
   }
 
   /** Re-checks each action before it runs; a stale confirmation just closes. */
@@ -899,18 +909,28 @@ export class ProjectFormComponent implements OnInit {
     }
     switch (confirm.kind) {
       case 'status':
-        if (!this.canSetDeliveryStatus() || this.deliveryStatus() === confirm.status) {
+        if (
+          confirm.projectId !== this.routedProjectId() ||
+          !this.canSetDeliveryStatus() ||
+          this.deliveryStatus() === confirm.status
+        ) {
           this.dismissStatusConfirm();
           return;
         }
-        this.changeDeliveryStatus(confirm.status);
-        return;
-      case 'restore':
-        if (!this.isArchived()) {
-          this.pendingConfirm.set(null);
+        if (this.isLifecycleBusy()) {
           return;
         }
-        this.changeArchived(false);
+        this.changeDeliveryStatus(confirm.projectId, confirm.status);
+        return;
+      case 'restore':
+        if (confirm.projectId !== this.routedProjectId() || !this.isArchived()) {
+          this.dismissStatusConfirm();
+          return;
+        }
+        if (this.isLifecycleBusy()) {
+          return;
+        }
+        this.changeArchived(confirm.projectId, false);
         return;
       case 'assign':
         this.runCollaboratorAssignment();
@@ -935,13 +955,13 @@ export class ProjectFormComponent implements OnInit {
     const status = DELIVERY_STATUS_OPTIONS.find((option) => option.value === value)?.value as
       | DeliveryStatus
       | undefined;
-    if (!status || !this.canSetDeliveryStatus() || this.isUpdatingStatus()) {
+    if (!status || !this.canSetDeliveryStatus() || this.isLifecycleBusy()) {
       return;
     }
     if (status === this.deliveryStatus()) {
       return;
     }
-    this.pendingConfirm.set({ kind: 'status', status });
+    this.pendingConfirm.set({ kind: 'status', projectId: this.routedProjectId(), status });
   }
 
   /** Closing any confirm puts the status menu back on the saved value. */
@@ -950,8 +970,7 @@ export class ProjectFormComponent implements OnInit {
     this.deliveryStatusControl.setValue(this.deliveryStatus() ?? 'in_flight', { emitEvent: false });
   }
 
-  private changeDeliveryStatus(status: DeliveryStatus) {
-    const projectId = this.projectForm.controls['projectId'].value;
+  private changeDeliveryStatus(projectId: number, status: DeliveryStatus) {
     if (!projectId) {
       return;
     }
@@ -962,7 +981,7 @@ export class ProjectFormComponent implements OnInit {
       destroyRef: this.destroyRef,
       key: PENDING.status(projectId),
       onSuccess: (project) => {
-        if (projectId !== this.routedProjectId) {
+        if (projectId !== this.routedProjectId()) {
           return;
         }
         this.currentProjectSignal.set(this.cloneProject(project));
@@ -982,9 +1001,9 @@ export class ProjectFormComponent implements OnInit {
   private detailConfirmKey(confirm: DetailConfirm): string {
     switch (confirm.kind) {
       case 'status':
-        return PENDING.status(this.currentProjectId());
+        return PENDING.status(confirm.projectId);
       case 'restore':
-        return PENDING.archive(this.currentProjectId());
+        return PENDING.archive(confirm.projectId);
       case 'assign':
         return PENDING.assign;
       case 'comment':
@@ -994,8 +1013,7 @@ export class ProjectFormComponent implements OnInit {
     }
   }
 
-  private changeArchived(archived: boolean) {
-    const projectId = this.projectForm.controls['projectId'].value;
+  private changeArchived(projectId: number, archived: boolean) {
     if (!projectId) {
       return;
     }
@@ -1005,7 +1023,7 @@ export class ProjectFormComponent implements OnInit {
       destroyRef: this.destroyRef,
       key: PENDING.archive(projectId),
       onSuccess: (project) => {
-        if (projectId !== this.routedProjectId) {
+        if (projectId !== this.routedProjectId()) {
           return;
         }
         this.pendingArchive.set(false);
@@ -1271,7 +1289,7 @@ export class ProjectFormComponent implements OnInit {
       destroyRef: this.destroyRef,
       key: PENDING.assign,
       onSuccess: () => {
-        if (projectId !== this.routedProjectId) {
+        if (projectId !== this.routedProjectId()) {
           return;
         }
         this.pendingConfirm.set(null);
@@ -2312,7 +2330,8 @@ export class ProjectFormComponent implements OnInit {
     project: IProject,
     options: { loadInsights?: boolean } = {}
   ): boolean {
-    if (this.routedProjectId && project.projectId !== this.routedProjectId) {
+    const routedProjectId = this.routedProjectId();
+    if (routedProjectId && project.projectId !== routedProjectId) {
       return false;
     }
     this.projectRequestToken++;

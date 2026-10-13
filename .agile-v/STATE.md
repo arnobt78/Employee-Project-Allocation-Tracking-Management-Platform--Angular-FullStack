@@ -1,7 +1,7 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0030 (project delivery status + deleted lead, TASK-0111–0114) and TASK-0110 pushed (`origin/main` = `9269e98`); per-project status/restore pending follow-up committed locally, not pushed  
+**Phase / Stage:** Stage 4 — GATE-0030 (project delivery status + deleted lead, TASK-0111–0114) and TASK-0110 pushed with the per-project pending follow-up (`origin/main` = `1166a6d`); lifecycle busy + confirm ownership follow-up committed locally, not pushed  
 **Gate:** GATE-0030 **COMPLETE (local)**; GATE-0029 **COMPLETE**; GATE-0028 **COMPLETE**; GATE-0027 **COMPLETE**; GATE-0026 **COMPLETE**; GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
 **Status:** GATE-0030 (REQ-0168–0170) committed locally on top of TASK-0110 (Reset Filters, also local); neither pushed. Node 24.21: lint PASS, API tests 104/104, unit 180/180, production build PASS, browser 390 + 1280 px PASS. Shared database reseeded 2026-10-13 with every project status (8 projects, 12 assignments); prod still runs `ba6d19d`, which buckets the new `in_flight` / `completed` / `cancelled` / `rejected` values with the old rules until this is deployed.  
 **Updated:** 2026-10-13  
@@ -13,7 +13,7 @@
 
 **Next exact task:** push the per-project pending follow-up on user approval, user checks prod at 1280 + 390 px (delivery status cycle, Closed card, Reset Filters), then run the CRUD prod soak.
 
-**Completed (GATE-0030 follow-up):** project detail `PENDING.archive(id)` / `PENDING.status(id)` keyed by project, so switching projects mid-save no longer greys out the other project's status menu, Reopen or Restore. Specs lock the Reopen behaviour (menu shows the saved status until the API confirms). Lint PASS, unit 183/183, build PASS, browser mid-save switch PASS.
+**Completed (GATE-0030 follow-up):** project detail `PENDING.archive(id)` / `PENDING.status(id)` / `PENDING.delete(id)` keyed by the `routedProjectId` signal (single project-id source; no form id reads), so switching projects mid-save never greys out another project. Status/restore confirms carry their `projectId`; a confirm for another project closes without a request. `isLifecycleBusy` (archive, status, delete) blocks overlapping lifecycle saves on one project (buttons, status menu, guards). Specs lock the Reopen behaviour (menu shows the saved status until the API confirms). Lint PASS, unit 188/188, build PASS, browser mid-save PASS.
 
 **Completed (GATE-0030, TASK-0111–0114):**
 

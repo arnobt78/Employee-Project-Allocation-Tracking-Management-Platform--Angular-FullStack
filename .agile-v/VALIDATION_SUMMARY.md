@@ -1,5 +1,19 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-13 — Project detail lifecycle busy + confirm ownership (GATE-0030 follow-up)
+
+**Node:** v24.21.0 via fnm
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `tsc` (app + spec) | **PASS** | |
+| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 188/188 (new: archive/delete blocked during a status save; status blocked during archive; stale status confirm for another project closes without a request; delete on one project does not block another; archive dialog closes if already archived) |
+| `npm run test:api` | not run | no API change |
+| `npm run build` | **PASS** | |
+| Browser (Playwright, dev, admin) 1280 px | **PASS** | `SetProjectStatus` delayed 4 s on Aurora: menu, Archive and Delete disabled during save; Atlas mid-save fully enabled; Aurora saved On Hold then reverted to In Flight; 0 console errors/warnings |
+| Independent verifier (2 passes) | **PASS** | First pass notes fixed: delete pending keyed by project, Archive/Restore need a routed id, `confirmArchive` re-checks state; spec now asserts the archive dialog opened |
+
 ## Session 2026-10-13 — Per-project status / restore pending state (GATE-0030 follow-up)
 
 **Node:** v24.21.0 via fnm

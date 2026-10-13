@@ -31,7 +31,7 @@
             [iconSize]="14"
             [pending]="isArchiving()"
             pendingLabel="Restoring…"
-            [disabled]="isSaving() || isDeleting()"
+            [disabled]="isSaving() || isDeleting() || isUpdatingStatus()"
             (click)="requestRestore()"
           >
             <span>Restore Project</span>
@@ -54,7 +54,7 @@
             [iconSize]="14"
             [pending]="isUpdatingStatus()"
             pendingLabel="Reopening…"
-            [disabled]="isSaving() || isDeleting()"
+            [disabled]="isSaving() || isDeleting() || isArchiving()"
             (click)="requestDeliveryStatus('in_flight')"
           >
             <span>Reopen Project</span>
@@ -2443,7 +2443,7 @@
                 [iconSize]="14"
                 [pending]="isArchiving()"
                 pendingLabel="Archiving…"
-                [disabled]="isSaving() || isDeleting()"
+                [disabled]="isSaving() || isDeleting() || isUpdatingStatus()"
                 (click)="requestArchive()"
               >
                 <span>Archive Project</span>
@@ -2457,7 +2457,7 @@
               [iconSize]="14"
               [pending]="isDeleting()"
               pendingLabel="Deleting…"
-              [disabled]="isSaving() || isArchiving()"
+              [disabled]="isSaving() || isArchiving() || isUpdatingStatus()"
               (click)="requestDelete()"
             >
               <span>Delete Permanently</span>

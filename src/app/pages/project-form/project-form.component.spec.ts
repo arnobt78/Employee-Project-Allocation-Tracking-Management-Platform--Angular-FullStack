@@ -365,7 +365,7 @@ describe('ProjectFormComponent', () => {
       expect(component.pendingConfirm()).not.toBeNull();
 
       restore$.error(new Error('boom'));
-      expect(component.pendingConfirm()).toEqual({ kind: 'restore' });
+      expect(component.pendingConfirm()).toEqual({ kind: 'restore', projectId: 7 });
       expect(component.isDetailConfirmBusy()).toBeFalse();
 
       const retry$ = new Subject<IProject>();
@@ -477,7 +477,7 @@ describe('ProjectFormComponent', () => {
       create();
 
       component.requestDeliveryStatus('in_flight');
-      expect(component.pendingConfirm()).toEqual({ kind: 'status', status: 'in_flight' });
+      expect(component.pendingConfirm()).toEqual({ kind: 'status', projectId: 7, status: 'in_flight' });
       expect(component.deliveryStatusControl.value).toBe('completed');
       component.dismissDetailConfirm();
       expect(component.deliveryStatusControl.value).toBe('completed');
@@ -488,7 +488,7 @@ describe('ProjectFormComponent', () => {
       expect(component.deliveryStatusControl.disabled).toBeTrue();
       status$.error(new Error('boom'));
       fixture.detectChanges();
-      expect(component.pendingConfirm()).toEqual({ kind: 'status', status: 'in_flight' });
+      expect(component.pendingConfirm()).toEqual({ kind: 'status', projectId: 7, status: 'in_flight' });
       expect(component.deliveryStatusControl.value).toBe('completed');
       expect(component.deliveryStatusControl.disabled).toBeFalse();
 
@@ -541,8 +541,102 @@ describe('ProjectFormComponent', () => {
       params$.next({ id: '8' });
       expect(component.isArchiving()).toBeFalse();
       component.requestRestore();
-      expect(component.pendingConfirm()).toEqual({ kind: 'restore' });
+      expect(component.pendingConfirm()).toEqual({ kind: 'restore', projectId: 8 });
       expect(component.isDetailConfirmBusy()).toBeFalse();
+    });
+
+    it('blocks archive and delete while a status change is saving on the same project', () => {
+      spyOn(master, 'peekProject').and.returnValue({
+        project: { ...project, approvalStatus: 'approved', status: 'in_flight' },
+        fresh: true,
+      });
+      spyOn(master, 'setProjectStatus').and.returnValue(NEVER);
+      const archive = spyOn(master, 'setProjectArchived').and.returnValue(NEVER);
+      const remove = spyOn(master, 'deleteProjectById').and.returnValue(NEVER);
+      create();
+      component.requestDeliveryStatus('on_hold');
+      component.confirmDetailAction();
+      fixture.detectChanges();
+      expect(component.isLifecycleBusy()).toBeTrue();
+      expect(component.deliveryStatusControl.disabled).toBeTrue();
+
+      component.requestArchive();
+      expect(component.pendingArchive()).toBeFalse();
+      component.confirmArchive();
+      expect(archive).not.toHaveBeenCalled();
+      component.requestDelete();
+      expect(component.pendingDelete()).toBeFalse();
+      component.confirmDelete();
+      expect(remove).not.toHaveBeenCalled();
+    });
+
+    it('blocks a status change while the project is archiving', () => {
+      spyOn(master, 'peekProject').and.returnValue({
+        project: { ...project, approvalStatus: 'approved', status: 'in_flight' },
+        fresh: true,
+      });
+      const setStatus = spyOn(master, 'setProjectStatus').and.returnValue(NEVER);
+      spyOn(master, 'setProjectArchived').and.returnValue(NEVER);
+      create();
+      component.requestArchive();
+      component.confirmArchive();
+      fixture.detectChanges();
+      expect(component.isArchiving()).toBeTrue();
+      expect(component.deliveryStatusControl.disabled).toBeTrue();
+
+      component.requestDeliveryStatus('completed');
+      expect(component.pendingConfirm()).toBeNull();
+      expect(setStatus).not.toHaveBeenCalled();
+    });
+
+    it('closes a status confirm that belongs to another project without a request', () => {
+      spyOn(master, 'peekProject').and.callFake((id: number) => ({
+        project: { ...project, projectId: id, approvalStatus: 'approved', status: 'in_flight' },
+        fresh: true,
+      }));
+      const setStatus = spyOn(master, 'setProjectStatus').and.returnValue(NEVER);
+      create();
+      params$.next({ id: '8' });
+      component.pendingConfirm.set({ kind: 'status', projectId: 7, status: 'completed' });
+      expect(component.isDetailConfirmBusy()).toBeFalse();
+
+      component.confirmDetailAction();
+      expect(setStatus).not.toHaveBeenCalled();
+      expect(component.pendingConfirm()).toBeNull();
+      expect(component.deliveryStatusControl.value).toBe('in_flight');
+    });
+
+    it('does not block another project while a delete is still running', () => {
+      spyOn(master, 'peekProject').and.callFake((id: number) => ({
+        project: { ...project, projectId: id, approvalStatus: 'approved', status: 'in_flight' },
+        fresh: true,
+      }));
+      spyOn(master, 'deleteProjectById').and.returnValue(NEVER);
+      create();
+      component.confirmDelete();
+      expect(component.isDeleting()).toBeTrue();
+
+      params$.next({ id: '8' });
+      fixture.detectChanges();
+      expect(component.isDeleting()).toBeFalse();
+      expect(component.isLifecycleBusy()).toBeFalse();
+      expect(component.deliveryStatusControl.enabled).toBeTrue();
+      component.requestArchive();
+      expect(component.pendingArchive()).toBeTrue();
+    });
+
+    it('closes the archive dialog without a request if the project is already archived', () => {
+      spyOn(master, 'peekProject').and.returnValue({ project, fresh: true });
+      const archive = spyOn(master, 'setProjectArchived').and.returnValue(NEVER);
+      create();
+      component.requestArchive();
+      expect(component.pendingArchive()).toBeTrue();
+      (component as unknown as { currentProjectSignal: { set(p: IProject): void } })
+        .currentProjectSignal.set({ ...project, archivedAt: '2026-07-10T00:00:00.000Z' });
+
+      component.confirmArchive();
+      expect(archive).not.toHaveBeenCalled();
+      expect(component.pendingArchive()).toBeFalse();
     });
 
     it('hides the delivery status until approval and locks the team of a closed project', () => {
