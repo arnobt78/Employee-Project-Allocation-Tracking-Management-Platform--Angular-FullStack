@@ -942,12 +942,6 @@ export class ProjectFormComponent implements OnInit {
     this.pendingConfirm.set({ kind: 'status', status });
   }
 
-  /** Reopening a closed project from its banner. */
-  requestReopen() {
-    this.deliveryStatusControl.setValue('in_flight', { emitEvent: false });
-    this.requestDeliveryStatus('in_flight');
-  }
-
   /** Closing any confirm puts the status menu back on the saved value. */
   private dismissStatusConfirm() {
     this.pendingConfirm.set(null);
@@ -1141,7 +1135,7 @@ export class ProjectFormComponent implements OnInit {
   }
 
   applyRecommendedLead(candidate: IResourceProfile | null | undefined) {
-    if (!candidate?.employeeId) {
+    if (!candidate?.employeeId || this.isTeamLocked()) {
       return;
     }
     this.startEdit('team');

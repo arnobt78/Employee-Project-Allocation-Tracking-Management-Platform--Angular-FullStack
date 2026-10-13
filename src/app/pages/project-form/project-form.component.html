@@ -55,7 +55,7 @@
             [pending]="isUpdatingStatus()"
             pendingLabel="Reopening…"
             [disabled]="isSaving() || isDeleting()"
-            (click)="requestReopen()"
+            (click)="requestDeliveryStatus('in_flight')"
           >
             <span>Reopen Project</span>
           </button>
@@ -1355,6 +1355,8 @@
                             class="eh-action-btn eh-action-btn-primary"
                             icon="user-plus"
                             [iconSize]="14"
+                            [disabled]="isTeamLocked()"
+                            [attr.title]="isTeamLocked() ? footerCopy.teamLocked : null"
                             (click)="applyRecommendedLead(candidate)"
                           >
                             <span>Assign as Lead</span>

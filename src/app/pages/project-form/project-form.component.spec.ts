@@ -479,6 +479,8 @@ describe('ProjectFormComponent', () => {
       component.startCollaboratorAssignment({ employeeId: 3, employeeName: 'Liam Patel' } as never);
       component.submitCollaboratorAssignment();
       expect(component.pendingConfirm()).toBeNull();
+      component.applyRecommendedLead({ employeeId: 3, employeeName: 'Liam Patel' } as never);
+      expect(component.editingSection()).not.toBe('team');
 
       (component as unknown as { currentProjectSignal: { set(p: IProject): void } })
         .currentProjectSignal.set({ ...project, approvalStatus: 'in_review', status: 'in_review' });

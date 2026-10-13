@@ -15,7 +15,6 @@ export const PORTFOLIO_KPIS = {
   completed: { label: 'Completed', hint: 'Delivered projects', icon: 'circle-check', tone: 'sky' },
   cancelled: { label: 'Cancelled', hint: 'Stopped after approval', icon: 'circle-x', tone: 'rose' },
   closed: { label: 'Closed', hint: 'Completed or cancelled', icon: 'circle-check', tone: 'sky' },
-  archived: { label: 'Archived', hint: 'Restorable from the Archived tab', icon: 'archive', tone: 'slate' },
 } as const satisfies Record<string, PortfolioKpi>;
 
 /** Lead name, or this when a project has none (or its lead was deleted). */

@@ -97,7 +97,7 @@ const DELIVERY_LABELS = {
   cancelled: "Cancelled",
 };
 const DELIVERY_STATUSES = new Set(Object.keys(DELIVERY_LABELS));
-const CLOSED_STATUSES = new Set(["completed", "cancelled"]);
+const CLOSED_STATUSES = new Set(["completed", "done", "cancelled", "canceled"]);
 
 /** Completed and cancelled projects are closed: no capacity, no team changes. */
 function isProjectClosed(project) {

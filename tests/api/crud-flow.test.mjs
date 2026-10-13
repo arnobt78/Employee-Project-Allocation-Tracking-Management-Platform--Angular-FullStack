@@ -376,8 +376,9 @@ describe("CRUD HTTP flow", () => {
       );
       assert.equal(member.employee.allocation.allocatedPct, 20);
 
+      const elsewhere = await approvedProject();
       const moved = await put(`UpdateProjectEmployee/${assignment.empProjectId}`, {
-        projectId: live.projectId,
+        projectId: elsewhere.projectId,
       });
       assert.equal(moved.status, 409);
       assert.equal(moved.json.message, message);
