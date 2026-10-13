@@ -1,5 +1,18 @@
 # Validation Summary — Cycle C1
 
+## Session 2026-10-13 — GATE-0029 consistent KPIs and Insights cards
+
+**Node:** v24.21.0 via fnm
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run lint` | **PASS** | |
+| `ng test --watch=false --browsers=ChromeHeadless` | **PASS** | 174/174 (new: `portfolio-stats.spec`; Dashboard, Projects, Project Team and Insights KPI values on a seed-shaped fixture `src/app/testing/portfolio-fixture.ts`; Dashboard fills cards when the assignment list fails; Insights CSV "—" + UTF-8 BOM) |
+| `npm run test:api` | **PASS** | 98/98 (no API change) |
+| `npm run build` | **PASS** | |
+| Browser (Playwright, dev, admin, seed data) 1280 + 390 px | **PASS** | Dashboard 5/5/4/2/1/1/4/7/1 with "4 Assigned · 1 Available", "4 Staffed · 0 Lead Only · 0 Unstaffed", "5 Active · 1 Inactive · 1 Archived"; Projects 5/2/1/1/1; Project Team 7 ("6 On Active Projects · 1 Archived") / People 4; Insights subtitles, "2.2 of 5 people allocated", capacity 5 / 2.2 / 2.8 people, Employee Success "—"; cards in a row equal height (118 px desktop, 90 px phone); 0 console errors/warnings |
+| Independent verifier | **PASS WITH WARNINGS (fixed)** | Dashboard cards stuck loading after a failed list request; Dashboard vs Insights "Assigned/Available" rules differed (now `workforceCounts`); Insights status mapping differed (`approved` = Completed; now `projectStatusBucket`); dead `totalProjectCount`; plural; CSV BOM; loose spec matchers. Not changed: `assigneeKey` mixes ids and names (low risk, no orphans) |
+
 ## Session 2026-10-12 — GATE-0028 seed emails, email log TTL, calendar keyboard
 
 **Node:** v24.21.0 via fnm

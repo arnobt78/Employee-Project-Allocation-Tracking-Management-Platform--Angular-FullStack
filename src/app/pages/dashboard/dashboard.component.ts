@@ -20,11 +20,37 @@ import { PRIVATE_PAGE_META } from '@/app/constants/private-page-meta';
 import { BADGE_TONE_CLASS, projectStatusMeta } from '@/app/lib/status/project-status';
 import { employeeAvatar } from '@/app/lib/media/employee-avatar';
 import {
-  isAssignmentArchived,
-  isProjectArchived,
   projectCounts,
   projectCountsLabel,
+  type ProjectCounts,
 } from '@/app/lib/status/project-archive';
+import {
+  assignmentCounts,
+  assignmentCountsLabel,
+  dotJoin,
+  peopleLabel,
+  projectStatusBuckets,
+  staffingCounts,
+  staffingCountsLabel,
+  uniqueAssignees,
+  workforceCounts,
+  workforceCountsLabel,
+  type AssignmentCounts,
+  type ProjectStatusBuckets,
+  type StaffingCounts,
+  type WorkforceCounts,
+} from '@/app/lib/status/portfolio-stats';
+import { PORTFOLIO_KPIS } from '@/app/constants/portfolio-kpis';
+
+interface DashboardStats {
+  projects: ProjectCounts;
+  status: ProjectStatusBuckets;
+  staffing: StaffingCounts;
+  assignments: AssignmentCounts;
+  workforce: WorkforceCounts;
+  /** Unique people on active projects, as on Project Team. */
+  people: number;
+}
 
 interface DashboardSnapshot {
   totalEmployee: number;
@@ -62,17 +88,9 @@ export class DashboardComponent implements OnInit {
   employees: Employee[] = [];
   projectEmployees: IProjectEmployee[] = [];
 
-  projectStats: {
-    nonArchived: number;
-    archived: number;
-    active: number;
-    inactive: number;
-    planning: number;
-    assigned: number;
-    nonAssigned: number;
-    activeAssignments: number;
-    inactiveAssignments: number;
-  } | null = null;
+  /** Computed from the cached lists with the shared portfolio helpers. */
+  stats: DashboardStats | null = null;
+  readonly kpi = PORTFOLIO_KPIS;
 
   projectStatusSlices: DashboardChartSlice[] = [];
   assignmentSlices: DashboardChartSlice[] = [];
@@ -83,25 +101,42 @@ export class DashboardComponent implements OnInit {
     this.loadPageData();
   }
 
-  /** "N Active · M Archived" from the cached list, else from the dashboard aggregate. */
-  get projectCountsLabel(): string {
-    if (this.projectStats) {
-      return projectCountsLabel({
-        active: this.projectStats.nonArchived,
-        archived: this.projectStats.archived,
-        total: this.projectStats.nonArchived + this.projectStats.archived,
-      });
+  /** From the lists once loaded, else from the dashboard aggregate (`totalProject` is non-archived). */
+  get projectTotals(): ProjectCounts {
+    if (this.stats) {
+      return this.stats.projects;
     }
     const active = this.dashboardData?.totalProject ?? 0;
     const archived = this.dashboardData?.archivedProject ?? 0;
-    return projectCountsLabel({ active, archived, total: active + archived });
+    return { active, archived, total: active + archived };
+  }
+
+  get projectCountsLabel(): string {
+    return projectCountsLabel(this.projectTotals);
+  }
+
+  get employeeTotal(): number {
+    return this.stats?.workforce.total ?? this.dashboardData?.totalEmployee ?? 0;
+  }
+
+  get employeesHint(): string {
+    return this.stats ? workforceCountsLabel(this.stats.workforce) : 'Assigned · Available';
+  }
+
+  get staffingHint(): string {
+    return this.stats ? staffingCountsLabel(this.stats.staffing) : 'Staffed · Lead Only · Unstaffed';
+  }
+
+  get assignmentsHint(): string {
+    return this.stats ? assignmentCountsLabel(this.stats.assignments) : 'Active · Inactive · Archived';
   }
 
   get opsSummary(): string {
-    const emp = this.dashboardData?.totalEmployee ?? 0;
-    const proj = this.dashboardData?.totalProject ?? 0;
-    const active = this.dashboardData?.activeProjectEmployees ?? 0;
-    return `${emp} people · ${proj} projects · ${active} actively assigned`;
+    if (!this.stats) {
+      return `${this.dashboardData?.activeProjectEmployees ?? 0} active assignments`;
+    }
+    const { people, assignments } = this.stats;
+    return dotJoin([`${peopleLabel(people)} on projects`, `${assignments.active} active assignments`]);
   }
 
   private loadPageData(): void {
@@ -208,6 +243,7 @@ export class DashboardComponent implements OnInit {
           this.projects = [];
         }
         projectsLoaded = true;
+        this.tryCalculateStatistics(projectsLoaded, employeesLoaded, projectEmployeesLoaded);
         markComplete();
       },
     });
@@ -228,6 +264,7 @@ export class DashboardComponent implements OnInit {
           this.employees = [];
         }
         employeesLoaded = true;
+        this.tryCalculateStatistics(projectsLoaded, employeesLoaded, projectEmployeesLoaded);
         markComplete();
       },
     });
@@ -248,6 +285,7 @@ export class DashboardComponent implements OnInit {
           this.projectEmployees = [];
         }
         projectEmployeesLoaded = true;
+        this.tryCalculateStatistics(projectsLoaded, employeesLoaded, projectEmployeesLoaded);
         markComplete();
       },
     });
@@ -273,137 +311,36 @@ export class DashboardComponent implements OnInit {
   }
 
   calculateProjectStatistics(): void {
-    if (!this.projects.length) {
-      this.projectStats = {
-        nonArchived: 0,
-        archived: 0,
-        active: 0,
-        inactive: 0,
-        planning: 0,
-        assigned: 0,
-        nonAssigned: 0,
-        activeAssignments: 0,
-        inactiveAssignments: 0,
-      };
-      this.refreshChartSlices();
-      return;
-    }
-
-    const counts = projectCounts(this.projects);
-    const nonArchivedProjects = this.projects.filter((p) => !isProjectArchived(p));
-    const liveAssignments = this.projectEmployees.filter(
-      (pe) => !isAssignmentArchived(pe)
-    );
-
-    const activeProjectEmployees = liveAssignments.filter((pe) =>
-      this.isActive(pe.isActive)
-    );
-
-    const projectIdsWithActiveAssignments = new Set(
-      activeProjectEmployees.map((pe) => pe.projectId)
-    );
-
-    const activeProjects: IProject[] = [];
-    const inactiveProjects: IProject[] = [];
-    const planningProjects: IProject[] = [];
-    const assignedProjects: IProject[] = [];
-    const nonAssignedProjects: IProject[] = [];
-
-    nonArchivedProjects.forEach((p) => {
-      const hasActiveAssignments = projectIdsWithActiveAssignments.has(
-        p.projectId
-      );
-      const hasLead = p.leadByEmpId != null;
-
-      if (hasActiveAssignments) {
-        assignedProjects.push(p);
-      } else {
-        nonAssignedProjects.push(p);
-      }
-
-      if (hasActiveAssignments) {
-        activeProjects.push(p);
-      } else if (hasLead) {
-        planningProjects.push(p);
-        activeProjects.push(p);
-      } else {
-        inactiveProjects.push(p);
-      }
-    });
-
-    const activeAssignmentsCount = activeProjectEmployees.length;
-    const inactiveAssignmentsCount =
-      liveAssignments.length - activeAssignmentsCount;
-
-    this.projectStats = {
-      nonArchived: counts.active,
-      archived: counts.archived,
-      active: activeProjects.length,
-      inactive: inactiveProjects.length,
-      planning: planningProjects.length,
-      assigned: assignedProjects.length,
-      nonAssigned: nonAssignedProjects.length,
-      activeAssignments: activeAssignmentsCount,
-      inactiveAssignments: inactiveAssignmentsCount,
+    this.stats = {
+      projects: projectCounts(this.projects),
+      status: projectStatusBuckets(this.projects),
+      staffing: staffingCounts(this.projects, this.projectEmployees),
+      assignments: assignmentCounts(this.projectEmployees),
+      workforce: workforceCounts(this.employees, this.projectEmployees),
+      people: uniqueAssignees(this.projectEmployees),
     };
     this.refreshChartSlices();
   }
 
   private refreshChartSlices(): void {
-    const stats = this.projectStats;
+    const stats = this.stats;
     if (!stats) {
       this.projectStatusSlices = [];
       this.assignmentSlices = [];
       return;
     }
     this.projectStatusSlices = [
-      {
-        label: 'Assigned Active',
-        value: stats.assigned,
-        color: 'rgba(16, 185, 129, 0.85)',
-      },
-      {
-        label: 'Planning',
-        value: stats.planning,
-        color: 'rgba(139, 92, 246, 0.85)',
-      },
-      {
-        label: 'Inactive',
-        value: stats.inactive,
-        color: 'rgba(148, 163, 184, 0.75)',
-      },
-      {
-        label: 'Archived',
-        value: stats.archived,
-        color: 'rgba(100, 116, 139, 0.7)',
-      },
+      { label: 'Staffed', value: stats.staffing.staffed, color: 'rgba(16, 185, 129, 0.85)' },
+      { label: 'Lead Only', value: stats.staffing.leadOnly, color: 'rgba(139, 92, 246, 0.85)' },
+      { label: 'Unstaffed', value: stats.staffing.unstaffed, color: 'rgba(148, 163, 184, 0.75)' },
+      { label: 'Archived', value: stats.projects.archived, color: 'rgba(100, 116, 139, 0.7)' },
     ].filter((s) => s.value > 0);
 
     this.assignmentSlices = [
-      {
-        label: 'Active',
-        value: stats.activeAssignments,
-        color: 'rgba(56, 189, 248, 0.85)',
-      },
-      {
-        label: 'Inactive',
-        value: stats.inactiveAssignments,
-        color: 'rgba(244, 63, 94, 0.75)',
-      },
-      {
-        label: 'Unassigned Projects',
-        value: stats.nonAssigned,
-        color: 'rgba(245, 158, 11, 0.8)',
-      },
+      { label: 'Active', value: stats.assignments.active, color: 'rgba(56, 189, 248, 0.85)' },
+      { label: 'Inactive', value: stats.assignments.inactive, color: 'rgba(244, 63, 94, 0.75)' },
+      { label: 'Archived', value: stats.assignments.archived, color: 'rgba(100, 116, 139, 0.7)' },
     ].filter((s) => s.value > 0);
-  }
-
-  private isActive(value: string | boolean | null | undefined): boolean {
-    if (typeof value === 'boolean') return value;
-    if (typeof value === 'string') {
-      return ['y', 'yes', 'true', '1'].includes(value.toLowerCase());
-    }
-    return false;
   }
 
   getDepartmentLogo(logo: string): string {

@@ -10,13 +10,24 @@ import {
   isProjectArchived,
   projectCounts,
   projectCountsLabel,
+  type ProjectCounts,
 } from '@/app/lib/status/project-archive';
+import {
+  allocationToPeople,
+  isAssignmentActive,
+  isEmployeeActive,
+  normalizedProjectStatus,
+  peopleLabel,
+  projectStatusBucket,
+  workforceCounts,
+  workforceCountsLabel,
+  type WorkforceCounts,
+} from '@/app/lib/status/portfolio-stats';
 import { MasterService } from '../../service/master.service';
 import { IProject, IProjectEmployee } from '../../model/interface/master';
 import { Employee } from '../../model/class/Employee';
 import { InsightsSkeletonComponent } from '@/app/components/ui/insights-skeleton.component';
 import {
-  INSIGHTS_BREAKDOWN_CHIPS,
   INSIGHTS_BUDGET_KPIS,
   INSIGHTS_DEFAULT_FILTER_DISPLAY,
   INSIGHTS_FILTER_ICONS,
@@ -64,6 +75,8 @@ export interface IBusinessInsights {
   };
   readinessScores: {
     average: number;
+    /** Projects with a readiness above 0%, the ones the average covers. */
+    scoredCount: number;
     distribution: Array<{ range: string; count: number }>;
   };
   teamCapacity: {
@@ -88,7 +101,8 @@ export interface IBusinessInsights {
     department: string;
     employeeCount: number;
     projectCount: number;
-    averageReadiness: number;
+    /** `null` when the department leads no projects. */
+    averageReadiness: number | null;
   }>;
   projectTypeBreakdown: Array<{
     type: string;
@@ -96,14 +110,8 @@ export interface IBusinessInsights {
     averageReadiness: number;
   }>;
   filteredProjectCount?: number; // Non-archived projects (used for calculations)
-  totalProjectCount?: number; // All projects including archived
-  filteredEmployeeCount?: number;
-  activeProjectCount?: number;
-  inactiveProjectCount?: number;
   archivedProjectCount?: number;
-  planningProjectCount?: number;
-  assignedProjectCount?: number;
-  nonAssignedProjectCount?: number;
+  workforce: WorkforceCounts;
 }
 
 const USD = new Intl.NumberFormat('en-US', {
@@ -112,8 +120,12 @@ const USD = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 0,
 });
 
-function withValues(kpis: readonly InsightsKpi[], values: Array<string | number>) {
-  return kpis.map((kpi, index) => ({ ...kpi, value: values[index] }));
+function withValues(
+  kpis: readonly InsightsKpi[],
+  values: Array<string | number>,
+  hints: readonly string[] = []
+) {
+  return kpis.map((kpi, index) => ({ ...kpi, value: values[index], hint: hints[index] ?? '' }));
 }
 
 @Component({
@@ -193,42 +205,70 @@ export class BusinessInsightsComponent implements OnInit {
   readonly readinessTitle = INSIGHTS_READINESS_DISTRIBUTION_TITLE;
   readonly statusDistribution = computed(() => {
     const distribution = this.insights()?.projectStatusDistribution;
-    return INSIGHTS_STATUS_ITEMS.map((item) => ({
-      ...item,
-      value: distribution?.[item.key] || 0,
-    }));
+    const total = this.projectTotals().active;
+    return INSIGHTS_STATUS_ITEMS.map((item) => {
+      const value = distribution?.[item.key] || 0;
+      return { ...item, value, hint: `${value} of ${total} active` };
+    });
   });
 
-  readonly projectCounts = computed(() => projectCounts(this.projectsSignal()));
   /** Follows the active filters once insights are computed, else the raw list. */
-  readonly projectCountsLabel = computed(() => {
+  readonly projectTotals = computed<ProjectCounts>(() => {
     const insights = this.insights();
     if (insights?.filteredProjectCount == null) {
-      return projectCountsLabel(this.projectCounts());
+      return projectCounts(this.projectsSignal());
     }
     const active = insights.filteredProjectCount;
     const archived = insights.archivedProjectCount ?? 0;
-    return projectCountsLabel({ active, archived, total: active + archived });
+    return { active, archived, total: active + archived };
   });
 
   readonly overviewKpis = computed(() => {
     const insights = this.insights();
-    return withValues(INSIGHTS_KPIS, [
-      insights?.filteredProjectCount ?? this.projectCounts().active,
-      (insights?.filteredEmployeeCount ?? insights?.resourceUtilization?.totalEmployees) || 0,
-      `${insights?.readinessScores?.average || 0}%`,
-      `${insights?.teamCapacity?.utilizationPercentage || 0}%`,
-    ]);
+    const projects = this.projectTotals();
+    const readiness = insights?.readinessScores;
+    const capacity = insights?.teamCapacity;
+    const workforce = insights?.workforce;
+    return withValues(
+      INSIGHTS_KPIS,
+      [
+        projects.total,
+        workforce?.total ?? 0,
+        `${readiness?.average || 0}%`,
+        `${capacity?.utilizationPercentage || 0}%`,
+      ],
+      [
+        projectCountsLabel(projects),
+        workforce ? workforceCountsLabel(workforce) : '',
+        this.readinessHint(readiness?.scoredCount ?? 0, projects.active),
+        `${allocationToPeople(capacity?.utilizedCapacity ?? 0)} of ${peopleLabel(
+          allocationToPeople(capacity?.totalCapacity ?? 0)
+        )} allocated`,
+      ]
+    );
   });
 
   readonly resourceKpis = computed(() => {
     const resources = this.insights()?.resourceUtilization;
-    return withValues(INSIGHTS_RESOURCE_KPIS, [
-      resources?.totalEmployees || 0,
-      resources?.activeAssignments || 0,
-      `${resources?.averageAllocation || 0}%`,
-      resources?.availableCount || 0,
-    ]);
+    return withValues(
+      INSIGHTS_RESOURCE_KPIS,
+      [
+        resources?.totalEmployees || 0,
+        resources?.activeAssignments || 0,
+        `${resources?.averageAllocation || 0}%`,
+        resources?.availableCount || 0,
+      ],
+      ['Active employees', 'On active projects', 'Per active employee', 'No active assignment']
+    );
+  });
+
+  readonly capacityPeople = computed(() => {
+    const capacity = this.insights()?.teamCapacity;
+    return {
+      total: peopleLabel(allocationToPeople(capacity?.totalCapacity ?? 0)),
+      utilized: peopleLabel(allocationToPeople(capacity?.utilizedCapacity ?? 0)),
+      available: peopleLabel(allocationToPeople(capacity?.availableCapacity ?? 0)),
+    };
   });
 
   readonly budgetKpis = computed(() => {
@@ -239,14 +279,6 @@ export class BusinessInsightsComponent implements OnInit {
         (amount) => USD.format(amount || 0)
       )
     );
-  });
-
-  readonly breakdownChips = computed(() => {
-    const insights = this.insights();
-    return INSIGHTS_BREAKDOWN_CHIPS.map((chip) => ({
-      ...chip,
-      value: insights?.[chip.key] ?? 0,
-    })).filter((chip) => !chip.optional || chip.value > 0);
   });
 
   constructor() {
@@ -260,6 +292,17 @@ export class BusinessInsightsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
+  }
+
+  /** "—" for a department with no projects to average. */
+  readinessText(average: number | null): string {
+    return average == null ? '—' : `${average}%`;
+  }
+
+  /** The average skips 0% projects, so say how many it covers when that differs. */
+  private readinessHint(scored: number, active: number): string {
+    const projects = `active ${active === 1 ? 'project' : 'projects'}`;
+    return scored === active ? `Across ${active} ${projects}` : `Across ${scored} of ${active} ${projects}`;
   }
 
   loadData(): void {
@@ -363,12 +406,7 @@ export class BusinessInsightsComponent implements OnInit {
     let allProjectEmployees = [...projectEmployees];
     // Archived projects' allocation never counts toward utilization.
     let activeProjectEmployees = projectEmployees.filter(
-      (pe) =>
-        !isAssignmentArchived(pe) &&
-        (pe.isActive === 'Y' ||
-        pe.isActive === 'y' ||
-        pe.isActive === 'true' ||
-        String(pe.isActive).toLowerCase() === 'true')
+      (pe) => !isAssignmentArchived(pe) && isAssignmentActive(pe.isActive)
     );
 
     // Apply department filter
@@ -572,76 +610,7 @@ export class BusinessInsightsComponent implements OnInit {
       }
     }
 
-    // Calculate project states (only for non-archived projects)
-    // When filtering by department, check for department-specific assignments
-    const projectIdsWithActiveAssignments = new Set(
-      activeProjectEmployees.map((pe) => pe.projectId)
-    );
-
-    // If department filter is applied, check for department-specific assignments
-    let projectIdsWithDeptActiveAssignments: Set<number>;
-    if (filters.department && filters.department !== 'all') {
-      const employeeIdsInDept = new Set(
-        employees
-          .filter((e) => e.department === filters.department && e.isActive)
-          .map((e) => e.employeeId)
-      );
-      projectIdsWithDeptActiveAssignments = new Set(
-        activeProjectEmployees
-          .filter((pe) => employeeIdsInDept.has(pe.empId))
-          .map((pe) => pe.projectId)
-      );
-    } else {
-      // No department filter - use all active assignments
-      projectIdsWithDeptActiveAssignments = projectIdsWithActiveAssignments;
-    }
-
-    // Categorize projects
-    const activeProjects: IProject[] = [];
-    const inactiveProjects: IProject[] = [];
-    const planningProjects: IProject[] = [];
-    const assignedProjects: IProject[] = [];
-    const nonAssignedProjects: IProject[] = [];
-
-    filteredProjects.forEach((p) => {
-      // Check for department-specific active assignments (or all if no department filter)
-      const hasDeptActiveAssignments = projectIdsWithDeptActiveAssignments.has(
-        p.projectId
-      );
-      const hasLead = p.leadByEmpId != null;
-
-      // Assigned vs Non-assigned (based on department-specific assignments when filtered)
-      if (hasDeptActiveAssignments) {
-        assignedProjects.push(p);
-      } else {
-        nonAssignedProjects.push(p);
-      }
-
-      // Active vs Inactive vs Planning
-      // Use department-specific assignments for categorization when department filter is applied
-      if (hasDeptActiveAssignments) {
-        // Has department-specific active assignments = Active
-        activeProjects.push(p);
-      } else if (hasLead) {
-        // Has lead but no department-specific active assignments = Planning/Startup
-        planningProjects.push(p);
-        activeProjects.push(p); // Planning projects are also considered "active"
-      } else {
-        // No lead and no department-specific active assignments = Inactive
-        inactiveProjects.push(p);
-      }
-    });
-
-    const activeProjectCount = activeProjects.length;
-    const inactiveProjectCount = inactiveProjects.length;
-    const planningProjectCount = planningProjects.length;
-    const assignedProjectCount = assignedProjects.length;
-    const nonAssignedProjectCount = nonAssignedProjects.length;
     const archivedProjectCount = filteredArchivedProjects.length;
-
-    // Total projects = Non-archived (used for calculations) + Archived (display only)
-    const totalProjectCount =
-      filteredProjects.length + filteredArchivedProjects.length;
 
     // Calculate insights using filtered data
     const insights: IBusinessInsights = {
@@ -667,16 +636,9 @@ export class BusinessInsightsComponent implements OnInit {
       ),
       projectTypeBreakdown:
         this.calculateProjectTypeBreakdown(filteredProjects),
-      // Store filtered counts for display
-      totalProjectCount, // All projects (non-archived + archived) after filters
-      filteredProjectCount: filteredProjects.length, // Non-archived projects (used for calculations)
-      filteredEmployeeCount: filteredEmployees.length,
-      activeProjectCount,
-      inactiveProjectCount,
+      filteredProjectCount: filteredProjects.length,
       archivedProjectCount,
-      planningProjectCount,
-      assignedProjectCount,
-      nonAssignedProjectCount };
+      workforce: workforceCounts(filteredEmployees, activeProjectEmployees) };
 
     this.insightsSignal.set(insights);
     this.loadingSignal.set(false);
@@ -690,42 +652,17 @@ export class BusinessInsightsComponent implements OnInit {
       on_hold: 0,
       cancelled: 0 };
 
+    const buckets = { inFlight: 'in_progress', planning: 'draft', onHold: 'on_hold' } as const;
     projects.forEach((p) => {
-      // Use status field, fallback to approvalStatus if status is not set
-      const status = (p.status || p.approvalStatus || 'draft').toLowerCase();
-
-      // Map status values to distribution categories
-      if (status === 'draft') {
-        distribution.draft++;
-      } else if (status === 'in_review' || status.includes('review')) {
-        distribution.in_progress++;
-      } else if (
-        status === 'approved' ||
-        status.includes('approved') ||
-        status.includes('complete') ||
-        status.includes('done')
-      ) {
+      const bucket = projectStatusBucket(p);
+      const status = normalizedProjectStatus(p);
+      if (bucket) {
+        distribution[buckets[bucket]]++;
+      } else if (/complete|done/.test(status)) {
         distribution.completed++;
-      } else if (
-        status === 'rejected' ||
-        status.includes('reject') ||
-        status.includes('cancel')
-      ) {
+      } else if (/reject|cancel/.test(status)) {
         distribution.cancelled++;
-      } else if (
-        status.includes('hold') ||
-        status.includes('pause') ||
-        status.includes('blocked')
-      ) {
-        distribution.on_hold++;
-      } else if (
-        status.includes('progress') ||
-        status.includes('active') ||
-        status.includes('ongoing')
-      ) {
-        distribution.in_progress++;
       } else {
-        // Default to draft for unknown statuses
         distribution.draft++;
       }
     });
@@ -738,16 +675,9 @@ export class BusinessInsightsComponent implements OnInit {
     employees: Employee[],
     projectEmployees: IProjectEmployee[]
   ) {
-    const totalEmployees = employees.filter((e) => e.isActive).length;
+    const totalEmployees = employees.filter(isEmployeeActive).length;
 
-    // Get active project-employee assignments
-    const activeAssignments = projectEmployees.filter(
-      (pe) =>
-        pe.isActive === 'Y' ||
-        pe.isActive === 'y' ||
-        pe.isActive === 'true' ||
-        String(pe.isActive).toLowerCase() === 'true'
-    );
+    const activeAssignments = projectEmployees.filter((pe) => isAssignmentActive(pe.isActive));
 
     // Calculate total allocation percentage across all employees
     const employeeAllocations = new Map<number, number>();
@@ -771,11 +701,7 @@ export class BusinessInsightsComponent implements OnInit {
       (alloc) => alloc > 100
     ).length;
 
-    // Count available employees (no assignments or allocation = 0)
-    const assignedEmployeeIds = new Set(employeeAllocations.keys());
-    const availableCount = employees.filter(
-      (e) => e.isActive && !assignedEmployeeIds.has(e.employeeId)
-    ).length;
+    const availableCount = workforceCounts(employees, activeAssignments).available;
 
     return {
       totalEmployees,
@@ -880,7 +806,7 @@ export class BusinessInsightsComponent implements OnInit {
       else distribution[3].count++;
     });
 
-    return { average: Math.round(average), distribution };
+    return { average: Math.round(average), scoredCount: scoresForAverage.length, distribution };
   }
 
   private calculateTeamCapacity(
@@ -888,17 +814,10 @@ export class BusinessInsightsComponent implements OnInit {
     employees: Employee[],
     projectEmployees: IProjectEmployee[]
   ) {
-    const totalEmployees = employees.filter((e) => e.isActive).length;
+    const totalEmployees = employees.filter(isEmployeeActive).length;
     const totalCapacity = totalEmployees * 100;
 
-    // Calculate actual utilized capacity from project-employee assignments
-    const activeAssignments = projectEmployees.filter(
-      (pe) =>
-        pe.isActive === 'Y' ||
-        pe.isActive === 'y' ||
-        pe.isActive === 'true' ||
-        String(pe.isActive).toLowerCase() === 'true'
-    );
+    const activeAssignments = projectEmployees.filter((pe) => isAssignmentActive(pe.isActive));
     const utilizedCapacity = activeAssignments.reduce(
       (sum, assignment) => sum + (assignment.allocationPct || 0),
       0
@@ -1005,11 +924,11 @@ export class BusinessInsightsComponent implements OnInit {
       employeeCount: data.employees,
       projectCount: data.projects,
       averageReadiness:
-        data.readiness.length > 0
-          ? Math.round(
-              data.readiness.reduce((a, b) => a + b, 0) / data.readiness.length
-            )
-          : 0 }));
+        data.projects === 0
+          ? null
+          : data.readiness.length > 0
+            ? Math.round(data.readiness.reduce((a, b) => a + b, 0) / data.readiness.length)
+            : 0 }));
   }
 
   private calculateProjectTypeBreakdown(projects: IProject[]) {
@@ -1102,12 +1021,13 @@ export class BusinessInsightsComponent implements OnInit {
     csvRows.push('Department,Employees,Projects,Avg Readiness');
     insights.departmentBreakdown.forEach((dept) => {
       csvRows.push(
-        `${dept.department},${dept.employeeCount},${dept.projectCount},${dept.averageReadiness}%`
+        `${dept.department},${dept.employeeCount},${dept.projectCount},${this.readinessText(dept.averageReadiness)}`
       );
     });
 
-    const csvContent = csvRows.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    // The byte-order mark makes Excel read the file as UTF-8 ("—", "·").
+    const csvContent = '\uFEFF' + csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

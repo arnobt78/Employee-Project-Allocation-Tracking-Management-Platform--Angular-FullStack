@@ -53,18 +53,12 @@ import {
 } from '@/app/lib/status/project-archive';
 import { titleCaseLabel } from '@/app/lib/format/labels';
 import { BADGE_TONE_CLASS, projectStatusMeta } from '@/app/lib/status/project-status';
-
-const IN_FLIGHT_STATUSES = new Set([
-  'approved',
-  'active',
-  'in_review',
-  'in progress',
-  'in_progress',
-]);
-
-const PLANNING_STATUSES = new Set(['draft', 'planning', 'proposed']);
-
-const ON_HOLD_STATUSES = new Set(['on_hold', 'on hold', 'paused', 'hold']);
+import {
+  normalizedProjectStatus,
+  projectStatusBuckets,
+  uniqueCount,
+} from '@/app/lib/status/portfolio-stats';
+import { PORTFOLIO_KPIS } from '@/app/constants/portfolio-kpis';
 
 @Component({
   selector: 'app-project',
@@ -134,7 +128,7 @@ export class ProjectComponent implements OnInit {
     const status = this.filterValue().trim().toLowerCase();
     const client = this.clientFilter().trim().toLowerCase();
     return this.viewProjects().filter((project) => {
-      if (status && this.normalizedStatus(project) !== status) {
+      if (status && normalizedProjectStatus(project) !== status) {
         return false;
       }
       if (client && (project.clientName ?? '').trim().toLowerCase() !== client) {
@@ -179,29 +173,11 @@ export class ProjectComponent implements OnInit {
     },
   ]);
 
-  readonly kpiInFlight = computed(
-    () =>
-      this.activeProjects().filter((p) =>
-        IN_FLIGHT_STATUSES.has(this.normalizedStatus(p))
-      ).length
-  );
-
-  readonly kpiPlanning = computed(
-    () =>
-      this.activeProjects().filter((p) =>
-        PLANNING_STATUSES.has(this.normalizedStatus(p))
-      ).length
-  );
-
-  readonly kpiOnHold = computed(
-    () =>
-      this.activeProjects().filter((p) =>
-        ON_HOLD_STATUSES.has(this.normalizedStatus(p))
-      ).length
-  );
+  readonly kpi = PORTFOLIO_KPIS;
+  readonly statusBuckets = computed(() => projectStatusBuckets(this.projects()));
 
   readonly kpiClients = computed(() =>
-    this.uniqueCount(this.activeProjects(), (p) => p.clientName)
+    uniqueCount(this.activeProjects(), (p) => p.clientName)
   );
 
   readonly hasActiveFilters = computed(
@@ -477,10 +453,6 @@ export class ProjectComponent implements OnInit {
     return titleCaseLabel(project.health) || '—';
   }
 
-  private normalizedStatus(project: IProject): string {
-    return (project.status || project.approvalStatus || '').trim().toLowerCase();
-  }
-
   private uniqueStatusOptions(projects: readonly IProject[]): SelectMenuOption[] {
     const seen = new Set<string>();
     const options: SelectMenuOption[] = [];
@@ -523,20 +495,5 @@ export class ProjectComponent implements OnInit {
       options.push({ value: raw, label: raw, icon });
     }
     return options.sort((a, b) => a.label.localeCompare(b.label));
-  }
-
-  private uniqueCount(
-    projects: readonly IProject[],
-    pick: (p: IProject) => string | null | undefined
-  ): number {
-    const seen = new Set<string>();
-    for (const project of projects) {
-      const raw = pick(project)?.trim();
-      if (!raw) {
-        continue;
-      }
-      seen.add(raw.toLowerCase());
-    }
-    return seen.size;
   }
 }

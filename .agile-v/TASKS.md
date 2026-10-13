@@ -235,6 +235,14 @@
 | TASK-0105 | Seed employee/lead emails and SOW link → `example.com`; shared DB reseeded | REQ-0163 | DONE | 0 deliverable seed addresses; seed comment logs only `NOTIFY_APPROVAL_TO` |
 | TASK-0106 | 90-day `NotificationLog` TTL: `tools/ensure-indexes.mjs` (`db:indexes`, `db:push`), reset ensures it, API self-heals once per instance | REQ-0164 | DONE | API 98; live index `ttl=7776000` |
 
+## Wave — GATE-0029 consistent KPIs and Insights cards (COMPLETE 2026-10-13)
+
+| ID | Task | REQ | Status | Notes |
+|---|---|---|---|---|
+| TASK-0107 | `projectCounts` value = total; Projects KPI on Dashboard, Projects, Project Team, Insights; Project Team Total Assignments = all with "On Active Projects · Archived" subtitle | REQ-0165 | DONE | Project/Project Team specs; `project-archive.spec.ts` already covers `total` |
+| TASK-0108 | Shared status buckets in `lib/status/` (move `IN_FLIGHT/PLANNING/ON_HOLD` out of `project.component.ts`); Dashboard KPIs regrouped: Employees, Projects, In Flight, Planning, On Hold, Staffing (Staffed · Lead Only · Unstaffed), Assignments (Active · Inactive · Archived), Archived; hero chips + people count match Project Team | REQ-0166 | DONE | `lib/status/portfolio-stats.ts` + `constants/portfolio-kpis.ts`; Dashboard "People" (same label/number as Project Team); Insights status cards use the same buckets |
+| TASK-0109 | Insights: subtitles on all overview KPI cards, remove duplicate chip row, status cards with share-of-total subtitle, capacity in people, "—" for empty departments, equal-height responsive grids | REQ-0167 | DONE | `kpi-stat-card` host `block h-full`; CSV with UTF-8 BOM; browser 390 + 1280 px |
+
 ---
 
 ## Recommended approval options (GATE-0016 prod soak)

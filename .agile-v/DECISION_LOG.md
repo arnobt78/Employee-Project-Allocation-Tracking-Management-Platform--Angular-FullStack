@@ -400,3 +400,13 @@ Append-only. Do not rewrite prior entries.
 | Rationale | The "Archive" button was deleting. Prisma's MongoDB `deleteMany` skipped assignments with non-ObjectId `_id`s, leaving orphans; the bootstrap re-imported old data into an empty database. Native deletes avoid both the `_id` issue and the replica-set requirement of `$transaction` (RISK-0020 closed). |
 | Linked | GATE-0026, TASK-0095–0101, REQ-0155–0160 |
 | Status | DONE |
+
+## DEC-0041 — One rule set for portfolio KPIs
+
+| Field | Value |
+|---|---|
+| Date | 2026-10-13 |
+| Decision | Every KPI that counts projects, assignments or people comes from `src/app/lib/status/portfolio-stats.ts` (status buckets, staffing, assignment counts, unique assignees, assigned/available workforce, active flags). A "Projects" card shows the total including archived. Insights maps statuses through the same buckets (`approved` is In Flight, not Completed). The Dashboard's planned "People Booked" card ships as "People" with the Project Team label and number. |
+| Rationale | The same label showed different numbers on different pages (Dashboard staffing logic vs Projects status logic; Dashboard vs Insights assigned/available). |
+| Linked | GATE-0029, TASK-0107–0109, REQ-0165–0167 |
+| Status | DONE |

@@ -1,5 +1,14 @@
 # Changelog — Agile V project memory
 
+## 2026-10-13 — GATE-0029 consistent KPIs and Insights cards
+
+- Every "Projects" card shows the total including archived (5) with "4 Active · 1 Archived"; Project Team "Total Assignments" shows all 7 with "6 On Active Projects · 1 Archived"
+- One shared rule set (`lib/status/portfolio-stats.ts`) for status buckets, staffing, assignments, people and assigned/available, used by Dashboard, Projects, Project Team, Insights and Employees
+- Dashboard cards regrouped: Employees, Projects, People, In Flight, Planning, On Hold, Staffing, Assignments, Archived; hero and charts use the same numbers; a failed list request no longer leaves cards loading
+- Insights: a subtitle on every card, the duplicate pill row is gone, status cards use the shared In Flight / Planning / On Hold labels with "N of M active", capacity in people, "—" for departments without projects (table and CSV; CSV now opens correctly in Excel)
+- KPI cards in a row share one height app-wide
+- Node 24.21: lint PASS; API 98/98; unit 174/174; build PASS; browser 390 + 1280 px PASS
+
 ## 2026-10-12 — GATE-0028 seed emails, email log retention
 
 - Seed employees use `@example.com`, so demo actions no longer email them; database reseeded

@@ -1,15 +1,24 @@
 # Agile V State
 
 **Cycle:** C1  
-**Phase / Stage:** Stage 4 — GATE-0028 (seed emails, email log TTL) committed locally on top of GATE-0027 / GATE-0026; push + prod soak next  
-**Gate:** GATE-0028 **COMPLETE**; GATE-0027 **COMPLETE**; GATE-0026 **COMPLETE**; GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
-**Status:** GATE-0026, GATE-0027 and GATE-0028 committed locally (not pushed); `origin/main` at `d95a6c9` (GATE-0025). Node 24.21: lint PASS, API tests 98/98, unit 158/158, production build PASS. Database (shared by local and prod) reseeded with `@example.com` seed employees and has the 90-day `NotificationLog` TTL index; only `admin` remains as a user.  
-**Updated:** 2026-10-12  
-**resume_token:** `c1-gate28-prod-soak-2026-10-12`
+**Phase / Stage:** Stage 4 — GATE-0029 (consistent KPIs, Insights cards) committed locally, not pushed; GATE-0026–0028 pushed (`origin/main` = `4512353`)  
+**Gate:** GATE-0029 **COMPLETE**; GATE-0028 **COMPLETE**; GATE-0027 **COMPLETE**; GATE-0026 **COMPLETE**; GATE-0025 **COMPLETE**; GATE-0024 **COMPLETE**; GATE-0023 **COMPLETE**; GATE-0022 **COMPLETE**; GATE-0021 **COMPLETE**; GATE-0020 **COMPLETE**; GATE-0019 **COMPLETE**; GATE-0018 skeleton parity **COMPLETE**; detail-polish guide (CP-0020) **RESOLVED**; GATE-0017 soak CP-0019 **PENDING**; GATE-0001 **CLOSED**  
+**Status:** GATE-0029 (REQ-0165–0167, TASK-0107–0109) committed locally, not pushed; GATE-0026–0028 pushed. User checked prod 2026-10-13 (every page + refresh skeletons OK, CRUD soak not yet run). Node 24.21: lint PASS, API tests 98/98, unit 174/174, production build PASS. Database (shared by local and prod) reseeded with `@example.com` seed employees and has the 90-day `NotificationLog` TTL index; only `admin` remains as a user.  
+**Updated:** 2026-10-13  
+**resume_token:** `c1-gate29-complete-2026-10-13`
 
 ---
 
 ## Resume Point
+
+**Completed (GATE-0029, TASK-0107–0109):**
+
+- One rule set in `lib/status/portfolio-stats.ts` (spec'd): `projectStatusBucket(s)` (In Flight / Planning / On Hold, archived excluded), `staffingCounts` (Staffed / Lead Only / Unstaffed), `assignmentCounts` (total, on active projects, active, inactive, archived), `uniqueAssignees` (people on active projects, any state), `workforceCounts` (Assigned = active assignment on an active project; Available = active employee without one), `isAssignmentActive`, `isEmployeeActive` (`isActive !== false`), `allocationToPeople` / `peopleLabel`, `dotJoin`, `uniqueCount`. Card copy for the shared buckets in `constants/portfolio-kpis.ts` (`PORTFOLIO_KPIS`), reused by Insights status items.
+- "Projects" card = total incl. archived + "N Active · M Archived" on Dashboard, Projects, Project Team, Insights. Project Team "Total Assignments" = all, "N On Active Projects · M Archived"; tab badges use the same counts.
+- Dashboard: 9 cards (Employees, Projects, People, In Flight, Planning, On Hold, Staffing, Assignments, Archived), hero "N people on projects · N active assignments", charts Staffed/Lead Only/Unstaffed/Archived and Active/Inactive/Archived, skeleton 9 cards. "People Booked" from the plan shipped as "People" (same label and number as Project Team). A failed list request now still computes the cards.
+- Insights: subtitles on every card, pill row removed (page + skeleton), status cards "N of M active" with the shared mapping (`approved` is In Flight, no longer Completed), capacity in people, `averageReadiness: null` → "—" for departments without projects (table + CSV with UTF-8 BOM), unused project categorization removed.
+- `app-kpi-stat-card` host `block h-full` + `h-full` article: equal heights per grid row app-wide.
+- Test fixture `src/app/testing/portfolio-fixture.ts` (seed-shaped data, `warmPortfolioCaches`, `kpiCards`).
 
 **Completed (GATE-0028, TASK-0105–0106):**
 
@@ -28,7 +37,7 @@
 - Orphan root cause: Prisma's MongoDB `deleteMany` resolves rows by `_id` and silently skipped assignments whose `_id` was not an ObjectId (legacy imports). Deletes now go through the native driver (`deleteWithAssignments`); the reseed writes ObjectId `_id`s.
 - Archive and Delete are separate. `POST ArchiveProject/{id}` / `RestoreProject/{id}` set or clear `archivedAt`/`archivedBy` (history entry, nothing deleted). `DeleteProject` deletes assignments then the project with native driver deletes, sweeps again and fails loudly if any assignment still references the project; returns `deletedAssignments`. Archived projects are excluded from schedule, capacity, dashboard and insights aggregates; their team cannot change (409), and their lead cannot change (409) while other edits still save.
 - Projects and Project Team have Active/Archived tabs (`constants/tabs.ts`, `?view=archived` via `bindListQuery`, badge counts, skeleton tab row via `listTabCount`). Archived rows show only Restore. Project detail: archived banner with Restore, footer "Archive Project" + "Delete Permanently", each with an `app-alert-dialog`; the delete dialog states how many assignments will be removed (`deleteProjectWarning`).
-- Shared `lib/status/project-archive.ts`: `isProjectArchived`, `isAssignmentArchived`, `projectCounts`, `projectCountsLabel` ("4 Active · 1 Archived"), delete copy. KPI "Projects" = active count on Projects, Project Team, Dashboard and Insights.
+- Shared `lib/status/project-archive.ts`: `isProjectArchived`, `isAssignmentArchived`, `projectCounts`, `projectCountsLabel` ("4 Active · 1 Archived"), delete copy. (GATE-0029: the "Projects" KPI value is now the total.)
 - Lead sync: create/update gives the new lead an active "Project Lead" assignment if missing (duplicate-key race ignored); Project Team shows a violet "Lead" badge with a crown icon. Unique index `ProjectEmployee(projectId, empId)`.
 - Projects list: Lead tile (avatar, name, lead's employee email) and Client Contact tile (avatar, email, phone); read-only "Email" renamed "Contact Email". Timeline: "Lead" caption, readiness % and team size lines (schedule payload adds `readinessScore`, `teamSize`); `shield-user` removed.
 - Legacy bootstrap removed (`ensureBootstrapData`, `store.mjs`, `data.json`, `dataset/*.json`, `tools/wipe-local-domain.mjs`). New typed `prisma/seed-data.ts` (3 + 7 departments, 5 employees, 5 projects incl. one archived, 7 assignments). `npm run db:reset:demo` / `db:reseed:local` (`tools/reset-demo-data.mjs`) needs `ALLOW_DB_WIPE=1`, plus `EH_ALLOW_REMOTE_WIPE=1` for a non-local host; it never prints credentials and keeps only `admin`.
@@ -95,17 +104,18 @@
 - Employee edits don't refresh lead names in project list/schedule until TTL.
 - Guest `Session` 401 on the login page console (intentional).
 - The shared `archive` pending key blocks Restore on a second project until the first archive/restore request returns.
+- `uniqueAssignees` keys by employee id, else name; one person stored once with an id and once name-only would count twice (no such rows today).
 
 **Blockers:** none. Push/deploy needs human approval (GATE-0002). `npm run db:push` already applied to the configured DB (schema + TTL index).
 
-**Next exact action:** Human pushes GATE-0026 + GATE-0027 + GATE-0028, then prod soak (CP-0025): a comment on a seed project sends no email to seed employees (API Status "Recent Email Deliveries" counts only `NOTIFY_APPROVAL_TO`); every project-detail dialog (request approval, restore, add assignment, add comment, resolve/reopen); archive → Archived tab → restore on Projects and project detail; Delete Permanently (dialog shows the assignment count, rows gone from Project Team); change a lead (new Lead row appears); Timeline readiness/team lines; KPI "Projects" matches on Dashboard, Projects, Project Team and Insights. Run `npm run db:push` on any other database before using it (unique assignment index + TTL). Then the GATE-0025 soak (CP-0024): triage each bug / UI-consistency mismatch into a scoped plan for approval. Soak areas: project detail avatars, Project Team unassigned dates (deactivate/reactivate an assignment), Calendar (3 tabs), Insights (4 tabs + CSV export), API Status and API Doc (Copy URL needs a real clipboard). Earlier soak still open: prod soak of the project detail page (every section's edit/save, approval request → approve/reject → reset, archive, Contentful + AI helpers) and CRUD across Employees / Projects / Project Team. Note: dev saw one-off 40–77 s approval writes during a MongoDB latency spike (same endpoint ~2 s otherwise); watch for it on Vercel.
+**Next exact action:** Push GATE-0029 when the user approves (GATE-0002), then check prod KPIs match: Dashboard 5/4/2/1/1/4/7/1, Projects 5, Project Team 7 / People 4, Insights subtitles and capacity in people. Then user's CRUD prod soak (CP-0025): a comment on a seed project sends no email to seed employees (API Status "Recent Email Deliveries" counts only `NOTIFY_APPROVAL_TO`); every project-detail dialog (request approval, restore, add assignment, add comment, resolve/reopen); archive → Archived tab → restore on Projects and project detail; Delete Permanently (dialog shows the assignment count, rows gone from Project Team); change a lead (new Lead row appears); Timeline readiness/team lines; KPI "Projects" matches on Dashboard, Projects, Project Team and Insights. Run `npm run db:push` on any other database before using it (unique assignment index + TTL). Then the GATE-0025 soak (CP-0024): triage each bug / UI-consistency mismatch into a scoped plan for approval. Soak areas: project detail avatars, Project Team unassigned dates (deactivate/reactivate an assignment), Calendar (3 tabs), Insights (4 tabs + CSV export), API Status and API Doc (Copy URL needs a real clipboard). Earlier soak still open: prod soak of the project detail page (every section's edit/save, approval request → approve/reject → reset, archive, Contentful + AI helpers) and CRUD across Employees / Projects / Project Team. Note: dev saw one-off 40–77 s approval writes during a MongoDB latency spike (same endpoint ~2 s otherwise); watch for it on Vercel.
 
 **Resume prompt:**
 
 ```text
 Load CLAUDE.md, AGENTS.md, and .agile-v/STATE.md.
-Resume resume_token c1-gate28-prod-soak-2026-10-12.
-GATE-0026 (archive vs delete, reseed, lead sync, tiles, counts), GATE-0027 (project detail confirmations, overview shape fix) and GATE-0028 (example.com seed emails, 90-day NotificationLog TTL) committed locally on top of GATE-0025 (d95a6c9). Await push + prod soak feedback (CP-0025, CP-0024).
+Resume resume_token c1-gate29-complete-2026-10-13.
+GATE-0026–0028 pushed (origin/main 4512353). GATE-0029 (shared KPI rules in lib/status/portfolio-stats.ts, total-based Projects KPI, regrouped Dashboard, Insights card subtitles) committed locally, not pushed. Next: push on approval, prod KPI check, then CRUD prod soak (CP-0025).
 ```
 
 ---

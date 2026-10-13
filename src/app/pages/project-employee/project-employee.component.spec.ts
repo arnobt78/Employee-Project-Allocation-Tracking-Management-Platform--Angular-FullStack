@@ -4,6 +4,8 @@ import { provideRouter } from '@angular/router';
 
 import { ProjectEmployeeComponent } from './project-employee.component';
 import { IProjectEmployee } from '../../model/interface/master';
+import { MasterService } from '../../service/master.service';
+import { kpiCards, warmPortfolioCaches } from '@/app/testing/portfolio-fixture';
 
 describe('ProjectEmployeeComponent', () => {
   let component: ProjectEmployeeComponent;
@@ -35,6 +37,19 @@ describe('ProjectEmployeeComponent', () => {
     expect(
       component.unassignedLabel({ ...base, isActive: 'N', unassignedAt: '2026-02-03T00:00:00Z' })
     ).not.toMatch(/^(—|Still Assigned|Not Recorded)$/);
+  });
+
+  it('counts all assignments and the people on active projects', () => {
+    warmPortfolioCaches(TestBed.inject(MasterService));
+    const warm = TestBed.createComponent(ProjectEmployeeComponent);
+    warm.detectChanges();
+    const cards = kpiCards(warm.nativeElement as HTMLElement);
+
+    expect(cards['Total Assignments']).toBe('7 | 6 On Active Projects · 1 Archived');
+    expect(cards['Active']).toMatch(/^5 \|/);
+    expect(cards['Inactive']).toMatch(/^1 \|/);
+    expect(cards['Projects']).toBe('5 | 4 Active · 1 Archived');
+    expect(cards['People']).toBe('4 | Unique assignees on active projects');
   });
 
   it('renders assignment status with the shared badge', () => {

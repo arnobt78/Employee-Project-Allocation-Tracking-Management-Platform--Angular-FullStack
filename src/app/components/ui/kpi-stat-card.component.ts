@@ -15,9 +15,10 @@ export type KpiStatTone =
   selector: 'app-kpi-stat-card',
   standalone: true,
   imports: [CommonModule, AppIconComponent, TextStubComponent],
+  host: { class: 'block h-full' },
   template: `
     <article
-      class="flex items-center justify-between gap-3 rounded-[24px] border bg-gradient-to-br p-3 sm:p-4 transition hover:brightness-110"
+      class="flex h-full items-center justify-between gap-3 rounded-[24px] border bg-gradient-to-br p-3 sm:p-4 transition hover:brightness-110"
       [ngClass]="[toneClasses, glowClass]"
     >
       <div class="min-w-0">

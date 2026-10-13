@@ -133,20 +133,9 @@
             [value]="kpi.value"
             [icon]="kpi.icon"
             [tone]="kpi.tone"
-            [hint]="kpi.label === 'Projects' ? projectCountsLabel() : ''"
+            [hint]="kpi.hint"
           ></app-kpi-stat-card>
         }
-      </div>
-
-      <div class="eh-panel">
-        <div class="flex flex-wrap items-center gap-2">
-          @for (chip of breakdownChips(); track chip.key) {
-            <span class="eh-badge" [ngClass]="badgeTone[chip.tone]" [title]="chip.title">
-              <lucide-icon [name]="chip.icon" [size]="12"></lucide-icon>
-              {{ chip.value }} {{ chip.label }}
-            </span>
-          }
-        </div>
       </div>
 
       <section class="eh-section-card">
@@ -159,6 +148,7 @@
             <app-kpi-stat-card
               [label]="item.label"
               [value]="item.value"
+              [hint]="item.hint"
               [icon]="item.icon"
               [tone]="item.tone"
             ></app-kpi-stat-card>
@@ -226,7 +216,7 @@
                   <td class="py-3">
                     <span class="eh-badge eh-badge-sky">
                       <lucide-icon name="gauge" [size]="12"></lucide-icon>
-                      {{ dept.averageReadiness }}%
+                      {{ readinessText(dept.averageReadiness) }}
                     </span>
                   </td>
                 </tr>
@@ -282,6 +272,7 @@
             <app-kpi-stat-card
               [label]="kpi.label"
               [value]="kpi.value"
+              [hint]="kpi.hint"
               [icon]="kpi.icon"
               [tone]="kpi.tone"
             ></app-kpi-stat-card>
@@ -319,7 +310,7 @@
                 <span>Total Capacity</span>
               </p>
               <p class="mt-1 text-xl sm:text-2xl leading-none font-medium text-white">
-                {{ data.teamCapacity.totalCapacity || 0 }}%
+                {{ capacityPeople().total }}
               </p>
             </div>
             <div>
@@ -328,7 +319,7 @@
                 <span>Utilized</span>
               </p>
               <p class="mt-1 text-xl sm:text-2xl leading-none font-medium text-white">
-                {{ data.teamCapacity.utilizedCapacity || 0 }}%
+                {{ capacityPeople().utilized }}
               </p>
             </div>
             <div>
@@ -337,7 +328,7 @@
                 <span>Available</span>
               </p>
               <p class="mt-1 text-xl sm:text-2xl leading-none font-medium text-white">
-                {{ data.teamCapacity.availableCapacity || 0 }}%
+                {{ capacityPeople().available }}
               </p>
             </div>
           </div>

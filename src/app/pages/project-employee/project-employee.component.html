@@ -34,27 +34,23 @@
   <app-kpi-stat-card
     listShellKpis
     label="Total Assignments"
-    [value]="totalAssignmentsKpi()"
-    [hint]="
-      archivedAssignmentCount()
-        ? 'On active projects · ' + archivedAssignmentCount() + ' archived'
-        : 'On active projects'
-    "
+    [value]="assignmentKpis().total"
+    [hint]="totalAssignmentsHint()"
     icon="contact"
     tone="sky"
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
     label="Active"
-    [value]="activeAssignmentsKpi()"
-    hint="Currently active"
+    [value]="assignmentKpis().active"
+    hint="Currently active on active projects"
     icon="check-circle"
     tone="emerald"
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
     label="Inactive"
-    [value]="inactiveAssignmentsKpi()"
+    [value]="assignmentKpis().inactive"
     hint="Paused or ended"
     icon="pause-circle"
     tone="slate"
@@ -62,7 +58,7 @@
   <app-kpi-stat-card
     listShellKpis
     label="Projects"
-    [value]="counts().active"
+    [value]="counts().total"
     [hint]="countsLabel()"
     icon="folder-kanban"
     tone="violet"
@@ -98,8 +94,8 @@
         <span class="eh-badge eh-badge-neutral">
           {{
             tab.id === "archived"
-              ? archivedAssignmentCount()
-              : activeAssignments().length
+              ? assignmentKpis().archived
+              : assignmentKpis().onActiveProjects
           }}
         </span>
       </button>

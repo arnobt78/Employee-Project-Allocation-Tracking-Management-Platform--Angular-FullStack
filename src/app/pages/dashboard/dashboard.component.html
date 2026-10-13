@@ -31,7 +31,7 @@
             class="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm"
           >
             <lucide-icon name="users" [size]="14"></lucide-icon>
-            {{ dashboardData?.totalEmployee || 0 }} workforce
+            {{ employeeTotal }} workforce
           </span>
           <span
             class="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/10 px-3 py-1 backdrop-blur-sm"
@@ -54,88 +54,74 @@
         data-testid="dashboard-kpi-grid"
       >
         <app-kpi-stat-card
-          label="Total Employees"
-          [value]="dashboardData?.totalEmployee ?? 0"
-          hint="Track your entire organisation workforce across locations."
+          label="Employees"
+          [value]="employeeTotal"
+          [hint]="employeesHint"
           icon="users"
           tone="sky"
         ></app-kpi-stat-card>
         <app-kpi-stat-card
           label="Projects"
-          [value]="projectStats?.nonArchived ?? dashboardData?.totalProject ?? 0"
+          [value]="projectTotals.total"
           [hint]="projectCountsLabel"
           icon="folder-kanban"
-          tone="emerald"
+          tone="violet"
         ></app-kpi-stat-card>
         <app-kpi-stat-card
-          label="Active Project Employees"
-          [value]="dashboardData?.activeProjectEmployees ?? 0"
-          hint="Know exactly who is booked and where the next gaps appear."
+          label="People"
+          [value]="stats?.people ?? 0"
+          hint="Unique assignees on active projects"
           icon="user-plus"
           tone="amber"
+          [loading]="!stats"
         ></app-kpi-stat-card>
-        @if (projectStats) {
-          <app-kpi-stat-card
-            label="Active Projects"
-            [value]="projectStats.active"
-            hint="With active assignments or leads"
-            icon="zap"
-            tone="emerald"
-          ></app-kpi-stat-card>
-          <app-kpi-stat-card
-            label="Inactive Projects"
-            [value]="projectStats.inactive"
-            hint="No active assignments and no lead"
-            icon="pause-circle"
-            tone="slate"
-          ></app-kpi-stat-card>
-          <app-kpi-stat-card
-            label="Planning"
-            [value]="projectStats.planning"
-            hint="Lead assigned, no active team yet"
-            icon="compass"
-            tone="violet"
-          ></app-kpi-stat-card>
-          <app-kpi-stat-card
-            label="Assigned"
-            [value]="projectStats.assigned"
-            hint="Projects with active employee assignments"
-            icon="users"
-            tone="amber"
-          ></app-kpi-stat-card>
-          <app-kpi-stat-card
-            label="Active Assignments"
-            [value]="projectStats.activeAssignments"
-            hint="Live project–employee links"
-            icon="link"
-            tone="emerald"
-          ></app-kpi-stat-card>
-          <app-kpi-stat-card
-            label="Archived"
-            [value]="projectStats.archived"
-            hint="Excluded from active calculations; restore from Projects"
-            icon="archive"
-            tone="slate"
-          ></app-kpi-stat-card>
-          @if (projectStats.nonAssigned > 0) {
-            <app-kpi-stat-card
-              label="Unassigned"
-              [value]="projectStats.nonAssigned"
-              hint="No active employee assignments"
-              icon="user-x"
-              tone="rose"
-            ></app-kpi-stat-card>
-          }
-          @if (projectStats.inactiveAssignments > 0) {
-            <app-kpi-stat-card
-              label="Inactive Assignments"
-              [value]="projectStats.inactiveAssignments"
-              hint="Paused or ended allocations"
-              icon="unlink"
-              tone="rose"
-            ></app-kpi-stat-card>
-          }
-        }
+        <app-kpi-stat-card
+          [label]="kpi.inFlight.label"
+          [value]="stats?.status?.inFlight ?? 0"
+          [hint]="kpi.inFlight.hint"
+          [icon]="kpi.inFlight.icon"
+          [tone]="kpi.inFlight.tone"
+          [loading]="!stats"
+        ></app-kpi-stat-card>
+        <app-kpi-stat-card
+          [label]="kpi.planning.label"
+          [value]="stats?.status?.planning ?? 0"
+          [hint]="kpi.planning.hint"
+          [icon]="kpi.planning.icon"
+          [tone]="kpi.planning.tone"
+          [loading]="!stats"
+        ></app-kpi-stat-card>
+        <app-kpi-stat-card
+          [label]="kpi.onHold.label"
+          [value]="stats?.status?.onHold ?? 0"
+          [hint]="kpi.onHold.hint"
+          [icon]="kpi.onHold.icon"
+          [tone]="kpi.onHold.tone"
+          [loading]="!stats"
+        ></app-kpi-stat-card>
+        <app-kpi-stat-card
+          label="Staffing"
+          [value]="stats?.staffing?.staffed ?? 0"
+          [hint]="staffingHint"
+          icon="users"
+          tone="emerald"
+          [loading]="!stats"
+        ></app-kpi-stat-card>
+        <app-kpi-stat-card
+          label="Assignments"
+          [value]="stats?.assignments?.total ?? 0"
+          [hint]="assignmentsHint"
+          icon="link"
+          tone="sky"
+          [loading]="!stats"
+        ></app-kpi-stat-card>
+        <app-kpi-stat-card
+          [label]="kpi.archived.label"
+          [value]="projectTotals.archived"
+          hint="Restore from Projects"
+          [icon]="kpi.archived.icon"
+          [tone]="kpi.archived.tone"
+        ></app-kpi-stat-card>
       </section>
 
       <!-- Charts -->
@@ -148,7 +134,7 @@
               Project Portfolio Mix
             </h2>
             <p class="mb-4 text-xs sm:text-sm text-white/50">
-              Active, planning, inactive, and archived counts from live data
+              Staffed, lead only, unstaffed, and archived projects
             </p>
             @if (projectStatusSlices.length) {
               <app-dashboard-chart
@@ -169,7 +155,7 @@
               Assignment & Capacity
             </h2>
             <p class="mb-4 text-xs sm:text-sm text-white/50">
-              Active vs inactive allocations and unassigned projects
+              Active, inactive, and archived assignments
             </p>
             @if (assignmentSlices.length) {
               <app-dashboard-chart

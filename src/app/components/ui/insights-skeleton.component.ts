@@ -23,7 +23,7 @@ import { TextStubComponent } from './text-stub.component';
 
 /**
  * Full-page loading mirror of business-insights (header, filters, tabs,
- * overview KPIs, breakdown chips, status distribution). Rendered by both the
+ * overview KPIs, status distribution). Rendered by both the
  * route placeholder and the page's cold-load branch.
  * Keep structure in sync with business-insights.component.html.
  */
@@ -104,23 +104,12 @@ import { TextStubComponent } from './text-stub.component';
                 <app-kpi-stat-card
                   [label]="kpi.label"
                   value=""
+                  hint="&nbsp;"
                   [icon]="kpi.icon"
                   [tone]="kpi.tone"
                   [loading]="true"
                 ></app-kpi-stat-card>
               }
-            </div>
-
-            <div class="eh-panel" aria-hidden="true">
-              <div class="flex flex-wrap items-center gap-2">
-                @for (chip of chipWidths; track $index) {
-                  <span
-                    class="eh-badge eh-badge-neutral animate-pulse"
-                    [style.width.px]="chip"
-                    >&nbsp;</span
-                  >
-                }
-              </div>
             </div>
 
             <section class="eh-section-card">
@@ -133,6 +122,7 @@ import { TextStubComponent } from './text-stub.component';
                   <app-kpi-stat-card
                     [label]="item.label"
                     value=""
+                    hint="&nbsp;"
                     [icon]="item.icon"
                     [tone]="item.tone"
                     [loading]="true"
@@ -181,5 +171,4 @@ export class InsightsSkeletonComponent {
   readonly statusItems = INSIGHTS_STATUS_ITEMS;
   readonly readinessTitle = INSIGHTS_READINESS_DISTRIBUTION_TITLE;
   readonly readinessRanges = INSIGHTS_READINESS_RANGES;
-  readonly chipWidths = [136, 104, 88, 96, 104, 108, 132];
 }

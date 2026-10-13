@@ -69,6 +69,13 @@ import {
   projectCounts,
   projectCountsLabel,
 } from '@/app/lib/status/project-archive';
+import {
+  assignmentCounts,
+  dotJoin,
+  isAssignmentActive,
+  uniqueAssignees,
+  uniqueCount,
+} from '@/app/lib/status/portfolio-stats';
 
 const SAVE_KEY = 'save';
 const deleteKey = (empProjectId: number) => `delete:${empProjectId}`;
@@ -153,9 +160,6 @@ export class ProjectEmployeeComponent implements OnInit {
   /** Assignments split by their project's archive state; archived rows are read-only. */
   readonly activeAssignments = computed(() =>
     inArchiveView(this.assignments(), 'active', isAssignmentArchived)
-  );
-  readonly archivedAssignmentCount = computed(
-    () => this.assignments().length - this.activeAssignments().length
   );
   private readonly viewAssignments = computed(() =>
     inArchiveView(this.assignments(), this.view(), isAssignmentArchived)
@@ -251,23 +255,14 @@ export class ProjectEmployeeComponent implements OnInit {
     paginateList(this.filteredAssignments(), this.listPage())
   );
 
-  readonly totalAssignmentsKpi = computed(() => this.activeAssignments().length);
-  readonly activeAssignmentsKpi = computed(
-    () =>
-      this.activeAssignments().filter((item) => this.isActive(item.isActive)).length
-  );
-  readonly inactiveAssignmentsKpi = computed(
-    () => this.totalAssignmentsKpi() - this.activeAssignmentsKpi()
-  );
-  readonly uniqueEmployeesKpi = computed(() =>
-    this.uniqueCount(this.activeAssignments(), (item) =>
-      item.empId != null && item.empId !== 0
-        ? String(item.empId)
-        : item.employeeName
-    )
-  );
+  readonly assignmentKpis = computed(() => assignmentCounts(this.assignments()));
+  readonly totalAssignmentsHint = computed(() => {
+    const counts = this.assignmentKpis();
+    return dotJoin([`${counts.onActiveProjects} On Active Projects`, `${counts.archived} Archived`]);
+  });
+  readonly uniqueEmployeesKpi = computed(() => uniqueAssignees(this.assignments()));
   readonly uniqueRolesKpi = computed(() =>
-    this.uniqueCount(this.activeAssignments(), (item) => item.role)
+    uniqueCount(this.activeAssignments(), (item) => item.role)
   );
 
   projectEmployeeForm: FormGroup = this.fb.group({
@@ -737,11 +732,7 @@ export class ProjectEmployeeComponent implements OnInit {
   }
 
   isActive(value: string | boolean | null | undefined): boolean {
-    if (typeof value === 'boolean') return value;
-    if (typeof value === 'string') {
-      return ['y', 'yes', 'true', '1'].includes(value.toLowerCase());
-    }
-    return false;
+    return isAssignmentActive(value);
   }
 
   private uniqueOptions(
@@ -764,21 +755,6 @@ export class ProjectEmployeeComponent implements OnInit {
       options.push({ value: raw, label: raw, icon });
     }
     return options.sort((a, b) => a.label.localeCompare(b.label));
-  }
-
-  private uniqueCount(
-    items: readonly IProjectEmployee[],
-    pick: (item: IProjectEmployee) => string | null | undefined
-  ): number {
-    const seen = new Set<string>();
-    for (const item of items) {
-      const raw = pick(item)?.trim();
-      if (!raw) {
-        continue;
-      }
-      seen.add(raw.toLowerCase());
-    }
-    return seen.size;
   }
 
   private todayString() {

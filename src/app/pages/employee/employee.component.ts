@@ -44,6 +44,7 @@ import {
 import { MutationTracker, PendingSet } from '@/app/lib/mutation-tracker';
 import { removeBy, upsertBy } from '@/app/lib/list-ops';
 import { employeeAvatar } from '@/app/lib/media/employee-avatar';
+import { isEmployeeActive, uniqueCount } from '@/app/lib/status/portfolio-stats';
 
 const SAVE_KEY = 'save';
 const deleteKey = (employeeId: number) => `delete:${employeeId}`;
@@ -173,16 +174,16 @@ export class EmployeeComponent implements OnInit {
 
   readonly totalEmployeesKpi = computed(() => this.employees().length);
   readonly departmentsKpi = computed(() =>
-    this.uniqueCount(this.employees(), (e) => e.department),
+    uniqueCount(this.employees(), (e) => e.department),
   );
   readonly rolesKpi = computed(() =>
-    this.uniqueCount(this.employees(), (e) => e.role),
+    uniqueCount(this.employees(), (e) => e.role),
   );
   readonly activeEmployeesKpi = computed(
-    () => this.employees().filter((e) => e.isActive !== false).length,
+    () => this.employees().filter(isEmployeeActive).length,
   );
   readonly employmentTypesKpi = computed(() =>
-    this.uniqueCount(this.employees(), (e) => e.employmentType),
+    uniqueCount(this.employees(), (e) => e.employmentType),
   );
   readonly fullTimeKpi = computed(
     () =>
@@ -565,21 +566,6 @@ export class EmployeeComponent implements OnInit {
       options.push({ value: raw, label: raw, icon });
     }
     return options.sort((a, b) => a.label.localeCompare(b.label));
-  }
-
-  private uniqueCount(
-    employees: readonly Employee[],
-    pick: (e: Employee) => string | null | undefined,
-  ): number {
-    const seen = new Set<string>();
-    for (const employee of employees) {
-      const raw = pick(employee)?.trim();
-      if (!raw) {
-        continue;
-      }
-      seen.add(raw.toLowerCase());
-    }
-    return seen.size;
   }
 
   private normalizePayload(raw: any): Employee {

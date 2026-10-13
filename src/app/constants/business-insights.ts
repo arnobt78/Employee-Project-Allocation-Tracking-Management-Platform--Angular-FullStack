@@ -1,5 +1,5 @@
 import type { KpiStatTone } from '@/app/components/ui/kpi-stat-card.component';
-import type { StatusTone } from '@/app/lib/status/project-status';
+import { PORTFOLIO_KPIS, type PortfolioKpi } from './portfolio-kpis';
 import { TAB_ACTIVE_CLASS, TAB_IDLE_CLASS } from './tabs';
 
 export type InsightsTabId = 'overview' | 'projects' | 'resources' | 'financials';
@@ -88,6 +88,8 @@ export const INSIGHTS_READINESS_RANGES = [
   '76-100%',
 ] as const;
 
+const pick = ({ label, icon, tone }: PortfolioKpi) => ({ label, icon, tone });
+
 export type InsightsStatusKey =
   | 'draft'
   | 'in_progress'
@@ -101,85 +103,9 @@ export const INSIGHTS_STATUS_ITEMS: ReadonlyArray<{
   icon: string;
   tone: KpiStatTone;
 }> = [
-  { key: 'draft', label: 'Draft', icon: 'pencil', tone: 'violet' },
-  { key: 'in_progress', label: 'In Progress', icon: 'loader', tone: 'sky' },
+  { key: 'draft', ...pick(PORTFOLIO_KPIS.planning) },
+  { key: 'in_progress', ...pick(PORTFOLIO_KPIS.inFlight) },
   { key: 'completed', label: 'Completed', icon: 'circle-check', tone: 'sky' },
-  { key: 'on_hold', label: 'On Hold', icon: 'pause-circle', tone: 'slate' },
+  { key: 'on_hold', ...pick(PORTFOLIO_KPIS.onHold) },
   { key: 'cancelled', label: 'Cancelled', icon: 'circle-x', tone: 'rose' },
-];
-
-export type InsightsCountKey =
-  | 'filteredProjectCount'
-  | 'archivedProjectCount'
-  | 'activeProjectCount'
-  | 'inactiveProjectCount'
-  | 'planningProjectCount'
-  | 'assignedProjectCount'
-  | 'nonAssignedProjectCount';
-
-/** Project breakdown chips; `optional` chips hide when their count is zero. */
-export const INSIGHTS_BREAKDOWN_CHIPS: ReadonlyArray<{
-  key: InsightsCountKey;
-  label: string;
-  title: string;
-  icon: string;
-  tone: StatusTone;
-  optional: boolean;
-}> = [
-  {
-    key: 'filteredProjectCount',
-    label: 'Active',
-    title: 'Active (non-archived) projects, used for all calculations below',
-    icon: 'layers',
-    tone: 'sky',
-    optional: false,
-  },
-  {
-    key: 'archivedProjectCount',
-    label: 'Archived',
-    title: 'Archived projects (excluded from calculations, display only)',
-    icon: 'archive',
-    tone: 'slate',
-    optional: false,
-  },
-  {
-    key: 'activeProjectCount',
-    label: 'Active',
-    title: 'Projects with active assignments or leads',
-    icon: 'zap',
-    tone: 'emerald',
-    optional: false,
-  },
-  {
-    key: 'inactiveProjectCount',
-    label: 'Inactive',
-    title: 'Projects with no active assignments and no lead',
-    icon: 'pause-circle',
-    tone: 'slate',
-    optional: false,
-  },
-  {
-    key: 'planningProjectCount',
-    label: 'Planning',
-    title: 'Projects with lead but no active assignments (planning/startup phase)',
-    icon: 'pencil',
-    tone: 'violet',
-    optional: true,
-  },
-  {
-    key: 'assignedProjectCount',
-    label: 'Assigned',
-    title: 'Projects with active employee assignments',
-    icon: 'user-check',
-    tone: 'emerald',
-    optional: true,
-  },
-  {
-    key: 'nonAssignedProjectCount',
-    label: 'Non-Assigned',
-    title: 'Projects with no active employee assignments',
-    icon: 'user-x',
-    tone: 'amber',
-    optional: true,
-  },
 ];

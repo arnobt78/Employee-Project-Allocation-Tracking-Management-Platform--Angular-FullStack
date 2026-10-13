@@ -18,7 +18,7 @@ export interface ProjectCounts {
   total: number;
 }
 
-/** The one counting rule every page uses: "Projects" means non-archived. */
+/** The one counting rule every page uses: the "Projects" KPI shows `total`, subtitled with `projectCountsLabel`. */
 export function projectCounts(
   projects: ReadonlyArray<{ archivedAt?: string | null }>
 ): ProjectCounts {

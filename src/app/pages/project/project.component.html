@@ -22,42 +22,42 @@
   <app-kpi-stat-card
     listShellKpis
     label="Projects"
-    [value]="counts().active"
+    [value]="counts().total"
     [hint]="countsLabel()"
     icon="folder-kanban"
     tone="sky"
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
-    label="In Flight"
-    [value]="kpiInFlight()"
-    hint="Active projects approved or in review"
-    icon="zap"
-    tone="emerald"
+    [label]="kpi.inFlight.label"
+    [value]="statusBuckets().inFlight"
+    [hint]="kpi.inFlight.hint"
+    [icon]="kpi.inFlight.icon"
+    [tone]="kpi.inFlight.tone"
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
-    label="Planning"
-    [value]="kpiPlanning()"
-    hint="Draft or planning"
-    icon="pencil"
-    tone="violet"
+    [label]="kpi.planning.label"
+    [value]="statusBuckets().planning"
+    [hint]="kpi.planning.hint"
+    [icon]="kpi.planning.icon"
+    [tone]="kpi.planning.tone"
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
-    label="On Hold"
-    [value]="kpiOnHold()"
-    hint="Paused projects"
-    icon="pause-circle"
-    tone="amber"
+    [label]="kpi.onHold.label"
+    [value]="statusBuckets().onHold"
+    [hint]="kpi.onHold.hint"
+    [icon]="kpi.onHold.icon"
+    [tone]="kpi.onHold.tone"
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis
-    label="Archived"
+    [label]="kpi.archived.label"
     [value]="counts().archived"
-    hint="Restorable from the Archived tab"
-    icon="archive"
-    tone="sky"
+    [hint]="kpi.archived.hint"
+    [icon]="kpi.archived.icon"
+    [tone]="kpi.archived.tone"
   ></app-kpi-stat-card>
   <app-kpi-stat-card
     listShellKpis

@@ -35,7 +35,7 @@ import { Component } from '@angular/core';
 
       <!-- Unified KPI grid (matches live single gap-3 grid) -->
       <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        @for (card of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track card) {
+        @for (card of [1, 2, 3, 4, 5, 6, 7, 8, 9]; track card) {
           <article
             class="animate-pulse flex items-center justify-between gap-3 rounded-[24px] border border-white/10 bg-white/5 p-3 sm:p-4"
           >
