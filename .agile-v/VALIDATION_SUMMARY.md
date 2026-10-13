@@ -11,7 +11,8 @@
 | `npm run test:api` | not run | no API change |
 | `npm run build` | **PASS** | |
 | Browser (Playwright, dev, admin) 1280 + 390 px | **PASS** | Desktop link centre = dropdown centre (y 246); phone stacked under Department, left-aligned; Custom Range wraps to next row; reset restores "All Departments"; Employees toolbar link appears on search and clears it; 0 console errors |
-| Independent verifier | **PASS WITH WARNINGS (fixed)** | Focus lost when the link unmounts (now returns to Date Range); spec now checks the department label after reset. Not changed: focus style is an underline; Custom Range without dates counts as a filter |
+| Independent verifier | **PASS WITH WARNINGS (fixed)** | Focus lost when the link unmounts (now returns to Date Range); spec now checks the department label after reset. Custom Range without dates counts as a filter (kept) |
+| Follow-up (focus ring) | **PASS** | Link focus is a `ring-sky-400/60` ring (`ring-primary/60` doesn't work: `primary` is `hsl(var(--primary))` without alpha); spec asserts focus on `#insights-date-range` after Reset; Playwright Tab shows the ring, Enter moves focus to Date Range; lint PASS, unit 175/175, build PASS; verifier PASS. Three editor review findings about the focus target were false positives |
 
 ## Session 2026-10-13 — GATE-0029 consistent KPIs and Insights cards
 

@@ -10,7 +10,7 @@ import { AppIconComponent } from './app-icon.component';
   template: `
     <button
       type="button"
-      class="inline-flex shrink-0 items-center gap-1.5 rounded-md text-xs font-medium text-sky-300/90 transition hover:text-sky-200 focus-visible:underline focus-visible:outline-none sm:text-sm"
+      class="-mx-1 inline-flex shrink-0 items-center gap-1.5 rounded-md px-1 text-xs font-medium text-sky-300/90 transition hover:text-sky-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/60 sm:text-sm"
       (click)="cleared.emit()"
     >
       <lucide-icon [name]="icon()" [size]="14" aria-hidden="true"></lucide-icon>

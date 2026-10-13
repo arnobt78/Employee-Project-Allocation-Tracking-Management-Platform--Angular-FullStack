@@ -4,6 +4,7 @@
 
 - Insights shows a "Reset Filters" link next to the filters while a date range or department is set; it restores All Time / All Departments
 - Employees, Projects and Project Team toolbars use the same link instead of "Clear"
+- The link shows a focus ring for keyboard users; after a reset, focus moves to Date Range
 - Node 24.21: lint PASS; unit 175/175; build PASS; browser 390 + 1280 px PASS
 
 ## 2026-10-13 — GATE-0029 consistent KPIs and Insights cards

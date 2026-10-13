@@ -121,6 +121,7 @@ describe('BusinessInsightsComponent', () => {
     );
     expect(component.insights()?.workforce.total).toBe(5);
     expect(link()).toBeNull();
+    expect(document.activeElement?.id).toBe('insights-date-range');
     expect(el.querySelector('#insights-department')?.textContent).toContain('All Departments');
   });
 
